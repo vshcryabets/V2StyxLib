@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import com.v2soft.styxlib.Config;
 import com.v2soft.styxlib.library.io.StyxInputStream;
 import com.v2soft.styxlib.library.io.StyxOutputStream;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
@@ -100,9 +101,14 @@ public class StyxRReadMessage extends StyxMessage {
 
 	@Override
 	protected String internalToString() {
-		return String.format("Data Length:%d\nData: %s",
-		        mData.length,
-				StyxMessage.toString(mData));
+	    if ( Config.LOG_DATA_FIELDS ) {
+    		return String.format("Data Length:%d\nData: %s",
+    		        mData.length,
+    				StyxMessage.toString(mData));
+	    } else {
+            return String.format("Data Length:%d",
+                    mData.length);
+	    }
 	}
 	
 }

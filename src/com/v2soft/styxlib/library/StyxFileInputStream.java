@@ -100,6 +100,7 @@ public class StyxFileInputStream extends InputStream
             }
             System.arraycopy(mBuffer, mBufPos, outBuffer, offset, toRead);
             mBufPos+=toRead;
+            readed+=toRead;
             return readed;
         } catch (Exception e) {
             throw new IOException(e.toString());

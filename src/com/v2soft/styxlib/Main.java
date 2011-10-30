@@ -1,16 +1,12 @@
 package com.v2soft.styxlib;
 
-import java.io.BufferedReader;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.net.InetAddress;
 
 import com.v2soft.styxlib.library.StyxClientManager;
 import com.v2soft.styxlib.library.StyxFile;
-import com.v2soft.styxlib.tests.FileListTest;
-import com.v2soft.styxlib.tests.RunTest;
+import com.v2soft.styxlib.library.StyxFileInputStream;
 
 public class Main {
 	
@@ -22,21 +18,20 @@ public class Main {
 			manager = new StyxClientManager(InetAddress.getByName("localhost"),
 					8080, false, null, null);
 			manager.connect();
-//			System.out.println((new FileListTest()).doTest(manager));
-			StyxFile file = new StyxFile(manager, "/audio/MasterVolume");
-//			InputStream is = file.openForRead();
-//			InputStreamReader in = new InputStreamReader(is, "UTF-8");
-//			BufferedReader bin = new BufferedReader(in);
-//			
-//			System.out.println(bin.readLine());
-//			bin.close();
-//			in.close();
-//			is.close();
-			OutputStream out = file.openForWrite();
-			String q = "75";
-			out.write(q.getBytes());
-			out.flush();
+			StyxFile file = new StyxFile(manager, "test.dat");
+			FileOutputStream out = new FileOutputStream("out.dat");
+			StyxFileInputStream is = file.openForRead();
+			byte buffer[] = new byte[4096];
+			int readed = 0;
+			long total = 0;
+			while ( (readed = is.read(buffer)) > 0 ) {
+			    total+=readed;
+				System.out.println("Readed "+total);
+				out.write(buffer, 0, readed);
+			}
 			out.close();
+			is.close();
+
 		} catch (Exception e)
 		{
 			e.printStackTrace();
