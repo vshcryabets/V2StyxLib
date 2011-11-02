@@ -139,6 +139,7 @@ public class StyxFileOutputStream extends OutputStream {
     
     @Override
     public void close() throws IOException {
+	flush();
     	mFile.close();
     	super.close();
     }
