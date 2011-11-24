@@ -3,7 +3,10 @@ package com.v2soft.styxlib.library;
 import java.io.Closeable;
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.net.SocketAddress;
+import java.security.InvalidParameterException;
 import java.util.LinkedList;
 import java.util.concurrent.TimeoutException;
 
@@ -100,8 +103,10 @@ public class StyxClientManager implements Closeable {
         if (ssl)
             socketFactory = SSLSocketFactory.getDefault();
         else socketFactory = SocketFactory.getDefault();
-
-        Socket socket = socketFactory.createSocket(address, port);
+        
+        Socket socket = socketFactory.createSocket();
+        SocketAddress sa= new InetSocketAddress(address, port);
+        socket.connect(sa, mTimeout);
         socket.setSoTimeout(mTimeout);
         mMessenger = new Messenger(socket);
 
@@ -200,18 +205,23 @@ public class StyxClientManager implements Closeable {
         return mAuthQID;
     }
 
-    public void clunk(long fid) throws InterruptedException, StyxException, TimeoutException
-    {
-        StyxTClunkMessage tClunk = new StyxTClunkMessage(this.getActiveTags().getTag(),
+    /**
+     * Send TClunk message (release FID)
+     * @param fid
+     * @throws InterruptedException
+     * @throws StyxException
+     * @throws TimeoutException
+     */
+    public void clunk(long fid) 
+            throws InterruptedException, StyxException, TimeoutException {
+        final StyxTClunkMessage tClunk = new StyxTClunkMessage(
+                this.getActiveTags().getTag(),
                 fid);
 
-        Messenger messenger = this.getMessenger();
-        messenger.send(tClunk);
+        mMessenger.send(tClunk);
         StyxMessage rMessage = tClunk.waitForAnswer(mTimeout);
         StyxErrorMessageException.doException(rMessage);
-
-        ActiveFids activeFids = this.getActiveFids();
-        activeFids.releaseFid(fid);
+        mActiveFids.releaseFid(fid);
     }
 
     private void processVersionMessage(StyxRVersionMessage message)
@@ -331,6 +341,10 @@ public class StyxClientManager implements Closeable {
             synchronized (mAvailableFids) {
                 if (fid == StyxMessage.NOFID)
                     return false;
+                if ( mAvailableFids.contains(fid)) {
+                    throw new InvalidParameterException(
+                            String.format("Something goes wrong, this FID(%d) already has been released", fid));
+                }
                 return mAvailableFids.add(fid);
             }
         }

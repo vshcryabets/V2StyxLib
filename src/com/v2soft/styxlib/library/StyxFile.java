@@ -57,8 +57,6 @@ public class StyxFile implements Closeable {
 			mPath = path;
 			mParentFID = manager.getFID();
 		}
-//		mParent = parent;
-		//sendWalkMessage(path, parent);
 	}
 	
 	public StyxFile(StyxClientManager manager, long fid)
@@ -68,15 +66,6 @@ public class StyxFile implements Closeable {
 		mFID = fid;
 	}
 	
-/*	private StyxFile(StyxClientManager manager, StyxFile parent, StyxStat stat)
-	{
-		mManager = manager;
-		mStat = stat;
-		mPath = combinePath(parent, stat.getName());
-		mParent = parent;
-		//sendWalkMessage(stat.getName(), parent);
-	}*/
-	
 	private String combinePath(StyxFile parent, String path)
 	{
 		if (parent.mPath == null)
@@ -84,31 +73,8 @@ public class StyxFile implements Closeable {
 		return parent.mPath + SEPARATOR + path;
 	}
 	
-	/*public StyxFile getParent()
-	{
-		if (mParent == null)
-			mParent = createParent();
-		return mParent;
-	}
 	
-	private StyxFile createParent() 
-	{
-		StringBuilder builder = new StringBuilder(getPath());
-		while (builder.toString().startsWith(SEPARATOR))
-			builder.delete(0, 1);
-		while (builder.toString().endsWith(SEPARATOR))
-			builder.delete(builder.length() - 1, builder.length());
-		
-		int index = builder.toString().lastIndexOf(SEPARATOR);
-		if (index < 0)
-			return null;
-		
-		builder.delete(index, builder.length());
-		return new StyxFile(mManager, builder.toString());
-	}*/
-	
-	public String getPath()
-	{
+	public String getPath() {
 		if (mPath == null)
 			return "/";
 		return mPath;
@@ -138,11 +104,10 @@ public class StyxFile implements Closeable {
 	@Override
 	public void close() throws IOException
 	{
-		if (mFID == StyxMessage.NOFID)
-			return;
+		if (mFID == StyxMessage.NOFID) return;
 		try {
-			mManager.clunk(getFID());
-			mManager.getActiveFids().releaseFid(mFID);
+//		    System.out.println("Release FID "+mFID);
+			mManager.clunk(mFID);
 			mFID = StyxMessage.NOFID;
 			mStat = null;
 		} catch (Exception e) {
@@ -239,15 +204,14 @@ public class StyxFile implements Closeable {
 		return files.toArray(new StyxFile[0]);
 	}
 	
-	public StyxFileInputStream openForRead() throws InterruptedException, StyxException, TimeoutException, IOException
-	{
-		StyxStat stat = getStat();
+	public StyxFileInputStream openForRead() 
+	        throws InterruptedException, StyxException, TimeoutException, IOException {
 		int iounit = open(ModeType.OREAD);
 		return new StyxFileInputStream(mManager, this, iounit);
 	}
 	
-	public StyxFileOutputStream openForWrite() throws InterruptedException, StyxException, TimeoutException, IOException
-	{
+	public StyxFileOutputStream openForWrite() 
+	        throws InterruptedException, StyxException, TimeoutException, IOException {
 		int iounit = open(ModeType.OWRITE);
 		return new StyxFileOutputStream(mManager, this, iounit);
 	}
@@ -501,7 +465,7 @@ public class StyxFile implements Closeable {
 		Messenger messenger = mManager.getMessenger();
 		messenger.send(tWalk);
 		StyxMessage rWalk = tWalk.waitForAnswer(mTimeout);
-		StyxErrorMessageException.doException(rWalk);
+		StyxErrorMessageException.doException(rWalk, mPath);
 		if ( ((StyxRWalkMessage)rWalk).getQIDListLength() != tWalk.getPathLength())
 			throw new FileNotFoundException("File not found "+mPath);
 		

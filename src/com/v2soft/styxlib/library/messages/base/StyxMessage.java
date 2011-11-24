@@ -63,6 +63,7 @@ public abstract class StyxMessage {
 		int tag = is.readUShort();
 		// load other data
 		int toRead = (int) (packet_size - 7);
+		//System.out.println("packet size="+packet_size);
 		byte[] data = new byte[toRead];
 		int readed = 0;
 		while ( readed < toRead ) {
