@@ -15,6 +15,7 @@ import javax.net.ssl.SSLSocketFactory;
 
 import com.v2soft.styxlib.library.core.Messenger;
 import com.v2soft.styxlib.library.core.Messenger.ActiveTags;
+import com.v2soft.styxlib.library.core.Messenger.StyxMessngerListener;
 import com.v2soft.styxlib.library.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.library.exceptions.StyxException;
 import com.v2soft.styxlib.library.exceptions.StyxWrongMessageException;
@@ -30,9 +31,16 @@ import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
 import com.v2soft.styxlib.library.messages.base.structs.StyxQID;
 
-public class StyxClientManager implements Closeable {
+public class StyxClientManager 
+    implements Closeable, StyxMessngerListener {
+    //---------------------------------------------------------------------------
+    // Constants
+    //---------------------------------------------------------------------------
     public static final String PROTOCOL = "9P2000";
     public static final int DEFAULT_TIMEOUT = 5000;
+    //---------------------------------------------------------------------------
+    // Class fields
+    //---------------------------------------------------------------------------
     private StyxFile mRoot;
     private InetAddress mAddress;
     private String mUserName;
@@ -42,6 +50,7 @@ public class StyxClientManager implements Closeable {
     private int mTimeout = DEFAULT_TIMEOUT;
     private boolean mSSL;
     private boolean mNeedAuth;
+    private boolean isConnected;
     private Messenger mMessenger;
     private long mIOBufSize = 8192;
     private long mAuthFID = StyxMessage.NOFID;
@@ -57,6 +66,7 @@ public class StyxClientManager implements Closeable {
     public StyxClientManager(InetAddress address, int port, boolean ssl)
     {
         this(address, port, ssl, null, null);
+        setConnected(false);
     }
 
     public StyxClientManager(InetAddress address, int port, boolean ssl, String username, String password) {
@@ -108,9 +118,10 @@ public class StyxClientManager implements Closeable {
         SocketAddress sa= new InetSocketAddress(address, port);
         socket.connect(sa, mTimeout);
         socket.setSoTimeout(mTimeout);
-        mMessenger = new Messenger(socket);
+        mMessenger = new Messenger(socket, this);
 
         sendVersionMessage();
+        setConnected(socket.isConnected());
         return socket.isConnected();
     }
 
@@ -135,11 +146,6 @@ public class StyxClientManager implements Closeable {
     {
         return getMessenger().getActiveTags();
     }
-
-//    public Socket getSocket()
-//    {
-//        return getMessenger().getSocket();
-//    }
 
     public long getIOBufSize()
     {
@@ -359,5 +365,20 @@ public class StyxClientManager implements Closeable {
     //-------------------------------------------------------------------------------------
     public void setTimeout(int mTimeout) {
         this.mTimeout = mTimeout;
+    }
+
+    public boolean isConnected() {
+        return isConnected;
+    }
+
+    public void setConnected(boolean isConnected) {
+        this.isConnected = isConnected;
+    }
+    //-------------------------------------------------------------------------------------
+    // Messenger listener
+    //-------------------------------------------------------------------------------------
+    @Override
+    public void onSocketDisconected() {
+        setConnected(false);
     }
 }

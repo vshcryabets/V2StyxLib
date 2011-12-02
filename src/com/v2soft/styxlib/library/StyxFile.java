@@ -47,9 +47,12 @@ public class StyxFile implements Closeable {
 		this(manager, path, null);
 	}
 	
-	public StyxFile(StyxClientManager manager, String path, StyxFile parent) throws StyxException, TimeoutException, IOException, InterruptedException
-	{
+	public StyxFile(StyxClientManager manager, String path, StyxFile parent) 
+	        throws StyxException, TimeoutException, IOException, InterruptedException {
+	    if ( !manager.isConnected() )
+	        throw new IOException("Styx connection wasn't established");
 		mManager = manager;
+		mTimeout = mManager.getTimeout();
 		if ( parent != null ) {
 			mPath = combinePath(parent, path);
 			mParentFID = parent.getFID();
@@ -59,8 +62,9 @@ public class StyxFile implements Closeable {
 		}
 	}
 	
-	public StyxFile(StyxClientManager manager, long fid)
-	{
+	public StyxFile(StyxClientManager manager, long fid) throws IOException {
+        if ( !manager.isConnected() )
+            throw new IOException("Styx connection wasn't established");
 		mManager = manager;
 		mPath = null;
 		mFID = fid;
@@ -106,7 +110,6 @@ public class StyxFile implements Closeable {
 	{
 		if (mFID == StyxMessage.NOFID) return;
 		try {
-//		    System.out.println("Release FID "+mFID);
 			mManager.clunk(mFID);
 			mFID = StyxMessage.NOFID;
 			mStat = null;
@@ -144,7 +147,6 @@ public class StyxFile implements Closeable {
 	{
 		StyxStat[] stats = listStat();
 		int count = stats.length;
-		System.out.println("Count="+count);
 		String [] result = new String[count];
 		for ( int i = 0; i < count; i++ ) {
 		    result[i] = stats[i].getName();
@@ -206,12 +208,18 @@ public class StyxFile implements Closeable {
 	
 	public StyxFileInputStream openForRead() 
 	        throws InterruptedException, StyxException, TimeoutException, IOException {
+        if ( !mManager.isConnected()) {
+            throw new IOException("Not connected to server");
+        }
 		int iounit = open(ModeType.OREAD);
 		return new StyxFileInputStream(mManager, this, iounit);
 	}
 	
 	public StyxFileOutputStream openForWrite() 
 	        throws InterruptedException, StyxException, TimeoutException, IOException {
+	    if ( !mManager.isConnected()) {
+	        throw new IOException("Not connected to server");
+	    }
 		int iounit = open(ModeType.OWRITE);
 		return new StyxFileOutputStream(mManager, this, iounit);
 	}

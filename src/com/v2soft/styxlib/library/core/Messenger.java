@@ -3,8 +3,8 @@ package com.v2soft.styxlib.library.core;
 import java.io.BufferedOutputStream;
 import java.io.Closeable;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.Socket;
+import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.util.Collection;
 import java.util.HashMap;
@@ -19,18 +19,22 @@ import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.messages.base.StyxTMessage;
 
 public class Messenger implements Runnable, Closeable {
+    public interface StyxMessngerListener {
+        void onSocketDisconected();
+    }
+    private StyxMessngerListener mListener;
     private Map<Integer, MessageListenerPairs> mMessages = new HashMap<Integer, MessageListenerPairs>();
     private Thread mThread;
-
     private Socket mSocket;
     private ActiveTags mActiveTags = new ActiveTags();
     private BufferedOutputStream mOutputStream;
     private boolean isWorking;
 
-    public Messenger(Socket socket) throws IOException
+    public Messenger(Socket socket, StyxMessngerListener listener) throws IOException
     {
         mSocket = socket;
         mOutputStream = new BufferedOutputStream(mSocket.getOutputStream());
+        mListener = listener;
         mThread = new Thread(this);
         mThread.start();
     }
@@ -68,12 +72,17 @@ public class Messenger implements Runnable, Closeable {
             if ( Config.LOG_TMESSAGES) {
                 System.out.println("Send message "+message.toString());
             }
+            if ( !mSocket.isConnected() ) {
+                throw new IOException("Not connected");
+            }
             mMessages.put(message.getTag(), pairs);
             message.writeToStream(mOutputStream);
             mOutputStream.flush();
             return true;
-        } catch (IOException e)
-        {
+        } catch (SocketException e) {
+            mListener.onSocketDisconected();
+        }
+        catch (IOException e) {
             e.printStackTrace();
         }
         return false;
@@ -172,6 +181,14 @@ public class Messenger implements Runnable, Closeable {
     public void close() throws IOException {
         isWorking = false;
         mThread.interrupt();		
+    }
+
+    public StyxMessngerListener getListener() {
+        return mListener;
+    }
+
+    public void setListener(StyxMessngerListener mListener) {
+        this.mListener = mListener;
     }
 
 }

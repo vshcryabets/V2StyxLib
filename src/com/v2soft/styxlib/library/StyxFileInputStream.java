@@ -27,6 +27,7 @@ public class StyxFileInputStream extends InputStream
 	public StyxFileInputStream(StyxClientManager manager, StyxFile file, int iounit)
 	{
 		mManager = manager;
+		mTimeout = manager.getTimeout();
 		mFile = file;
 		mIOUnit = iounit;
 		mBuffer = new byte[mIOUnit*2];
