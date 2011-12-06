@@ -374,6 +374,10 @@ public class StyxClientManager
     public void setConnected(boolean isConnected) {
         this.isConnected = isConnected;
     }
+    public void setAddressPort(InetAddress address, int port) {
+        mAddress = address;
+        mPort = port;
+    }
     //-------------------------------------------------------------------------------------
     // Messenger listener
     //-------------------------------------------------------------------------------------
