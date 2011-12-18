@@ -1,9 +1,7 @@
 package com.v2soft.styxlib.library.messages.base;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 
 import com.v2soft.styxlib.library.io.StyxInputStream;
@@ -55,15 +53,25 @@ public abstract class StyxMessage {
 	private int mTag;
 	private MessageType mType;
 	
-	public static StyxMessage factory(StyxInputStream is) throws IOException
-	{
+	/**
+	 * Construct message from input stream
+	 * @param is intput stream
+	 * @param io_unit packet size
+	 * @return constructed Message object
+	 * @throws IOException
+	 */
+	public static StyxMessage factory(StyxInputStream is, int io_unit) throws IOException {
 	    // get common packet data
 		long packet_size = is.readUInt();
+		if ( packet_size > io_unit ) {
+		    // Something wrong, packet size is to big
+		    return null;
+		}
 		MessageType type = MessageType.factory(is.readUByte());
 		int tag = is.readUShort();
 		// load other data
 		int toRead = (int) (packet_size - 7);
-		//System.out.println("packet size="+packet_size);
+//		System.out.println("packet size="+packet_size);
 		byte[] data = new byte[toRead];
 		int readed = 0;
 		while ( readed < toRead ) {
@@ -233,29 +241,16 @@ public abstract class StyxMessage {
 	}
 	
 	public final void writeToStream(OutputStream stream) 
-		throws IOException
-	{
+		throws IOException {
 		StyxOutputStream output = new StyxOutputStream(stream);
-		// TODO: не в том порядке идет запись чисел. например размер пакета 0x13 байт, сейчас пишется
-		// в сокет 00000013, а настоящий клиент пишет 13000000
 		output.writeUInt(getBinarySize());
 		output.writeUByte(getType().getByte());
 		output.writeUShort(getTag());
 		internalWriteToStream(output);
 	}
 	
-	protected abstract void internalWriteToStream(StyxOutputStream output)
-		throws IOException;
-	
-	public final byte[] getBinary() 
-		throws IOException
-	{
-		ByteArrayOutputStream stream = new ByteArrayOutputStream();
-		writeToStream(stream);
-		
-		return stream.toByteArray();
-	}
-	
+    protected abstract void internalWriteToStream(StyxOutputStream output)
+            throws IOException;
 	protected abstract String internalToString();
 	protected abstract void load(StyxInputStream is)  throws IOException;
 	

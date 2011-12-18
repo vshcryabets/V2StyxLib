@@ -15,7 +15,7 @@ import javax.net.ssl.SSLSocketFactory;
 
 import com.v2soft.styxlib.library.core.Messenger;
 import com.v2soft.styxlib.library.core.Messenger.ActiveTags;
-import com.v2soft.styxlib.library.core.Messenger.StyxMessngerListener;
+import com.v2soft.styxlib.library.core.Messenger.StyxMessengerListener;
 import com.v2soft.styxlib.library.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.library.exceptions.StyxException;
 import com.v2soft.styxlib.library.exceptions.StyxWrongMessageException;
@@ -32,7 +32,7 @@ import com.v2soft.styxlib.library.messages.base.enums.MessageType;
 import com.v2soft.styxlib.library.messages.base.structs.StyxQID;
 
 public class StyxClientManager 
-    implements Closeable, StyxMessngerListener {
+    implements Closeable, StyxMessengerListener {
     //---------------------------------------------------------------------------
     // Constants
     //---------------------------------------------------------------------------
@@ -52,7 +52,7 @@ public class StyxClientManager
     private boolean mNeedAuth;
     private boolean isConnected;
     private Messenger mMessenger;
-    private long mIOBufSize = 8192;
+    private int mIOBufSize = 8192;
     private long mAuthFID = StyxMessage.NOFID;
     private StyxQID mAuthQID;
     private StyxQID mQID;
@@ -118,7 +118,7 @@ public class StyxClientManager
         SocketAddress sa= new InetSocketAddress(address, port);
         socket.connect(sa, mTimeout);
         socket.setSoTimeout(mTimeout);
-        mMessenger = new Messenger(socket, this);
+        mMessenger = new Messenger(socket, mIOBufSize, this);
 
         sendVersionMessage();
         setConnected(socket.isConnected());
@@ -142,10 +142,10 @@ public class StyxClientManager
         return mActiveFids;
     }
 
-    public ActiveTags getActiveTags()
-    {
-        return getMessenger().getActiveTags();
-    }
+//    public ActiveTags getActiveTags()
+//    {
+//        return getMessenger().getActiveTags();
+//    }
 
     public long getIOBufSize()
     {
@@ -220,10 +220,7 @@ public class StyxClientManager
      */
     public void clunk(long fid) 
             throws InterruptedException, StyxException, TimeoutException {
-        final StyxTClunkMessage tClunk = new StyxTClunkMessage(
-                this.getActiveTags().getTag(),
-                fid);
-
+        final StyxTClunkMessage tClunk = new StyxTClunkMessage(fid);
         mMessenger.send(tClunk);
         StyxMessage rMessage = tClunk.waitForAnswer(mTimeout);
         StyxErrorMessageException.doException(rMessage);
@@ -233,7 +230,7 @@ public class StyxClientManager
     private void processVersionMessage(StyxRVersionMessage message)
     {
         if (message.getMaxPacketSize() < mIOBufSize)
-            mIOBufSize = message.getMaxPacketSize();
+            mIOBufSize = (int) message.getMaxPacketSize();
     }
 
     public void sendVersionMessage()
@@ -250,8 +247,7 @@ public class StyxClientManager
         mAuthFID = getActiveFids().getFreeFid();
 
         Messenger messenger = getMessenger();
-        StyxTAuthMessage tAuth = new StyxTAuthMessage(messenger
-                .getActiveTags().getTag(), mAuthFID);
+        StyxTAuthMessage tAuth = new StyxTAuthMessage(mAuthFID);
         tAuth.setUserName(getUserName());
         tAuth.setMountPoint(getMountPoint());
         messenger.send(tAuth);
@@ -265,8 +261,7 @@ public class StyxClientManager
         mFID = getActiveFids().getFreeFid();
 
         Messenger messenger = getMessenger();
-        StyxTAttachMessage tAttach = new StyxTAttachMessage(messenger
-                .getActiveTags().getTag(), getFID(), getAuthFID());
+        StyxTAttachMessage tAttach = new StyxTAttachMessage(getFID(), getAuthFID());
         tAttach.setUserName(getUserName());
         tAttach.setMountPoint(getMountPoint());
         messenger.send(tAttach);
@@ -316,7 +311,7 @@ public class StyxClientManager
     }
 
     @Override
-    public void close() throws IOException {
+    public void close() {
         if ( mMessenger != null ) {
             mMessenger.close();
             mMessenger = null;

@@ -1,9 +1,6 @@
 package com.v2soft.styxlib.library.messages.base.structs;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 
 import com.v2soft.styxlib.library.io.StyxInputStream;
 import com.v2soft.styxlib.library.io.StyxOutputStream;
@@ -25,76 +22,25 @@ public class StyxQID {
 		mPath = path;
 	}
 	
-	public StyxQID(InputStream stream) 
-		throws IOException {
-	    this(new StyxInputStream(stream));
-	}
-	
-	public StyxQID(StyxInputStream input) throws IOException
-	{
+	public StyxQID(StyxInputStream input) throws IOException {
         mType = QIDType.factory(input.readUByte());
         mVersion = input.readUInt();
         mPath = input.readULong();
 	}
 	
-	public QIDType getType()
-	{
-		return mType;
-	}
+	public QIDType getType(){return mType;}
+    public long getVersion(){return mVersion;}
+    public ULong getPath(){return mPath;}
 	
-	public void setType(QIDType type)
-	{
-		mType = type;
-	}
+	public void setType(QIDType type){mType = type;}
+	public void setVersion(long version){mVersion = version;}
+	public void setPath(ULong path){mPath = path;}
 	
-	public long getVersion()
-	{
-		return mVersion;
-	}
-	
-	public void setVersion(long version)
-	{
-		mVersion = version;
-	}
-	
-	public ULong getPath()
-	{
-		return mPath;
-	}
-	
-	public void setPath(ULong path)
-	{
-		mPath = path;
-	}
-	
-	public byte[] getBinary()
-		throws IOException
-	{
-		ByteArrayOutputStream stream = new ByteArrayOutputStream();
-		writeBinaryTo(stream);
-				
-		return stream.toByteArray();
-	}
-	
-	public void writeBinaryTo(OutputStream stream) 
-		throws IOException
-	{
-		StyxOutputStream output = new StyxOutputStream(stream);
-		writeBinaryToOutput(output);
-		output.flush();
-	}
-	
-	public void writeBinaryTo(StyxOutputStream output) throws IOException
-	{
-		writeBinaryToOutput(output);
-	}
-	
-	private void writeBinaryToOutput(StyxOutputStream output) throws IOException
-	{
-		output.writeUByte(getType().getByte());
-		output.writeUInt(getVersion());
-		output.writeULong(getPath());
-	}
+	public void writeBinaryTo(StyxOutputStream output) throws IOException {
+        output.writeUByte(getType().getByte());
+        output.writeUInt(getVersion());
+        output.writeULong(getPath());
+    }
 	
 	@Override
 	public String toString() {

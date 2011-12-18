@@ -11,7 +11,6 @@ public enum QIDType {
 		for (QIDType type : types)
 			if (type.getByte() == b)
 				return type;
-		
 		return null;
 	}
 	

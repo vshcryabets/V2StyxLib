@@ -1,12 +1,8 @@
 package com.v2soft.styxlib.library.messages.base.structs;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.Date;
 
-import com.v2soft.styxlib.library.StyxFileInputStream;
 import com.v2soft.styxlib.library.io.StyxInputStream;
 import com.v2soft.styxlib.library.io.StyxOutputStream;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
@@ -40,16 +36,6 @@ public class StyxStat {
 		return date.getTime() / 1000;
 	}
 	
-	public static InputStream readFullPacket(InputStream is) throws IOException
-	{
-		StyxInputStream input = new StyxInputStream(is);
-		int packet_size = input.readUShort();
-		byte[] data = new byte[packet_size];
-		input.read(data);
-		
-		return new ByteArrayInputStream(data);
-	}
-	
 	public StyxStat(short type, int dev, StyxQID qid, int mode, Date accessTime,
 			Date modificationTime, ULong length, String name, String userName, 
 			String groupName, String modificationUser)
@@ -67,12 +53,7 @@ public class StyxStat {
 		setModificationUser(modificationUser);
 	}
 	
-	public StyxStat(StyxInputStream stream) throws IOException {
-		initBy(stream);
-	}
-	
-	private void initBy(StyxInputStream input) throws IOException
-	{
+	public StyxStat(StyxInputStream input) throws IOException {
 	    int size = input.readUShort(); // skip size bytes
 	    mType = input.readUShort();
 	    mDev = input.readUInt();
@@ -153,7 +134,7 @@ public class StyxStat {
 	public Date getModificationTime()
 	{
 		if (mModificationTime == null)
-			return IntToDate(0);
+			return IntToDate(0); // TODO ???
 		return mModificationTime;
 	}
 	
@@ -220,21 +201,8 @@ public class StyxStat {
 		mModificationUser = modificationUser;
 	}
 	
-	public void writeBinaryTo(OutputStream stream) throws IOException
-	{
-		StyxOutputStream output = new StyxOutputStream(stream);
-		writeBinaryToOutput(output);
-		output.flush();
-	}
-	
-	public void writeBinaryTo(StyxOutputStream output) throws IOException
-	{
-		writeBinaryToOutput(output);
-	}
-	
-	private void writeBinaryToOutput(StyxOutputStream output) throws IOException
-	{
-		output.writeUShort(getSize() - 2);
+	public void writeBinaryTo(StyxOutputStream output) throws IOException {
+		output.writeUShort(getSize() - 2); // TODO -2??? what does it mean?
 		output.writeUShort(getType());
 		output.writeUInt(getDev());
 		getQID().writeBinaryTo(output);

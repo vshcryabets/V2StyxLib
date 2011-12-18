@@ -4,7 +4,6 @@ import java.util.concurrent.TimeoutException;
 
 import com.v2soft.styxlib.library.exceptions.StyxException;
 import com.v2soft.styxlib.library.exceptions.StyxWrongMessageException;
-import com.v2soft.styxlib.library.io.StyxInputStream;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
 
 public abstract class StyxTMessage extends StyxMessage

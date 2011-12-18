@@ -1,7 +1,6 @@
 package com.v2soft.styxlib.library.messages;
 
 import java.io.IOException;
-import java.io.InputStream;
 
 import com.v2soft.styxlib.library.io.StyxInputStream;
 import com.v2soft.styxlib.library.io.StyxOutputStream;
@@ -31,12 +30,12 @@ public class StyxRVersionMessage extends StyxMessage
         setMaxPacketSize(input.readUInt());
 		setProtocolVersion(input.readUTF());
 	}
-	
+	// TODO should max packet size be long? or int?
 	public long getMaxPacketSize() {return mMaxPacketSize;}
 	
-	public void setMaxPacketSize(long max_pocket_size)
+	public void setMaxPacketSize(long max_packet_size)
 	{
-		mMaxPacketSize = max_pocket_size;
+		mMaxPacketSize = max_packet_size;
 	}
 	
 	public String getProtocolVersion()

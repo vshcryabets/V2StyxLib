@@ -1,6 +1,5 @@
 package com.v2soft.styxlib.library.io;
 
-import java.io.EOFException;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -9,28 +8,31 @@ import java.io.UnsupportedEncodingException;
 import com.v2soft.styxlib.library.types.ULong;
 
 public class StyxInputStream extends FilterInputStream {
-
+    private static final int sDataBufferSize = 16; 
+    private byte [] mDataBuffer;
+    
 	public StyxInputStream(InputStream in) {
 		super(in);
+		mDataBuffer = new byte[sDataBufferSize];
 	}
 	
 	private long readInteger(int bytes) throws IOException
 	{
+	    if ( bytes > sDataBufferSize )
+	        throw new IOException("Can't read. Bufer overflow");
 		long result = 0L;
-		// TODO optimize that method, it shuld use read(byte array)
+		int readed = read(mDataBuffer, 0, bytes);
+		if ( readed < bytes )
+		    throw new IOException("Can't read "+bytes+" bytes");
 		int shift = 0;
 		for (int i=0; i<bytes; i++)
 		{
-			long b = (read()&0xFF);
-//			if (b < 0)
-//				throw new EOFException();
+			long b = (mDataBuffer[i]&0xFF);
 			if (shift > 0)
 				b <<= shift;
-			shift += 8;
-			
+			shift += 8;			
 			result |= b;
-		}
-		
+		}		
 		return result;
 	}
 	

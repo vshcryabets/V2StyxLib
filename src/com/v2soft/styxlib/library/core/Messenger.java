@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -19,19 +18,21 @@ import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.messages.base.StyxTMessage;
 
 public class Messenger implements Runnable, Closeable {
-    public interface StyxMessngerListener {
+    public interface StyxMessengerListener {
         void onSocketDisconected();
     }
-    private StyxMessngerListener mListener;
-    private Map<Integer, MessageListenerPairs> mMessages = new HashMap<Integer, MessageListenerPairs>();
+    private StyxMessengerListener mListener;
+    private Map<Integer, StyxTMessage> mMessages = new HashMap<Integer, StyxTMessage>();
     private Thread mThread;
     private Socket mSocket;
     private ActiveTags mActiveTags = new ActiveTags();
     private BufferedOutputStream mOutputStream;
     private boolean isWorking;
+    private int mIOBufferSize;
 
-    public Messenger(Socket socket, StyxMessngerListener listener) throws IOException
-    {
+    public Messenger(Socket socket, int io_unit, StyxMessengerListener listener) 
+            throws IOException {
+        mIOBufferSize = io_unit;
         mSocket = socket;
         mOutputStream = new BufferedOutputStream(mSocket.getOutputStream());
         mListener = listener;
@@ -39,43 +40,22 @@ public class Messenger implements Runnable, Closeable {
         mThread.start();
     }
 
-    // TODO may we can hide ActiveTags?
-    public ActiveTags getActiveTags()
-    {
-        return mActiveTags;
-    }
-
-    public boolean send(StyxTMessage message)
-    {
-        return send(message, 
-                new MessageListenerPairs(message));
-    }
-
-    public boolean send(StyxTMessage message,
-            MessageReceivedListener listener)
-    {
-        return send(message,
-                new MessageListenerPairs(message, listener));
-    }
-
-    public boolean send(StyxTMessage message,
-            Collection<MessageReceivedListener> listeners)
-    {
-        return send(message,
-                new MessageListenerPairs(message, listeners));
-    }
-
-    private boolean send(StyxTMessage message, 
-            MessageListenerPairs pairs) {
-        try
-        {
+    /**
+     * Send messatge to server
+     * @param message
+     * @return true if success
+     */
+    public boolean send(StyxTMessage message) {
+        try {
             if ( Config.LOG_TMESSAGES) {
                 System.out.println("Send message "+message.toString());
             }
             if ( !mSocket.isConnected() ) {
                 throw new IOException("Not connected");
             }
-            mMessages.put(message.getTag(), pairs);
+            int tag = mActiveTags.getTag();
+            message.setTag((short) tag);
+            mMessages.put(tag, message);
             message.writeToStream(mOutputStream);
             mOutputStream.flush();
             return true;
@@ -88,36 +68,26 @@ public class Messenger implements Runnable, Closeable {
         return false;
     }
 
-    public boolean addListenerFor(StyxMessage message, 
-            MessageReceivedListener listener)
-    {
-        int tag = message.getTag();
-        if (!mMessages.containsKey(tag))
-            return false;
-
-        MessageListenerPairs pairs = mMessages.get(tag);
-        return pairs.addListener(listener);
-    }
-
     @Override
-    public void run() 
-    {
-        try
-        {
-            StyxInputStream is = new StyxInputStream(mSocket.getInputStream());
+    public void run() {
+        try {
+            final StyxInputStream is = new StyxInputStream(mSocket.getInputStream());
             isWorking = true;
-            while (isWorking)
-            {
-                if (Thread.interrupted())
-                    throw new InterruptedException();
+            while (isWorking) {
+                if (Thread.interrupted()) break;
                 try	{
-                    StyxMessage message = StyxMessage.factory(is);
-                    if ( Config.LOG_RMESSAGES) {
-                        System.out.println("Got message "+message.toString());
+                    final StyxMessage message = StyxMessage.factory(is, mIOBufferSize);
+                    if ( message != null ) {
+                        if ( Config.LOG_RMESSAGES) {
+                            System.out.println("Got message "+message.toString());
+                        }
+                        processIncomingMessage(message);
+                    } else {
+                        System.out.println("Got NULL message");
                     }
-                    processIncomingMessage(message);
                 } 
-                catch (SocketTimeoutException e) { 
+                catch (SocketTimeoutException e) {
+                    // Nothing to read
 //                    e.printStackTrace();
                 }
                 catch (StyxException e)	{ 
@@ -134,22 +104,16 @@ public class Messenger implements Runnable, Closeable {
         int tag = message.getTag();
         if (!mMessages.containsKey(tag)) // we didn't send T message with such tag, so ignore this R message
             return;
-
-        MessageListenerPairs pairs = mMessages.get(tag);
-        pairs.processListeners(message);
-        pairs.getTMessage().setAnswer(message);
+        StyxTMessage tMessage = mMessages.get(tag);
+        tMessage.setAnswer(message);
         mMessages.remove(tag);
         mActiveTags.releaseTag(tag);
     }
 
     public class ActiveTags {
-        private LinkedList<Integer> mAvailableTags
-        = new LinkedList<Integer>();
+        private LinkedList<Integer> mAvailableTags = new LinkedList<Integer>();
         private int mLastTag = 0;
         private Object mSync = new Object();
-
-        private ActiveTags()
-        { }
 
         public int getTag()
         {
@@ -174,20 +138,19 @@ public class Messenger implements Runnable, Closeable {
                 return mAvailableTags.add(tag);
             }
         }
-
     }
 
     @Override
-    public void close() throws IOException {
+    public void close() {
         isWorking = false;
         mThread.interrupt();		
     }
 
-    public StyxMessngerListener getListener() {
+    public StyxMessengerListener getListener() {
         return mListener;
     }
 
-    public void setListener(StyxMessngerListener mListener) {
+    public void setListener(StyxMessengerListener mListener) {
         this.mListener = mListener;
     }
 

@@ -128,9 +128,7 @@ public class StyxFileInputStream extends InputStream
         mBufEnd = length;
         
         // send Tread
-        StyxTReadMessage tRead = new StyxTReadMessage(mManager
-                .getActiveTags().getTag(), mFile.getFID(), mFilePosition, mIOUnit);
-        
+        StyxTReadMessage tRead = new StyxTReadMessage(mFile.getFID(), mFilePosition, mIOUnit);
         Messenger messenger = mManager.getMessenger();
         messenger.send(tRead);
         StyxMessage rMessage = tRead.waitForAnswer(mTimeout);

@@ -21,10 +21,12 @@ public class StyxFileOutputStream extends OutputStream {
     private ULong offset = ULong.ZERO;
     private int mIOUnit;
     private StyxClientManager mManager;
+    private Messenger mMessenger;
 
     public StyxFileOutputStream(StyxClientManager manager, StyxFile file, int iounit)
     {
         mManager = manager;
+        mMessenger = manager.getMessenger();
         mFile = file;
         mIOUnit = iounit;
     }
@@ -41,14 +43,9 @@ public class StyxFileOutputStream extends OutputStream {
 
     private void writeBuffer() throws IOException, InterruptedException, StyxException, TimeoutException
     {
-        StyxFile file = getFile();
         ByteArrayInputStream is = new ByteArrayInputStream(buffer, 0, index);
-
-        StyxTWriteMessage tWrite = new StyxTWriteMessage(mManager.getActiveTags().getTag(),
-                file.getFID(), offset, is);
-
-        Messenger messenger = mManager.getMessenger();
-        messenger.send(tWrite);
+        StyxTWriteMessage tWrite = new StyxTWriteMessage(mFile.getFID(), offset, is);
+        mMessenger.send(tWrite);
         StyxMessage rMessage = tWrite.waitForAnswer(mTimeout);
         StyxErrorMessageException.doException(rMessage);
 

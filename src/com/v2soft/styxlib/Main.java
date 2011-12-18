@@ -1,13 +1,17 @@
 package com.v2soft.styxlib;
 
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.net.InetAddress;
 
 import com.v2soft.styxlib.library.StyxClientManager;
 import com.v2soft.styxlib.library.StyxFile;
 import com.v2soft.styxlib.library.StyxFileInputStream;
 
+/**
+ * 
+ * @author V.Shcriyabets (vshcryabets@gmail.com)
+ *
+ */
 public class Main {
 	
 	public void doRunTest()
@@ -36,12 +40,8 @@ public class Main {
 		{
 			e.printStackTrace();
 		} finally {
-			try
-			{
-				if (manager != null)
-					manager.close();
-			} catch (IOException e)
-			{ }
+			if (manager != null)
+				manager.close();
 		}
 	}
 	
