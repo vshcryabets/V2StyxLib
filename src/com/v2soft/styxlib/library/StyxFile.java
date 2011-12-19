@@ -12,6 +12,8 @@ import java.util.concurrent.TimeoutException;
 import com.v2soft.styxlib.library.core.Messenger;
 import com.v2soft.styxlib.library.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.library.exceptions.StyxException;
+import com.v2soft.styxlib.library.io.StyxFileInputStream;
+import com.v2soft.styxlib.library.io.StyxFileOutputStream;
 import com.v2soft.styxlib.library.io.StyxInputStream;
 import com.v2soft.styxlib.library.messages.StyxROpenMessage;
 import com.v2soft.styxlib.library.messages.StyxRStatMessage;

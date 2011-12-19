@@ -1,10 +1,12 @@
-package com.v2soft.styxlib.library;
+package com.v2soft.styxlib.library.io;
 
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.concurrent.TimeoutException;
 
+import com.v2soft.styxlib.library.StyxClientManager;
+import com.v2soft.styxlib.library.StyxFile;
 import com.v2soft.styxlib.library.core.Messenger;
 import com.v2soft.styxlib.library.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.library.exceptions.StyxException;
@@ -21,19 +23,19 @@ public class StyxFileInputStream extends InputStream
 	private int mIOUnit;
 	private byte [] mBuffer;
 	private int mBufPos, mBufEnd;
-	public boolean mEOF = false;
-	private StyxClientManager mManager;
+	private Messenger mMessenger;
+	private boolean mEOF;
 	
-	public StyxFileInputStream(StyxClientManager manager, StyxFile file, int iounit)
-	{
-		mManager = manager;
+	public StyxFileInputStream(StyxClientManager manager, StyxFile file, int iounit) {
 		mTimeout = manager.getTimeout();
+		mMessenger = manager.getMessenger();
 		mFile = file;
 		mIOUnit = iounit;
 		mBuffer = new byte[mIOUnit*2];
 		mBufEnd = 0;
 		mBufPos = 0;
 		mFilePosition = ULong.ZERO;
+		mEOF = false;
 	}
 	
 	@Override
@@ -81,7 +83,6 @@ public class StyxFileInputStream extends InputStream
 
     @Override
 	public int read(byte[] outBuffer, int offset, int toRead) throws IOException {
-//        if ( mEOF ) throw new EOFException();
         if ( mEOF ) return -1;
         int readed = 0;
         try {
@@ -118,7 +119,7 @@ public class StyxFileInputStream extends InputStream
 
     private void loadNextPart() 
             throws InterruptedException, StyxException, TimeoutException, IOException {
-    	// TODO may we should move this code to StyxFile?
+    	// TODO may be we should move this code to StyxFile?
         // shift buffer
         int length = available();
         if ( length > 0 ) {
@@ -129,8 +130,8 @@ public class StyxFileInputStream extends InputStream
         
         // send Tread
         StyxTReadMessage tRead = new StyxTReadMessage(mFile.getFID(), mFilePosition, mIOUnit);
-        Messenger messenger = mManager.getMessenger();
-        messenger.send(tRead);
+//        Messenger messenger = mManager.getMessenger();
+        mMessenger.send(tRead);
         StyxMessage rMessage = tRead.waitForAnswer(mTimeout);
         StyxErrorMessageException.doException(rMessage);
         

@@ -1,7 +1,6 @@
 package com.v2soft.styxlib.library.messages;
 
 import java.io.IOException;
-import java.io.InputStream;
 
 import com.v2soft.styxlib.library.io.StyxInputStream;
 import com.v2soft.styxlib.library.io.StyxOutputStream;
@@ -9,8 +8,7 @@ import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.messages.base.StyxTMessage;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
 
-public class StyxTVersionMessage extends StyxTMessage 
-{
+public class StyxTVersionMessage extends StyxTMessage {
 	private long mMaxPacketSize;
 	private String mProtocolVersion;
 	

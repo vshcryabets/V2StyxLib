@@ -5,7 +5,7 @@ import java.net.InetAddress;
 
 import com.v2soft.styxlib.library.StyxClientManager;
 import com.v2soft.styxlib.library.StyxFile;
-import com.v2soft.styxlib.library.StyxFileInputStream;
+import com.v2soft.styxlib.library.io.StyxFileInputStream;
 
 /**
  * 

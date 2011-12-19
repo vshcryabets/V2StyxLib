@@ -20,6 +20,7 @@ import com.v2soft.styxlib.library.messages.base.StyxTMessage;
 public class Messenger implements Runnable, Closeable {
     public interface StyxMessengerListener {
         void onSocketDisconected();
+        void onTrashReceived();
     }
     private StyxMessengerListener mListener;
     private Map<Integer, StyxTMessage> mMessages = new HashMap<Integer, StyxTMessage>();

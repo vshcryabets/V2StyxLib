@@ -1,10 +1,12 @@
-package com.v2soft.styxlib.library;
+package com.v2soft.styxlib.library.io;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.concurrent.TimeoutException;
 
+import com.v2soft.styxlib.library.StyxClientManager;
+import com.v2soft.styxlib.library.StyxFile;
 import com.v2soft.styxlib.library.core.Messenger;
 import com.v2soft.styxlib.library.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.library.exceptions.StyxException;
@@ -20,12 +22,10 @@ public class StyxFileOutputStream extends OutputStream {
     private int index;
     private ULong offset = ULong.ZERO;
     private int mIOUnit;
-    private StyxClientManager mManager;
     private Messenger mMessenger;
 
     public StyxFileOutputStream(StyxClientManager manager, StyxFile file, int iounit)
     {
-        mManager = manager;
         mMessenger = manager.getMessenger();
         mFile = file;
         mIOUnit = iounit;

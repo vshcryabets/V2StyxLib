@@ -14,11 +14,9 @@ import javax.net.SocketFactory;
 import javax.net.ssl.SSLSocketFactory;
 
 import com.v2soft.styxlib.library.core.Messenger;
-import com.v2soft.styxlib.library.core.Messenger.ActiveTags;
 import com.v2soft.styxlib.library.core.Messenger.StyxMessengerListener;
 import com.v2soft.styxlib.library.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.library.exceptions.StyxException;
-import com.v2soft.styxlib.library.exceptions.StyxWrongMessageException;
 import com.v2soft.styxlib.library.io.StyxOutputStream;
 import com.v2soft.styxlib.library.messages.StyxRAttachMessage;
 import com.v2soft.styxlib.library.messages.StyxRAuthMessage;
@@ -28,7 +26,6 @@ import com.v2soft.styxlib.library.messages.StyxTAuthMessage;
 import com.v2soft.styxlib.library.messages.StyxTClunkMessage;
 import com.v2soft.styxlib.library.messages.StyxTVersionMessage;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
-import com.v2soft.styxlib.library.messages.base.enums.MessageType;
 import com.v2soft.styxlib.library.messages.base.structs.StyxQID;
 
 public class StyxClientManager 
@@ -50,7 +47,7 @@ public class StyxClientManager
     private int mTimeout = DEFAULT_TIMEOUT;
     private boolean mSSL;
     private boolean mNeedAuth;
-    private boolean isConnected;
+    private boolean isConnected, isAttached;
     private Messenger mMessenger;
     private int mIOBufSize = 8192;
     private long mAuthFID = StyxMessage.NOFID;
@@ -227,22 +224,24 @@ public class StyxClientManager
         mActiveFids.releaseFid(fid);
     }
 
-    private void processVersionMessage(StyxRVersionMessage message)
-    {
-        if (message.getMaxPacketSize() < mIOBufSize)
-            mIOBufSize = (int) message.getMaxPacketSize();
-    }
-
-    public void sendVersionMessage()
+    private void sendVersionMessage()
             throws InterruptedException, StyxException, IOException, TimeoutException {
         StyxTVersionMessage tVersion = new StyxTVersionMessage(mIOBufSize,PROTOCOL);
         mMessenger.send(tVersion);
 
         StyxMessage rMessage = tVersion.waitForAnswer(mTimeout);
-        onReceivedVersion(tVersion, rMessage);
+        StyxErrorMessageException.doException(rMessage);
+        StyxRVersionMessage rVersion = (StyxRVersionMessage)rMessage;
+        if (rVersion.getMaxPacketSize() < mIOBufSize)
+            mIOBufSize = (int)rVersion.getMaxPacketSize();
+        getActiveFids().clean();
+       if (isNeedAuth())
+            sendAuthMessage();
+        else
+            sendAttachMessage();
     }
 
-    public void sendAuthMessage()
+    private void sendAuthMessage()
             throws InterruptedException, StyxException, IOException, TimeoutException {
         mAuthFID = getActiveFids().getFreeFid();
 
@@ -256,41 +255,24 @@ public class StyxClientManager
         onReceivedAuth(tAuth, rMessage);
     }
 
-    public void sendAttachMessage()
+    private void sendAttachMessage()
             throws InterruptedException, StyxException, TimeoutException {
         mFID = getActiveFids().getFreeFid();
-
-        Messenger messenger = getMessenger();
         StyxTAttachMessage tAttach = new StyxTAttachMessage(getFID(), getAuthFID());
         tAttach.setUserName(getUserName());
         tAttach.setMountPoint(getMountPoint());
-        messenger.send(tAttach);
+        mMessenger.send(tAttach);
 
         StyxMessage rMessage = tAttach.waitForAnswer(mTimeout);
-        onReceivedAttach(tAttach, rMessage);
-    }
-
-    private void checkMessages(StyxMessage tMessage, StyxMessage rMessage, MessageType needed)
-            throws StyxException {
         StyxErrorMessageException.doException(rMessage);
-        if (rMessage.getType() != needed)
-            throw new StyxWrongMessageException(rMessage, MessageType.Rversion);
-    }
-
-    private void onReceivedVersion(StyxMessage tMessage, StyxMessage rMessage)
-            throws StyxException, InterruptedException, IOException, TimeoutException {
-        checkMessages(tMessage, rMessage, MessageType.Rversion);
-        processVersionMessage((StyxRVersionMessage) rMessage);
-        if (isNeedAuth())
-            sendAuthMessage();
-        else
-            sendAttachMessage();
+        StyxRAttachMessage rAttach = (StyxRAttachMessage) rMessage;
+        mQID = rAttach.getQID();
+        setAttached(true);
     }
 
     private void onReceivedAuth(StyxMessage tMessage, StyxMessage rMessage)
             throws StyxException, InterruptedException, IOException, TimeoutException {
-        checkMessages(tMessage, rMessage, MessageType.Rauth);
-
+        StyxErrorMessageException.doException(rMessage);
         StyxRAuthMessage rAuth = (StyxRAuthMessage) rMessage;
         mAuthQID = rAuth.getQID();
 
@@ -300,14 +282,6 @@ public class StyxClientManager
         output.flush();
 
         sendAttachMessage();
-    }
-
-    private void onReceivedAttach(StyxMessage tMessage, StyxMessage rMessage)
-            throws StyxException {
-        checkMessages(tMessage, rMessage, MessageType.Rattach);
-
-        StyxRAttachMessage rAttach = (StyxRAttachMessage) rMessage;
-        mQID = rAttach.getQID();
     }
 
     @Override
@@ -324,10 +298,9 @@ public class StyxClientManager
         private long mLastFid = 0L;
 
         /**
-         * 
          * @return Return free FID
          */
-        public long getFreeFid() {
+        protected long getFreeFid() {
             synchronized (mAvailableFids) {
                 if (!mAvailableFids.isEmpty())
                     return mAvailableFids.poll();
@@ -338,7 +311,7 @@ public class StyxClientManager
             }
         }
 
-        public boolean releaseFid(long fid) {
+        protected boolean releaseFid(long fid) {
             synchronized (mAvailableFids) {
                 if (fid == StyxMessage.NOFID)
                     return false;
@@ -349,19 +322,25 @@ public class StyxClientManager
                 return mAvailableFids.add(fid);
             }
         }
+        protected void clean() {
+            mAvailableFids.clear();
+            mLastFid = 0;
+        }
     }
     //-------------------------------------------------------------------------------------
     // Getters
     //-------------------------------------------------------------------------------------
     public int getTimeout() {return mTimeout;}
-
+    public boolean isAttached() {return isAttached;}
     //-------------------------------------------------------------------------------------
     // Setters
     //-------------------------------------------------------------------------------------
     public void setTimeout(int mTimeout) {
         this.mTimeout = mTimeout;
     }
-
+    public void setAttached(boolean isAttached) {
+        this.isAttached = isAttached;
+    }
     public boolean isConnected() {
         return isConnected;
     }
@@ -379,5 +358,16 @@ public class StyxClientManager
     @Override
     public void onSocketDisconected() {
         setConnected(false);
+    }
+
+    @Override
+    public void onTrashReceived() {
+        //something goes wrong, we should restart protocol
+        setAttached(false);
+        try {
+            sendVersionMessage();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

@@ -27,8 +27,7 @@ public abstract class StyxTMessage extends StyxMessage
 	
 	public void setAnswer(StyxMessage answer) 
 		throws StyxException {
-		synchronized (this)
-		{
+		synchronized (this) {
 			if (!checkAnswer(answer))
 				throw new StyxWrongMessageException(answer, getNeeded());
 			mAnswer = answer;
@@ -37,8 +36,7 @@ public abstract class StyxTMessage extends StyxMessage
 	}
 	
 	public StyxMessage waitForAnswer(long timeout) throws InterruptedException, TimeoutException {
-		synchronized (this)
-		{
+		synchronized (this)	{
 		    if ( mAnswer == null)
 				wait(timeout);
 		    if ( mAnswer == null )

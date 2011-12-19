@@ -3,7 +3,6 @@ package com.v2soft.styxlib.library.io;
 import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
 
 import com.v2soft.styxlib.library.Consts;
 import com.v2soft.styxlib.library.types.ULong;
@@ -17,6 +16,7 @@ public class StyxOutputStream extends FilterOutputStream {
 	private final void writeInteger(long value, int bytes) throws IOException
 	{
 		int shift = 0;
+		// TODO optimize it
 		for (int i=0; i<bytes; i++)
 		{
 			long __value = value;
@@ -28,9 +28,8 @@ public class StyxOutputStream extends FilterOutputStream {
 		}
 	}
 	
-	public final void writeByte(int value) throws IOException
-	{
-		writeInteger(value, 1);
+	public final void writeByte(int value) throws IOException {
+	    write(value);
 	}
 	
 	public final void writeShort(int value) throws IOException
@@ -80,9 +79,9 @@ public class StyxOutputStream extends FilterOutputStream {
 		write(bytes);
 	}
 	
-	public final void writeUTF(String utf) throws IOException
+	public final void writeUTF(String string) throws IOException
 	{
-		byte[] bytes = stringToUTF8(utf);
+		byte[] bytes = string.getBytes("UTF-8");
 		writeUShort(bytes.length);
 		if ( bytes.length > 0 )
 			write(bytes);
@@ -90,21 +89,9 @@ public class StyxOutputStream extends FilterOutputStream {
 	
 	public final void writeString(String string) throws IOException
 	{
-		byte[] bytes = stringToUTF8(string);
+	    // TODO this is weird method
+		byte[] bytes = string.getBytes("UTF-8");
 		if (bytes.length > 0)
 			write(bytes);
 	}
-	
-	public static byte[] stringToUTF8(String string)
-	{
-		byte[] result = null;
-		try
-		{
-			result = string.getBytes("UTF-8");
-		} catch (UnsupportedEncodingException e)
-		{ }
-		
-		return result;
-	}
-
 }

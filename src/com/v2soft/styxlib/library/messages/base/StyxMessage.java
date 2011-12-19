@@ -193,6 +193,7 @@ public abstract class StyxMessage {
 	
 	public static int countUTFBytes(String utf)
 	{
+	    // TODO !!!! Is it working correct??
 		int result = 0;
 		int length = utf.length();
 		for (int i=0; i<length; i++)

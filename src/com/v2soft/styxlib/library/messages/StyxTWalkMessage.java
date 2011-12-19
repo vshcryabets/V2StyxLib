@@ -1,9 +1,6 @@
 package com.v2soft.styxlib.library.messages;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.Arrays;
-import java.util.List;
 
 import com.v2soft.styxlib.library.StyxFile;
 import com.v2soft.styxlib.library.io.StyxInputStream;
@@ -15,41 +12,30 @@ import com.v2soft.styxlib.library.messages.base.enums.MessageType;
 public class StyxTWalkMessage extends StyxTMessage {
 	private long mFID, mNewFID;
 	private String mPath;
-	private List<String> mPathElements;
+	private String[] mPathElements;
 
-	public StyxTWalkMessage()
-	{
-		this(NOFID, NOFID);
-	}
-	
-	public StyxTWalkMessage(long fid, long new_fid)
-	{
+	public StyxTWalkMessage(){this(NOFID, NOFID);}
+    public StyxTWalkMessage(int tag){this(tag, NOFID, NOFID);}
+
+    public StyxTWalkMessage(long fid, long new_fid){
 		super(MessageType.Twalk);
 		mFID = fid;
 		mNewFID = new_fid;
 	}
 	
-	public StyxTWalkMessage(int tag)
-	{
-		this(tag, NOFID, NOFID);
-	}
-	
-	public StyxTWalkMessage(int tag, long fid, long new_fid)
-	{
+	public StyxTWalkMessage(int tag, long fid, long new_fid){
 		super(MessageType.Twalk, tag);
 		mFID = fid;
 		mNewFID = new_fid;
 	}
 	
 	@Override
-	public void load(StyxInputStream input) throws IOException
-	{
+	public void load(StyxInputStream input) throws IOException	{
 	    String path = "";
 		setFID(input.readUInt());
 		setNewFID(input.readUInt());
 		int count = input.readUShort();
-		for (int i=0; i<count; i++)
-		{
+		for (int i=0; i<count; i++)	{
 			String stmp = input.readUTF();
 			if (!path.equals(""))
 				path += "/";
@@ -57,6 +43,21 @@ public class StyxTWalkMessage extends StyxTMessage {
 		}
 		setPath(path);
 	}
+    @Override
+    protected void internalWriteToStream(StyxOutputStream output)
+            throws IOException 
+    {
+        output.writeUInt(getFID());
+        output.writeUInt(getNewFID());
+        if (mPathElements != null)
+        {
+            output.writeUShort(mPathElements.length);
+            for (String pathElement : mPathElements)
+                output.writeUTF(pathElement);
+        } else {
+            output.writeUShort(0);
+        }
+    }
 	
 	public long getFID()
 	{
@@ -91,25 +92,23 @@ public class StyxTWalkMessage extends StyxTMessage {
 			return;
 		if (path.equals(""))
 			return;
-		
 		StringBuilder builder = new StringBuilder(path);
 		while (builder.toString().startsWith(StyxFile.SEPARATOR))
 			builder.delete(0, 1);
 		while (builder.toString().endsWith(StyxFile.SEPARATOR))
 			builder.delete(builder.length() - 1, builder.length());
-		
 		mPath = builder.toString();
-		mPathElements = Arrays.asList(mPath.split(StyxFile.SEPARATOR));
+		mPathElements = mPath.split(StyxFile.SEPARATOR);
 	}
 	
 	public int getPathLength()
 	{
 		if (mPathElements == null)
 			return 0;
-		return mPathElements.size();
+		return mPathElements.length;
 	}
 	
-	public Iterable<String> getPathIterable()
+	public String[] getPathIterable()
 	{
 		return mPathElements;
 	}
@@ -127,23 +126,9 @@ public class StyxTWalkMessage extends StyxTMessage {
 	}
 	
 	@Override
-	protected void internalWriteToStream(StyxOutputStream output)
-			throws IOException 
-	{
-		output.writeUInt(getFID());
-		output.writeUInt(getNewFID());
-		output.writeUShort(getPathLength());
-		if (mPathElements != null)
-		{
-			for (String pathElement : mPathElements)
-				output.writeUTF(pathElement);
-		}		
-	}
-
-	@Override
 	protected String internalToString() {
 		return String.format("FID: %d\nNewFID: %d\nNumber of walks:%d\nPath: %s",
-				getFID(), getNewFID(), mPathElements.size(), getPath());
+				getFID(), getNewFID(), mPathElements.length, getPath());
 	}
 
 	@Override

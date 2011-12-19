@@ -7,7 +7,6 @@ import com.v2soft.styxlib.library.messages.base.enums.MessageType;
 public class StyxErrorMessageException extends StyxException {
     private static final long serialVersionUID = 1;
     private StyxRErrorMessage mMessage;
-    private String mFileName;
 
     public static void doException(StyxMessage rMessage) 
             throws StyxErrorMessageException {
@@ -15,7 +14,6 @@ public class StyxErrorMessageException extends StyxException {
             throw new NullPointerException();
         if (rMessage.getType() != MessageType.Rerror)
             return;
-
         StyxRErrorMessage rError = (StyxRErrorMessage) rMessage;
         throw new StyxErrorMessageException(rError);
     }

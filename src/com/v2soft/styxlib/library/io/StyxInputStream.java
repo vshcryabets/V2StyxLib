@@ -3,7 +3,6 @@ package com.v2soft.styxlib.library.io;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 
 import com.v2soft.styxlib.library.types.ULong;
 
@@ -38,7 +37,7 @@ public class StyxInputStream extends FilterInputStream {
 	
 	public final byte readByte() throws IOException
 	{
-		return (byte)readInteger(1);
+		return (byte)(read()&0xFF);
 	}
 	
 	public final short readShort() throws IOException
@@ -79,25 +78,10 @@ public class StyxInputStream extends FilterInputStream {
 		return new ULong(bytes);
 	}
 	
-	public final String readUTF() throws IOException
-	{
+	public final String readUTF() throws IOException {
 		int count = readUShort();
 		byte[] bytes = new byte[count];
-		read(bytes);
-		
-		return utf8ToString(bytes);
+		read(bytes);		
+		return new String(bytes, "UTF-8");
 	}
-	
-	public static String utf8ToString(byte[] bytes)
-	{
-		String result = null;
-		try
-		{
-			result = new String(bytes, "UTF-8"); 
-		} catch (UnsupportedEncodingException e)
-		{ }
-		
-		return result;
-	}
-
 }
