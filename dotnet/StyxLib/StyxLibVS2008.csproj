@@ -1,0 +1,103 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.21022</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{2F1FD8A7-B5C8-4BE0-9405-283D45D270AB}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AssemblyName>StyxLib</AssemblyName>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <OldToolsVersion>2.0</OldToolsVersion>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <StartupObject>
+    </StartupObject>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\out\</OutputPath>
+    <DefineConstants>DEBUG</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>none</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\out\</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="Interfaces\StyxFileSystemInterface.cs" />
+    <Compile Include="Interfaces\StyxServerInterface.cs" />
+    <Compile Include="Messages\StyxWstatMessage.cs" />
+    <Compile Include="Messages\Structures\StatStructure.cs" />
+    <Compile Include="FileSystem\StyxDirectoryInfo.cs" />
+    <Compile Include="Messages\IStyxMessage.cs" />
+    <Compile Include="Messages\StyxAttachMessage.cs" />
+    <Compile Include="Messages\StyxAuthMessage.cs" />
+    <Compile Include="Messages\StyxClunkMessage.cs" />
+    <Compile Include="Messages\StyxCreateMessage.cs" />
+    <Compile Include="Messages\StyxErrorMessage.cs" />
+    <Compile Include="Messages\StyxFlushMessage.cs" />
+    <Compile Include="Messages\StyxMessage.cs" />
+    <Compile Include="Messages\StyxOpenMessage.cs" />
+    <Compile Include="Messages\StyxReadMessage.cs" />
+    <Compile Include="Messages\StyxRemoveMessage.cs" />
+    <Compile Include="Messages\StyxStatMessage.cs" />
+    <Compile Include="Messages\StyxVersionMessage.cs" />
+    <Compile Include="Messages\StyxWalkMessage.cs" />
+    <Compile Include="Messages\StyxWriteMessage.cs" />
+    <Compile Include="Server\SocketServer.cs" />
+    <Compile Include="Server\ClientHandler.cs" />
+    <Compile Include="Streams\StyxStream.cs" />
+    <Compile Include="StyxClientManager.cs" />
+    <Compile Include="StyxErrorMessageException.cs" />
+    <Compile Include="Utils\Crc64.cs" />
+    <Compile Include="Utils\TimeConverter.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.2.0">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 2.0 %28x86%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.0">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.0 %28x86%29</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+</Project>

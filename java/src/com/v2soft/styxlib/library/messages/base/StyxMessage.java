@@ -82,7 +82,7 @@ public abstract class StyxMessage {
 		StyxMessage result = null;
 		switch (type) {
         case Tversion:
-            result = new StyxTVersionMessage(tag);
+            result = new StyxTVersionMessage();
             break;
         case Rversion:
             result = new StyxRVersionMessage(tag);
@@ -233,7 +233,7 @@ public abstract class StyxMessage {
 	
 	public void setTag(short tag)
 	{
-		mTag = tag;
+		mTag = (tag & 0xFFFF);
 	}
 	
 	public int getBinarySize()

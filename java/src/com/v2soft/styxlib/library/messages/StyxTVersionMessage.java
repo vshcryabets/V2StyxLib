@@ -12,16 +12,14 @@ public class StyxTVersionMessage extends StyxTMessage {
 	private long mMaxPacketSize;
 	private String mProtocolVersion;
 	
-	public StyxTVersionMessage(long maxPacketSize, String protocolVersion)
-	{
-		super(MessageType.Tversion);
+	public StyxTVersionMessage(long maxPacketSize, String protocolVersion) {
+		this();
 		mMaxPacketSize = maxPacketSize;
 		mProtocolVersion = protocolVersion;
 	}
 	
-	public StyxTVersionMessage(int tag)
-	{
-		super(MessageType.Tversion, tag);
+	public StyxTVersionMessage() {
+		super(MessageType.Tversion, StyxMessage.NOTAG);
 	}
 	
 	@Override

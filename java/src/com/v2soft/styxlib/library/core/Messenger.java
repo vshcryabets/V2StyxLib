@@ -16,6 +16,7 @@ import com.v2soft.styxlib.library.exceptions.StyxException;
 import com.v2soft.styxlib.library.io.StyxInputStream;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.messages.base.StyxTMessage;
+import com.v2soft.styxlib.library.messages.base.enums.MessageType;
 
 public class Messenger implements Runnable, Closeable {
     public interface StyxMessengerListener {
@@ -30,15 +31,23 @@ public class Messenger implements Runnable, Closeable {
     private BufferedOutputStream mOutputStream;
     private boolean isWorking;
     private int mIOBufferSize;
+    private int mTransmitedCount, mReceivedCount, mErrorCount;
 
     public Messenger(Socket socket, int io_unit, StyxMessengerListener listener) 
             throws IOException {
+        resetStatistics();
         mIOBufferSize = io_unit;
         mSocket = socket;
         mOutputStream = new BufferedOutputStream(mSocket.getOutputStream());
         mListener = listener;
         mThread = new Thread(this);
-        mThread.start();
+        mThread.start();        
+    }
+
+    private void resetStatistics() {
+        mTransmitedCount = 0;
+        mReceivedCount = 0;
+        mErrorCount = 0;
     }
 
     /**
@@ -54,11 +63,15 @@ public class Messenger implements Runnable, Closeable {
             if ( !mSocket.isConnected() ) {
                 throw new IOException("Not connected");
             }
-            int tag = mActiveTags.getTag();
+            int tag = StyxMessage.NOTAG;
+            if ( message.getType() != MessageType.Tversion ) {
+                tag = mActiveTags.getTag();
+            }
             message.setTag((short) tag);
             mMessages.put(tag, message);
             message.writeToStream(mOutputStream);
             mOutputStream.flush();
+            mTransmitedCount++;
             return true;
         } catch (SocketException e) {
             mListener.onSocketDisconected();
@@ -82,6 +95,7 @@ public class Messenger implements Runnable, Closeable {
                         if ( Config.LOG_RMESSAGES) {
                             System.out.println("Got message "+message.toString());
                         }
+                        mReceivedCount++;
                         processIncomingMessage(message);
                     } else {
                         System.out.println("Got NULL message");
@@ -107,6 +121,9 @@ public class Messenger implements Runnable, Closeable {
             return;
         StyxTMessage tMessage = mMessages.get(tag);
         tMessage.setAnswer(message);
+        if ( message.getType() == MessageType.Rerror ) {
+            mErrorCount++;
+        }
         mMessages.remove(tag);
         mActiveTags.releaseTag(tag);
     }
@@ -154,5 +171,9 @@ public class Messenger implements Runnable, Closeable {
     public void setListener(StyxMessengerListener mListener) {
         this.mListener = mListener;
     }
+    
+    public int getTransmitedCount() {return mTransmitedCount;}
+    public int getReceivedCount() {return mReceivedCount;}
+    public int getErrorsCount() {return mErrorCount;}
 
 }

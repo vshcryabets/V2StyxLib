@@ -1,0 +1,27 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 9.00
+# Visual Studio 2005
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StyxLibMDev", "..\StyxLib\StyxLibMDev.csproj", "{AF976E62-B1E1-4E39-A69B-3220F986DFE0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClientTest", "..\ClientTest\ClientTest.csproj", "{4DFFCE90-077F-4130-BDDC-BA89D8C6AA3E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4DFFCE90-077F-4130-BDDC-BA89D8C6AA3E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4DFFCE90-077F-4130-BDDC-BA89D8C6AA3E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4DFFCE90-077F-4130-BDDC-BA89D8C6AA3E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4DFFCE90-077F-4130-BDDC-BA89D8C6AA3E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AF976E62-B1E1-4E39-A69B-3220F986DFE0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AF976E62-B1E1-4E39-A69B-3220F986DFE0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AF976E62-B1E1-4E39-A69B-3220F986DFE0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AF976E62-B1E1-4E39-A69B-3220F986DFE0}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		version = 0.1
+		StartupItem = ..\ClientTest\ClientTest.csproj
+	EndGlobalSection
+EndGlobal

@@ -225,7 +225,7 @@ public class StyxFile implements Closeable {
 		return new StyxFileOutputStream(mManager, this, iounit);
 	}
 	
-	public OutputStream create(long permissions) 
+	public StyxFileOutputStream create(long permissions) 
 	        throws InterruptedException, StyxException, TimeoutException, IOException {
 		StyxTCreateMessage tCreate = new StyxTCreateMessage(mParentFID, getName(), permissions, ModeType.OWRITE);
 		

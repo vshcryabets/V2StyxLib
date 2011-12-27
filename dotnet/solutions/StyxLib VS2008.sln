@@ -1,0 +1,35 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StyxLibVS2008", "..\StyxLib\StyxLibVS2008.csproj", "{2F1FD8A7-B5C8-4BE0-9405-283D45D270AB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClientTest", "..\ClientTest\ClientTest.csproj", "{4DFFCE90-077F-4130-BDDC-BA89D8C6AA3E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServerTest", "..\ServerTest\ServerTest.csproj", "{9CCC27A0-A392-414E-9F08-6BC33C05D968}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2F1FD8A7-B5C8-4BE0-9405-283D45D270AB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2F1FD8A7-B5C8-4BE0-9405-283D45D270AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2F1FD8A7-B5C8-4BE0-9405-283D45D270AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2F1FD8A7-B5C8-4BE0-9405-283D45D270AB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4DFFCE90-077F-4130-BDDC-BA89D8C6AA3E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4DFFCE90-077F-4130-BDDC-BA89D8C6AA3E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4DFFCE90-077F-4130-BDDC-BA89D8C6AA3E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4DFFCE90-077F-4130-BDDC-BA89D8C6AA3E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9CCC27A0-A392-414E-9F08-6BC33C05D968}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9CCC27A0-A392-414E-9F08-6BC33C05D968}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9CCC27A0-A392-414E-9F08-6BC33C05D968}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9CCC27A0-A392-414E-9F08-6BC33C05D968}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		StartupItem = StyxLib.csproj
+	EndGlobalSection
+EndGlobal

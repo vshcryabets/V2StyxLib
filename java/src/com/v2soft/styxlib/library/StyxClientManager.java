@@ -29,7 +29,7 @@ import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.messages.base.structs.StyxQID;
 
 public class StyxClientManager 
-    implements Closeable, StyxMessengerListener {
+implements Closeable, StyxMessengerListener {
     //---------------------------------------------------------------------------
     // Constants
     //---------------------------------------------------------------------------
@@ -110,7 +110,7 @@ public class StyxClientManager
         if (ssl)
             socketFactory = SSLSocketFactory.getDefault();
         else socketFactory = SocketFactory.getDefault();
-        
+
         Socket socket = socketFactory.createSocket();
         SocketAddress sa= new InetSocketAddress(address, port);
         socket.connect(sa, mTimeout);
@@ -138,11 +138,6 @@ public class StyxClientManager
     {
         return mActiveFids;
     }
-
-//    public ActiveTags getActiveTags()
-//    {
-//        return getMessenger().getActiveTags();
-//    }
 
     public long getIOBufSize()
     {
@@ -224,7 +219,14 @@ public class StyxClientManager
         mActiveFids.releaseFid(fid);
     }
 
-    private void sendVersionMessage()
+    /**
+     * Restart session with server
+     * @throws InterruptedException
+     * @throws StyxException
+     * @throws IOException
+     * @throws TimeoutException
+     */
+    public void sendVersionMessage()
             throws InterruptedException, StyxException, IOException, TimeoutException {
         StyxTVersionMessage tVersion = new StyxTVersionMessage(mIOBufSize,PROTOCOL);
         mMessenger.send(tVersion);
@@ -234,8 +236,8 @@ public class StyxClientManager
         StyxRVersionMessage rVersion = (StyxRVersionMessage)rMessage;
         if (rVersion.getMaxPacketSize() < mIOBufSize)
             mIOBufSize = (int)rVersion.getMaxPacketSize();
-        getActiveFids().clean();
-       if (isNeedAuth())
+        mActiveFids.clean();
+        if (isNeedAuth())
             sendAuthMessage();
         else
             sendAttachMessage();

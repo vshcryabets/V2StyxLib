@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.50727</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{AF976E62-B1E1-4E39-A69B-3220F986DFE0}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AssemblyName>StyxLib</AssemblyName>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\out\</OutputPath>
+    <DefineConstants>DEBUG</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>none</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ProjectExtensions>
+    <MonoDevelop>
+      <Properties>
+        <MonoDevelop.Autotools.MakefileInfo RelativeMakefileName="Makefile" SyncReferences="true">
+          <BuildFilesVar Sync="true" Name="FILES" />
+          <DeployFilesVar />
+          <ResourcesVar />
+          <OthersVar />
+          <GacRefVar Sync="true" Name="REFS" />
+          <AsmRefVar Sync="true" Name="REFS" />
+          <ProjectRefVar Sync="true" Name="REFS" />
+        </MonoDevelop.Autotools.MakefileInfo>
+      </Properties>
+    </MonoDevelop>
+  </ProjectExtensions>
+  <ItemGroup>
+    <Compile Include="StyxClientManager.cs" />
+    <Compile Include="StyxErrorMessageException.cs" />
+    <Compile Include="FileSystem\StyxDirectoryInfo.cs" />
+    <Compile Include="Messages\Structures\StatStructure.cs" />
+    <Compile Include="Messages\IStyxMessage.cs" />
+    <Compile Include="Messages\StyxAttachMessage.cs" />
+    <Compile Include="Messages\StyxAuthMessage.cs" />
+    <Compile Include="Messages\StyxClunkMessage.cs" />
+    <Compile Include="Messages\StyxCreateMessage.cs" />
+    <Compile Include="Messages\StyxErrorMessage.cs" />
+    <Compile Include="Messages\StyxFlushMessage.cs" />
+    <Compile Include="Messages\StyxMessage.cs" />
+    <Compile Include="Messages\StyxOpenMessage.cs" />
+    <Compile Include="Messages\StyxReadMessage.cs" />
+    <Compile Include="Messages\StyxRemoveMessage.cs" />
+    <Compile Include="Messages\StyxStatMessage.cs" />
+    <Compile Include="Messages\StyxVersionMessage.cs" />
+    <Compile Include="Messages\StyxWalkMessage.cs" />
+    <Compile Include="Messages\StyxWriteMessage.cs" />
+    <Compile Include="Streams\StyxStream.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+  </ItemGroup>
+</Project>
