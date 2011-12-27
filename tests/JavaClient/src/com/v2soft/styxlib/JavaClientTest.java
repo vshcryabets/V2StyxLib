@@ -1,15 +1,9 @@
 package com.v2soft.styxlib;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.concurrent.TimeoutException;
 
-import com.v2soft.styxlib.library.StyxClientManager;
-import com.v2soft.styxlib.library.StyxFile;
 import com.v2soft.styxlib.library.exceptions.StyxException;
-import com.v2soft.styxlib.library.io.StyxFileInputStream;
 import com.v2soft.styxlib.tests.BigFiles;
 import com.v2soft.styxlib.tests.TVersionTest;
 
@@ -33,9 +27,9 @@ public class JavaClientTest {
             return;
         }
         int pos = 0;
-        String host = "localhost", testname = TEST_TVERSION;
+        String host = "localhost";
         int port = 8080, count = 100;
-        long size = 1024*1024*1024*2; // 2GB
+        long size = 1024L*1024L*1024L*2; // 2GB
         while ( pos < args.length ) {
             String command = args[pos];
             if ( command.equalsIgnoreCase(PARAM_HOST)) {

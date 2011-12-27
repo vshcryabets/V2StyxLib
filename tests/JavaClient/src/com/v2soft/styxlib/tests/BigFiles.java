@@ -54,10 +54,11 @@ public class BigFiles {
             out.close();
         }
         long diff = System.currentTimeMillis()-startTime;
-        System.out.println(String.format("Done in %d ms", diff/1000));
+        System.out.println(String.format("Done in %d ms", diff));
         System.out.println(String.format("\tTransmited %d messages", mManager.getMessenger().getTransmitedCount()));
         System.out.println(String.format("\tReceived %d messages", mManager.getMessenger().getReceivedCount()));
         System.out.println(String.format("\tError %d messages", mManager.getMessenger().getErrorsCount()));
 //        System.out.println(String.format("\tAverage time for connection %d ms",diff/count));
+        mManager.close();
     }
 }

@@ -90,7 +90,7 @@ public class StyxFile implements Closeable {
 	public long getFID() throws StyxException, TimeoutException, IOException, InterruptedException
 	{
 		if (mFID == StyxMessage.NOFID)
-			sendWalkMessage(mPath);
+			mFID = sendWalkMessage(mPath);
 		return mFID;
 	}
 	
@@ -225,15 +225,21 @@ public class StyxFile implements Closeable {
 		return new StyxFileOutputStream(mManager, this, iounit);
 	}
 	
-	public StyxFileOutputStream create(long permissions) 
+	public StyxFileOutputStream create(long permissions)
 	        throws InterruptedException, StyxException, TimeoutException, IOException {
-		StyxTCreateMessage tCreate = new StyxTCreateMessage(mParentFID, getName(), permissions, ModeType.OWRITE);
-		
-		mMessenger.send(tCreate);
-		StyxMessage rMessage = tCreate.waitForAnswer(mTimeout);
-		StyxErrorMessageException.doException(rMessage);
-		
-		return openForWrite();
+        if ( !mManager.isConnected()) {
+            throw new IOException("Not connected to server");
+        }
+        // reserver FID
+	    long tempFID = sendWalkMessage("");
+		StyxTCreateMessage tCreate = new StyxTCreateMessage(tempFID, getName(), permissions, ModeType.OWRITE);
+        mMessenger.send(tCreate);
+        StyxMessage rMessage = tCreate.waitForAnswer(mTimeout);
+        StyxErrorMessageException.doException(rMessage);
+
+        // close temp FID
+		mManager.clunk(tempFID);
+        return openForWrite();
 	}
 	
 	public static boolean exists(StyxClientManager manager, String fileName) 
@@ -439,7 +445,8 @@ public class StyxFile implements Closeable {
 		return stat.getModificationUser();
 	}
 	
-	private void sendWalkMessage(String path) 
+	// TODO this method is wrong, it should process parent fid and file name separately
+	private long sendWalkMessage(String path) 
 		throws StyxException, InterruptedException, TimeoutException, IOException {
 		long newFID = mManager.getActiveFids().getFreeFid();
 		StyxTWalkMessage tWalk = new StyxTWalkMessage(mManager.getFID(),
@@ -450,8 +457,7 @@ public class StyxFile implements Closeable {
 		StyxErrorMessageException.doException(rWalk, mPath);
 		if ( ((StyxRWalkMessage)rWalk).getQIDListLength() != tWalk.getPathLength())
 			throw new FileNotFoundException("File not found "+mPath);
-		
-		mFID = newFID;
+		return newFID;
 	}
 		
 	/**
