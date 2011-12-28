@@ -1,15 +1,13 @@
 package com.v2soft.styxlib.tests;
 
-import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Random;
-import java.util.concurrent.TimeoutException;
 import java.util.zip.CRC32;
 
 import com.v2soft.styxlib.library.StyxClientManager;
 import com.v2soft.styxlib.library.StyxFile;
-import com.v2soft.styxlib.library.exceptions.StyxException;
+import com.v2soft.styxlib.library.io.StyxFileInputStream;
 import com.v2soft.styxlib.library.io.StyxFileOutputStream;
 import com.v2soft.styxlib.library.messages.base.enums.FileMode;
 
@@ -21,7 +19,7 @@ public class BigFiles {
                 port, false);
     }
     
-    public void start(long size) throws IOException, StyxException, InterruptedException, TimeoutException {
+    public void start(long size) throws Exception {
         mManager.connect();
         int filecount = 10;
         byte [] buffer = new byte[256];
@@ -53,8 +51,37 @@ public class BigFiles {
             // close it
             out.close();
         }
-        long diff = System.currentTimeMillis()-startTime;
-        System.out.println(String.format("Done in %d ms", diff));
+        long writeTime = System.currentTimeMillis();
+        System.out.println("Read from server...");
+        for ( int i = 0 ; i < filecount; i++) {
+            
+            // open file
+            String filename = "bigfile"+i;
+            StyxFile file = new StyxFile(mManager, filename);
+            StyxFileInputStream in = file.openForRead();
+            
+            // read it
+            long bufcount = filessize/buffer.length;
+//            long last = filessize%buffer.length;
+            int readed = 0;
+            for ( int j = 0 ; j < bufcount; j++ ) {
+                readed = in.read(buffer);
+                crcounter.reset();
+                crcounter.update(buffer, 0, readed);
+                if ( crcounter.getValue() != crc32 )
+                    throw new Exception("CRC32 not equals");
+            }
+            
+            // close it
+            in.close();
+            
+            // delete it
+            file.delete();
+        }
+                
+        long diff = System.currentTimeMillis()-writeTime;
+        System.out.println(String.format("Write done in %d ms", (writeTime-startTime)));
+        System.out.println(String.format("Read done in %d ms", diff));
         System.out.println(String.format("\tTransmited %d messages", mManager.getMessenger().getTransmitedCount()));
         System.out.println(String.format("\tReceived %d messages", mManager.getMessenger().getReceivedCount()));
         System.out.println(String.format("\tError %d messages", mManager.getMessenger().getErrorsCount()));

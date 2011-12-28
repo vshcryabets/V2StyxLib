@@ -4,7 +4,6 @@ import java.io.Closeable;
 import java.io.EOFException;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.concurrent.TimeoutException;
@@ -20,7 +19,6 @@ import com.v2soft.styxlib.library.messages.StyxRStatMessage;
 import com.v2soft.styxlib.library.messages.StyxRWalkMessage;
 import com.v2soft.styxlib.library.messages.StyxTCreateMessage;
 import com.v2soft.styxlib.library.messages.StyxTOpenMessage;
-import com.v2soft.styxlib.library.messages.StyxTRemoveMessage;
 import com.v2soft.styxlib.library.messages.StyxTStatMessage;
 import com.v2soft.styxlib.library.messages.StyxTWStatMessage;
 import com.v2soft.styxlib.library.messages.StyxTWalkMessage;
@@ -30,6 +28,11 @@ import com.v2soft.styxlib.library.messages.base.enums.ModeType;
 import com.v2soft.styxlib.library.messages.base.structs.StyxStat;
 import com.v2soft.styxlib.library.types.ULong;
 
+/**
+ * 
+ * @author V.Shcriyabets (vshcryabets@gmail.com)
+ *
+ */
 public class StyxFile implements Closeable {
 	public static final String SEPARATOR = "/";
 	
@@ -230,7 +233,7 @@ public class StyxFile implements Closeable {
         if ( !mManager.isConnected()) {
             throw new IOException("Not connected to server");
         }
-        // reserver FID
+        // reserve FID
 	    long tempFID = sendWalkMessage("");
 		StyxTCreateMessage tCreate = new StyxTCreateMessage(tempFID, getName(), permissions, ModeType.OWRITE);
         mMessenger.send(tCreate);
@@ -261,36 +264,40 @@ public class StyxFile implements Closeable {
 		}
 	}
 	
-	public void delete() throws InterruptedException, StyxException, TimeoutException, IOException {
+	/**
+	 * Delete file or empty folder
+	 * @throws InterruptedException
+	 * @throws StyxException
+	 * @throws TimeoutException
+	 * @throws IOException
+	 */
+	public void delete() 
+	        throws InterruptedException, StyxException, TimeoutException, IOException {
 		delete(false);
 	}
 	
-	public void delete(boolean recurse) throws InterruptedException, StyxException, TimeoutException, IOException
-	{
-		if (recurse && this.isDirectory())
-		{
+	/**
+	 * Delete file or folder
+	 * @param recurse Recursive delete
+	 * @throws InterruptedException
+	 * @throws StyxException
+	 * @throws TimeoutException
+	 * @throws IOException
+	 */
+	public void delete(boolean recurse) 
+	        throws InterruptedException, StyxException, TimeoutException, IOException {
+		if (recurse && this.isDirectory()) {
 			StyxFile[] files = listFiles();
 			for (StyxFile file : files)
 				file.delete(recurse);
 		}
-		
-		StyxTRemoveMessage tRemove = new StyxTRemoveMessage(getFID());
-		
-		mMessenger.send(tRemove);
-		StyxMessage rMessage = tRemove.waitForAnswer(mTimeout);
-		close();
-		StyxErrorMessageException.doException(rMessage);
-	}
-	
-	public static void delete(StyxClientManager manager, String fileName)
-		throws InterruptedException, StyxException, TimeoutException, IOException {
-		StyxFile file = new StyxFile(manager, fileName);
-		file.delete();
+		mManager.remove(getFID());
+		mFID = StyxMessage.NOFID;
 	}
 	
 	public static void delete(StyxClientManager manager, String fileName, boolean recurse)
 		throws InterruptedException, StyxException, TimeoutException, IOException {
-		StyxFile file = new StyxFile(manager, fileName);
+		final StyxFile file = new StyxFile(manager, fileName);
 		file.delete(recurse);
 	}
 	

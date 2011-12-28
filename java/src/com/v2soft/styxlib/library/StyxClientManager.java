@@ -24,6 +24,7 @@ import com.v2soft.styxlib.library.messages.StyxRVersionMessage;
 import com.v2soft.styxlib.library.messages.StyxTAttachMessage;
 import com.v2soft.styxlib.library.messages.StyxTAuthMessage;
 import com.v2soft.styxlib.library.messages.StyxTClunkMessage;
+import com.v2soft.styxlib.library.messages.StyxTRemoveMessage;
 import com.v2soft.styxlib.library.messages.StyxTVersionMessage;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.messages.base.structs.StyxQID;
@@ -219,6 +220,21 @@ implements Closeable, StyxMessengerListener {
         mActiveFids.releaseFid(fid);
     }
 
+    /**
+     * Send TRemove message for specefied FID, note that FID will be released even if remove failed.
+     * @param fid FID of the file that should be removed
+     * @throws TimeoutException 
+     * @throws InterruptedException 
+     * @throws StyxErrorMessageException 
+     */
+    public void remove(long fid) throws InterruptedException, TimeoutException, StyxErrorMessageException {
+        StyxTRemoveMessage tRemove = new StyxTRemoveMessage(fid);
+        
+        mMessenger.send(tRemove);
+        StyxMessage rMessage = tRemove.waitForAnswer(mTimeout);
+        getActiveFids().releaseFid(fid);
+        StyxErrorMessageException.doException(rMessage);
+    }    
     /**
      * Restart session with server
      * @throws InterruptedException
