@@ -55,14 +55,16 @@ public class ConnectionAcceptor implements Runnable, Closeable {
                             //                        ServerSocketChannel channel = (ServerSocketChannel) key.channel();
                             SocketChannel clientChannel = mChannel.accept();
                             clientChannel.configureBlocking(false);
-                            SelectionKey readKey =
-                                    clientChannel.register( mSelector,
-                                        SelectionKey.OP_READ|SelectionKey.OP_WRITE  );                            
-//                            mBalancer.push(clientChannel);
+                            clientChannel.register( mSelector, SelectionKey.OP_READ );
+                            mBalancer.pushNewConnection(clientChannel);
                         } else if ( key.isReadable() ) {
-                            System.out.print("Something readable");
+                        	SocketChannel clientChannel = (SocketChannel) key.channel();
+                        	mBalancer.pushReadable(clientChannel);
+                        } else if ( key.isValid() ) {
+                        	System.out.println("Key invalid");
                         }
                     }
+                    mBalancer.process();
                 } catch (IOException e) {
                     // this is ok
                     e.printStackTrace();

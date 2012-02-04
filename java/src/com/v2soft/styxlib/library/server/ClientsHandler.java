@@ -25,73 +25,42 @@ public class ClientsHandler
     private int mIOUnit;
     private boolean isWorking;
     private List<SocketChannel> mClients;
-    private Selector mSelector;
-    private java.nio.ByteBuffer mBuffer;
     private Map<SocketChannel, ClientState> mClientStatesMap;
     
     public ClientsHandler(int iounit) throws IOException {
         mIOUnit = iounit;
-        mSelector = Selector.open();
         mClients = new ArrayList<SocketChannel>();
-        mBuffer = java.nio.ByteBuffer.allocateDirect(iounit);
         mClientStatesMap = new HashMap<SocketChannel, ClientState>();
     }
 
     public void addClient(SocketChannel client) throws IOException {
         client.configureBlocking(false);
-        mSelector.wakeup();
-        client.register(mSelector, SelectionKey.OP_READ);
         mClients.add(client);
         mClientStatesMap.put(client, new ClientState(mIOUnit));
     }
     
     @Override
     public void run() {
-        isWorking = true;
-        while (isWorking) {
-            try {
-                mSelector.select();
-                Iterator<SelectionKey> iterator = mSelector.selectedKeys().iterator();
-                while ( iterator.hasNext() ) {
-                    SelectionKey key = iterator.next();
-                    iterator.remove();
-                    if ( key.isAcceptable() ) {
-                        System.out.println(
-                                " Before: Remaining="+mBuffer.remaining()+
-                                " Capacity="+mBuffer.capacity()+
-                                " Limit="+mBuffer.limit()+
-                                " Position="+mBuffer.position()
-                                );
-                        SocketChannel channel = (SocketChannel) key.channel();
-                        int readed = channel.read(mBuffer);
-                        System.out.println(
-                                " After: Remaining="+mBuffer.remaining()+
-                                " Capacity="+mBuffer.capacity()+
-                                " Limit="+mBuffer.limit()+
-                                " Position="+mBuffer.position()
-                                );
-                        
-                        mClientStatesMap.get(channel).process(mBuffer, readed);
-                        mBuffer.clear();
-                    }
-                }
-            } catch (IOException e) {
-                // this is ok
-            } catch (Exception e) {
-                e.printStackTrace();
-                break;
-            }
-        }
+
     }
 
     @Override
     public void close() throws WebServiceException {
-        try {
-            mSelector.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
+
+	public boolean readClient(SocketChannel channel) throws IOException {
+		final ClientState state = mClientStatesMap.get(channel);
+        int readed = channel.read(state.getBuffer());
+        if ( readed == -1 ) {
+        	state.close();
+        	channel.close();
+        	mClientStatesMap.remove(channel);
+        	return true;
+        } else {
+            state.process();
+        }
+        return false;
+	}
     
     
 }
