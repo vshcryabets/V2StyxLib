@@ -1,13 +1,9 @@
 package com.v2soft.styxlib.library.server;
 
 import java.io.IOException;
-import java.nio.channels.ClosedChannelException;
-import java.nio.channels.SelectionKey;
-import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -21,9 +17,8 @@ import com.sun.xml.internal.ws.Closeable;
  *
  */
 public class ClientsHandler 
-    implements Runnable, Closeable {
+    implements Closeable {
     private int mIOUnit;
-    private boolean isWorking;
     private List<SocketChannel> mClients;
     private Map<SocketChannel, ClientState> mClientStatesMap;
     
@@ -38,28 +33,28 @@ public class ClientsHandler
         mClients.add(client);
         mClientStatesMap.put(client, new ClientState(mIOUnit));
     }
-    
-    @Override
-    public void run() {
-
-    }
 
     @Override
     public void close() throws WebServiceException {
     }
 
-	public boolean readClient(SocketChannel channel) throws IOException {
+	protected boolean readClient(SocketChannel channel) throws IOException {
 		final ClientState state = mClientStatesMap.get(channel);
         int readed = channel.read(state.getBuffer());
         if ( readed == -1 ) {
+        	removeClient(channel);
         	state.close();
-        	channel.close();
-        	mClientStatesMap.remove(channel);
         	return true;
         } else {
             state.process();
         }
         return false;
+	}
+
+	
+	private void removeClient(SocketChannel channel) throws IOException {
+    	mClientStatesMap.remove(channel);
+    	channel.close();
 	}
     
     
