@@ -1,6 +1,7 @@
 package com.v2soft.styxlib.library.server;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -40,15 +41,11 @@ public class ClientsHandler
 
 	protected boolean readClient(SocketChannel channel) throws IOException {
 		final ClientState state = mClientStatesMap.get(channel);
-        int readed = channel.read(state.getBuffer());
-        if ( readed == -1 ) {
-        	removeClient(channel);
-        	state.close();
-        	return true;
-        } else {
-            state.process();
-        }
-        return false;
+		boolean result = state.read(channel);
+		if ( result ) {
+		    removeClient(channel);
+		}
+		return result;
 	}
 
 	
