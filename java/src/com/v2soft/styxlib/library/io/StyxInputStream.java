@@ -55,22 +55,22 @@ public class StyxInputStream extends FilterInputStream {
 		return readInteger(8);
 	}
 	
-	public final short readUByte() throws IOException
+	public final short readUInt8() throws IOException
 	{
 		return (short) (readByte() & 0xFF);
 	}
 	
-	public final int readUShort() throws IOException
+	public final int readUInt16() throws IOException
 	{
 		return readShort() & 0xFFFF;
 	}
 	
-	public final long readUInt() throws IOException
+	public final long readUInt32() throws IOException
 	{
 		return readInt() & 0xFFFFFFFFL;
 	}
 	
-	public final ULong readULong() throws IOException
+	public final ULong readUInt64() throws IOException
 	{
 		byte[] bytes = new byte[ULong.ULONG_LENGTH];
 		read(bytes);
@@ -79,7 +79,7 @@ public class StyxInputStream extends FilterInputStream {
 	}
 	
 	public final String readUTF() throws IOException {
-		int count = readUShort();
+		int count = readUInt16();
 		byte[] bytes = new byte[count];
 		read(bytes);		
 		return new String(bytes, "UTF-8");

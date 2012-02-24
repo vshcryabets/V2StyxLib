@@ -7,6 +7,7 @@ import com.v2soft.styxlib.library.io.StyxOutputStream;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
 import com.v2soft.styxlib.library.messages.base.structs.StyxQID;
+import com.v2soft.styxlib.library.server.DualStateBuffer;
 
 public class StyxRAuthMessage extends StyxMessage {
 	private StyxQID mQID;
@@ -14,18 +15,6 @@ public class StyxRAuthMessage extends StyxMessage {
     public StyxRAuthMessage(int tag) {
         super(MessageType.Rauth, tag);
     }
-
-//    public StyxRAuthMessage(StyxQID qid)
-//	{
-//		super(MessageType.Rauth);
-//		mQID = qid;
-//	}
-//	
-//	public StyxRAuthMessage(int tag, StyxQID qid)
-//	{
-//		super(MessageType.Rauth, tag);
-//		mQID = qid;
-//	}
 	
 	public StyxQID getQID()
 	{
@@ -60,5 +49,8 @@ public class StyxRAuthMessage extends StyxMessage {
     protected void load(StyxInputStream is) throws IOException {
         mQID = new StyxQID(is);
     }
-	
+    @Override
+    protected void load(DualStateBuffer is) throws IOException {
+        mQID = new StyxQID(is);
+    }	
 }

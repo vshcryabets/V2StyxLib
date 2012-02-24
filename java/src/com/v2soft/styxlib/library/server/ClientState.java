@@ -6,6 +6,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.channels.SocketChannel;
 
+import com.v2soft.styxlib.library.messages.base.StyxMessage;
+
 /**
  * 
  * @author V.Shcriyabets (vshcryabets@gmail.com)
@@ -27,13 +29,13 @@ implements Closeable {
 
 	public void process() throws IOException {
 	    int inBuffer = mBuffer.remainsToRead();
-	    if ( inBuffer >= mIOUnit ) {
-            byte [] out = new byte[mIOUnit];
-            mBuffer.read(out, 0, out.length);
-            mTestOut.write(out, 0, mIOUnit);
-            mCount += mIOUnit;
-            System.out.print("\rReaded "+mCount);
-        }
+	    if ( inBuffer > 4 ) {
+	        long packetSize = mBuffer.getUInt32();
+	        if ( inBuffer >= packetSize ) {
+	            StyxMessage msg = StyxMessage.factory(mBuffer, mIOUnit);
+	            System.out.print("Got message "+msg.toString());
+	        }
+	    }
 	}
 
 	@Override

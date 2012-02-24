@@ -1,8 +1,11 @@
 package com.v2soft.styxlib.library.server;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
+
+import com.v2soft.styxlib.library.types.ULong;
 
 /**
  * 
@@ -10,6 +13,8 @@ import java.nio.channels.SocketChannel;
  *
  */
 public class DualStateBuffer {
+    private static final int sDataBufferSize = 16; 
+    private byte [] mDataBuffer;
     private ByteBuffer mBuffer;
     private int mWritePosition, mReadPosition, mCapacity, mStoredBytes;
 
@@ -19,6 +24,8 @@ public class DualStateBuffer {
         mStoredBytes = 0;
         mCapacity = capacity;
         mBuffer = ByteBuffer.allocateDirect(mCapacity);
+        mDataBuffer = new byte[sDataBufferSize];
+
     }
 
     public int remainsToRead() {
@@ -26,12 +33,12 @@ public class DualStateBuffer {
     }
 
     /**
-     * Read byte array from buffer
+     * Get byte array from buffer, this operation will not move read position pointer
      * @param out
      * @param i
      * @param length
      */
-    public void read(byte[] out, int i, int length) {
+    public int get(byte[] out, int i, int length) {
         assert out != null;
         assert mStoredBytes > length;
         if ( mReadPosition >= mCapacity ) {
@@ -40,8 +47,22 @@ public class DualStateBuffer {
         mBuffer.position(mReadPosition);
         mBuffer.limit( mWritePosition <= mReadPosition ? mCapacity : mWritePosition );
         mBuffer.get(out, i, length);
+        return length;
+    }
+    
+    /**
+     * Read byte array from buffer
+     * @param out
+     * @param i
+     * @param length
+     */
+    public int read(byte[] out, int i, int length) {
+        assert out != null;
+        assert mStoredBytes > length;
+        int res = get(out, i, length);
         mReadPosition=mBuffer.position();
-        mStoredBytes-=length;
+        mStoredBytes-=res;
+        return res;
     }
 
     public int readFromChannel(SocketChannel channel) throws IOException {
@@ -59,4 +80,59 @@ public class DualStateBuffer {
         }
         return readed;
     }
+
+    private long getInteger(int bytes) {
+        assert bytes < sDataBufferSize;
+        long result = 0L;
+        int shift = 0;
+        int readed = get(mDataBuffer, 0, bytes);
+        assert readed == bytes;
+        for (int i=0; i<bytes; i++)
+        {
+            long b = (mDataBuffer[i]&0xFF);
+            if (shift > 0)
+                b <<= shift;
+            shift += 8;         
+            result |= b;
+        }       
+        return result;
+    }
+
+    private long readInteger(int bytes) {
+        assert bytes < sDataBufferSize;
+        long result = getInteger(bytes);
+        mReadPosition+=bytes;
+        mStoredBytes-=bytes;
+        return result;
+    }
+    
+    public long readUInt32() {
+        return readInteger(4);
+    }
+
+    public int readUInt16() {
+        return (int) readInteger(2);
+    }
+
+    public short readUInt8() {
+        return (short) (readInteger(1)&0XFF);
+    }
+    public ULong readUInt64() {
+        byte[] bytes = new byte[ULong.ULONG_LENGTH];
+        read(bytes, 0, ULong.ULONG_LENGTH);
+        return new ULong(bytes);
+    }
+
+    public long getUInt32() {
+        return getInteger(4) & 0xFFFFFFFFL;
+    }
+
+    public String readUTF() throws UnsupportedEncodingException {
+        int count = readUInt16();
+        byte[] bytes = new byte[count];
+        read(bytes, 0, count);
+        return new String(bytes, "UTF-8");
+    }
+
+
 }

@@ -7,6 +7,7 @@ import com.v2soft.styxlib.library.io.StyxOutputStream;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.messages.base.StyxTMessage;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
+import com.v2soft.styxlib.library.server.DualStateBuffer;
 
 public class StyxTVersionMessage extends StyxTMessage {
 	private long mMaxPacketSize;
@@ -25,9 +26,16 @@ public class StyxTVersionMessage extends StyxTMessage {
 	@Override
 	public void load(StyxInputStream input) 
 		throws IOException	{
-		setMaxPacketSize(input.readUInt());
+		setMaxPacketSize(input.readUInt32());
 		setProtocolVersion(input.readUTF());
 	}
+
+    @Override
+    public void load(DualStateBuffer input)
+        throws IOException {
+        setMaxPacketSize(input.readUInt32());
+        setProtocolVersion(input.readUTF());
+    }
 	
 	public long getMaxPacketSize()
 	{

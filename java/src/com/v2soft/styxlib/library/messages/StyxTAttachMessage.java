@@ -8,6 +8,7 @@ import com.v2soft.styxlib.library.io.StyxOutputStream;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.messages.base.StyxTMessage;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
+import com.v2soft.styxlib.library.server.DualStateBuffer;
 
 public class StyxTAttachMessage extends StyxTMessage 
 {
@@ -42,11 +43,19 @@ public class StyxTAttachMessage extends StyxTMessage
     @Override
     public void load(StyxInputStream input) 
         throws IOException  {
-		setFID(input.readUInt());
-		setAuthFID(input.readUInt());
+		setFID(input.readUInt32());
+		setAuthFID(input.readUInt32());
 		setUserName(input.readUTF());
 		setMountPoint(input.readUTF());
 	}
+    @Override
+    public void load(DualStateBuffer input) 
+        throws IOException  {
+        setFID(input.readUInt32());
+        setAuthFID(input.readUInt32());
+        setUserName(input.readUTF());
+        setMountPoint(input.readUTF());
+    }
 	
 	public long getFID()
 	{

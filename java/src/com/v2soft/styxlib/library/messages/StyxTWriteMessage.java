@@ -10,6 +10,7 @@ import com.v2soft.styxlib.library.io.StyxOutputStream;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.messages.base.StyxTMessage;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
+import com.v2soft.styxlib.library.server.DualStateBuffer;
 import com.v2soft.styxlib.library.types.ULong;
 
 public class StyxTWriteMessage extends StyxTMessage {
@@ -46,10 +47,18 @@ public class StyxTWriteMessage extends StyxTMessage {
     @Override
     public void load(StyxInputStream input) throws IOException
     {
-        mFID = input.readUInt();
-        mOffset = input.readULong();
-        int count = (int)input.readUInt();
+        mFID = input.readUInt32();
+        mOffset = input.readUInt64();
+        int count = (int)input.readUInt32();
         setData(input, 0, count);
+    }
+    @Override
+    public void load(DualStateBuffer input) throws IOException {
+        mFID = input.readUInt32();
+        mOffset = input.readUInt64();
+        int count = (int)input.readUInt32();
+        mData = new byte[count];
+        input.read(mData, 0, count);
     }
 
     public long getFID()

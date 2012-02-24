@@ -7,41 +7,26 @@ import com.v2soft.styxlib.library.io.StyxOutputStream;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
 import com.v2soft.styxlib.library.messages.base.structs.StyxQID;
+import com.v2soft.styxlib.library.server.DualStateBuffer;
 
 public class StyxROpenMessage extends StyxMessage {
 	private StyxQID mQID;
 	private long mIOUnit;
 
-	public StyxROpenMessage(int tag)
-	{
+	public StyxROpenMessage(int tag) {
 		super(MessageType.Ropen, tag);
 	}
-/*	
-	public StyxROpenMessage(StyxQID qid, long iounit)
-	{
-		super(MessageType.Ropen);
-		mQID = qid;
-		mIOUnit = iounit;
-	}
-	
-	public StyxROpenMessage(int tag, StyxQID qid)
-	{
-		this(tag, qid, 0);
-	}
-	
-	public StyxROpenMessage(int tag, StyxQID qid, int iounit)
-	{
-		super(MessageType.Ropen, tag);
-		mQID = qid;
-		mIOUnit = iounit;
-	}*/
 	
 	@Override
-	public void load(StyxInputStream stream) throws IOException
-	{
+	public void load(StyxInputStream stream) throws IOException {
 	    mQID = new StyxQID(stream);
-	    mIOUnit = stream.readUInt();
+	    mIOUnit = stream.readUInt32();
 	}
+    @Override
+    public void load(DualStateBuffer stream) throws IOException {
+        mQID = new StyxQID(stream);
+        mIOUnit = stream.readUInt32();
+    }
 	
 	public StyxQID getQID()
 	{

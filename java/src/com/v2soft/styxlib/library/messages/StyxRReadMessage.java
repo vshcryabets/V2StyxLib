@@ -9,6 +9,7 @@ import com.v2soft.styxlib.library.io.StyxInputStream;
 import com.v2soft.styxlib.library.io.StyxOutputStream;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
+import com.v2soft.styxlib.library.server.DualStateBuffer;
 
 public class StyxRReadMessage extends StyxMessage {
 	private byte[] mData;
@@ -38,9 +39,16 @@ public class StyxRReadMessage extends StyxMessage {
     @Override
     public void load(StyxInputStream input) 
         throws IOException  {
-        int count = (int)input.readUInt();
+        int count = (int)input.readUInt32();
 		setData(input, 0, count);
 	}
+    @Override
+    public void load(DualStateBuffer input) 
+        throws IOException  {
+        int count = (int)input.readUInt32();
+        mData = new byte[count];
+        input.read(mData, 0, count);
+    }
 	
 	private byte[] getData()
 	{
@@ -50,7 +58,7 @@ public class StyxRReadMessage extends StyxMessage {
 	}
 	
 	public InputStream getDataStream()	{
-		// TODO WTF????
+		// TODO Optimize me
 		return new ByteArrayInputStream(getData());
 	}
 	

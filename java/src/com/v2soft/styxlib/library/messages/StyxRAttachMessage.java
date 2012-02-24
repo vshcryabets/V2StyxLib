@@ -8,6 +8,7 @@ import com.v2soft.styxlib.library.io.StyxOutputStream;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
 import com.v2soft.styxlib.library.messages.base.structs.StyxQID;
+import com.v2soft.styxlib.library.server.DualStateBuffer;
 
 public class StyxRAttachMessage extends StyxMessage {
 	private StyxQID mQID;
@@ -61,5 +62,9 @@ public class StyxRAttachMessage extends StyxMessage {
 	protected String internalToString() {
 		return String.format("QID: %s", getQID().toString());
 	}
+
+    @Override
+    protected void load(DualStateBuffer buffer) throws IOException {
+    }
 	
 }

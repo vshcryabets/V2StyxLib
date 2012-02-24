@@ -7,6 +7,7 @@ import com.v2soft.styxlib.library.io.StyxInputStream;
 import com.v2soft.styxlib.library.io.StyxOutputStream;
 import com.v2soft.styxlib.library.messages.base.StyxTMessage;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
+import com.v2soft.styxlib.library.server.DualStateBuffer;
 
 public class StyxTFlushMessage extends StyxTMessage {
 	private int mOldTag;
@@ -24,8 +25,13 @@ public class StyxTFlushMessage extends StyxTMessage {
     @Override
     public void load(StyxInputStream input) 
         throws IOException  {
-		setOldTag(input.readUShort());
+		setOldTag(input.readUInt16());
 	}
+    @Override
+    public void load(DualStateBuffer input) 
+        throws IOException  {
+        setOldTag(input.readUInt16());
+    }
 
 	public int getOldTag()
 	{

@@ -7,6 +7,7 @@ import com.v2soft.styxlib.library.io.StyxInputStream;
 import com.v2soft.styxlib.library.io.StyxOutputStream;
 import com.v2soft.styxlib.library.messages.base.StyxTMessage;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
+import com.v2soft.styxlib.library.server.DualStateBuffer;
 
 public class StyxTRemoveMessage extends StyxTMessage {
 	private long mFID;
@@ -36,8 +37,13 @@ public class StyxTRemoveMessage extends StyxTMessage {
     @Override
     public void load(StyxInputStream input) 
         throws IOException  {
-		setFID(input.readUInt());
+		setFID(input.readUInt32());
 	}
+    @Override
+    public void load(DualStateBuffer input) 
+        throws IOException  {
+        setFID(input.readUInt32());
+    }
 	
 	public long getFID()
 	{

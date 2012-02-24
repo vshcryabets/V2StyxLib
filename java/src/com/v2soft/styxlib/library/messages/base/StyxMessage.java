@@ -34,6 +34,7 @@ import com.v2soft.styxlib.library.messages.StyxTWStatMessage;
 import com.v2soft.styxlib.library.messages.StyxTWalkMessage;
 import com.v2soft.styxlib.library.messages.StyxTWriteMessage;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
+import com.v2soft.styxlib.library.server.DualStateBuffer;
 
 public abstract class StyxMessage {
 	public static final int BASE_BINARY_SIZE = 7;
@@ -53,6 +54,119 @@ public abstract class StyxMessage {
 	private int mTag;
 	private MessageType mType;
 	
+    /**
+     * Construct message from DoubleStateBuffer
+     * @param is intput stream
+     * @param io_unit packet size
+     * @return constructed Message object
+     * @throws IOException
+     */
+    public static StyxMessage factory(DualStateBuffer buffer, int io_unit) throws IOException {
+        // get common packet data
+        long packet_size = buffer.readUInt32();
+        if ( packet_size > io_unit ) {
+            // Something wrong, packet size is to big
+            return null;
+        }
+        MessageType type = MessageType.factory(buffer.readUInt8());
+        int tag = buffer.readUInt16();
+        // load other data
+        int toRead = (int) (packet_size - 7);
+        byte[] data = new byte[toRead];
+        int readed = 0;
+        while ( readed < toRead ) {
+            readed+= buffer.read(data, readed, toRead-readed);
+        }
+        // create Message
+        StyxInputStream dataStream = new StyxInputStream(new ByteArrayInputStream(data));
+        StyxMessage result = null;
+        switch (type) {
+        case Tversion:
+            result = new StyxTVersionMessage();
+            break;
+        case Rversion:
+            result = new StyxRVersionMessage(tag);
+            break;
+        case Tauth:
+            result = new StyxTAuthMessage(tag);
+            break;
+        case Tflush:
+            result = new StyxTFlushMessage(tag);
+            break;
+        case Tattach:
+            result = new StyxTAttachMessage(tag);
+            break;
+        case Twalk:
+            result = new StyxTWalkMessage(tag);
+            break;
+        case Rauth:
+            result = new StyxRAuthMessage(tag);
+            break;
+        case Rerror:
+            result = new StyxRErrorMessage(tag);
+            break;
+        case Rflush:
+            result = new StyxRFlushMessage(tag);
+            break;
+        case Rattach:
+            result = new StyxRAttachMessage(tag);
+            break;
+        case Rwalk:
+            result = new StyxRWalkMessage(tag); 
+            break;
+        case Topen:
+            result = new StyxTOpenMessage(tag);
+            break;
+        case Ropen:
+            result = new StyxROpenMessage(tag);
+            break;
+        case Tcreate:
+            result = new StyxTCreateMessage(tag);
+            break;
+        case Rcreate:
+            result = new StyxRCreateMessage(tag);
+            break;
+        case Tread:
+            result = new StyxTReadMessage(tag);
+            break;
+        case Rread:
+            result = new StyxRReadMessage(tag);
+            break;
+        case Twrite:
+            result = new StyxTWriteMessage(tag);
+            break;
+        case Rwrite:
+            result = new StyxRWriteMessage(tag);
+            break;
+        case Tclunk:
+            result = new StyxTClunkMessage(tag);
+            break;
+        case Rclunk:
+            result = new StyxRClunkMessage(tag);
+            break;
+        case Tremove:
+            result = new StyxTRemoveMessage(tag);
+            break;
+        case Rremove:
+            result = new StyxRRemoveMessage(tag);
+            break;
+        case Tstat:
+            result = new StyxTStatMessage(tag);
+            break;
+        case Rstat:
+            result = new StyxRStatMessage(tag);
+            break;
+        case Twstat:
+            result = new StyxTWStatMessage(tag);
+            break;
+        case Rwstat:
+            result = new StyxRWStatMessage(tag);
+            break;
+        }
+        result.load(dataStream);
+        return result;
+    }	
+	
 	/**
 	 * Construct message from input stream
 	 * @param is intput stream
@@ -62,13 +176,13 @@ public abstract class StyxMessage {
 	 */
 	public static StyxMessage factory(StyxInputStream is, int io_unit) throws IOException {
 	    // get common packet data
-		long packet_size = is.readUInt();
+		long packet_size = is.readUInt32();
 		if ( packet_size > io_unit ) {
 		    // Something wrong, packet size is to big
 		    return null;
 		}
-		MessageType type = MessageType.factory(is.readUByte());
-		int tag = is.readUShort();
+		MessageType type = MessageType.factory(is.readUInt8());
+		int tag = is.readUInt16();
 		// load other data
 		int toRead = (int) (packet_size - 7);
 //		System.out.println("packet size="+packet_size);
@@ -254,6 +368,7 @@ public abstract class StyxMessage {
             throws IOException;
 	protected abstract String internalToString();
 	protected abstract void load(StyxInputStream is)  throws IOException;
+    protected abstract void load(DualStateBuffer buffer) throws IOException;
 	
 	@Override
 	public String toString() {

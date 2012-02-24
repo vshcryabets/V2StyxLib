@@ -7,6 +7,7 @@ import com.v2soft.styxlib.library.io.StyxOutputStream;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
 import com.v2soft.styxlib.library.messages.base.structs.StyxStat;
+import com.v2soft.styxlib.library.server.DualStateBuffer;
 
 public class StyxRStatMessage extends StyxMessage {
 	private StyxStat mStat;
@@ -29,9 +30,14 @@ public class StyxRStatMessage extends StyxMessage {
 
 	@Override
     public void load(StyxInputStream input) throws IOException {
-		int size = input.readUShort();
+		int size = input.readUInt16();
 		mStat = new StyxStat(input);
 	}
+    @Override
+    public void load(DualStateBuffer input) throws IOException {
+        int size = input.readUInt16();
+        mStat = new StyxStat(input);
+    }
 	
 	public StyxStat getStat()
 	{

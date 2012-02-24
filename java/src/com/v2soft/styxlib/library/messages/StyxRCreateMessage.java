@@ -7,6 +7,7 @@ import com.v2soft.styxlib.library.io.StyxOutputStream;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
 import com.v2soft.styxlib.library.messages.base.structs.StyxQID;
+import com.v2soft.styxlib.library.server.DualStateBuffer;
 
 public class StyxRCreateMessage extends StyxMessage {
 	private StyxQID mQID;
@@ -42,8 +43,12 @@ public class StyxRCreateMessage extends StyxMessage {
 
 	@Override
     public void load(StyxInputStream input) throws IOException {
-		setIOUnit(input.readUInt());
+		setIOUnit(input.readUInt32());
 	}
+    @Override
+    public void load(DualStateBuffer input) throws IOException {
+        setIOUnit(input.readUInt32());
+    }
 	
 	public StyxQID getQID()
 	{

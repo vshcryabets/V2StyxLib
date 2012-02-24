@@ -11,6 +11,7 @@ import com.v2soft.styxlib.library.io.StyxOutputStream;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
 import com.v2soft.styxlib.library.messages.base.structs.StyxQID;
+import com.v2soft.styxlib.library.server.DualStateBuffer;
 
 public class StyxRWalkMessage extends StyxMessage {
 	private List<StyxQID> mQIDList;
@@ -28,13 +29,23 @@ public class StyxRWalkMessage extends StyxMessage {
     @Override
     public void load(StyxInputStream input) 
         throws IOException  {
-        int count = input.readUShort();
+        int count = input.readUInt16();
 		
 		ArrayList<StyxQID> list = new ArrayList<StyxQID>();
 		for (int i=0; i<count; i++)
 			list.add(new StyxQID(input));
 		setQIDList(list);
 	}
+    @Override
+    public void load(DualStateBuffer input) 
+        throws IOException  {
+        int count = input.readUInt16();
+        
+        ArrayList<StyxQID> list = new ArrayList<StyxQID>();
+        for (int i=0; i<count; i++)
+            list.add(new StyxQID(input));
+        setQIDList(list);
+    }
 	
 	public void setQIDList(StyxQID[] array)
 	{

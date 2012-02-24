@@ -6,22 +6,18 @@ import com.v2soft.styxlib.library.exceptions.StyxException;
 import com.v2soft.styxlib.library.exceptions.StyxWrongMessageException;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
 
-public abstract class StyxTMessage extends StyxMessage
-{
+public abstract class StyxTMessage extends StyxMessage {
 	private StyxMessage mAnswer;
 	
-	public StyxTMessage(MessageType type)
-	{
+	public StyxTMessage(MessageType type) {
 		super(type);
 	}
 	
-	public StyxTMessage(MessageType type, int tag)
-	{
+	public StyxTMessage(MessageType type, int tag) {
 		super(type, tag);
 	}
 	
-	public StyxMessage getAnswer()
-	{
+	public StyxMessage getAnswer() {
 		return mAnswer;
 	}
 	

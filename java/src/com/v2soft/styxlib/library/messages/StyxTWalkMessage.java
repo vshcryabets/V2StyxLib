@@ -8,6 +8,7 @@ import com.v2soft.styxlib.library.io.StyxOutputStream;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.messages.base.StyxTMessage;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
+import com.v2soft.styxlib.library.server.DualStateBuffer;
 
 public class StyxTWalkMessage extends StyxTMessage {
 	private long mFID, mNewFID;
@@ -32,9 +33,9 @@ public class StyxTWalkMessage extends StyxTMessage {
 	@Override
 	public void load(StyxInputStream input) throws IOException	{
 	    String path = "";
-		setFID(input.readUInt());
-		setNewFID(input.readUInt());
-		int count = input.readUShort();
+		setFID(input.readUInt32());
+		setNewFID(input.readUInt32());
+		int count = input.readUInt16();
 		for (int i=0; i<count; i++)	{
 			String stmp = input.readUTF();
 			if (!path.equals(""))
@@ -43,6 +44,20 @@ public class StyxTWalkMessage extends StyxTMessage {
 		}
 		setPath(path);
 	}
+    @Override
+    public void load(DualStateBuffer input) throws IOException  {
+        String path = "";
+        setFID(input.readUInt32());
+        setNewFID(input.readUInt32());
+        int count = input.readUInt16();
+        for (int i=0; i<count; i++) {
+            String stmp = input.readUTF();
+            if (!path.equals(""))
+                path += "/";
+            path += stmp;
+        }
+        setPath(path);
+    }
     @Override
     protected void internalWriteToStream(StyxOutputStream output)
             throws IOException 

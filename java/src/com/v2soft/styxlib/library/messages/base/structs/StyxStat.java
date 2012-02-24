@@ -6,6 +6,7 @@ import java.util.Date;
 import com.v2soft.styxlib.library.io.StyxInputStream;
 import com.v2soft.styxlib.library.io.StyxOutputStream;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
+import com.v2soft.styxlib.library.server.DualStateBuffer;
 import com.v2soft.styxlib.library.types.ULong;
 
 public class StyxStat {
@@ -54,19 +55,33 @@ public class StyxStat {
 	}
 	
 	public StyxStat(StyxInputStream input) throws IOException {
-	    int size = input.readUShort(); // skip size bytes
-	    mType = input.readUShort();
-	    mDev = input.readUInt();
+	    int size = input.readUInt16(); // skip size bytes
+	    mType = input.readUInt16();
+	    mDev = input.readUInt32();
 	    mQID = new StyxQID(input);
-	    mMode = input.readUInt();
-	    mAccessTime = IntToDate(input.readUInt());
-	    mModificationTime = IntToDate(input.readUInt());
-	    mLength = input.readULong();
+	    mMode = input.readUInt32();
+	    mAccessTime = IntToDate(input.readUInt32());
+	    mModificationTime = IntToDate(input.readUInt32());
+	    mLength = input.readUInt64();
 	    mName = input.readUTF();
 	    mUserName = input.readUTF();
 	    mGroupName = input.readUTF();
 	    mModificationUser = input.readUTF();
 	}
+    public StyxStat(DualStateBuffer input) throws IOException {
+        int size = input.readUInt16(); // skip size bytes
+        mType = input.readUInt16();
+        mDev = input.readUInt32();
+        mQID = new StyxQID(input);
+        mMode = input.readUInt32();
+        mAccessTime = IntToDate(input.readUInt32());
+        mModificationTime = IntToDate(input.readUInt32());
+        mLength = input.readUInt64();
+        mName = input.readUTF();
+        mUserName = input.readUTF();
+        mGroupName = input.readUTF();
+        mModificationUser = input.readUTF();
+    }
 	
 	public int getSize()
 	{

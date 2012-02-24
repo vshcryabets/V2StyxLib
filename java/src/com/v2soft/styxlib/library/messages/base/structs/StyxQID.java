@@ -5,6 +5,7 @@ import java.io.IOException;
 import com.v2soft.styxlib.library.io.StyxInputStream;
 import com.v2soft.styxlib.library.io.StyxOutputStream;
 import com.v2soft.styxlib.library.messages.base.enums.QIDType;
+import com.v2soft.styxlib.library.server.DualStateBuffer;
 import com.v2soft.styxlib.library.types.ULong;
 
 public class StyxQID {
@@ -23,11 +24,16 @@ public class StyxQID {
 	}
 	
 	public StyxQID(StyxInputStream input) throws IOException {
-        mType = QIDType.factory(input.readUByte());
-        mVersion = input.readUInt();
-        mPath = input.readULong();
+        mType = QIDType.factory(input.readUInt8());
+        mVersion = input.readUInt32();
+        mPath = input.readUInt64();
 	}
-	
+    public StyxQID(DualStateBuffer input) throws IOException {
+        mType = QIDType.factory(input.readUInt8());
+        mVersion = input.readUInt32();
+        mPath = input.readUInt64();
+    }
+    
 	public QIDType getType(){return mType;}
     public long getVersion(){return mVersion;}
     public ULong getPath(){return mPath;}
