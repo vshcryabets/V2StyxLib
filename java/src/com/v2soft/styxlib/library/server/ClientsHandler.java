@@ -32,7 +32,7 @@ public class ClientsHandler
     public void addClient(SocketChannel client) throws IOException {
         client.configureBlocking(false);
         mClients.add(client);
-        mClientStatesMap.put(client, new ClientState(mIOUnit));
+        mClientStatesMap.put(client, new ClientState(mIOUnit, client));
     }
 
     @Override
@@ -41,7 +41,7 @@ public class ClientsHandler
 
 	protected boolean readClient(SocketChannel channel) throws IOException {
 		final ClientState state = mClientStatesMap.get(channel);
-		boolean result = state.read(channel);
+		boolean result = state.read();
 		if ( result ) {
 		    removeClient(channel);
 		}

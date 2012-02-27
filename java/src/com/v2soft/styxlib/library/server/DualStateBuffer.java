@@ -5,6 +5,8 @@ import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+
 import com.v2soft.styxlib.library.types.ULong;
 
 /**
@@ -12,7 +14,7 @@ import com.v2soft.styxlib.library.types.ULong;
  * @author V.Shcriyabets (vshcryabets@gmail.com)
  *
  */
-public class DualStateBuffer {
+public class DualStateBuffer extends StyxBufferOperations {
     private static final int sDataBufferSize = 16; 
     private byte [] mDataBuffer;
     private ByteBuffer mBuffer;
@@ -81,7 +83,9 @@ public class DualStateBuffer {
         return readed;
     }
 
-    private long getInteger(int bytes) {
+    @Override
+    protected long getInteger(int bytes) {
+    	// TODO this method will work wrong at the buffer end
         assert bytes < sDataBufferSize;
         long result = 0L;
         int shift = 0;
@@ -97,42 +101,48 @@ public class DualStateBuffer {
         }       
         return result;
     }
-
-    private long readInteger(int bytes) {
+    @Override
+    protected long readInteger(int bytes) {
+    	// TODO this method will work wrong at the buffer end
         assert bytes < sDataBufferSize;
         long result = getInteger(bytes);
         mReadPosition+=bytes;
         mStoredBytes-=bytes;
         return result;
     }
-    
-    public long readUInt32() {
-        return readInteger(4);
-    }
-
-    public int readUInt16() {
-        return (int) readInteger(2);
-    }
-
-    public short readUInt8() {
-        return (short) (readInteger(1)&0XFF);
-    }
+    @Override
     public ULong readUInt64() {
+    	// TODO this method will work wrong at the buffer end
         byte[] bytes = new byte[ULong.ULONG_LENGTH];
         read(bytes, 0, ULong.ULONG_LENGTH);
         return new ULong(bytes);
     }
-
-    public long getUInt32() {
-        return getInteger(4) & 0xFFFFFFFFL;
-    }
-
+    @Override
     public String readUTF() throws UnsupportedEncodingException {
-        int count = readUInt16();
+    	// TODO this method will work wrong at the buffer end
+    	int count = readUInt16();
         byte[] bytes = new byte[count];
         read(bytes, 0, count);
         return new String(bytes, "UTF-8");
     }
 
+	@Override
+	protected void writeInteger(int bytes, long value) {
+		throw new NotImplementedException();
+	}
 
+	@Override
+	public void clear() {
+		throw new NotImplementedException();
+	}
+
+	@Override
+	public void limit(int value) {
+		throw new NotImplementedException();
+	}
+
+	@Override
+	public void writeUTF(String protocolVersion) {
+		throw new NotImplementedException();
+	}
 }

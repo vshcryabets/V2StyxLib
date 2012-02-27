@@ -3,7 +3,10 @@ package com.v2soft.styxlib.library.messages.base;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
+import java.nio.ByteBuffer;
 
+import com.v2soft.styxlib.library.core.StyxByteBuffer;
 import com.v2soft.styxlib.library.io.StyxInputStream;
 import com.v2soft.styxlib.library.io.StyxOutputStream;
 import com.v2soft.styxlib.library.messages.StyxRAttachMessage;
@@ -35,6 +38,7 @@ import com.v2soft.styxlib.library.messages.StyxTWalkMessage;
 import com.v2soft.styxlib.library.messages.StyxTWriteMessage;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
 import com.v2soft.styxlib.library.server.DualStateBuffer;
+import com.v2soft.styxlib.library.server.StyxBufferOperations;
 
 public abstract class StyxMessage {
 	public static final int BASE_BINARY_SIZE = 7;
@@ -363,6 +367,14 @@ public abstract class StyxMessage {
 		output.writeUShort(getTag());
 		internalWriteToStream(output);
 	}
+	public void writeToBuffer(StyxBufferOperations output)  throws UnsupportedEncodingException {
+		output.clear();
+		int packetSize = getBinarySize();
+		output.limit(packetSize);
+		output.writeUInt(getBinarySize());
+		output.writeUByte((short) getType().getByte());
+		output.writeUShort(getTag());
+	}
 	
     protected abstract void internalWriteToStream(StyxOutputStream output)
             throws IOException;
@@ -381,5 +393,4 @@ public abstract class StyxMessage {
 		
 		return String.format("(\n%s\n)", stmp);
 	}
-	
 }
