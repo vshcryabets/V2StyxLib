@@ -2,6 +2,7 @@ package com.v2soft.styxlib.library.messages;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 
 import com.v2soft.styxlib.library.io.StyxInputStream;
 import com.v2soft.styxlib.library.io.StyxOutputStream;
@@ -9,6 +10,7 @@ import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.messages.base.StyxTMessage;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
 import com.v2soft.styxlib.library.server.DualStateBuffer;
+import com.v2soft.styxlib.library.server.StyxBufferOperations;
 
 public class StyxTAttachMessage extends StyxTMessage 
 {
@@ -109,6 +111,15 @@ public class StyxTAttachMessage extends StyxTMessage
 		return res;
 	}
 	
+	@Override
+	public void writeToBuffer(StyxBufferOperations output)
+	        throws UnsupportedEncodingException, IOException {
+	    super.writeToBuffer(output);
+        output.writeUInt(getFID());
+        output.writeUInt(getAuthFID());
+        output.writeUTF(getUserName());
+        output.writeUTF(getMountPoint());       
+	}
 	@Override
 	protected void internalWriteToStream(StyxOutputStream output)
 			throws IOException 

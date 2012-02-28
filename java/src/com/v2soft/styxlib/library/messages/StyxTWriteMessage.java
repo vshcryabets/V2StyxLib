@@ -3,6 +3,7 @@ package com.v2soft.styxlib.library.messages;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 
 import com.v2soft.styxlib.Config;
 import com.v2soft.styxlib.library.io.StyxInputStream;
@@ -11,6 +12,7 @@ import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.messages.base.StyxTMessage;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
 import com.v2soft.styxlib.library.server.DualStateBuffer;
+import com.v2soft.styxlib.library.server.StyxBufferOperations;
 import com.v2soft.styxlib.library.types.ULong;
 
 public class StyxTWriteMessage extends StyxTMessage {
@@ -131,14 +133,22 @@ public class StyxTWriteMessage extends StyxTMessage {
     }
 
     @Override
+    public void writeToBuffer(StyxBufferOperations output)
+            throws UnsupportedEncodingException, IOException {
+        super.writeToBuffer(output);
+        output.writeUInt(getFID());
+        output.writeUInt64(getOffset());
+        output.writeUInt(getDataLength());
+        output.write(getData());        
+    }
+    @Override
     protected void internalWriteToStream(StyxOutputStream output)
-            throws IOException 
-            {
+            throws IOException {
         output.writeUInt(getFID());
         output.writeULong(getOffset());
         output.writeUInt(getDataLength());
         output.write(getData());		
-            }
+    }
 
     @Override
     protected String internalToString() {

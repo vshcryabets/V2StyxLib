@@ -367,7 +367,8 @@ public abstract class StyxMessage {
 		output.writeUShort(getTag());
 		internalWriteToStream(output);
 	}
-	public void writeToBuffer(StyxBufferOperations output)  throws UnsupportedEncodingException {
+	public void writeToBuffer(StyxBufferOperations output)  
+	        throws UnsupportedEncodingException, IOException {
 		output.clear();
 		int packetSize = getBinarySize();
 		output.limit(packetSize);

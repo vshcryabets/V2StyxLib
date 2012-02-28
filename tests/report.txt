@@ -1,0 +1,5 @@
+Write - 338933
+Read - 85326
+After switching to use ByteBuffer (not fully optimized)
+Write - 119216
+Read - 98551

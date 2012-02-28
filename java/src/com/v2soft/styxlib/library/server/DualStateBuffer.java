@@ -5,8 +5,6 @@ import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-
 import com.v2soft.styxlib.library.types.ULong;
 
 /**
@@ -128,21 +126,28 @@ public class DualStateBuffer extends StyxBufferOperations {
 
 	@Override
 	protected void writeInteger(int bytes, long value) {
-		throw new NotImplementedException();
+		throw new RuntimeException();
 	}
 
 	@Override
 	public void clear() {
-		throw new NotImplementedException();
+	    throw new RuntimeException();
 	}
 
 	@Override
 	public void limit(int value) {
-		throw new NotImplementedException();
+	    throw new RuntimeException();
 	}
 
-	@Override
-	public void writeUTF(String protocolVersion) {
-		throw new NotImplementedException();
-	}
+    @Override
+    public void write(byte[] data) {
+        // TODO Auto-generated method stub
+        throw new RuntimeException();
+    }
+
+    @Override
+    public void write(byte[] data, int offset, int count) {
+        // TODO Auto-generated method stub
+        throw new RuntimeException();
+    }
 }

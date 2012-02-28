@@ -7,6 +7,7 @@ import com.v2soft.styxlib.library.io.StyxInputStream;
 import com.v2soft.styxlib.library.io.StyxOutputStream;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.server.DualStateBuffer;
+import com.v2soft.styxlib.library.server.StyxBufferOperations;
 import com.v2soft.styxlib.library.types.ULong;
 
 public class StyxStat {
@@ -230,7 +231,20 @@ public class StyxStat {
 		output.writeUTF(getGroupName());
 		output.writeUTF(getModificationUser());
 	}
-	
+    public void writeBinaryTo(StyxBufferOperations output) throws IOException {
+        output.writeUShort(getSize() - 2); // TODO -2??? what does it mean?
+        output.writeUShort(getType());
+        output.writeUInt(getDev());
+        getQID().writeBinaryTo(output);
+        output.writeUInt(getMode());
+        output.writeUInt(DateToInt(getAccessTime()));
+        output.writeUInt(DateToInt(getModificationTime()));
+        output.writeUInt64(getLength());
+        output.writeUTF(getName());
+        output.writeUTF(getUserName());
+        output.writeUTF(getGroupName());
+        output.writeUTF(getModificationUser());
+    }	
 	@Override
 	public String toString() {
 		return String.format("(Type: %d; Dev: %d; QID: %s; Mode: %d;"

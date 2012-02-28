@@ -74,7 +74,8 @@ public class StyxRVersionMessage extends StyxMessage
 		output.writeUTF(getProtocolVersion());		
 	}
 	@Override
-	public void writeToBuffer(StyxBufferOperations output) throws UnsupportedEncodingException {
+	public void writeToBuffer(StyxBufferOperations output) 
+	        throws UnsupportedEncodingException, IOException {
 		super.writeToBuffer(output);
 		output.writeUInt(getMaxPacketSize());
 		output.writeUTF(getProtocolVersion());		
