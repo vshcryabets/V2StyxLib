@@ -18,13 +18,8 @@ public class StyxROpenMessage extends StyxMessage {
 		super(MessageType.Ropen, tag);
 	}
 	
-	@Override
-	public void load(StyxInputStream stream) throws IOException {
-	    mQID = new StyxQID(stream);
-	    mIOUnit = stream.readUInt32();
-	}
     @Override
-    public void load(DualStateBuffer stream) throws IOException {
+    public void load(StyxBufferOperations stream) throws IOException {
         mQID = new StyxQID(stream);
         mIOUnit = stream.readUInt32();
     }

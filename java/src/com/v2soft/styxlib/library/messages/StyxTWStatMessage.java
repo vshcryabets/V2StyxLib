@@ -2,11 +2,9 @@ package com.v2soft.styxlib.library.messages;
 
 import java.io.IOException;
 
-import com.v2soft.styxlib.library.io.StyxInputStream;
 import com.v2soft.styxlib.library.messages.base.StyxTMessage;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
 import com.v2soft.styxlib.library.messages.base.structs.StyxStat;
-import com.v2soft.styxlib.library.server.DualStateBuffer;
 import com.v2soft.styxlib.library.server.StyxBufferOperations;
 
 public class StyxTWStatMessage extends StyxTMessage {
@@ -40,7 +38,7 @@ public class StyxTWStatMessage extends StyxTMessage {
 	    super(MessageType.Twstat, tag);
     }
     @Override
-    public void load(DualStateBuffer input) throws IOException {
+    public void load(StyxBufferOperations input) throws IOException {
         mFID = input.readUInt32();
         input.readUInt16();
         mStat = new StyxStat(input);
@@ -84,12 +82,7 @@ public class StyxTWStatMessage extends StyxTMessage {
 	}
 
 	@Override
-	protected MessageType getNeeded() {
+	protected MessageType getRequiredAnswerType() {
 		return MessageType.Twstat;
 	}
-
-    @Override
-    protected void load(StyxInputStream is) throws IOException {
-    }
-	
 }

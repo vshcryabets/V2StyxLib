@@ -21,14 +21,9 @@ public class StyxTFlushMessage extends StyxTMessage {
 	{
 		super(MessageType.Tflush, tag);
 	}
-	
+
     @Override
-    public void load(StyxInputStream input) 
-        throws IOException  {
-		setOldTag(input.readUInt16());
-	}
-    @Override
-    public void load(DualStateBuffer input) 
+    public void load(StyxBufferOperations input) 
         throws IOException  {
         setOldTag(input.readUInt16());
     }
@@ -61,7 +56,7 @@ public class StyxTFlushMessage extends StyxTMessage {
 	}
 
 	@Override
-	protected MessageType getNeeded() {
+	protected MessageType getRequiredAnswerType() {
 		return MessageType.Rflush;
 	}
 }

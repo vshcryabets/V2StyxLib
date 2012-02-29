@@ -23,7 +23,6 @@ public class ClientState
 implements Closeable {
 	private DualStateBuffer mBuffer;
 	private int mIOUnit;
-	private long mCount;
 	private SocketChannel mChannel;
 	private StyxByteBuffer mOutputBuffer;
 
@@ -31,7 +30,6 @@ implements Closeable {
 		mIOUnit = iounit;
 		mBuffer =new DualStateBuffer(iounit*2);
 		mOutputBuffer = new StyxByteBuffer(ByteBuffer.allocateDirect(iounit));
-		mCount = 0;
 		mChannel = channel;
 	}
 
@@ -40,13 +38,13 @@ implements Closeable {
 	    if ( inBuffer > 4 ) {
 	        long packetSize = mBuffer.getUInt32();
 	        if ( inBuffer >= packetSize ) {
-	            StyxMessage msg = StyxMessage.factory(mBuffer, mIOUnit);
-	            if ( msg instanceof StyxTVersionMessage ) {
+	            StyxMessage message = StyxMessage.factory(mBuffer, mIOUnit);
+	            if ( message instanceof StyxTVersionMessage ) {
 	            	// answer
 	            	StyxRVersionMessage answer = new StyxRVersionMessage(mIOUnit, StyxClientManager.PROTOCOL);
 	            	sendMessage(answer);
 	            }
-	            System.out.print("Got message "+msg.toString());
+	            System.out.print("Got message "+message.toString());
 	            return true;
 	        }
 	    }
@@ -73,7 +71,6 @@ implements Closeable {
 //
 //		}
 		mBuffer = null;
-		mCount = 0;
 	}
 
     public boolean read() throws IOException {

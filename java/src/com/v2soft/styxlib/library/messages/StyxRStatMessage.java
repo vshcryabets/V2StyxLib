@@ -29,13 +29,8 @@ public class StyxRStatMessage extends StyxMessage {
 	    super(MessageType.Rstat, tag);
     }
 
-	@Override
-    public void load(StyxInputStream input) throws IOException {
-		int size = input.readUInt16();
-		mStat = new StyxStat(input);
-	}
     @Override
-    public void load(DualStateBuffer input) throws IOException {
+    public void load(StyxBufferOperations input) throws IOException {
         int size = input.readUInt16();
         mStat = new StyxStat(input);
     }

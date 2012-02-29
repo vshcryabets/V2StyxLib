@@ -42,13 +42,10 @@ public class StyxRCreateMessage extends StyxMessage {
         super(MessageType.Rcreate, tag);
     }
 
-	@Override
-    public void load(StyxInputStream input) throws IOException {
-		setIOUnit(input.readUInt32());
-	}
     @Override
-    public void load(DualStateBuffer input) throws IOException {
-        setIOUnit(input.readUInt32());
+    public void load(StyxBufferOperations input) throws IOException {
+        mQID = new StyxQID(input);
+        mIOUnit = input.readUInt32();
     }
 	
 	public StyxQID getQID()

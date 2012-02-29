@@ -1,11 +1,8 @@
 package com.v2soft.styxlib.library.server;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
-
-import com.v2soft.styxlib.library.types.ULong;
 
 /**
  * 
@@ -45,11 +42,23 @@ public class DualStateBuffer extends StyxBufferOperations {
             mReadPosition = 0;
         }
         mBuffer.position(mReadPosition);
-        mBuffer.limit( mWritePosition <= mReadPosition ? mCapacity : mWritePosition );
-        mBuffer.get(out, i, length);
+        int limit = mWritePosition <= mReadPosition ? mCapacity : mWritePosition;
+        mBuffer.limit( limit );
+        int avaiable = limit-mReadPosition;
+        if ( avaiable < length ) {
+            // splited block
+            // read first part
+            mBuffer.get(out, i, avaiable);
+            // read second part
+            mBuffer.position(0);
+            mBuffer.get(out, i+avaiable, length-avaiable);
+        } else {
+            // single block
+            mBuffer.get(out, i, length);
+        }
         return length;
     }
-    
+
     /**
      * Read byte array from buffer
      * @param out
@@ -83,14 +92,13 @@ public class DualStateBuffer extends StyxBufferOperations {
 
     @Override
     protected long getInteger(int bytes) {
-    	// TODO this method will work wrong at the buffer end
+        // TODO this method will work wrong at the buffer end
         assert bytes < sDataBufferSize;
         long result = 0L;
         int shift = 0;
         int readed = get(mDataBuffer, 0, bytes);
         assert readed == bytes;
-        for (int i=0; i<bytes; i++)
-        {
+        for (int i=0; i<bytes; i++) {
             long b = (mDataBuffer[i]&0xFF);
             if (shift > 0)
                 b <<= shift;
@@ -99,45 +107,16 @@ public class DualStateBuffer extends StyxBufferOperations {
         }       
         return result;
     }
+
     @Override
-    protected long readInteger(int bytes) {
-    	// TODO this method will work wrong at the buffer end
-        assert bytes < sDataBufferSize;
-        long result = getInteger(bytes);
-        mReadPosition+=bytes;
-        mStoredBytes-=bytes;
-        return result;
-    }
-    @Override
-    public ULong readUInt64() {
-    	// TODO this method will work wrong at the buffer end
-        byte[] bytes = new byte[ULong.ULONG_LENGTH];
-        read(bytes, 0, ULong.ULONG_LENGTH);
-        return new ULong(bytes);
-    }
-    @Override
-    public String readUTF() throws UnsupportedEncodingException {
-    	// TODO this method will work wrong at the buffer end
-    	int count = readUInt16();
-        byte[] bytes = new byte[count];
-        read(bytes, 0, count);
-        return new String(bytes, "UTF-8");
+    public void clear() {
+        throw new RuntimeException();
     }
 
-	@Override
-	protected void writeInteger(int bytes, long value) {
-		throw new RuntimeException();
-	}
-
-	@Override
-	public void clear() {
-	    throw new RuntimeException();
-	}
-
-	@Override
-	public void limit(int value) {
-	    throw new RuntimeException();
-	}
+    @Override
+    public void limit(int value) {
+        throw new RuntimeException();
+    }
 
     @Override
     public void write(byte[] data) {

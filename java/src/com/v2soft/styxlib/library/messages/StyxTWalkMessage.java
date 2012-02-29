@@ -31,22 +31,8 @@ public class StyxTWalkMessage extends StyxTMessage {
 		mNewFID = new_fid;
 	}
 	
-	@Override
-	public void load(StyxInputStream input) throws IOException	{
-	    String path = "";
-		setFID(input.readUInt32());
-		setNewFID(input.readUInt32());
-		int count = input.readUInt16();
-		for (int i=0; i<count; i++)	{
-			String stmp = input.readUTF();
-			if (!path.equals(""))
-				path += "/";
-			path += stmp;
-		}
-		setPath(path);
-	}
     @Override
-    public void load(DualStateBuffer input) throws IOException  {
+    public void load(StyxBufferOperations input) throws IOException  {
         String path = "";
         setFID(input.readUInt32());
         setNewFID(input.readUInt32());
@@ -148,7 +134,7 @@ public class StyxTWalkMessage extends StyxTMessage {
 	}
 
 	@Override
-	protected MessageType getNeeded() {
+	protected MessageType getRequiredAnswerType() {
 		return MessageType.Rwalk;
 	}
 	

@@ -3,12 +3,10 @@ package com.v2soft.styxlib.library.messages;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
-import com.v2soft.styxlib.library.io.StyxInputStream;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.messages.base.StyxTMessage;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
 import com.v2soft.styxlib.library.messages.base.enums.ModeType;
-import com.v2soft.styxlib.library.server.DualStateBuffer;
 import com.v2soft.styxlib.library.server.StyxBufferOperations;
 
 public class StyxTCreateMessage extends StyxTMessage {
@@ -50,13 +48,7 @@ public class StyxTCreateMessage extends StyxTMessage {
         mMode = mode;
     }
 
-    public void load(StyxInputStream input) throws IOException {
-        mFID = input.readInt();
-        mName = input.readUTF();
-        mPermissions = input.readUInt32();
-        mMode = ModeType.factory(input.readByte());
-    }
-    public void load(DualStateBuffer input) throws IOException {
+    public void load(StyxBufferOperations input) throws IOException {
         mFID = input.readUInt32();
         mName = input.readUTF();
         mPermissions = input.readUInt32();
@@ -128,7 +120,7 @@ public class StyxTCreateMessage extends StyxTMessage {
     }
 
     @Override
-    protected MessageType getNeeded() {
+    protected MessageType getRequiredAnswerType() {
         return MessageType.Rcreate;
     }
 

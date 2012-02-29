@@ -3,37 +3,26 @@ package com.v2soft.styxlib.library.messages;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
-import com.v2soft.styxlib.library.io.StyxInputStream;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
-import com.v2soft.styxlib.library.server.DualStateBuffer;
 import com.v2soft.styxlib.library.server.StyxBufferOperations;
 
-public class StyxRVersionMessage extends StyxMessage 
-{
+public class StyxRVersionMessage extends StyxMessage {
 	private long mMaxPacketSize;
 	private String mProtocolVersion;
 	
-	public StyxRVersionMessage(long maxPacketSize, String protocolVersion)
-	{
+	public StyxRVersionMessage(long maxPacketSize, String protocolVersion) {
 		super(MessageType.Rversion);
 		mMaxPacketSize = maxPacketSize;
 		mProtocolVersion = protocolVersion;
 	}
 	
-	public StyxRVersionMessage(int tag)
-	{
-		super(MessageType.Rversion, tag);
+	public StyxRVersionMessage() {
+		super(MessageType.Rversion, StyxMessage.NOTAG);
 	}
-	
+
     @Override
-    public void load(StyxInputStream input) 
-        throws IOException  {
-        setMaxPacketSize(input.readUInt32());
-		setProtocolVersion(input.readUTF());
-	}
-    @Override
-    public void load(DualStateBuffer input) 
+    public void load(StyxBufferOperations input) 
         throws IOException  {
         setMaxPacketSize(input.readUInt32());
         setProtocolVersion(input.readUTF());
@@ -78,5 +67,4 @@ public class StyxRVersionMessage extends StyxMessage
 		return String.format("MaxPocketSize: %d;\nProtocolVersion: %s", 
 				getMaxPacketSize(), getProtocolVersion());
 	}
-
 }

@@ -37,16 +37,9 @@ public class StyxTAuthMessage extends StyxTMessage
 		super(MessageType.Tauth, tag);
 		mAuthFID = fid;
 	}
-	
+
     @Override
-    public void load(StyxInputStream input) 
-        throws IOException  {
-		setAuthFID(input.readUInt32());
-		setUserName(input.readUTF());
-		setMountPoint(input.readUTF());
-	}
-    @Override
-    public void load(DualStateBuffer input) 
+    public void load(StyxBufferOperations input) 
         throws IOException  {
         setAuthFID(input.readUInt32());
         setUserName(input.readUTF());
@@ -110,7 +103,7 @@ public class StyxTAuthMessage extends StyxTMessage
 	}
 
 	@Override
-	protected MessageType getNeeded() {
+	protected MessageType getRequiredAnswerType() {
 		return MessageType.Rauth;
 	}
 	

@@ -35,12 +35,7 @@ public class StyxTStatMessage extends StyxTMessage {
 	}
 	
     @Override
-    public void load(StyxInputStream input) 
-        throws IOException  {
-		setFID(input.readUInt32());
-	}
-    @Override
-    public void load(DualStateBuffer input) 
+    public void load(StyxBufferOperations input) 
         throws IOException  {
         setFID(input.readUInt32());
     }
@@ -72,7 +67,7 @@ public class StyxTStatMessage extends StyxTMessage {
 	}
 
 	@Override
-	protected MessageType getNeeded() {
+	protected MessageType getRequiredAnswerType() {
 		return MessageType.Rstat;
 	}
 	

@@ -24,12 +24,7 @@ public class StyxRErrorMessage extends StyxMessage
 	}
 	
     @Override
-    public void load(StyxInputStream input) 
-        throws IOException  {
-        setError(input.readUTF());
-	}
-    @Override
-    public void load(DualStateBuffer input) 
+    public void load(StyxBufferOperations input) 
         throws IOException  {
         setError(input.readUTF());
     }	
