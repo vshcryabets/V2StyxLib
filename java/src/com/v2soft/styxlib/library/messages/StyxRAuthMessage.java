@@ -47,11 +47,7 @@ public class StyxRAuthMessage extends StyxMessage {
 	}
 
     @Override
-    protected void load(StyxInputStream is) throws IOException {
-        mQID = new StyxQID(is);
-    }
-    @Override
-    protected void load(DualStateBuffer is) throws IOException {
+    protected void load(StyxBufferOperations is) throws IOException {
         mQID = new StyxQID(is);
     }	
 }

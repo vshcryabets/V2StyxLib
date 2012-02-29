@@ -3,11 +3,9 @@ package com.v2soft.styxlib.library.messages;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
-import com.v2soft.styxlib.library.io.StyxInputStream;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
 import com.v2soft.styxlib.library.messages.base.structs.StyxQID;
-import com.v2soft.styxlib.library.server.DualStateBuffer;
 import com.v2soft.styxlib.library.server.StyxBufferOperations;
 
 public class StyxRAttachMessage extends StyxMessage {
@@ -28,11 +26,6 @@ public class StyxRAttachMessage extends StyxMessage {
 		super(MessageType.Rattach, tag);
 		setQID(qid);
 	}
-	
-    @Override
-    public void load(StyxInputStream input) 
-        throws IOException  {
-    }
 	
 	public StyxQID getQID()
 	{
@@ -64,7 +57,8 @@ public class StyxRAttachMessage extends StyxMessage {
 	}
 
     @Override
-    protected void load(DualStateBuffer buffer) throws IOException {
+    protected void load(StyxBufferOperations buffer) throws IOException {
+        mQID = new StyxQID(buffer);
     }
 	
 }

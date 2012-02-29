@@ -7,17 +7,22 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.nio.ByteBuffer;
+import java.nio.channels.SocketChannel;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
 import com.v2soft.styxlib.Config;
 import com.v2soft.styxlib.library.Consts;
+import com.v2soft.styxlib.library.StyxClientManager;
 import com.v2soft.styxlib.library.exceptions.StyxException;
 import com.v2soft.styxlib.library.io.StyxInputStream;
+import com.v2soft.styxlib.library.messages.StyxRVersionMessage;
+import com.v2soft.styxlib.library.messages.StyxTVersionMessage;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.messages.base.StyxTMessage;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
+import com.v2soft.styxlib.library.server.DualStateBuffer;
 import com.v2soft.styxlib.library.types.ObjectsPoll;
 import com.v2soft.styxlib.library.types.ObjectsPoll.ObjectsPollFactory;
 
@@ -29,20 +34,20 @@ public class Messenger implements Runnable, Closeable, ObjectsPollFactory<StyxBy
     private StyxMessengerListener mListener;
     private Map<Integer, StyxTMessage> mMessages = new HashMap<Integer, StyxTMessage>();
     private Thread mThread;
-    private Socket mSocket;
+    private SocketChannel mSocket;
     private ActiveTags mActiveTags = new ActiveTags();
-    private BufferedOutputStream mOutputStream;
+    //    private BufferedOutputStream mOutputStream;
     private boolean isWorking;
     private int mIOBufferSize;
     private int mTransmitedCount, mReceivedCount, mErrorCount, mBuffersAllocated;
     private ObjectsPoll<StyxByteBuffer> mBufferPoll;
 
-    public Messenger(Socket socket, int io_unit, StyxMessengerListener listener) 
+    public Messenger(SocketChannel socket, int io_unit, StyxMessengerListener listener) 
             throws IOException {
         resetStatistics();
         mIOBufferSize = io_unit;
         mSocket = socket;
-        mOutputStream = new BufferedOutputStream(mSocket.getOutputStream());
+        //        mOutputStream = new BufferedOutputStream(mSocket.getOutputStream());
         mListener = listener;
         mBufferPoll = new ObjectsPoll<StyxByteBuffer>(this);
         mThread = new Thread(this);
@@ -60,37 +65,29 @@ public class Messenger implements Runnable, Closeable, ObjectsPollFactory<StyxBy
      * @param message
      * @return true if success
      */
-    public boolean send(StyxTMessage message) {
+    public boolean send(StyxTMessage message) throws IOException {
         try {
             if ( Config.LOG_TMESSAGES) {
                 System.out.println("Send message "+message.toString());
             }
-            if ( !mSocket.isConnected() ) {
-                throw new IOException("Not connected");
-            }
+            assert mSocket.isConnected();
+
             int tag = StyxMessage.NOTAG;
             if ( message.getType() != MessageType.Tversion ) {
                 tag = mActiveTags.getTag();
             }
             message.setTag((short) tag);
             mMessages.put(tag, message);
-            
+
             StyxByteBuffer buffer = mBufferPoll.get();
             message.writeToBuffer(buffer);
-            // TODO optimize it
-            ByteBuffer inbuf = buffer.getBuffer(); 
-            byte [] array = new byte[inbuf.position()];
-            inbuf.position(0);
-            inbuf.get(array);
-            mOutputStream.write(array);
-            mOutputStream.flush();
+            final ByteBuffer inbuf = buffer.getBuffer();
+            inbuf.flip();
+            mSocket.write(inbuf);
             mTransmitedCount++;
             return true;
         } catch (SocketException e) {
             mListener.onSocketDisconected();
-        }
-        catch (IOException e) {
-            e.printStackTrace();
         }
         return false;
     }
@@ -98,25 +95,32 @@ public class Messenger implements Runnable, Closeable, ObjectsPollFactory<StyxBy
     @Override
     public void run() {
         try {
-            final StyxInputStream is = new StyxInputStream(mSocket.getInputStream());
+            final DualStateBuffer buffer = new DualStateBuffer(mIOBufferSize*2);
             isWorking = true;
             while (isWorking) {
                 if (Thread.interrupted()) break;
-                try	{
-                    final StyxMessage message = StyxMessage.factory(is, mIOBufferSize);
-                    if ( message != null ) {
-                        if ( Config.LOG_RMESSAGES) {
-                            System.out.println("Got message "+message.toString());
+                // read from socket
+                try {
+                    int readed = buffer.readFromChannel(mSocket);
+                    if ( readed > 0 ) {
+                        // try to decode
+                        int inBuffer = buffer.remainsToRead();
+                        if ( inBuffer > 4 ) {
+                            long packetSize = buffer.getUInt32();
+                            if ( inBuffer >= packetSize ) {
+                                StyxMessage message = StyxMessage.factory(buffer, mIOBufferSize);
+                                if ( Config.LOG_RMESSAGES) {
+                                    System.out.println("Got message "+message.toString());
+                                }
+                                mReceivedCount++;
+                                processIncomingMessage(message);
+                            }
                         }
-                        mReceivedCount++;
-                        processIncomingMessage(message);
-                    } else {
-                        System.out.println("Got NULL message");
                     }
-                } 
+                }
                 catch (SocketTimeoutException e) {
                     // Nothing to read
-//                    e.printStackTrace();
+                    //                    e.printStackTrace();
                 }
                 catch (StyxException e)	{ 
                     e.printStackTrace();
@@ -184,10 +188,11 @@ public class Messenger implements Runnable, Closeable, ObjectsPollFactory<StyxBy
     public void setListener(StyxMessengerListener mListener) {
         this.mListener = mListener;
     }
-    
+
     public int getTransmitedCount() {return mTransmitedCount;}
     public int getReceivedCount() {return mReceivedCount;}
     public int getErrorsCount() {return mErrorCount;}
+    public int getAllocationCount() {return mBuffersAllocated;}
 
     @Override
     public StyxByteBuffer create() {
