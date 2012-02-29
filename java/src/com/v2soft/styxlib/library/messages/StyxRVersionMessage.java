@@ -3,9 +3,7 @@ package com.v2soft.styxlib.library.messages;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
-import com.v2soft.styxlib.library.core.StyxByteBuffer;
 import com.v2soft.styxlib.library.io.StyxInputStream;
-import com.v2soft.styxlib.library.io.StyxOutputStream;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
 import com.v2soft.styxlib.library.server.DualStateBuffer;
@@ -67,12 +65,6 @@ public class StyxRVersionMessage extends StyxMessage
 			+ StyxMessage.getUTFSize(getProtocolVersion());
 	}
 	
-	@Override
-	protected void internalWriteToStream(StyxOutputStream output) 
-			throws IOException {
-		output.writeUInt(getMaxPacketSize());
-		output.writeUTF(getProtocolVersion());		
-	}
 	@Override
 	public void writeToBuffer(StyxBufferOperations output) 
 	        throws UnsupportedEncodingException, IOException {

@@ -5,7 +5,6 @@ import java.io.UnsupportedEncodingException;
 
 import com.v2soft.styxlib.library.StyxFile;
 import com.v2soft.styxlib.library.io.StyxInputStream;
-import com.v2soft.styxlib.library.io.StyxOutputStream;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.messages.base.StyxTMessage;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
@@ -64,21 +63,6 @@ public class StyxTWalkMessage extends StyxTMessage {
     public void writeToBuffer(StyxBufferOperations output)
             throws UnsupportedEncodingException, IOException {
         super.writeToBuffer(output);
-        output.writeUInt(getFID());
-        output.writeUInt(getNewFID());
-        if (mPathElements != null)
-        {
-            output.writeUShort(mPathElements.length);
-            for (String pathElement : mPathElements)
-                output.writeUTF(pathElement);
-        } else {
-            output.writeUShort(0);
-        }
-    }
-    @Override
-    protected void internalWriteToStream(StyxOutputStream output)
-            throws IOException 
-    {
         output.writeUInt(getFID());
         output.writeUInt(getNewFID());
         if (mPathElements != null)

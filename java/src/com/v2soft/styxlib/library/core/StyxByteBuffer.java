@@ -3,7 +3,6 @@ package com.v2soft.styxlib.library.core;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import com.v2soft.styxlib.library.server.StyxBufferOperations;
 import com.v2soft.styxlib.library.types.ULong;
@@ -80,21 +79,13 @@ public class StyxByteBuffer extends StyxBufferOperations {
 		return mBuffer;
 	}
 
-	@Override
-	protected void writeInteger(int bytes, long value) {
-        assert bytes < mBuffer.remaining();
-        for (int i=0; i<bytes; i++) {
-        	mDataBuffer[i] = (byte) (value & 0xFF);
-        	value >>= 8;
-        }
-        mBuffer.put(mDataBuffer, 0, bytes);
-	}
+    @Override
+    public void write(byte[] data) {
+        mBuffer.put(data);
+    }
 
-	@Override
-	public void writeUTF(String string) throws UnsupportedEncodingException {
-		byte [] data = string.getBytes("UTF-8"); // TODO Use charset object
-		int count = data.length;
-		writeUShort(count);
-		mBuffer.put(data);
-	}
+    @Override
+    public void write(byte[] data, int offset, int count) {
+        mBuffer.put(data, offset, count);
+    }
 }

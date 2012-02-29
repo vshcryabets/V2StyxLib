@@ -17,9 +17,7 @@ import com.v2soft.styxlib.library.core.Messenger;
 import com.v2soft.styxlib.library.core.Messenger.StyxMessengerListener;
 import com.v2soft.styxlib.library.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.library.exceptions.StyxException;
-import com.v2soft.styxlib.library.io.StyxOutputStream;
 import com.v2soft.styxlib.library.messages.StyxRAttachMessage;
-import com.v2soft.styxlib.library.messages.StyxRAuthMessage;
 import com.v2soft.styxlib.library.messages.StyxRVersionMessage;
 import com.v2soft.styxlib.library.messages.StyxTAttachMessage;
 import com.v2soft.styxlib.library.messages.StyxTAuthMessage;
@@ -290,7 +288,9 @@ implements Closeable, StyxMessengerListener {
 
     private void onReceivedAuth(StyxMessage tMessage, StyxMessage rMessage)
             throws StyxException, InterruptedException, IOException, TimeoutException {
-        StyxErrorMessageException.doException(rMessage);
+        throw new RuntimeException();
+        // TODO uncomment later
+/*        StyxErrorMessageException.doException(rMessage);
         StyxRAuthMessage rAuth = (StyxRAuthMessage) rMessage;
         mAuthQID = rAuth.getQID();
 
@@ -299,7 +299,7 @@ implements Closeable, StyxMessengerListener {
         output.writeString(getPassword());
         output.flush();
 
-        sendAttachMessage();
+        sendAttachMessage();*/
     }
 
     @Override

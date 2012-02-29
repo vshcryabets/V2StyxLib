@@ -3,9 +3,8 @@ package com.v2soft.styxlib.library.messages.base.structs;
 import java.io.IOException;
 
 import com.v2soft.styxlib.library.io.StyxInputStream;
-import com.v2soft.styxlib.library.io.StyxOutputStream;
 import com.v2soft.styxlib.library.messages.base.enums.QIDType;
-import com.v2soft.styxlib.library.server.DualStateBuffer;
+import com.v2soft.styxlib.library.server.StyxBufferOperations;
 import com.v2soft.styxlib.library.types.ULong;
 
 public class StyxQID {
@@ -22,13 +21,13 @@ public class StyxQID {
 		mVersion = version;
 		mPath = path;
 	}
-	
-	public StyxQID(StyxInputStream input) throws IOException {
+
+    public StyxQID(StyxBufferOperations input) throws IOException {
         mType = QIDType.factory(input.readUInt8());
         mVersion = input.readUInt32();
         mPath = input.readUInt64();
-	}
-    public StyxQID(DualStateBuffer input) throws IOException {
+    }
+    public StyxQID(StyxInputStream input) throws IOException {
         mType = QIDType.factory(input.readUInt8());
         mVersion = input.readUInt32();
         mPath = input.readUInt64();
@@ -42,10 +41,10 @@ public class StyxQID {
 	public void setVersion(long version){mVersion = version;}
 	public void setPath(ULong path){mPath = path;}
 	
-	public void writeBinaryTo(StyxOutputStream output) throws IOException {
-        output.writeUByte(getType().getByte());
+	public void writeBinaryTo(StyxBufferOperations output) throws IOException {
+        output.writeUByte((short) getType().getByte());
         output.writeUInt(getVersion());
-        output.writeULong(getPath());
+        output.writeUInt64(getPath());
     }
 	
 	@Override

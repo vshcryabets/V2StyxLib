@@ -1,10 +1,8 @@
 package com.v2soft.styxlib.library.messages;
 
 import java.io.IOException;
-import java.io.InputStream;
 
 import com.v2soft.styxlib.library.io.StyxInputStream;
-import com.v2soft.styxlib.library.io.StyxOutputStream;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
 import com.v2soft.styxlib.library.server.DualStateBuffer;
@@ -33,13 +31,6 @@ public class StyxRFlushMessage extends StyxMessage {
 	@Override
 	public int getBinarySize() {
 		return super.getBinarySize();
-	}
-	
-	@Override
-	protected void internalWriteToStream(StyxOutputStream output)
-			throws IOException 
-	{
-		
 	}
 
 	@Override

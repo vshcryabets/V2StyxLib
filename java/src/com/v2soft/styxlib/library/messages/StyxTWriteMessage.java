@@ -7,7 +7,6 @@ import java.io.UnsupportedEncodingException;
 
 import com.v2soft.styxlib.Config;
 import com.v2soft.styxlib.library.io.StyxInputStream;
-import com.v2soft.styxlib.library.io.StyxOutputStream;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.messages.base.StyxTMessage;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
@@ -140,14 +139,6 @@ public class StyxTWriteMessage extends StyxTMessage {
         output.writeUInt64(getOffset());
         output.writeUInt(getDataLength());
         output.write(getData());        
-    }
-    @Override
-    protected void internalWriteToStream(StyxOutputStream output)
-            throws IOException {
-        output.writeUInt(getFID());
-        output.writeULong(getOffset());
-        output.writeUInt(getDataLength());
-        output.write(getData());		
     }
 
     @Override

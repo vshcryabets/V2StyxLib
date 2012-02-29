@@ -1,10 +1,8 @@
 package com.v2soft.styxlib.library.messages;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 
 import com.v2soft.styxlib.library.io.StyxInputStream;
-import com.v2soft.styxlib.library.io.StyxOutputStream;
 import com.v2soft.styxlib.library.messages.base.StyxTMessage;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
 import com.v2soft.styxlib.library.messages.base.structs.StyxStat;
@@ -78,14 +76,6 @@ public class StyxTWStatMessage extends StyxTMessage {
         output.writeUShort(getStat().getSize());
         getStat().writeBinaryTo(output);        
     }	
-	@Override
-	protected void internalWriteToStream(StyxOutputStream output)
-			throws IOException 
-	{
-		output.writeUInt(getFID());
-		output.writeUShort(getStat().getSize());
-		getStat().writeBinaryTo(output);		
-	}
 
 	@Override
 	protected String internalToString() {

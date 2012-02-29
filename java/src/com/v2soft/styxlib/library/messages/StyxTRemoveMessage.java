@@ -1,11 +1,9 @@
 package com.v2soft.styxlib.library.messages;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 
 import com.v2soft.styxlib.library.io.StyxInputStream;
-import com.v2soft.styxlib.library.io.StyxOutputStream;
 import com.v2soft.styxlib.library.messages.base.StyxTMessage;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
 import com.v2soft.styxlib.library.server.DualStateBuffer;
@@ -67,12 +65,6 @@ public class StyxTRemoveMessage extends StyxTMessage {
 	        throws UnsupportedEncodingException, IOException {
 	    super.writeToBuffer(output);
 	    output.writeUInt(getFID());
-	}
-	@Override
-	protected void internalWriteToStream(StyxOutputStream output)
-			throws IOException 
-	{
-		output.writeUInt(getFID());		
 	}
 
 	@Override

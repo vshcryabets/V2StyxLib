@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
+import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -17,8 +18,10 @@ import com.v2soft.styxlib.library.io.StyxInputStream;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.messages.base.StyxTMessage;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
+import com.v2soft.styxlib.library.types.ObjectsPoll;
+import com.v2soft.styxlib.library.types.ObjectsPoll.ObjectsPollFactory;
 
-public class Messenger implements Runnable, Closeable {
+public class Messenger implements Runnable, Closeable, ObjectsPollFactory<StyxByteBuffer> {
     public interface StyxMessengerListener {
         void onSocketDisconected();
         void onTrashReceived();
@@ -31,7 +34,8 @@ public class Messenger implements Runnable, Closeable {
     private BufferedOutputStream mOutputStream;
     private boolean isWorking;
     private int mIOBufferSize;
-    private int mTransmitedCount, mReceivedCount, mErrorCount;
+    private int mTransmitedCount, mReceivedCount, mErrorCount, mBuffersAllocated;
+    private ObjectsPoll<StyxByteBuffer> mBufferPoll;
 
     public Messenger(Socket socket, int io_unit, StyxMessengerListener listener) 
             throws IOException {
@@ -40,6 +44,7 @@ public class Messenger implements Runnable, Closeable {
         mSocket = socket;
         mOutputStream = new BufferedOutputStream(mSocket.getOutputStream());
         mListener = listener;
+        mBufferPoll = new ObjectsPoll<StyxByteBuffer>(this);
         mThread = new Thread(this);
         mThread.start();        
     }
@@ -69,7 +74,15 @@ public class Messenger implements Runnable, Closeable {
             }
             message.setTag((short) tag);
             mMessages.put(tag, message);
-            message.writeToStream(mOutputStream);
+            
+            StyxByteBuffer buffer = mBufferPoll.get();
+            message.writeToBuffer(buffer);
+            // TODO optimize it
+            ByteBuffer inbuf = buffer.getBuffer(); 
+            byte [] array = new byte[inbuf.position()];
+            inbuf.position(0);
+            inbuf.get(array);
+            mOutputStream.write(array);
             mOutputStream.flush();
             mTransmitedCount++;
             return true;
@@ -175,5 +188,11 @@ public class Messenger implements Runnable, Closeable {
     public int getTransmitedCount() {return mTransmitedCount;}
     public int getReceivedCount() {return mReceivedCount;}
     public int getErrorsCount() {return mErrorCount;}
+
+    @Override
+    public StyxByteBuffer create() {
+        mBuffersAllocated++;
+        return new StyxByteBuffer(ByteBuffer.allocateDirect(mIOBufferSize));
+    }
 
 }

@@ -4,11 +4,8 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
-import java.nio.ByteBuffer;
 
-import com.v2soft.styxlib.library.core.StyxByteBuffer;
 import com.v2soft.styxlib.library.io.StyxInputStream;
-import com.v2soft.styxlib.library.io.StyxOutputStream;
 import com.v2soft.styxlib.library.messages.StyxRAttachMessage;
 import com.v2soft.styxlib.library.messages.StyxRAuthMessage;
 import com.v2soft.styxlib.library.messages.StyxRClunkMessage;
@@ -45,15 +42,6 @@ public abstract class StyxMessage {
 	
 	public static final int NOTAG  =      0xFFFF;
 	public static final long NOFID = 0xFFFFFFFFL;
-	
-	/*
-	public static final int DMDIR    = 0x80000000;
-    public static final int DMAPPEND = 0x40000000;
-    public static final int DMEXCL   = 0x20000000;
-    public static final int DMREAD   = 0x00000004;
-    public static final int DMWRITE  = 0x00000002;
-    public static final int DMEXEC   = 0x00000001;
-    */
 	
 	private int mTag;
 	private MessageType mType;
@@ -359,14 +347,6 @@ public abstract class StyxMessage {
 		return BASE_BINARY_SIZE;
 	}
 	
-	public final void writeToStream(OutputStream stream) 
-		throws IOException {
-		StyxOutputStream output = new StyxOutputStream(stream);
-		output.writeUInt(getBinarySize());
-		output.writeUByte(getType().getByte());
-		output.writeUShort(getTag());
-		internalWriteToStream(output);
-	}
 	public void writeToBuffer(StyxBufferOperations output)  
 	        throws UnsupportedEncodingException, IOException {
 		output.clear();
@@ -376,9 +356,7 @@ public abstract class StyxMessage {
 		output.writeUByte((short) getType().getByte());
 		output.writeUShort(getTag());
 	}
-	
-    protected abstract void internalWriteToStream(StyxOutputStream output)
-            throws IOException;
+
 	protected abstract String internalToString();
 	protected abstract void load(StyxInputStream is)  throws IOException;
     protected abstract void load(DualStateBuffer buffer) throws IOException;
