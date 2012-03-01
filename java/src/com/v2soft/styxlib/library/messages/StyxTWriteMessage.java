@@ -17,30 +17,21 @@ public class StyxTWriteMessage extends StyxTMessage {
     private ULong mOffset;
     private byte[] mData;
 
-    public StyxTWriteMessage() throws IOException
-    {
-        this(NOFID, ULong.ZERO, null);
+    public StyxTWriteMessage() throws IOException {
+        this(NOTAG);
     }
-
-    public StyxTWriteMessage(long fid, ULong offset, InputStream is) throws IOException
-    {
-        super(MessageType.Twrite);
-        mFID = fid;
-        mOffset = offset;
-        setData(is);
-    }
-
-    public StyxTWriteMessage(int tag) throws IOException
-    {
+    public StyxTWriteMessage(int tag) throws IOException {
         this(tag, NOFID, ULong.ZERO, null);
     }
-
-    public StyxTWriteMessage(int tag, long fid, ULong offset, InputStream is) throws IOException
-    {
+    public StyxTWriteMessage(long fid, ULong offset, byte [] data) throws IOException {
+        this(StyxMessage.NOTAG, fid, offset, data);
+    }
+    public StyxTWriteMessage(int tag, long fid, ULong offset, byte [] data) 
+            throws IOException {
         super(MessageType.Twrite, tag);
         mFID = fid;
         mOffset = offset;
-        setData(is);
+        mData = data;
     }
 
     @Override
@@ -72,8 +63,7 @@ public class StyxTWriteMessage extends StyxTMessage {
         mOffset = offset;
     }
 
-    private byte[] getData()
-    {
+    private byte[] getData() {
         if (mData == null)
             return new byte[0];
         return mData;
@@ -91,28 +81,8 @@ public class StyxTWriteMessage extends StyxTMessage {
         return mData.length;
     }
 
-    public void setData(InputStream is) throws IOException
-    {
-        if (is == null)
-        {
-            mData = null;
-            return;
-        }
-
-        mData = new byte[is.available()];
-        is.read(mData);
-    }
-
-    public void setData(InputStream is, int offset, int count) throws IOException
-    {
-        if (is == null)
-        {
-            mData = null;
-            return;
-        }
-
-        mData = new byte[count];
-        is.read(mData, offset, count);
+    public void setData(byte [] data) {
+        mData = data;
     }
 
     @Override
@@ -125,8 +95,8 @@ public class StyxTWriteMessage extends StyxTMessage {
     public void writeToBuffer(StyxBufferOperations output)
             throws UnsupportedEncodingException, IOException {
         super.writeToBuffer(output);
-        output.writeUInt(getFID());
-        output.writeUInt64(getOffset());
+        output.writeUInt(mFID);
+        output.writeUInt64(mOffset);
         output.writeUInt(getDataLength());
         output.write(getData());        
     }

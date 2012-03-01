@@ -3,3 +3,5 @@ Read - 85326
 After switching to use ByteBuffer (not fully optimized)
 Write - 119216
 Read - 98551
+After switching to use StyxBufferOperations for all StyxMessages
+131/96
