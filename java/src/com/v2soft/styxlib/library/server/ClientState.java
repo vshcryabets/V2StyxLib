@@ -2,16 +2,14 @@ package com.v2soft.styxlib.library.server;
 
 import java.io.Closeable;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 
 import com.v2soft.styxlib.library.StyxClientManager;
 import com.v2soft.styxlib.library.core.StyxByteBuffer;
+import com.v2soft.styxlib.library.messages.StyxRAttachMessage;
 import com.v2soft.styxlib.library.messages.StyxRVersionMessage;
-import com.v2soft.styxlib.library.messages.StyxTVersionMessage;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
 
 /**
@@ -23,7 +21,6 @@ public class ClientState
 implements Closeable {
 	private DualStateBuffer mBuffer;
 	private int mIOUnit;
-	private long mCount;
 	private SocketChannel mChannel;
 	private StyxByteBuffer mOutputBuffer;
 
@@ -31,26 +28,48 @@ implements Closeable {
 		mIOUnit = iounit;
 		mBuffer =new DualStateBuffer(iounit*2);
 		mOutputBuffer = new StyxByteBuffer(ByteBuffer.allocateDirect(iounit));
-		mCount = 0;
 		mChannel = channel;
 	}
 
+	/**
+	 * 
+	 * @return true if message was processed
+	 * @throws IOException
+	 */
 	private boolean process() throws IOException {
 	    int inBuffer = mBuffer.remainsToRead();
 	    if ( inBuffer > 4 ) {
 	        long packetSize = mBuffer.getUInt32();
 	        if ( inBuffer >= packetSize ) {
-	            StyxMessage msg = StyxMessage.factory(mBuffer, mIOUnit);
-	            if ( msg instanceof StyxTVersionMessage ) {
-	            	// answer
-	            	StyxRVersionMessage answer = new StyxRVersionMessage(mIOUnit, StyxClientManager.PROTOCOL);
-	            	sendMessage(answer);
-	            }
-	            System.out.print("Got message "+msg.toString());
+	            final StyxMessage message = StyxMessage.factory(mBuffer, mIOUnit);
+	            processMessage(message);
 	            return true;
 	        }
 	    }
 	    return false;
+	}
+
+	/**
+	 * Processing incoming messages
+	 * @param msg
+	 * @throws IOException 
+	 */
+	private void processMessage(StyxMessage msg) throws IOException {
+        System.out.print("Got message "+msg.toString());
+        StyxMessage answer = null;
+		switch (msg.getType()) {
+		case Tversion:
+        	answer = new StyxRVersionMessage(mIOUnit, StyxClientManager.PROTOCOL);
+			break;
+		case Tattach:
+			answer = new StyxRAttachMessage(msg.getTag(), qid);
+			break;
+		default:
+			break;
+		}
+		if ( answer != null ) {
+			sendMessage(answer);
+		}
 	}
 
 	private void sendMessage(StyxMessage answer) throws IOException {
@@ -61,21 +80,14 @@ implements Closeable {
 
 	@Override
 	public void close() throws IOException {
-		// write the rest data in buffer
-//		int rest = mBuffer.remainsToRead();
-//		if ( rest > 0 ) {
-//			byte [] out = new byte[rest];
-//			mBuffer.read(out, 0, rest);
-//			mTestOut.write(out, 0, rest);
-//			mTestOut.close();
-//			mCount += rest;
-//			System.out.print("\rReaded "+mCount);
-//
-//		}
 		mBuffer = null;
-		mCount = 0;
 	}
 
+	/**
+	 * Read data from assigned SocketChannel
+	 * @return
+	 * @throws IOException
+	 */
     public boolean read() throws IOException {
         int readed = mBuffer.readFromChannel(mChannel);
         if ( readed == -1 ) {
