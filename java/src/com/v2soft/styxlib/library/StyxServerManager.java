@@ -14,6 +14,7 @@ import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.messages.base.structs.StyxQID;
 import com.v2soft.styxlib.library.server.ClientBalancer;
 import com.v2soft.styxlib.library.server.ConnectionAcceptor;
+import com.v2soft.styxlib.library.server.vfs.IVirtualStyxDirectory;
 
 public class StyxServerManager 
 implements Closeable, StyxMessengerListener {
@@ -40,7 +41,7 @@ implements Closeable, StyxMessengerListener {
     private ClientBalancer mBalancer;
     private Thread mAcceptorThread;
 
-    public StyxServerManager(InetAddress address, int port, boolean ssl) throws IOException {
+    public StyxServerManager(InetAddress address, int port, boolean ssl, IVirtualStyxDirectory root) throws IOException {
         mPort = port;
         ServerSocketChannel channel = null;
         if ( ssl ) {
@@ -56,7 +57,7 @@ implements Closeable, StyxMessengerListener {
         socket.setReuseAddress(true);
         socket.setSoTimeout(mTimeout);
         
-        mBalancer = new ClientBalancer(mIOBufSize);
+        mBalancer = new ClientBalancer(mIOBufSize, root);
         mAcceptor = new ConnectionAcceptor(channel, mBalancer);
     }
 

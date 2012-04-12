@@ -40,8 +40,7 @@ public class StyxTStatMessage extends StyxTMessage {
         setFID(input.readUInt32());
     }
 	
-	public long getFID()
-	{
+	public long getFID() {
 		return mFID;
 	}
 	
