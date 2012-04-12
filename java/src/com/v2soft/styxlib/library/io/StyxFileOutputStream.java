@@ -41,10 +41,11 @@ public class StyxFileOutputStream extends OutputStream {
         return mIOUnit;
     }
 
-    private void writeBuffer() throws IOException, InterruptedException, StyxException, TimeoutException
-    {
-        ByteArrayInputStream is = new ByteArrayInputStream(buffer, 0, index);
-        StyxTWriteMessage tWrite = new StyxTWriteMessage(mFile.getFID(), offset, is);
+    private void writeBuffer() 
+            throws IOException, InterruptedException, StyxException, TimeoutException {
+        final byte [] data = new byte[index];
+        System.arraycopy(buffer, 0, data, 0, index);
+        StyxTWriteMessage tWrite = new StyxTWriteMessage(mFile.getFID(), offset, data);
         mMessenger.send(tWrite);
         StyxMessage rMessage = tWrite.waitForAnswer(mTimeout);
         StyxErrorMessageException.doException(rMessage);

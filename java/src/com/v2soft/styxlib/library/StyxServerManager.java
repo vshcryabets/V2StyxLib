@@ -9,9 +9,6 @@ import java.nio.channels.ServerSocketChannel;
 import java.security.InvalidParameterException;
 import java.util.LinkedList;
 
-import javax.net.ServerSocketFactory;
-import javax.net.ssl.SSLServerSocketFactory;
-
 import com.v2soft.styxlib.library.core.Messenger.StyxMessengerListener;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.messages.base.structs.StyxQID;
@@ -38,29 +35,26 @@ implements Closeable, StyxMessengerListener {
     private StyxQID mQID;
     private long mFID = StyxMessage.NOFID;
     private ActiveFids mActiveFids = new ActiveFids();
-    private ServerSocket mSocket;
+//    private ServerSocket mSocket;
     private ConnectionAcceptor mAcceptor;
     private ClientBalancer mBalancer;
     private Thread mAcceptorThread;
 
     public StyxServerManager(InetAddress address, int port, boolean ssl) throws IOException {
         mPort = port;
-//        ServerSocketFactory factory;
         ServerSocketChannel channel = null;
         if ( ssl ) {
-//            factory = SSLServerSocketFactory.getDefault();
-//            channel = SSLServerSocketChannel.open();
+            throw new RuntimeException("Not implemented");
         } else {
-//            factory = ServerSocketFactory.getDefault();
             channel = ServerSocketChannel.open();
         }
 
         // Bind the server socket to the local host and port
         InetSocketAddress isa = new InetSocketAddress(address, port);
-        mSocket = channel.socket();
-        mSocket.bind(isa);
-        mSocket.setReuseAddress(true);
-        mSocket.setSoTimeout(mTimeout);
+        ServerSocket socket = channel.socket();
+        socket.bind(isa);
+        socket.setReuseAddress(true);
+        socket.setSoTimeout(mTimeout);
         
         mBalancer = new ClientBalancer(mIOBufSize);
         mAcceptor = new ConnectionAcceptor(channel, mBalancer);

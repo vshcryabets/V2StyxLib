@@ -2,11 +2,9 @@ package com.v2soft.styxlib.library.messages;
 
 import java.io.IOException;
 
-import com.v2soft.styxlib.library.io.StyxInputStream;
-import com.v2soft.styxlib.library.io.StyxOutputStream;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
-import com.v2soft.styxlib.library.server.DualStateBuffer;
+import com.v2soft.styxlib.library.server.StyxBufferOperations;
 
 public class StyxRWStatMessage extends StyxMessage {
 
@@ -21,24 +19,13 @@ public class StyxRWStatMessage extends StyxMessage {
 	}
 	
     @Override
-    public void load(StyxInputStream input) 
-        throws IOException  {
-	}
-    @Override
-    public void load(DualStateBuffer input) 
+    public void load(StyxBufferOperations input) 
         throws IOException  {
     }
 	
 	@Override
 	public int getBinarySize() {
 		return super.getBinarySize();
-	}
-	
-	@Override
-	protected void internalWriteToStream(StyxOutputStream output)
-			throws IOException 
-	{
-		
 	}
 
 	@Override

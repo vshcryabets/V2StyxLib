@@ -25,7 +25,7 @@ public abstract class StyxTMessage extends StyxMessage {
 		throws StyxException {
 		synchronized (this) {
 			if (!checkAnswer(answer))
-				throw new StyxWrongMessageException(answer, getNeeded());
+				throw new StyxWrongMessageException(answer, getRequiredAnswerType());
 			mAnswer = answer;
 			notifyAll();
 		}
@@ -43,11 +43,11 @@ public abstract class StyxTMessage extends StyxMessage {
 	
 	protected boolean checkAnswer(StyxMessage answer)
 	{
-		MessageType needed = getNeeded();
+		MessageType needed = getRequiredAnswerType();
 		MessageType received = answer.getType();
 		
 		return (needed == received || received == MessageType.Rerror);
 	}
 	
-	protected abstract MessageType getNeeded();
+	protected abstract MessageType getRequiredAnswerType();
 }

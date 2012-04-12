@@ -1,13 +1,13 @@
 package com.v2soft.styxlib.library.messages;
 
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 
 import com.v2soft.styxlib.library.io.StyxInputStream;
-import com.v2soft.styxlib.library.io.StyxOutputStream;
 import com.v2soft.styxlib.library.messages.base.StyxTMessage;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
 import com.v2soft.styxlib.library.server.DualStateBuffer;
+import com.v2soft.styxlib.library.server.StyxBufferOperations;
 
 public class StyxTFlushMessage extends StyxTMessage {
 	private int mOldTag;
@@ -21,14 +21,9 @@ public class StyxTFlushMessage extends StyxTMessage {
 	{
 		super(MessageType.Tflush, tag);
 	}
-	
+
     @Override
-    public void load(StyxInputStream input) 
-        throws IOException  {
-		setOldTag(input.readUInt16());
-	}
-    @Override
-    public void load(DualStateBuffer input) 
+    public void load(StyxBufferOperations input) 
         throws IOException  {
         setOldTag(input.readUInt16());
     }
@@ -49,10 +44,10 @@ public class StyxTFlushMessage extends StyxTMessage {
 	}
 	
 	@Override
-	protected void internalWriteToStream(StyxOutputStream output)
-			throws IOException 
-	{
-		output.writeUShort(getOldTag());		
+	public void writeToBuffer(StyxBufferOperations output)
+	        throws UnsupportedEncodingException, IOException {
+	    super.writeToBuffer(output);
+	    output.writeUShort(getOldTag());
 	}
 
 	@Override
@@ -61,7 +56,7 @@ public class StyxTFlushMessage extends StyxTMessage {
 	}
 
 	@Override
-	protected MessageType getNeeded() {
+	protected MessageType getRequiredAnswerType() {
 		return MessageType.Rflush;
 	}
 }

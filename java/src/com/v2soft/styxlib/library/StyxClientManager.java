@@ -6,6 +6,7 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketAddress;
+import java.nio.channels.SocketChannel;
 import java.security.InvalidParameterException;
 import java.util.LinkedList;
 import java.util.concurrent.TimeoutException;
@@ -17,9 +18,7 @@ import com.v2soft.styxlib.library.core.Messenger;
 import com.v2soft.styxlib.library.core.Messenger.StyxMessengerListener;
 import com.v2soft.styxlib.library.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.library.exceptions.StyxException;
-import com.v2soft.styxlib.library.io.StyxOutputStream;
 import com.v2soft.styxlib.library.messages.StyxRAttachMessage;
-import com.v2soft.styxlib.library.messages.StyxRAuthMessage;
 import com.v2soft.styxlib.library.messages.StyxRVersionMessage;
 import com.v2soft.styxlib.library.messages.StyxTAttachMessage;
 import com.v2soft.styxlib.library.messages.StyxTAuthMessage;
@@ -110,13 +109,18 @@ implements Closeable, StyxMessengerListener {
         SocketFactory socketFactory = null;
         if (ssl)
             socketFactory = SSLSocketFactory.getDefault();
-        else socketFactory = SocketFactory.getDefault();
+        else 
+            socketFactory = SocketFactory.getDefault();
 
-        Socket socket = socketFactory.createSocket();
+        
+//        Socket socket = socketFactory.createSocket();
+        
         SocketAddress sa= new InetSocketAddress(address, port);
-        socket.connect(sa, mTimeout);
+        SocketChannel channel = SocketChannel.open(sa);
+        channel.configureBlocking(true);
+        Socket socket = channel.socket();
         socket.setSoTimeout(mTimeout);
-        mMessenger = new Messenger(socket, mIOBufSize, this);
+        mMessenger = new Messenger(channel, mIOBufSize, this);
 
         sendVersionMessage();
         setConnected(socket.isConnected());
@@ -130,8 +134,7 @@ implements Closeable, StyxMessengerListener {
         return mRoot;
     }
 
-    public Messenger getMessenger()
-    {
+    public Messenger getMessenger() {
         return mMessenger;
     }		
 
@@ -210,9 +213,10 @@ implements Closeable, StyxMessengerListener {
      * @throws InterruptedException
      * @throws StyxException
      * @throws TimeoutException
+     * @throws IOException 
      */
     public void clunk(long fid) 
-            throws InterruptedException, StyxException, TimeoutException {
+            throws InterruptedException, StyxException, TimeoutException, IOException {
         final StyxTClunkMessage tClunk = new StyxTClunkMessage(fid);
         mMessenger.send(tClunk);
         StyxMessage rMessage = tClunk.waitForAnswer(mTimeout);
@@ -226,8 +230,9 @@ implements Closeable, StyxMessengerListener {
      * @throws TimeoutException 
      * @throws InterruptedException 
      * @throws StyxErrorMessageException 
+     * @throws IOException 
      */
-    public void remove(long fid) throws InterruptedException, TimeoutException, StyxErrorMessageException {
+    public void remove(long fid) throws InterruptedException, TimeoutException, StyxErrorMessageException, IOException {
         StyxTRemoveMessage tRemove = new StyxTRemoveMessage(fid);
         
         mMessenger.send(tRemove);
@@ -263,18 +268,17 @@ implements Closeable, StyxMessengerListener {
             throws InterruptedException, StyxException, IOException, TimeoutException {
         mAuthFID = getActiveFids().getFreeFid();
 
-        Messenger messenger = getMessenger();
         StyxTAuthMessage tAuth = new StyxTAuthMessage(mAuthFID);
         tAuth.setUserName(getUserName());
         tAuth.setMountPoint(getMountPoint());
-        messenger.send(tAuth);
+        mMessenger.send(tAuth);
 
         StyxMessage rMessage = tAuth.waitForAnswer(mTimeout);
         onReceivedAuth(tAuth, rMessage);
     }
 
     private void sendAttachMessage()
-            throws InterruptedException, StyxException, TimeoutException {
+            throws InterruptedException, StyxException, TimeoutException, IOException {
         mFID = getActiveFids().getFreeFid();
         StyxTAttachMessage tAttach = new StyxTAttachMessage(getFID(), getAuthFID());
         tAttach.setUserName(getUserName());
@@ -290,7 +294,9 @@ implements Closeable, StyxMessengerListener {
 
     private void onReceivedAuth(StyxMessage tMessage, StyxMessage rMessage)
             throws StyxException, InterruptedException, IOException, TimeoutException {
-        StyxErrorMessageException.doException(rMessage);
+        throw new RuntimeException();
+        // TODO uncomment later
+/*        StyxErrorMessageException.doException(rMessage);
         StyxRAuthMessage rAuth = (StyxRAuthMessage) rMessage;
         mAuthQID = rAuth.getQID();
 
@@ -299,7 +305,7 @@ implements Closeable, StyxMessengerListener {
         output.writeString(getPassword());
         output.flush();
 
-        sendAttachMessage();
+        sendAttachMessage();*/
     }
 
     @Override

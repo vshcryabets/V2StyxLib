@@ -3,13 +3,12 @@ package com.v2soft.styxlib.library.messages;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 
 import com.v2soft.styxlib.Config;
-import com.v2soft.styxlib.library.io.StyxInputStream;
-import com.v2soft.styxlib.library.io.StyxOutputStream;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
-import com.v2soft.styxlib.library.server.DualStateBuffer;
+import com.v2soft.styxlib.library.server.StyxBufferOperations;
 
 public class StyxRReadMessage extends StyxMessage {
 	private byte[] mData;
@@ -37,13 +36,7 @@ public class StyxRReadMessage extends StyxMessage {
 	}
 	
     @Override
-    public void load(StyxInputStream input) 
-        throws IOException  {
-        int count = (int)input.readUInt32();
-		setData(input, 0, count);
-	}
-    @Override
-    public void load(DualStateBuffer input) 
+    public void load(StyxBufferOperations input) 
         throws IOException  {
         int count = (int)input.readUInt32();
         mData = new byte[count];
@@ -100,9 +93,9 @@ public class StyxRReadMessage extends StyxMessage {
 	}
 	
 	@Override
-	protected void internalWriteToStream(StyxOutputStream output)
-			throws IOException 
-	{
+	public void writeToBuffer(StyxBufferOperations output)
+	        throws UnsupportedEncodingException, IOException {
+	    super.writeToBuffer(output);
 		output.writeUInt(getDataLength());
 		output.write(getData());
 	}

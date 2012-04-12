@@ -1,24 +1,20 @@
 package com.v2soft.styxlib.library.messages;
 
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 
-import com.v2soft.styxlib.library.io.StyxInputStream;
-import com.v2soft.styxlib.library.io.StyxOutputStream;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
-import com.v2soft.styxlib.library.server.DualStateBuffer;
+import com.v2soft.styxlib.library.server.StyxBufferOperations;
 
 public class StyxRWriteMessage extends StyxMessage {
 	private long mCount;
 
-	public StyxRWriteMessage()
-	{
+	public StyxRWriteMessage() {
 		this(0);
 	}
 	
-	public StyxRWriteMessage(long count)
-	{
+	public StyxRWriteMessage(long count) {
 		super(MessageType.Rwrite);
 		mCount = count;
 	}
@@ -35,12 +31,7 @@ public class StyxRWriteMessage extends StyxMessage {
 	}
 	
     @Override
-    public void load(StyxInputStream input) 
-        throws IOException  {
-		setCount(input.readUInt32());
-	}
-    @Override
-    public void load(DualStateBuffer input) 
+    public void load(StyxBufferOperations input) 
         throws IOException  {
         setCount(input.readUInt32());
     }
@@ -61,9 +52,9 @@ public class StyxRWriteMessage extends StyxMessage {
 	}
 	
 	@Override
-	protected void internalWriteToStream(StyxOutputStream output)
-			throws IOException 
-	{
+	public void writeToBuffer(StyxBufferOperations output)
+	        throws UnsupportedEncodingException, IOException {
+	    super.writeToBuffer(output);
 		output.writeUInt(getCount());
 	}
 

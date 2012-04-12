@@ -1,14 +1,15 @@
 package com.v2soft.styxlib.library.messages;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 
 import com.v2soft.styxlib.library.StyxFile;
 import com.v2soft.styxlib.library.io.StyxInputStream;
-import com.v2soft.styxlib.library.io.StyxOutputStream;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.messages.base.StyxTMessage;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
 import com.v2soft.styxlib.library.server.DualStateBuffer;
+import com.v2soft.styxlib.library.server.StyxBufferOperations;
 
 public class StyxTWalkMessage extends StyxTMessage {
 	private long mFID, mNewFID;
@@ -30,22 +31,8 @@ public class StyxTWalkMessage extends StyxTMessage {
 		mNewFID = new_fid;
 	}
 	
-	@Override
-	public void load(StyxInputStream input) throws IOException	{
-	    String path = "";
-		setFID(input.readUInt32());
-		setNewFID(input.readUInt32());
-		int count = input.readUInt16();
-		for (int i=0; i<count; i++)	{
-			String stmp = input.readUTF();
-			if (!path.equals(""))
-				path += "/";
-			path += stmp;
-		}
-		setPath(path);
-	}
     @Override
-    public void load(DualStateBuffer input) throws IOException  {
+    public void load(StyxBufferOperations input) throws IOException  {
         String path = "";
         setFID(input.readUInt32());
         setNewFID(input.readUInt32());
@@ -59,9 +46,9 @@ public class StyxTWalkMessage extends StyxTMessage {
         setPath(path);
     }
     @Override
-    protected void internalWriteToStream(StyxOutputStream output)
-            throws IOException 
-    {
+    public void writeToBuffer(StyxBufferOperations output)
+            throws UnsupportedEncodingException, IOException {
+        super.writeToBuffer(output);
         output.writeUInt(getFID());
         output.writeUInt(getNewFID());
         if (mPathElements != null)
@@ -147,7 +134,7 @@ public class StyxTWalkMessage extends StyxTMessage {
 	}
 
 	@Override
-	protected MessageType getNeeded() {
+	protected MessageType getRequiredAnswerType() {
 		return MessageType.Rwalk;
 	}
 	

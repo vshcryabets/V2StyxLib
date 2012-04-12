@@ -1,17 +1,16 @@
 package com.v2soft.styxlib.library.messages;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import com.v2soft.styxlib.library.io.StyxInputStream;
-import com.v2soft.styxlib.library.io.StyxOutputStream;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
 import com.v2soft.styxlib.library.messages.base.structs.StyxQID;
-import com.v2soft.styxlib.library.server.DualStateBuffer;
+import com.v2soft.styxlib.library.server.StyxBufferOperations;
 
 public class StyxRWalkMessage extends StyxMessage {
 	private List<StyxQID> mQIDList;
@@ -27,17 +26,7 @@ public class StyxRWalkMessage extends StyxMessage {
 	}
 	
     @Override
-    public void load(StyxInputStream input) 
-        throws IOException  {
-        int count = input.readUInt16();
-		
-		ArrayList<StyxQID> list = new ArrayList<StyxQID>();
-		for (int i=0; i<count; i++)
-			list.add(new StyxQID(input));
-		setQIDList(list);
-	}
-    @Override
-    public void load(DualStateBuffer input) 
+    public void load(StyxBufferOperations input) 
         throws IOException  {
         int count = input.readUInt16();
         
@@ -92,10 +81,10 @@ public class StyxRWalkMessage extends StyxMessage {
 	}
 	
 	@Override
-	protected void internalWriteToStream(StyxOutputStream output)
-			throws IOException 
-	{
-		output.writeShort(getQIDListLength());
+	public void writeToBuffer(StyxBufferOperations output)
+	        throws UnsupportedEncodingException, IOException {
+	    super.writeToBuffer(output);
+		output.writeUShort(getQIDListLength());
 		if (mQIDList != null)
 		{
 			for (StyxQID qid : mQIDList)

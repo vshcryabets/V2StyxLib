@@ -3,14 +3,13 @@ package com.v2soft.styxlib.library.messages;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 
 import com.v2soft.styxlib.Config;
-import com.v2soft.styxlib.library.io.StyxInputStream;
-import com.v2soft.styxlib.library.io.StyxOutputStream;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.messages.base.StyxTMessage;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
-import com.v2soft.styxlib.library.server.DualStateBuffer;
+import com.v2soft.styxlib.library.server.StyxBufferOperations;
 import com.v2soft.styxlib.library.types.ULong;
 
 public class StyxTWriteMessage extends StyxTMessage {
@@ -18,42 +17,25 @@ public class StyxTWriteMessage extends StyxTMessage {
     private ULong mOffset;
     private byte[] mData;
 
-    public StyxTWriteMessage() throws IOException
-    {
-        this(NOFID, ULong.ZERO, null);
+    public StyxTWriteMessage() throws IOException {
+        this(NOTAG);
     }
-
-    public StyxTWriteMessage(long fid, ULong offset, InputStream is) throws IOException
-    {
-        super(MessageType.Twrite);
-        mFID = fid;
-        mOffset = offset;
-        setData(is);
-    }
-
-    public StyxTWriteMessage(int tag) throws IOException
-    {
+    public StyxTWriteMessage(int tag) throws IOException {
         this(tag, NOFID, ULong.ZERO, null);
     }
-
-    public StyxTWriteMessage(int tag, long fid, ULong offset, InputStream is) throws IOException
-    {
+    public StyxTWriteMessage(long fid, ULong offset, byte [] data) throws IOException {
+        this(StyxMessage.NOTAG, fid, offset, data);
+    }
+    public StyxTWriteMessage(int tag, long fid, ULong offset, byte [] data) 
+            throws IOException {
         super(MessageType.Twrite, tag);
         mFID = fid;
         mOffset = offset;
-        setData(is);
+        mData = data;
     }
 
     @Override
-    public void load(StyxInputStream input) throws IOException
-    {
-        mFID = input.readUInt32();
-        mOffset = input.readUInt64();
-        int count = (int)input.readUInt32();
-        setData(input, 0, count);
-    }
-    @Override
-    public void load(DualStateBuffer input) throws IOException {
+    public void load(StyxBufferOperations input) throws IOException {
         mFID = input.readUInt32();
         mOffset = input.readUInt64();
         int count = (int)input.readUInt32();
@@ -81,8 +63,7 @@ public class StyxTWriteMessage extends StyxTMessage {
         mOffset = offset;
     }
 
-    private byte[] getData()
-    {
+    private byte[] getData() {
         if (mData == null)
             return new byte[0];
         return mData;
@@ -100,28 +81,8 @@ public class StyxTWriteMessage extends StyxTMessage {
         return mData.length;
     }
 
-    public void setData(InputStream is) throws IOException
-    {
-        if (is == null)
-        {
-            mData = null;
-            return;
-        }
-
-        mData = new byte[is.available()];
-        is.read(mData);
-    }
-
-    public void setData(InputStream is, int offset, int count) throws IOException
-    {
-        if (is == null)
-        {
-            mData = null;
-            return;
-        }
-
-        mData = new byte[count];
-        is.read(mData, offset, count);
+    public void setData(byte [] data) {
+        mData = data;
     }
 
     @Override
@@ -131,14 +92,14 @@ public class StyxTWriteMessage extends StyxTMessage {
     }
 
     @Override
-    protected void internalWriteToStream(StyxOutputStream output)
-            throws IOException 
-            {
-        output.writeUInt(getFID());
-        output.writeULong(getOffset());
+    public void writeToBuffer(StyxBufferOperations output)
+            throws UnsupportedEncodingException, IOException {
+        super.writeToBuffer(output);
+        output.writeUInt(mFID);
+        output.writeUInt64(mOffset);
         output.writeUInt(getDataLength());
-        output.write(getData());		
-            }
+        output.write(getData());        
+    }
 
     @Override
     protected String internalToString() {
@@ -152,7 +113,7 @@ public class StyxTWriteMessage extends StyxTMessage {
     }
 
     @Override
-    protected MessageType getNeeded() {
+    protected MessageType getRequiredAnswerType() {
         return MessageType.Rwrite;
     }
 

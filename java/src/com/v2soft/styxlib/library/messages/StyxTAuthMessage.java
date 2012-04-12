@@ -1,14 +1,14 @@
 package com.v2soft.styxlib.library.messages;
 
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 
 import com.v2soft.styxlib.library.io.StyxInputStream;
-import com.v2soft.styxlib.library.io.StyxOutputStream;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.messages.base.StyxTMessage;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
 import com.v2soft.styxlib.library.server.DualStateBuffer;
+import com.v2soft.styxlib.library.server.StyxBufferOperations;
 
 public class StyxTAuthMessage extends StyxTMessage 
 {
@@ -37,16 +37,9 @@ public class StyxTAuthMessage extends StyxTMessage
 		super(MessageType.Tauth, tag);
 		mAuthFID = fid;
 	}
-	
+
     @Override
-    public void load(StyxInputStream input) 
-        throws IOException  {
-		setAuthFID(input.readUInt32());
-		setUserName(input.readUTF());
-		setMountPoint(input.readUTF());
-	}
-    @Override
-    public void load(DualStateBuffer input) 
+    public void load(StyxBufferOperations input) 
         throws IOException  {
         setAuthFID(input.readUInt32());
         setUserName(input.readUTF());
@@ -95,9 +88,9 @@ public class StyxTAuthMessage extends StyxTMessage
 	}
 	
 	@Override
-	protected void internalWriteToStream(StyxOutputStream output)
-			throws IOException 
-	{
+	public void writeToBuffer(StyxBufferOperations output)
+	        throws UnsupportedEncodingException, IOException {
+	    super.writeToBuffer(output);
 		output.writeUInt(getAuthFID());
 		output.writeUTF(getUserName());
 		output.writeUTF(getMountPoint());		
@@ -110,7 +103,7 @@ public class StyxTAuthMessage extends StyxTMessage
 	}
 
 	@Override
-	protected MessageType getNeeded() {
+	protected MessageType getRequiredAnswerType() {
 		return MessageType.Rauth;
 	}
 	

@@ -1,13 +1,12 @@
 package com.v2soft.styxlib.library.messages;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 
-import com.v2soft.styxlib.library.io.StyxInputStream;
-import com.v2soft.styxlib.library.io.StyxOutputStream;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.messages.base.StyxTMessage;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
-import com.v2soft.styxlib.library.server.DualStateBuffer;
+import com.v2soft.styxlib.library.server.StyxBufferOperations;
 
 public class StyxTVersionMessage extends StyxTMessage {
 	private long mMaxPacketSize;
@@ -23,15 +22,8 @@ public class StyxTVersionMessage extends StyxTMessage {
 		super(MessageType.Tversion, StyxMessage.NOTAG);
 	}
 	
-	@Override
-	public void load(StyxInputStream input) 
-		throws IOException	{
-		setMaxPacketSize(input.readUInt32());
-		setProtocolVersion(input.readUTF());
-	}
-
     @Override
-    public void load(DualStateBuffer input)
+    public void load(StyxBufferOperations input)
         throws IOException {
         setMaxPacketSize(input.readUInt32());
         setProtocolVersion(input.readUTF());
@@ -66,11 +58,11 @@ public class StyxTVersionMessage extends StyxTMessage {
 	}
 	
 	@Override
-	protected void internalWriteToStream(StyxOutputStream output)
-			throws IOException 
-	{
-		output.writeUInt(getMaxPacketSize());
-		output.writeUTF(getProtocolVersion());		
+	public void writeToBuffer(StyxBufferOperations output)
+	        throws UnsupportedEncodingException, IOException {
+	    super.writeToBuffer(output);
+        output.writeUInt(getMaxPacketSize());
+        output.writeUTF(getProtocolVersion());      
 	}
 
 	@Override
@@ -80,7 +72,7 @@ public class StyxTVersionMessage extends StyxTMessage {
 	}
 
 	@Override
-	protected MessageType getNeeded() {
+	protected MessageType getRequiredAnswerType() {
 		return MessageType.Rversion;
 	}
 }
