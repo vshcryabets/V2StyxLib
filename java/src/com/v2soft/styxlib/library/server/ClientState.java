@@ -5,12 +5,18 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
+import java.util.HashMap;
 
 import com.v2soft.styxlib.library.StyxClientManager;
 import com.v2soft.styxlib.library.core.StyxByteBuffer;
 import com.v2soft.styxlib.library.messages.StyxRAttachMessage;
+import com.v2soft.styxlib.library.messages.StyxRStatMessage;
 import com.v2soft.styxlib.library.messages.StyxRVersionMessage;
+import com.v2soft.styxlib.library.messages.StyxTAttachMessage;
+import com.v2soft.styxlib.library.messages.StyxTStatMessage;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
+import com.v2soft.styxlib.library.server.vfs.IVirtualStyxDirectory;
+import com.v2soft.styxlib.library.server.vfs.IVirtualStyxFile;
 
 /**
  * 
@@ -23,12 +29,18 @@ implements Closeable {
 	private int mIOUnit;
 	private SocketChannel mChannel;
 	private StyxByteBuffer mOutputBuffer;
+	private IVirtualStyxDirectory mServerRoot;
+	private IVirtualStyxDirectory mClientRoot;
+	private HashMap<Long, IVirtualStyxFile> mOpenedFiles;
 
-	public ClientState(int iounit, SocketChannel channel) throws FileNotFoundException {
+	public ClientState(int iounit, 
+			SocketChannel channel, 
+			IVirtualStyxDirectory root) throws FileNotFoundException {
 		mIOUnit = iounit;
 		mBuffer =new DualStateBuffer(iounit*2);
 		mOutputBuffer = new StyxByteBuffer(ByteBuffer.allocateDirect(iounit));
 		mChannel = channel;
+		mServerRoot = root;
 	}
 
 	/**
@@ -62,8 +74,14 @@ implements Closeable {
         	answer = new StyxRVersionMessage(mIOUnit, StyxClientManager.PROTOCOL);
 			break;
 		case Tattach:
-			answer = new StyxRAttachMessage(msg.getTag(), qid);
+        	String mountPoint = ((StyxTAttachMessage)msg).getMountPoint();
+        	mClientRoot = mServerRoot.getDirectory(mountPoint);
+        	answer = new StyxRAttachMessage(msg.getTag(), mClientRoot.getQID());
+        	registerOpenedFile(((StyxTAttachMessage)msg).getFID(), mClientRoot );
 			break;
+		case Tstat:
+        	IVirtualStyxFile file = mOpenedFiles.get(((StyxTStatMessage)msg).getFID());
+        	answer = new StyxRStatMessage(msg.getTag(), file.getStat());
 		default:
 			break;
 		}
@@ -72,6 +90,15 @@ implements Closeable {
 		}
 	}
 
+	private void registerOpenedFile(long fid, IVirtualStyxFile file) {
+		mOpenedFiles.put(fid, file);
+	}
+
+	/**
+	 * Send answer message to client
+	 * @param answer
+	 * @throws IOException
+	 */
 	private void sendMessage(StyxMessage answer) throws IOException {
 		answer.writeToBuffer(mOutputBuffer);
 		mOutputBuffer.getBuffer().position(0);

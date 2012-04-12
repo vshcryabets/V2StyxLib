@@ -5,16 +5,18 @@ import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.v2soft.styxlib.library.server.vfs.IVirtualStyxDirectory;
+
 
 public class ClientBalancer {
     private ClientsHandler mHandler;
     private Thread mThread;
     private List<SocketChannel> mNewConnetion, mReadable;
     
-    public ClientBalancer(int iounit) throws IOException {
+    public ClientBalancer(int iounit, IVirtualStyxDirectory root) throws IOException {
     	mNewConnetion = new ArrayList<SocketChannel>();
     	mReadable = new ArrayList<SocketChannel>();
-        mHandler = new ClientsHandler(iounit);
+        mHandler = new ClientsHandler(iounit, root);
 //        mThread = new Thread(mHandler, "ClientsHandler");
 //        mThread.start();
     }
