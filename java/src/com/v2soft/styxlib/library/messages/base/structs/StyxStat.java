@@ -12,17 +12,17 @@ public class StyxStat {
     public static final StyxStat EMPTY = new StyxStat((short)0, 0, null,
             0, null, null, ULong.ZERO, null, null, null, null);
 
-    private int mType;
-    private long mDev;
+    private int mType; //for kernel use 
+    private long mDev; //for kernel use 
     private StyxQID mQID;
-    private long mMode;
-    private Date mAccessTime;
-    private Date mModificationTime;
-    private ULong mLength;
-    private String mName;
-    private String mUserName;
-    private String mGroupName;
-    private String mModificationUser;
+    private long mMode; // permissions and flags 
+    private Date mAccessTime; // last access time 
+    private Date mModificationTime; // last modification time 
+    private ULong mLength; //length of file in bytes 
+    private String mName; // file name; must be / if the file is the root directory of the server 
+    private String mUserName; //owner name 
+    private String mGroupName; //group name 
+    private String mModificationUser; //name of the user who last modified the file 
 
     public static Date IntToDate(long date)
     {

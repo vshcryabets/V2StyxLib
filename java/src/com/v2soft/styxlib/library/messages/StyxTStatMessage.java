@@ -3,12 +3,15 @@ package com.v2soft.styxlib.library.messages;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
-import com.v2soft.styxlib.library.io.StyxInputStream;
 import com.v2soft.styxlib.library.messages.base.StyxTMessage;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
-import com.v2soft.styxlib.library.server.DualStateBuffer;
 import com.v2soft.styxlib.library.server.StyxBufferOperations;
 
+/**
+ * Class for TStat message
+ * @author vhscryabets@gmail.com
+ *
+ */
 public class StyxTStatMessage extends StyxTMessage {
 	private long mFID;
 
@@ -40,9 +43,10 @@ public class StyxTStatMessage extends StyxTMessage {
         setFID(input.readUInt32());
     }
 	
-	public long getFID() {
-		return mFID;
-	}
+    /**
+     * @return File ID
+     */
+	public long getFID() {return mFID;}
 	
 	public void setFID(long fid)
 	{

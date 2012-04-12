@@ -11,9 +11,9 @@ public class StyxQID {
 	public static final int CONTENT_SIZE = 13;
 	public static final StyxQID EMPTY = new StyxQID(QIDType.QTFILE, 0L, ULong.ZERO);
 	
-	private QIDType mType;
-	private long mVersion;
-	private ULong mPath;
+	private QIDType mType; //the type of the file (directory, etc.), represented as a bit vector corresponding to the high 8 bits of the file's mode word. 
+	private long mVersion; // version number for given path 
+	private ULong mPath; //the file server's unique identification for the file 
 	
 	public StyxQID(QIDType type, long version, ULong path)
 	{

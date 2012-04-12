@@ -13,7 +13,7 @@ public class MemoryStyxDirectory
 	
 	@Override
 	public StyxQID getQID() {
-		return new StyxQID(QIDType.QTDIR, 0, new ULong(1));
+		return new StyxQID(QIDType.QTDIR, 0, new ULong(this.hashCode()));
 	}
 
 	@Override
@@ -30,7 +30,7 @@ public class MemoryStyxDirectory
 
 	@Override
 	public StyxStat getStat() {
-//		StyxStat result = new StyxStat(type, 
+		StyxStat result = new StyxStat(type, 
 //				dev, 
 //				getQID(), 
 //				mode, 
