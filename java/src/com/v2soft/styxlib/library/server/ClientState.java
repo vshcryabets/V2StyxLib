@@ -7,12 +7,16 @@ import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.util.HashMap;
 
+import com.sun.xml.internal.ws.api.pipe.TubeCloner;
 import com.v2soft.styxlib.library.StyxClientManager;
 import com.v2soft.styxlib.library.core.StyxByteBuffer;
 import com.v2soft.styxlib.library.messages.StyxRAttachMessage;
+import com.v2soft.styxlib.library.messages.StyxRClunkMessage;
+import com.v2soft.styxlib.library.messages.StyxRErrorMessage;
 import com.v2soft.styxlib.library.messages.StyxRStatMessage;
 import com.v2soft.styxlib.library.messages.StyxRVersionMessage;
 import com.v2soft.styxlib.library.messages.StyxTAttachMessage;
+import com.v2soft.styxlib.library.messages.StyxTClunkMessage;
 import com.v2soft.styxlib.library.messages.StyxTStatMessage;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.server.vfs.IVirtualStyxDirectory;
@@ -41,6 +45,7 @@ implements Closeable {
 		mOutputBuffer = new StyxByteBuffer(ByteBuffer.allocateDirect(iounit));
 		mChannel = channel;
 		mServerRoot = root;
+		mOpenedFiles = new HashMap<Long, IVirtualStyxFile>();
 	}
 
 	/**
@@ -49,16 +54,16 @@ implements Closeable {
 	 * @throws IOException
 	 */
 	private boolean process() throws IOException {
-	    int inBuffer = mBuffer.remainsToRead();
-	    if ( inBuffer > 4 ) {
-	        long packetSize = mBuffer.getUInt32();
-	        if ( inBuffer >= packetSize ) {
-	            final StyxMessage message = StyxMessage.factory(mBuffer, mIOUnit);
-	            processMessage(message);
-	            return true;
-	        }
-	    }
-	    return false;
+		int inBuffer = mBuffer.remainsToRead();
+		if ( inBuffer > 4 ) {
+			long packetSize = mBuffer.getUInt32();
+			if ( inBuffer >= packetSize ) {
+				final StyxMessage message = StyxMessage.factory(mBuffer, mIOUnit);
+				processMessage(message);
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**
@@ -67,21 +72,35 @@ implements Closeable {
 	 * @throws IOException 
 	 */
 	private void processMessage(StyxMessage msg) throws IOException {
-        System.out.print("Got message "+msg.toString());
-        StyxMessage answer = null;
+		System.out.print("Got message "+msg.toString());
+		StyxMessage answer = null;
+		IVirtualStyxFile file;
 		switch (msg.getType()) {
 		case Tversion:
-        	answer = new StyxRVersionMessage(mIOUnit, StyxClientManager.PROTOCOL);
+			answer = new StyxRVersionMessage(mIOUnit, StyxClientManager.PROTOCOL);
 			break;
 		case Tattach:
-        	String mountPoint = ((StyxTAttachMessage)msg).getMountPoint();
-        	mClientRoot = mServerRoot.getDirectory(mountPoint);
-        	answer = new StyxRAttachMessage(msg.getTag(), mClientRoot.getQID());
-        	registerOpenedFile(((StyxTAttachMessage)msg).getFID(), mClientRoot );
+			String mountPoint = ((StyxTAttachMessage)msg).getMountPoint();
+			mClientRoot = mServerRoot.getDirectory(mountPoint);
+			answer = new StyxRAttachMessage(msg.getTag(), mClientRoot.getQID());
+			registerOpenedFile(((StyxTAttachMessage)msg).getFID(), mClientRoot );
 			break;
 		case Tstat:
-        	IVirtualStyxFile file = mOpenedFiles.get(((StyxTStatMessage)msg).getFID());
-        	answer = new StyxRStatMessage(msg.getTag(), file.getStat());
+			file = mOpenedFiles.get(((StyxTStatMessage)msg).getFID());
+			if ( file != null ) {
+				answer = new StyxRStatMessage(msg.getTag(), file.getStat());
+			} else {
+				answer = new StyxRErrorMessage(msg.getTag(), "Unknown FID");
+			}
+			break;
+		case Tclunk:
+			file = mOpenedFiles.remove(((StyxTClunkMessage)msg).getFID());
+			if ( file == null ) {
+				answer = new StyxRErrorMessage(msg.getTag(), "Unknown FID");
+			} else {
+				answer = new StyxRClunkMessage(msg.getTag());
+			}
+			break;
 		default:
 			break;
 		}
@@ -115,14 +134,14 @@ implements Closeable {
 	 * @return
 	 * @throws IOException
 	 */
-    public boolean read() throws IOException {
-        int readed = mBuffer.readFromChannel(mChannel);
-        if ( readed == -1 ) {
-            close();
-            return true;
-        } else {
-        	while ( process() );
-        }
-        return false;
-    }
+	public boolean read() throws IOException {
+		int readed = mBuffer.readFromChannel(mChannel);
+		if ( readed == -1 ) {
+			close();
+			return true;
+		} else {
+			while ( process() );
+		}
+		return false;
+	}
 }

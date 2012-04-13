@@ -1,5 +1,6 @@
 package com.v2soft.styxlib.library.server.vfs;
 
+import java.util.Date;
 import java.util.LinkedList;
 
 import com.v2soft.styxlib.library.messages.base.enums.QIDType;
@@ -30,19 +31,57 @@ public class MemoryStyxDirectory
 
 	@Override
 	public StyxStat getStat() {
-		StyxStat result = new StyxStat(type, 
-//				dev, 
-//				getQID(), 
-//				mode, 
-//				accessTime, 
-//				modificationTime, 
-//				length, 
-//				name, 
-//				userName, 
-//				groupName, 
-//				modificationUser);
-		// TODO Auto-generated method stub
-		return null;
+		StyxStat result = new StyxStat((short)0, 
+				1, 
+				getQID(), 
+				getMode(),
+				getAccessTime(), 
+				getModificationTime(), 
+				getLength(), 
+				getName(), 
+				getOwnerName(), 
+				getGroupName(), 
+				getModificationUser());
+		return result;
 	}
 
+	@Override
+	public int getMode() {
+		return 0x1F;
+	}
+
+	@Override
+	public String getName() {
+		return "/";
+	}
+
+	@Override
+	public Date getAccessTime() {
+		return new Date();
+	}
+
+	@Override
+	public Date getModificationTime() {
+		return new Date();
+	}
+
+	@Override
+	public ULong getLength() {
+		return new ULong(0);
+	}
+
+	@Override
+	public String getOwnerName() {
+		return "nobody";
+	}
+
+	@Override
+	public String getGroupName() {
+		return "nobody";
+	}
+
+	@Override
+	public String getModificationUser() {
+		return "nobody";
+	}
 }

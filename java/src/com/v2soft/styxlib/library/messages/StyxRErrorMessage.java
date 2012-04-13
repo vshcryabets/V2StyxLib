@@ -3,24 +3,20 @@ package com.v2soft.styxlib.library.messages;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
-import com.v2soft.styxlib.library.io.StyxInputStream;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
-import com.v2soft.styxlib.library.server.DualStateBuffer;
 import com.v2soft.styxlib.library.server.StyxBufferOperations;
 
-public class StyxRErrorMessage extends StyxMessage 
-{
+public class StyxRErrorMessage extends StyxMessage {
 	private String mError;
 	
-	public StyxRErrorMessage()
-	{
+	public StyxRErrorMessage() {
 		super(MessageType.Rerror);
 	}
 	
-	public StyxRErrorMessage(int tag)
-	{
+	public StyxRErrorMessage(int tag, String error) {
 		super(MessageType.Rerror, tag);
+		mError = error;
 	}
 	
     @Override
@@ -35,8 +31,7 @@ public class StyxRErrorMessage extends StyxMessage
 		return mError;
 	}
 	
-	public void setError(String error)
-	{
+	public void setError(String error) {
 		mError = error;
 	}
 	

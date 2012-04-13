@@ -81,7 +81,7 @@ public abstract class StyxMessage {
             result = new StyxRAuthMessage(tag);
             break;
         case Rerror:
-            result = new StyxRErrorMessage(tag);
+            result = new StyxRErrorMessage(tag, null);
             break;
         case Rflush:
             result = new StyxRFlushMessage(tag);
@@ -224,7 +224,7 @@ public abstract class StyxMessage {
 		output.clear();
 		int packetSize = getBinarySize();
 		output.limit(packetSize);
-		output.writeUInt(getBinarySize());
+		output.writeUInt(packetSize);
 		output.writeUByte((short) getType().getByte());
 		output.writeUShort(getTag());
 	}

@@ -48,7 +48,6 @@ public class StyxRStatMessage extends StyxMessage {
 	public void writeToBuffer(StyxBufferOperations output)
 	        throws UnsupportedEncodingException, IOException {
 	    super.writeToBuffer(output);
-		output.writeUShort(getStat().getSize());
 		getStat().writeBinaryTo(output);		
 	}
 
