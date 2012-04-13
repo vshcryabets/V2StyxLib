@@ -7,7 +7,6 @@ import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.util.HashMap;
 
-import com.sun.xml.internal.ws.api.pipe.TubeCloner;
 import com.v2soft.styxlib.library.StyxClientManager;
 import com.v2soft.styxlib.library.core.StyxByteBuffer;
 import com.v2soft.styxlib.library.messages.StyxRAttachMessage;
@@ -15,9 +14,11 @@ import com.v2soft.styxlib.library.messages.StyxRClunkMessage;
 import com.v2soft.styxlib.library.messages.StyxRErrorMessage;
 import com.v2soft.styxlib.library.messages.StyxRStatMessage;
 import com.v2soft.styxlib.library.messages.StyxRVersionMessage;
+import com.v2soft.styxlib.library.messages.StyxRWalkMessage;
 import com.v2soft.styxlib.library.messages.StyxTAttachMessage;
 import com.v2soft.styxlib.library.messages.StyxTClunkMessage;
 import com.v2soft.styxlib.library.messages.StyxTStatMessage;
+import com.v2soft.styxlib.library.messages.StyxTWalkMessage;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.server.vfs.IVirtualStyxDirectory;
 import com.v2soft.styxlib.library.server.vfs.IVirtualStyxFile;
@@ -41,7 +42,7 @@ implements Closeable {
 			SocketChannel channel, 
 			IVirtualStyxDirectory root) throws FileNotFoundException {
 		mIOUnit = iounit;
-		mBuffer =new DualStateBuffer(iounit*2);
+		mBuffer = new DualStateBuffer(iounit*2);
 		mOutputBuffer = new StyxByteBuffer(ByteBuffer.allocateDirect(iounit));
 		mChannel = channel;
 		mServerRoot = root;
@@ -75,6 +76,7 @@ implements Closeable {
 		System.out.print("Got message "+msg.toString());
 		StyxMessage answer = null;
 		IVirtualStyxFile file;
+		long fid;
 		switch (msg.getType()) {
 		case Tversion:
 			answer = new StyxRVersionMessage(mIOUnit, StyxClientManager.PROTOCOL);
@@ -86,21 +88,36 @@ implements Closeable {
 			registerOpenedFile(((StyxTAttachMessage)msg).getFID(), mClientRoot );
 			break;
 		case Tstat:
-			file = mOpenedFiles.get(((StyxTStatMessage)msg).getFID());
+		    fid = ((StyxTStatMessage)msg).getFID();
+			file = mOpenedFiles.get(fid);
 			if ( file != null ) {
 				answer = new StyxRStatMessage(msg.getTag(), file.getStat());
 			} else {
-				answer = new StyxRErrorMessage(msg.getTag(), "Unknown FID");
+			    answer = getNoFIDError(msg, fid);
 			}
 			break;
 		case Tclunk:
-			file = mOpenedFiles.remove(((StyxTClunkMessage)msg).getFID());
+		    fid = ((StyxTClunkMessage)msg).getFID();
+			file = mOpenedFiles.remove(fid);
 			if ( file == null ) {
-				answer = new StyxRErrorMessage(msg.getTag(), "Unknown FID");
+			    answer = getNoFIDError(msg, fid);
 			} else {
 				answer = new StyxRClunkMessage(msg.getTag());
 			}
 			break;
+		case Twalk:
+		    fid = ((StyxTWalkMessage)msg).getFID();
+            file = mOpenedFiles.get(fid);
+            if ( file == null ) {
+                answer = getNoFIDError(msg, fid);
+            } else {
+                if ( file instanceof IVirtualStyxDirectory ) {
+                    IVirtualStyxFile newFile = ((IVirtualStyxDirectory)file).walk(((StyxTWalkMessage)msg).getPath());
+//                    answer = new StyxRWalkMessage(msg.getTag()).se
+                    
+                }
+                
+            }
 		default:
 			break;
 		}
@@ -109,7 +126,18 @@ implements Closeable {
 		}
 	}
 
-	private void registerOpenedFile(long fid, IVirtualStyxFile file) {
+	/**
+	 * 
+	 * @param tag message tag
+	 * @param fid File ID
+	 * @return new Rerror message
+	 */
+	private StyxRErrorMessage getNoFIDError(StyxMessage message, long fid) {
+	    return new StyxRErrorMessage(message.getTag(), 
+	            String.format("Unknown FID (%d)", fid));
+    }
+
+    private void registerOpenedFile(long fid, IVirtualStyxFile file) {
 		mOpenedFiles.put(fid, file);
 	}
 

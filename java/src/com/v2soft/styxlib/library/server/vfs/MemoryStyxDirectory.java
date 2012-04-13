@@ -47,12 +47,12 @@ public class MemoryStyxDirectory
 
 	@Override
 	public int getMode() {
-		return 0x1F;
+		return 0x800001FF;
 	}
 
 	@Override
 	public String getName() {
-		return "/";
+		return "memory";
 	}
 
 	@Override

@@ -41,14 +41,15 @@ public class StyxRStatMessage extends StyxMessage {
 	@Override
 	public int getBinarySize() {
 		return super.getBinarySize()
-			+ getStat().getSize();
+			+ 2 + getStat().getSize();
 	}
 	
 	@Override
 	public void writeToBuffer(StyxBufferOperations output)
 	        throws UnsupportedEncodingException, IOException {
 	    super.writeToBuffer(output);
-		getStat().writeBinaryTo(output);		
+	    output.writeUShort(mStat.getSize());
+		mStat.writeBinaryTo(output);		
 	}
 
 	@Override

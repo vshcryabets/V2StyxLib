@@ -3,7 +3,6 @@ package com.v2soft.styxlib.library.messages.base.structs;
 import java.io.IOException;
 import java.util.Date;
 
-import com.v2soft.styxlib.library.io.StyxInputStream;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.server.StyxBufferOperations;
 import com.v2soft.styxlib.library.types.ULong;
@@ -52,21 +51,7 @@ public class StyxStat {
         setGroupName(groupName);
         setModificationUser(modificationUser);
     }
-    // TODO remove this method
-    public StyxStat(StyxInputStream input) throws IOException {
-        int size = input.readUInt16(); // skip size bytes
-        mType = input.readUInt16();
-        mDev = input.readUInt32();
-        mQID = new StyxQID(input);
-        mMode = input.readUInt32();
-        mAccessTime = IntToDate(input.readUInt32());
-        mModificationTime = IntToDate(input.readUInt32());
-        mLength = input.readUInt64();
-        mName = input.readUTF();
-        mUserName = input.readUTF();
-        mGroupName = input.readUTF();
-        mModificationUser = input.readUTF();
-    }
+
     public StyxStat(StyxBufferOperations input) throws IOException {
         int size = input.readUInt16(); // skip size bytes
         mType = input.readUInt16();

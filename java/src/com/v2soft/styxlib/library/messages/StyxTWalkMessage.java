@@ -4,14 +4,13 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
 import com.v2soft.styxlib.library.StyxFile;
-import com.v2soft.styxlib.library.io.StyxInputStream;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.messages.base.StyxTMessage;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
-import com.v2soft.styxlib.library.server.DualStateBuffer;
 import com.v2soft.styxlib.library.server.StyxBufferOperations;
 
-public class StyxTWalkMessage extends StyxTMessage {
+public class StyxTWalkMessage 
+    extends StyxTMessage {
 	private long mFID, mNewFID;
 	private String mPath;
 	private String[] mPathElements;

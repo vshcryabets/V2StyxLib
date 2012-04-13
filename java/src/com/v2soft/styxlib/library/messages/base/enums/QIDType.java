@@ -1,7 +1,12 @@
 package com.v2soft.styxlib.library.messages.base.enums;
 
 public enum QIDType {
-	QTDIR(0x80), QTAPPEND(0x40), QTEXCL(0x20), QTMOUNT(0x10), QTAUTH(0x08), QTFILE(0x00);
+	QTDIR(0x80), 
+	QTAPPEND(0x40), 
+	QTEXCL(0x20), 
+	QTMOUNT(0x10), 
+	QTAUTH(0x08), 
+	QTFILE(0x00);
 	
 	private int mByte;
 	
