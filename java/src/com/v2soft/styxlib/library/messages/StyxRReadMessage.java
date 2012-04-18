@@ -13,26 +13,9 @@ import com.v2soft.styxlib.library.server.StyxBufferOperations;
 public class StyxRReadMessage extends StyxMessage {
 	private byte[] mData;
 	
-	public StyxRReadMessage() throws IOException
-	{
-		this(null);
-	}
-	
-	public StyxRReadMessage(InputStream is) throws IOException
-	{
-		super(MessageType.Rread);
-		setData(is);
-	}
-	
-	public StyxRReadMessage(int tag) throws IOException
-	{
-		this(tag, null);
-	}
-	
-	public StyxRReadMessage(int tag, InputStream is) throws IOException
-	{
+	public StyxRReadMessage(int tag, byte[] data) throws IOException {
 		super(MessageType.Rread, tag);
-		setData(is);
+		mData = data;
 	}
 	
     @Override
@@ -55,35 +38,11 @@ public class StyxRReadMessage extends StyxMessage {
 		return new ByteArrayInputStream(getData());
 	}
 	
-	public void setData(InputStream is) throws IOException
-	{
-		if (is == null)
-		{
-			mData = null;
-			return;
-		}
-		
-		mData = new byte[is.available()];
-		is.read(mData);
-	}
-	
 	public int getDataLength()
 	{
 		if (mData == null)
 			return 0;
 		return mData.length;
-	}
-	
-	public void setData(InputStream is, int offset, int count) throws IOException
-	{
-		if (is == null)
-		{
-			mData = null;
-			return;
-		}
-		
-		mData = new byte[count];
-		is.read(mData, offset, count);
 	}
 	
 	@Override

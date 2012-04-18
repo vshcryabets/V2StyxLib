@@ -12,25 +12,8 @@ public class StyxTOpenMessage extends StyxTMessage {
     private long mFID;
     private ModeType mMode;
 
-    public StyxTOpenMessage()
-    {
-        this(NOFID, ModeType.OREAD);
-    }
-
-    public StyxTOpenMessage(long fid, ModeType mode)
-    {
+    public StyxTOpenMessage(long fid, ModeType mode) {
         super(MessageType.Topen);
-        mFID = fid;
-        mMode = mode;
-    }
-
-    public StyxTOpenMessage(int tag)
-    {
-        this(tag, NOFID, ModeType.OREAD);
-    }
-
-    public StyxTOpenMessage(int tag, long fid, ModeType mode) {
-        super(MessageType.Topen, tag);
         mFID = fid;
         mMode = mode;
     }

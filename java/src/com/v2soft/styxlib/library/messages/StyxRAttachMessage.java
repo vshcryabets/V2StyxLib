@@ -11,20 +11,9 @@ import com.v2soft.styxlib.library.server.StyxBufferOperations;
 public class StyxRAttachMessage extends StyxMessage {
 	private StyxQID mQID;
 
-	public StyxRAttachMessage()
-	{
-		super(MessageType.Rattach);
-	}
-	
-	public StyxRAttachMessage(int tag)
-	{
+	public StyxRAttachMessage(int tag, StyxQID qid) {
 		super(MessageType.Rattach, tag);
-	}
-	
-	public StyxRAttachMessage(int tag, StyxQID qid)
-	{
-		super(MessageType.Rattach, tag);
-		setQID(qid);
+		mQID = qid;
 	}
 	
 	public StyxQID getQID()

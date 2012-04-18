@@ -280,9 +280,9 @@ implements Closeable, StyxMessengerListener {
     private void sendAttachMessage()
             throws InterruptedException, StyxException, TimeoutException, IOException {
         mFID = getActiveFids().getFreeFid();
-        StyxTAttachMessage tAttach = new StyxTAttachMessage(getFID(), getAuthFID());
-        tAttach.setUserName(getUserName());
-        tAttach.setMountPoint(getMountPoint());
+        StyxTAttachMessage tAttach = new StyxTAttachMessage(getFID(), getAuthFID(),
+                getUserName(),
+                getMountPoint());
         mMessenger.send(tAttach);
 
         StyxMessage rMessage = tAttach.waitForAnswer(mTimeout);

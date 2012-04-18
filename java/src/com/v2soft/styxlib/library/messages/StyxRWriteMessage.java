@@ -10,22 +10,7 @@ import com.v2soft.styxlib.library.server.StyxBufferOperations;
 public class StyxRWriteMessage extends StyxMessage {
 	private long mCount;
 
-	public StyxRWriteMessage() {
-		this(0);
-	}
-	
-	public StyxRWriteMessage(long count) {
-		super(MessageType.Rwrite);
-		mCount = count;
-	}
-	
-	public StyxRWriteMessage(int tag)
-	{
-		this(tag, 0);
-	}
-	
-	public StyxRWriteMessage(int tag, long count)
-	{
+	public StyxRWriteMessage(int tag, long count) {
 		super(MessageType.Rwrite, tag);
 		mCount = count;
 	}

@@ -457,8 +457,7 @@ public class StyxFile implements Closeable {
 		throws StyxException, InterruptedException, TimeoutException, IOException {
 		long newFID = mManager.getActiveFids().getFreeFid();
 		StyxTWalkMessage tWalk = new StyxTWalkMessage(mManager.getFID(),
-				newFID);
-		tWalk.setPath(path);
+				newFID, path);
 		mMessenger.send(tWalk);
 		StyxMessage rWalk = tWalk.waitForAnswer(mTimeout);
 		StyxErrorMessageException.doException(rWalk, mPath);

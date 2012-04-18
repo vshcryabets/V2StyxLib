@@ -14,26 +14,10 @@ import com.v2soft.styxlib.library.server.StyxBufferOperations;
  */
 public class StyxTStatMessage extends StyxTMessage {
 	private long mFID;
-
-	public StyxTStatMessage()
-	{
-		this(NOFID);
-	}
 	
 	public StyxTStatMessage(long fid)
 	{
 		super(MessageType.Tstat);
-		mFID = fid;
-	}
-	
-	public StyxTStatMessage(int tag)
-	{
-		this(tag, NOFID);
-	}
-	
-	public StyxTStatMessage(int tag, long fid)
-	{
-		super(MessageType.Tstat, tag);
 		mFID = fid;
 	}
 	

@@ -13,27 +13,8 @@ public class StyxTReadMessage extends StyxTMessage {
 	private ULong mOffset;
 	private long mCount;
 
-	public StyxTReadMessage()
-	{
-		this(NOFID, ULong.ZERO, 0);
-	}
-	
-	public StyxTReadMessage(long fid, ULong offset, long count)
-	{
+	public StyxTReadMessage(long fid, ULong offset, long count)	{
 		super(MessageType.Tread);
-		mFID = fid;
-		mOffset = offset;
-		mCount = count;
-	}
-	
-	public StyxTReadMessage(int tag)
-	{
-		this(tag, NOFID, ULong.ZERO, 0);
-	}
-	
-	public StyxTReadMessage(int tag, long fid, ULong offset, long count)
-	{
-		super(MessageType.Tread, tag);
 		mFID = fid;
 		mOffset = offset;
 		mCount = count;

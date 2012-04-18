@@ -15,33 +15,9 @@ public class StyxTCreateMessage extends StyxTMessage {
     private long mPermissions;
     private ModeType mMode;
 
-
-    public StyxTCreateMessage(int tag) {
-        super(MessageType.Tcreate);
-    }
-
-    public StyxTCreateMessage(String name, long permissions)
-    {
-        this(NOFID, name, permissions, ModeType.OREAD);
-    }
-
     public StyxTCreateMessage(long fid, String name, long permissions, ModeType mode)
     {
         super(MessageType.Tcreate);
-        mFID = fid;
-        mName = name;
-        mPermissions = permissions;
-        mMode = mode;
-    }
-
-    public StyxTCreateMessage(int tag, String name, long permissions)
-    {
-        this(tag, NOFID, name, permissions, ModeType.OREAD);
-    }
-
-    public StyxTCreateMessage(int tag, long fid, String name, long permissions, ModeType mode)
-    {
-        super(MessageType.Tcreate, tag);
         mFID = fid;
         mName = name;
         mPermissions = permissions;

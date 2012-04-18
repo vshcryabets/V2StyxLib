@@ -2,6 +2,7 @@ package com.v2soft.styxlib.library.server.vfs;
 
 import java.util.Date;
 import java.util.LinkedList;
+import java.util.List;
 
 import com.v2soft.styxlib.library.messages.base.enums.QIDType;
 import com.v2soft.styxlib.library.messages.base.structs.StyxQID;
@@ -84,4 +85,10 @@ public class MemoryStyxDirectory
 	public String getModificationUser() {
 		return "nobody";
 	}
+
+    @Override
+    public IVirtualStyxFile walk(String path, List<StyxQID> qids) {
+        // TODO Auto-generated method stub
+        return null;
+    }
 }

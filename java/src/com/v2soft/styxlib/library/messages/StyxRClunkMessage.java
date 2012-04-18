@@ -8,11 +8,6 @@ import com.v2soft.styxlib.library.server.StyxBufferOperations;
 
 public class StyxRClunkMessage extends StyxMessage {
 	
-	public StyxRClunkMessage()
-	{
-		super(MessageType.Rclunk);
-	}
-	
 	public StyxRClunkMessage(int tag)
 	{
 		super(MessageType.Rclunk, tag);

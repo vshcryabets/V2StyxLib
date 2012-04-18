@@ -5,6 +5,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
@@ -15,14 +16,9 @@ import com.v2soft.styxlib.library.server.StyxBufferOperations;
 public class StyxRWalkMessage extends StyxMessage {
 	private List<StyxQID> mQIDList;
 
-	public StyxRWalkMessage()
-	{
-		super(MessageType.Rwalk);
-	}
-	
-	public StyxRWalkMessage(int tag)
-	{
+	public StyxRWalkMessage(int tag, List<StyxQID> qids) {
 		super(MessageType.Rwalk, tag);
+		mQIDList = qids;
 	}
 	
     @Override
@@ -30,10 +26,9 @@ public class StyxRWalkMessage extends StyxMessage {
         throws IOException  {
         int count = input.readUInt16();
         
-        ArrayList<StyxQID> list = new ArrayList<StyxQID>();
+        mQIDList = new LinkedList<StyxQID>();
         for (int i=0; i<count; i++)
-            list.add(new StyxQID(input));
-        setQIDList(list);
+            mQIDList.add(new StyxQID(input));
     }
 	
 	public void setQIDList(StyxQID[] array)
@@ -41,15 +36,14 @@ public class StyxRWalkMessage extends StyxMessage {
 		mQIDList = Arrays.asList(array);
 	}
 	
-	public void setQIDList(Collection<StyxQID> collection)
-	{
-		mQIDList = new ArrayList<StyxQID>(collection);
+	public StyxRWalkMessage setQIDList(Collection<StyxQID> collection) {
+		mQIDList = new LinkedList<StyxQID>(collection);
+		return this;
 	}
 	
-	public boolean add(StyxQID qid)
-	{
+	public boolean add(StyxQID qid) {
 		if (mQIDList == null)
-			mQIDList = new ArrayList<StyxQID>();
+			mQIDList = new LinkedList<StyxQID>();
 		return mQIDList.add(qid);
 	}
 	

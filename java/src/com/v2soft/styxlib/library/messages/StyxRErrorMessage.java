@@ -10,10 +10,6 @@ import com.v2soft.styxlib.library.server.StyxBufferOperations;
 public class StyxRErrorMessage extends StyxMessage {
 	private String mError;
 	
-	public StyxRErrorMessage() {
-		super(MessageType.Rerror);
-	}
-	
 	public StyxRErrorMessage(int tag, String error) {
 		super(MessageType.Rerror, tag);
 		mError = error;

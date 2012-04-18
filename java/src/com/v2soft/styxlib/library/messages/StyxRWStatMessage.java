@@ -8,13 +8,7 @@ import com.v2soft.styxlib.library.server.StyxBufferOperations;
 
 public class StyxRWStatMessage extends StyxMessage {
 
-	public StyxRWStatMessage()
-	{
-		super(MessageType.Rwstat);
-	}
-	
-	public StyxRWStatMessage(int tag)
-	{
+	public StyxRWStatMessage(int tag) {
 		super(MessageType.Rwstat, tag);
 	}
 	

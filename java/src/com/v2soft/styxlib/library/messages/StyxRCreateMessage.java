@@ -3,34 +3,15 @@ package com.v2soft.styxlib.library.messages;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
-import com.v2soft.styxlib.library.io.StyxInputStream;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
 import com.v2soft.styxlib.library.messages.base.structs.StyxQID;
-import com.v2soft.styxlib.library.server.DualStateBuffer;
 import com.v2soft.styxlib.library.server.StyxBufferOperations;
 
 public class StyxRCreateMessage extends StyxMessage {
 	private StyxQID mQID;
 	private long mIOUnit;
 
-	public StyxRCreateMessage(StyxQID qid)
-	{
-		this(qid, 0);
-	}
-	
-	public StyxRCreateMessage(StyxQID qid, int iounit)
-	{
-		super(MessageType.Rcreate);
-		mQID = qid;
-		mIOUnit = iounit;
-	}
-	
-	public StyxRCreateMessage(int tag, StyxQID qid)
-	{
-		this(tag, qid, 0);
-	}
-	
 	public StyxRCreateMessage(int tag, StyxQID qid, int iounit)
 	{
 		this(tag);

@@ -12,13 +12,9 @@ public class StyxRVersionMessage extends StyxMessage {
 	private String mProtocolVersion;
 	
 	public StyxRVersionMessage(long maxPacketSize, String protocolVersion) {
-		super(MessageType.Rversion);
+		super(MessageType.Rversion, StyxMessage.NOTAG);
 		mMaxPacketSize = maxPacketSize;
 		mProtocolVersion = protocolVersion;
-	}
-	
-	public StyxRVersionMessage() {
-		super(MessageType.Rversion, StyxMessage.NOTAG);
 	}
 
     @Override

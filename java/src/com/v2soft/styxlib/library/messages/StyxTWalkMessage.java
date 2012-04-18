@@ -15,19 +15,11 @@ public class StyxTWalkMessage
 	private String mPath;
 	private String[] mPathElements;
 
-	public StyxTWalkMessage(){this(NOFID, NOFID);}
-    public StyxTWalkMessage(int tag){this(tag, NOFID, NOFID);}
-
-    public StyxTWalkMessage(long fid, long new_fid){
+	public StyxTWalkMessage(long fid, long new_fid, String path){
 		super(MessageType.Twalk);
 		mFID = fid;
 		mNewFID = new_fid;
-	}
-	
-	public StyxTWalkMessage(int tag, long fid, long new_fid){
-		super(MessageType.Twalk, tag);
-		mFID = fid;
-		mNewFID = new_fid;
+		setPath(path);
 	}
 	
     @Override

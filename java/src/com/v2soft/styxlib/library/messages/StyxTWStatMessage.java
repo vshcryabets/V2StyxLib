@@ -11,32 +11,11 @@ public class StyxTWStatMessage extends StyxTMessage {
 	private long mFID;
 	private StyxStat mStat;
 
-	public StyxTWStatMessage(StyxStat stat)
-	{
-		this(NOFID, stat);
-	}
-	
-	public StyxTWStatMessage(long fid, StyxStat stat)
-	{
+	public StyxTWStatMessage(long fid, StyxStat stat) {
 		super(MessageType.Twstat);
 		mFID = fid;
 		mStat = stat;
 	}
-	
-	public StyxTWStatMessage(int tag, StyxStat stat)
-	{
-		this(tag, NOFID, stat);
-	}
-	
-	public StyxTWStatMessage(int tag, long fid, StyxStat stat) {
-	    this(tag);
-		mFID = fid;
-		mStat = stat;
-	}
-	
-	public StyxTWStatMessage(int tag) {
-	    super(MessageType.Twstat, tag);
-    }
     @Override
     public void load(StyxBufferOperations input) throws IOException {
         mFID = input.readUInt32();

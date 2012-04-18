@@ -17,18 +17,9 @@ public class StyxTWriteMessage extends StyxTMessage {
     private ULong mOffset;
     private byte[] mData;
 
-    public StyxTWriteMessage() throws IOException {
-        this(NOTAG);
-    }
-    public StyxTWriteMessage(int tag) throws IOException {
-        this(tag, NOFID, ULong.ZERO, null);
-    }
-    public StyxTWriteMessage(long fid, ULong offset, byte [] data) throws IOException {
-        this(StyxMessage.NOTAG, fid, offset, data);
-    }
-    public StyxTWriteMessage(int tag, long fid, ULong offset, byte [] data) 
+    public StyxTWriteMessage(long fid, ULong offset, byte [] data) 
             throws IOException {
-        super(MessageType.Twrite, tag);
+        super(MessageType.Twrite);
         mFID = fid;
         mOffset = offset;
         mData = data;

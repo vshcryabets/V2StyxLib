@@ -3,11 +3,9 @@ package com.v2soft.styxlib.library.messages;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
-import com.v2soft.styxlib.library.io.StyxInputStream;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.messages.base.StyxTMessage;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
-import com.v2soft.styxlib.library.server.DualStateBuffer;
 import com.v2soft.styxlib.library.server.StyxBufferOperations;
 
 public class StyxTAuthMessage extends StyxTMessage 
@@ -16,25 +14,8 @@ public class StyxTAuthMessage extends StyxTMessage
 	private String mUserName;
 	private String mMountPoint;
 	
-	public StyxTAuthMessage()
-	{
-		this(NOFID);
-	}
-	
-	public StyxTAuthMessage(long fid)
-	{
+	public StyxTAuthMessage(long fid) {
 		super(MessageType.Tauth);
-		mAuthFID = fid;
-	}
-	
-	public StyxTAuthMessage(int tag)
-	{
-		this(tag, NOFID);
-	}
-	
-	public StyxTAuthMessage(int tag, long fid)
-	{
-		super(MessageType.Tauth, tag);
 		mAuthFID = fid;
 	}
 

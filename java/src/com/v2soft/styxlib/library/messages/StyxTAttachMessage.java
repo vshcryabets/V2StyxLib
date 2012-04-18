@@ -14,28 +14,12 @@ public class StyxTAttachMessage extends StyxTMessage
 	private String mUserName;
 	private String mMountPoint;
 
-	public StyxTAttachMessage()
-	{
-		this(NOFID, NOFID);
-	}
-	
-	public StyxTAttachMessage(long fid, long afid)
-	{
+	public StyxTAttachMessage(long fid, long afid, String username, String mountpoint){
 		super(MessageType.Tattach);
 		mFID = fid;
 		mAuthFID = afid;
-	}
-	
-	public StyxTAttachMessage(int tag)
-	{
-		this(tag, NOFID, NOFID);
-	}
-	
-	public StyxTAttachMessage(int tag, long fid, long afid)
-	{
-		super(MessageType.Tattach, tag);
-		mFID = fid;
-		mAuthFID = afid;
+		mUserName = username;
+		mMountPoint = mountpoint;
 	}
 	
     @Override

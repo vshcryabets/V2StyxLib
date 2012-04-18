@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 
 import com.v2soft.styxlib.library.StyxClientManager;
 import com.v2soft.styxlib.library.core.StyxByteBuffer;
@@ -20,6 +22,7 @@ import com.v2soft.styxlib.library.messages.StyxTClunkMessage;
 import com.v2soft.styxlib.library.messages.StyxTStatMessage;
 import com.v2soft.styxlib.library.messages.StyxTWalkMessage;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
+import com.v2soft.styxlib.library.messages.base.structs.StyxQID;
 import com.v2soft.styxlib.library.server.vfs.IVirtualStyxDirectory;
 import com.v2soft.styxlib.library.server.vfs.IVirtualStyxFile;
 
@@ -106,18 +109,8 @@ implements Closeable {
 			}
 			break;
 		case Twalk:
-		    fid = ((StyxTWalkMessage)msg).getFID();
-            file = mOpenedFiles.get(fid);
-            if ( file == null ) {
-                answer = getNoFIDError(msg, fid);
-            } else {
-                if ( file instanceof IVirtualStyxDirectory ) {
-                    IVirtualStyxFile newFile = ((IVirtualStyxDirectory)file).walk(((StyxTWalkMessage)msg).getPath());
-//                    answer = new StyxRWalkMessage(msg.getTag()).se
-                    
-                }
-                
-            }
+		    answer = processTWalk((StyxTWalkMessage) msg);
+		    break;
 		default:
 			break;
 		}
@@ -126,7 +119,29 @@ implements Closeable {
 		}
 	}
 
-	/**
+	private StyxMessage processTWalk(StyxTWalkMessage msg) {
+        long fid = msg.getFID();
+        IVirtualStyxFile file = mOpenedFiles.get(fid);
+        if ( file == null ) {
+            return getNoFIDError(msg, fid);
+        } else {
+            if ( file instanceof IVirtualStyxDirectory ) {
+                List<StyxQID> QIDList = new LinkedList<StyxQID>();
+                IVirtualStyxFile walkFile = ((IVirtualStyxDirectory)file).walk(
+                        msg.getPath(), 
+                        QIDList);
+                if ( walkFile != null ) {
+                    mOpenedFiles.put(msg.getNewFID(), walkFile);
+                    return new StyxRWalkMessage(msg.getTag(), QIDList);
+                } else {
+                    return new StyxRErrorMessage(msg.getTag(), "file does not exist");
+                }
+            }
+        }
+        return new StyxRErrorMessage(msg.getTag(), "file does not exist");
+    }
+
+    /**
 	 * 
 	 * @param tag message tag
 	 * @param fid File ID

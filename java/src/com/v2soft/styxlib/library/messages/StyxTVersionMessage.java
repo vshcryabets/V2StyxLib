@@ -19,7 +19,7 @@ public class StyxTVersionMessage extends StyxTMessage {
 	}
 	
 	public StyxTVersionMessage() {
-		super(MessageType.Tversion, StyxMessage.NOTAG);
+		super(MessageType.Tversion);
 	}
 	
     @Override
