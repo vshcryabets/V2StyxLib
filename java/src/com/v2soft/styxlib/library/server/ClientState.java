@@ -9,11 +9,13 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.sun.corba.se.impl.protocol.giopmsgheaders.Message;
 import com.v2soft.styxlib.library.StyxClientManager;
 import com.v2soft.styxlib.library.core.StyxByteBuffer;
 import com.v2soft.styxlib.library.messages.StyxRAttachMessage;
 import com.v2soft.styxlib.library.messages.StyxRClunkMessage;
 import com.v2soft.styxlib.library.messages.StyxRErrorMessage;
+import com.v2soft.styxlib.library.messages.StyxRFlushMessage;
 import com.v2soft.styxlib.library.messages.StyxRStatMessage;
 import com.v2soft.styxlib.library.messages.StyxRVersionMessage;
 import com.v2soft.styxlib.library.messages.StyxRWalkMessage;
@@ -108,6 +110,10 @@ implements Closeable {
 				answer = new StyxRClunkMessage(msg.getTag());
 			}
 			break;
+		case Tflush:
+		    // TODO do something there
+		    answer = new StyxRFlushMessage(msg.getTag());
+		    break;
 		case Twalk:
 		    answer = processTWalk((StyxTWalkMessage) msg);
 		    break;

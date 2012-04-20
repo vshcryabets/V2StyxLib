@@ -88,7 +88,10 @@ public class MemoryStyxDirectory
 
     @Override
     public IVirtualStyxFile walk(String path, List<StyxQID> qids) {
-        // TODO Auto-generated method stub
+        if ( path.length() < 1 ) {
+            qids.clear();
+            return this;
+        }
         return null;
     }
 }

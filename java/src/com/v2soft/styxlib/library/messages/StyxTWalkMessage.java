@@ -79,12 +79,14 @@ public class StyxTWalkMessage
 		return mPath;
 	}
 	
-	public void setPath(String path)
-	{
+	public void setPath(String path) {
 		if (path == null)
 			return;
-		if (path.equals(""))
+		if (path.equals("")) {
+		    mPath = path;
+		    mPathElements = new String[0];
 			return;
+		}
 		StringBuilder builder = new StringBuilder(path);
 		while (builder.toString().startsWith(StyxFile.SEPARATOR))
 			builder.delete(0, 1);
@@ -121,7 +123,7 @@ public class StyxTWalkMessage
 	@Override
 	protected String internalToString() {
 		return String.format("FID: %d\nNewFID: %d\nNumber of walks:%d\nPath: %s",
-				getFID(), getNewFID(), mPathElements.length, getPath());
+				mFID, mNewFID, mPathElements.length, mPath);
 	}
 
 	@Override

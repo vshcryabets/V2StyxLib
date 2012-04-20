@@ -31,6 +31,7 @@ import com.v2soft.styxlib.library.messages.StyxTWStatMessage;
 import com.v2soft.styxlib.library.messages.StyxTWalkMessage;
 import com.v2soft.styxlib.library.messages.StyxTWriteMessage;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
+import com.v2soft.styxlib.library.messages.base.structs.StyxQID;
 import com.v2soft.styxlib.library.server.StyxBufferOperations;
 
 public abstract class StyxMessage {
@@ -49,11 +50,13 @@ public abstract class StyxMessage {
      * @return constructed Message object
      * @throws IOException
      */
-    public static StyxMessage factory(StyxBufferOperations buffer, int io_unit) throws IOException {
+    public static StyxMessage factory(StyxBufferOperations buffer, int io_unit) 
+            throws IOException {
         // get common packet data
         long packet_size = buffer.readUInt32();
-        assert packet_size <= io_unit;
+        if ( packet_size > io_unit ) throw new IOException("Packet size to large");
         MessageType type = MessageType.factory(buffer.readUInt8());
+        if ( type == null ) throw new NullPointerException("Type is null");
         assert type != null;
         int tag = buffer.readUInt16();
         // load other data
@@ -63,19 +66,19 @@ public abstract class StyxMessage {
             result = new StyxTVersionMessage();
             break;
         case Rversion:
-            result = new StyxRVersionMessage();
+            result = new StyxRVersionMessage(0, null);
             break;
         case Tauth:
-            result = new StyxTAuthMessage(tag);
+            result = new StyxTAuthMessage(NOFID);
             break;
         case Tflush:
-            result = new StyxTFlushMessage(tag);
+            result = new StyxTFlushMessage(NOTAG);
             break;
         case Tattach:
-            result = new StyxTAttachMessage(tag);
+            result = new StyxTAttachMessage(NOFID, NOFID, null, null);
             break;
         case Twalk:
-            result = new StyxTWalkMessage(tag);
+            result = new StyxTWalkMessage(NOFID, NOFID, "");
             break;
         case Rauth:
             result = new StyxRAuthMessage(tag);
@@ -87,34 +90,34 @@ public abstract class StyxMessage {
             result = new StyxRFlushMessage(tag);
             break;
         case Rattach:
-            result = new StyxRAttachMessage(tag);
+            result = new StyxRAttachMessage(tag, StyxQID.EMPTY);
             break;
         case Rwalk:
-            result = new StyxRWalkMessage(tag); 
+            result = new StyxRWalkMessage(tag, null); 
             break;
         case Topen:
-            result = new StyxTOpenMessage(tag);
+            result = new StyxTOpenMessage(NOFID, null);
             break;
         case Ropen:
             result = new StyxROpenMessage(tag);
             break;
         case Tcreate:
-            result = new StyxTCreateMessage(tag);
+            result = new StyxTCreateMessage(NOFID, null, 0, null);
             break;
         case Rcreate:
             result = new StyxRCreateMessage(tag);
             break;
         case Tread:
-            result = new StyxTReadMessage(tag);
+            result = new StyxTReadMessage(NOFID, null, 0);
             break;
         case Rread:
-            result = new StyxRReadMessage(tag);
+            result = new StyxRReadMessage(tag, null);
             break;
         case Twrite:
-            result = new StyxTWriteMessage(tag);
+            result = new StyxTWriteMessage(NOFID, null, null );
             break;
         case Rwrite:
-            result = new StyxRWriteMessage(tag);
+            result = new StyxRWriteMessage(tag, 0);
             break;
         case Tclunk:
             result = new StyxTClunkMessage(tag);
@@ -135,12 +138,13 @@ public abstract class StyxMessage {
             result = new StyxRStatMessage(tag);
             break;
         case Twstat:
-            result = new StyxTWStatMessage(tag);
+            result = new StyxTWStatMessage(NOFID, null);
             break;
         case Rwstat:
             result = new StyxRWStatMessage(tag);
             break;
         }
+        result.setTag((short) tag);
         result.load(buffer);
         return result;
     }	
@@ -188,13 +192,7 @@ public abstract class StyxMessage {
 		return result;
 	}
 	
-	protected StyxMessage(MessageType type)
-	{
-		this(type, NOTAG);
-	}
-	
-	protected StyxMessage(MessageType type, int tag)
-	{
+	protected StyxMessage(MessageType type, int tag) {
 		mType = type;
 		mTag = tag;
 	}

@@ -10,11 +10,7 @@ public abstract class StyxTMessage extends StyxMessage {
 	private StyxMessage mAnswer;
 	
 	public StyxTMessage(MessageType type) {
-		super(type);
-	}
-	
-	public StyxTMessage(MessageType type, int tag) {
-		super(type, tag);
+		super(type, StyxMessage.NOTAG);
 	}
 	
 	public StyxMessage getAnswer() {
