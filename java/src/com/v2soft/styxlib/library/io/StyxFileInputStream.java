@@ -15,8 +15,8 @@ import com.v2soft.styxlib.library.messages.StyxTReadMessage;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.types.ULong;
 
-public class StyxFileInputStream extends InputStream
-{
+public class StyxFileInputStream 
+    extends InputStream {
 	private ULong mFilePosition;
 	private long mTimeout = StyxClientManager.DEFAULT_TIMEOUT;
 	private StyxFile mFile;
@@ -130,7 +130,6 @@ public class StyxFileInputStream extends InputStream
         
         // send Tread
         StyxTReadMessage tRead = new StyxTReadMessage(mFile.getFID(), mFilePosition, mIOUnit);
-//        Messenger messenger = mManager.getMessenger();
         mMessenger.send(tRead);
         StyxMessage rMessage = tRead.waitForAnswer(mTimeout);
         StyxErrorMessageException.doException(rMessage);
@@ -138,9 +137,7 @@ public class StyxFileInputStream extends InputStream
         StyxRReadMessage rRead = (StyxRReadMessage) rMessage;
         int readed = rRead.getDataLength();
         if ( readed > 0 ) {
-            InputStream inp = rRead.getDataStream();
-            byte [] tempbuf = new byte[readed];
-            inp.read(tempbuf, 0, readed);
+            byte [] tempbuf = rRead.getDataBuffer();
             System.arraycopy(tempbuf, 0, mBuffer, mBufEnd, readed);
             mBufEnd+=readed;
             mFilePosition = mFilePosition.add(readed);
