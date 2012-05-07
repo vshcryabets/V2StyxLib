@@ -13,7 +13,7 @@ import com.v2soft.styxlib.library.server.StyxBufferOperations;
 public class StyxRReadMessage extends StyxMessage {
 	private byte[] mData;
 	
-	public StyxRReadMessage(int tag, byte[] data) throws IOException {
+	public StyxRReadMessage(int tag, byte[] data) {
 		super(MessageType.Rread, tag);
 		mData = data;
 	}

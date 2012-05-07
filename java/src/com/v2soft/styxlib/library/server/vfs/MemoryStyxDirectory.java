@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.v2soft.styxlib.library.messages.base.enums.ModeType;
 import com.v2soft.styxlib.library.messages.base.enums.QIDType;
 import com.v2soft.styxlib.library.messages.base.structs.StyxQID;
 import com.v2soft.styxlib.library.messages.base.structs.StyxStat;
@@ -92,6 +93,17 @@ public class MemoryStyxDirectory
             qids.clear();
             return this;
         }
+        return null;
+    }
+
+    @Override
+    public boolean open(ModeType mode) {
+        return (mode == ModeType.OREAD);
+    }
+
+    @Override
+    public byte[] read(ULong offset, long count) {
+        // TODO Auto-generated method stub
         return null;
     }
 }

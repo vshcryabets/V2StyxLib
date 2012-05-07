@@ -2,13 +2,19 @@ package com.v2soft.styxlib.library.server.vfs;
 
 import java.util.Date;
 
+import com.v2soft.styxlib.library.messages.base.enums.ModeType;
 import com.v2soft.styxlib.library.messages.base.structs.StyxQID;
 import com.v2soft.styxlib.library.messages.base.structs.StyxStat;
 import com.v2soft.styxlib.library.types.ULong;
 
+/**
+ * Virtual styx file interface
+ * @author vschryabets@gmail.com
+ *
+ */
 public abstract interface IVirtualStyxFile {
 	/**
-	 * @return unical ID of the file
+	 * @return unic ID of the file
 	 */
 	public StyxQID getQID();
 
@@ -27,4 +33,16 @@ public abstract interface IVirtualStyxFile {
 	public String getOwnerName();
 	public String getGroupName();
 	public String getModificationUser();
+	/**
+	 * Open file
+	 * @param mode
+	 */
+    public boolean open(ModeType mode);
+    /**
+     * Read from file
+     * @param offset offset from begining of the file
+     * @param count number of bytes to read
+     * @return
+     */
+    public byte[] read(ULong offset, long count);
 }
