@@ -8,11 +8,21 @@ import com.v2soft.styxlib.library.messages.base.enums.ModeType;
 import com.v2soft.styxlib.library.messages.base.enums.QIDType;
 import com.v2soft.styxlib.library.messages.base.structs.StyxQID;
 import com.v2soft.styxlib.library.messages.base.structs.StyxStat;
+import com.v2soft.styxlib.library.server.ClientState;
 import com.v2soft.styxlib.library.types.ULong;
 
+/**
+ * In-Memory directory
+ * @author vshcryabets@gmail.com
+ *
+ */
 public class MemoryStyxDirectory 
 	implements IVirtualStyxDirectory {
-	private LinkedList<IVirtualStyxDirectory> subdirs;
+	private List<IVirtualStyxFile> mFiles;
+	
+	public MemoryStyxDirectory() {
+	    mFiles = new LinkedList<IVirtualStyxFile>();
+    }
 	
 	@Override
 	public StyxQID getQID() {
@@ -97,12 +107,17 @@ public class MemoryStyxDirectory
     }
 
     @Override
-    public boolean open(ModeType mode) {
-        return (mode == ModeType.OREAD);
+    public boolean open(ClientState client, ModeType mode) {
+        boolean result = (mode == ModeType.OREAD);
+        if ( result ) {
+            // prepare binary structure of the directory
+            int count = mFiles.size();
+        }
+        return result;
     }
 
     @Override
-    public byte[] read(ULong offset, long count) {
+    public byte[] read(ClientState client, ULong offset, long count) {
         // TODO Auto-generated method stub
         return null;
     }

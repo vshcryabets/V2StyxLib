@@ -18,6 +18,13 @@ public class StyxErrorMessageException extends StyxException {
         throw new StyxErrorMessageException(rError);
     }
 
+    public static void doException(String message) 
+            throws StyxErrorMessageException {
+        if (message == null)
+            throw new NullPointerException("Message is null");
+        throw new StyxErrorMessageException(new StyxRErrorMessage(StyxMessage.NOTAG, message));
+    }
+
     public static void doException(StyxMessage rMessage, String fileName) 
             throws StyxErrorMessageException {
         if (rMessage == null)

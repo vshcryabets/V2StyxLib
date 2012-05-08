@@ -5,6 +5,7 @@ import java.util.Date;
 import com.v2soft.styxlib.library.messages.base.enums.ModeType;
 import com.v2soft.styxlib.library.messages.base.structs.StyxQID;
 import com.v2soft.styxlib.library.messages.base.structs.StyxStat;
+import com.v2soft.styxlib.library.server.ClientState;
 import com.v2soft.styxlib.library.types.ULong;
 
 /**
@@ -37,12 +38,12 @@ public abstract interface IVirtualStyxFile {
 	 * Open file
 	 * @param mode
 	 */
-    public boolean open(ModeType mode);
+    public boolean open(ClientState client, ModeType mode);
     /**
      * Read from file
      * @param offset offset from begining of the file
      * @param count number of bytes to read
      * @return
      */
-    public byte[] read(ULong offset, long count);
+    public byte[] read(ClientState client, ULong offset, long count);
 }

@@ -11,6 +11,7 @@ import java.util.List;
 
 import com.v2soft.styxlib.library.StyxClientManager;
 import com.v2soft.styxlib.library.core.StyxByteBuffer;
+import com.v2soft.styxlib.library.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.library.messages.StyxRAttachMessage;
 import com.v2soft.styxlib.library.messages.StyxRClunkMessage;
 import com.v2soft.styxlib.library.messages.StyxRErrorMessage;
@@ -38,6 +39,7 @@ import com.v2soft.styxlib.library.server.vfs.IVirtualStyxFile;
  */
 public class ClientState 
 implements Closeable {
+    private String mUserName;
     private DualStateBuffer mBuffer;
     private int mIOUnit;
     private SocketChannel mChannel;
@@ -55,6 +57,7 @@ implements Closeable {
         mChannel = channel;
         mServerRoot = root;
         mAssignedFiles = new HashMap<Long, IVirtualStyxFile>();
+        mUserName = "";
     }
 
     /**
@@ -85,71 +88,83 @@ implements Closeable {
         StyxMessage answer = null;
         IVirtualStyxFile file;
         long fid;
-        switch (msg.getType()) {
-        case Tversion:
-            answer = new StyxRVersionMessage(mIOUnit, StyxClientManager.PROTOCOL);
-            break;
-        case Tattach:
-            String mountPoint = ((StyxTAttachMessage)msg).getMountPoint();
-            mClientRoot = mServerRoot.getDirectory(mountPoint);
-            answer = new StyxRAttachMessage(msg.getTag(), mClientRoot.getQID());
-            registerOpenedFile(((StyxTAttachMessage)msg).getFID(), mClientRoot );
-            break;
-        case Tstat:
-            fid = ((StyxTStatMessage)msg).getFID();
-            file = mAssignedFiles.get(fid);
-            if ( file != null ) {
-                answer = new StyxRStatMessage(msg.getTag(), file.getStat());
-            } else {
-                answer = getNoFIDError(msg, fid);
+        try {
+            switch (msg.getType()) {
+            case Tversion:
+                answer = new StyxRVersionMessage(mIOUnit, StyxClientManager.PROTOCOL);
+                break;
+            case Tattach:
+                answer = processAttach((StyxTAttachMessage)msg);
+                break;
+            case Tstat:
+                fid = ((StyxTStatMessage)msg).getFID();
+                file = mAssignedFiles.get(fid);
+                if ( file != null ) {
+                    answer = new StyxRStatMessage(msg.getTag(), file.getStat());
+                } else {
+                    answer = getNoFIDError(msg, fid);
+                }
+                break;
+            case Tclunk:
+                fid = ((StyxTClunkMessage)msg).getFID();
+                file = mAssignedFiles.remove(fid);
+                if ( file == null ) {
+                    answer = getNoFIDError(msg, fid);
+                } else {
+                    answer = new StyxRClunkMessage(msg.getTag());
+                }
+                break;
+            case Tflush:
+                // TODO do something there
+                answer = new StyxRFlushMessage(msg.getTag());
+                break;
+            case Twalk:
+                answer = processTWalk((StyxTWalkMessage) msg);
+                break;
+            case Topen:
+                answer = processTopen((StyxTOpenMessage)msg);
+                break;
+            case Tread:
+                answer = processTread((StyxTReadMessage)msg);
+                break;
+            default:
+                System.out.println("Got message:");
+                System.out.println(msg.toString());
+                break;
             }
-            break;
-        case Tclunk:
-            fid = ((StyxTClunkMessage)msg).getFID();
-            file = mAssignedFiles.remove(fid);
-            if ( file == null ) {
-                answer = getNoFIDError(msg, fid);
-            } else {
-                answer = new StyxRClunkMessage(msg.getTag());
-            }
-            break;
-        case Tflush:
-            // TODO do something there
-            answer = new StyxRFlushMessage(msg.getTag());
-            break;
-        case Twalk:
-            answer = processTWalk((StyxTWalkMessage) msg);
-            break;
-        case Topen:
-            answer = processTopen((StyxTOpenMessage)msg);
-            break;
-        case Tread:
-            answer = processTread((StyxTReadMessage)msg);
-            break;
-        default:
-            System.out.println("Got message:");
-            System.out.println(msg.toString());
-            break;
+        } catch (StyxErrorMessageException e) {
+            answer = e.getErrorMessage();
+            answer.setTag(msg.getTag());
         }
         if ( answer != null ) {
             sendMessage(answer);
         }
     }
 
+    private StyxRAttachMessage processAttach(StyxTAttachMessage msg) {
+        String mountPoint = msg.getMountPoint();
+        mClientRoot = mServerRoot.getDirectory(mountPoint);
+        mUserName = msg.getUserName(); 
+        StyxRAttachMessage answer = new StyxRAttachMessage(msg.getTag(), mClientRoot.getQID());
+        registerOpenedFile(((StyxTAttachMessage)msg).getFID(), mClientRoot );
+        return answer;
+    }
+
     /**
      * Handle read operation
      * @param msg
      * @return
+     * @throws StyxErrorMessageException 
      */
-    private StyxMessage processTread(StyxTReadMessage msg) {
+    private StyxMessage processTread(StyxTReadMessage msg) throws StyxErrorMessageException {
         long fid = msg.getFID();
         IVirtualStyxFile file = mAssignedFiles.get(fid);
         if ( file == null ) {
             return getNoFIDError(msg, fid);
         }
-        byte [] buffer = file.read(msg.getOffset(), msg.getCount());
+        byte [] buffer = file.read(this, msg.getOffset(), msg.getCount());
         if ( buffer == null ) {
-            return new StyxRErrorMessage(msg.getTag(), "Unable to read this file");
+            StyxErrorMessageException.doException("Unable to read this file");
         }
         return new StyxRReadMessage(msg.getTag(), buffer);
     }
@@ -158,21 +173,23 @@ implements Closeable {
      * Handle TOpen message from client
      * @param msg
      * @return
+     * @throws StyxErrorMessageException 
      */
-    private StyxMessage processTopen(StyxTOpenMessage msg) {
+    private StyxMessage processTopen(StyxTOpenMessage msg) throws StyxErrorMessageException {
         long fid = msg.getFID();
         IVirtualStyxFile file = mAssignedFiles.get(fid);
         if ( file == null ) {
             return getNoFIDError(msg, fid);
         }
-        if ( file.open(msg.getMode()) ) {
+        if ( file.open(this, msg.getMode()) ) {
             return new StyxROpenMessage(msg.getTag());
         } else {
-            return new StyxRErrorMessage(msg.getTag(), "Incorrect mode for specified file");
+            StyxErrorMessageException.doException("Incorrect mode for specified file");
+            return null;
         }
     }
 
-    private StyxMessage processTWalk(StyxTWalkMessage msg) {
+    private StyxMessage processTWalk(StyxTWalkMessage msg) throws StyxErrorMessageException {
         long fid = msg.getFID();
         IVirtualStyxFile file = mAssignedFiles.get(fid);
         if ( file == null ) {
@@ -199,10 +216,11 @@ implements Closeable {
      * @param tag message tag
      * @param fid File ID
      * @return new Rerror message
+     * @throws StyxErrorMessageException 
      */
-    private StyxRErrorMessage getNoFIDError(StyxMessage message, long fid) {
-        return new StyxRErrorMessage(message.getTag(), 
-                String.format("Unknown FID (%d)", fid));
+    private StyxRErrorMessage getNoFIDError(StyxMessage message, long fid) throws StyxErrorMessageException {
+        StyxErrorMessageException.doException(String.format("Unknown FID (%d)", fid));
+        return null;
     }
 
     private void registerOpenedFile(long fid, IVirtualStyxFile file) {

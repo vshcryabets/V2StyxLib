@@ -207,7 +207,7 @@ public abstract class StyxMessage {
 		return mTag;
 	}
 	
-	public void setTag(short tag)
+	public void setTag(int tag)
 	{
 		mTag = (tag & 0xFFFF);
 	}
