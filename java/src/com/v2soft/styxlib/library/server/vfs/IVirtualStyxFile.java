@@ -1,5 +1,6 @@
 package com.v2soft.styxlib.library.server.vfs;
 
+import java.io.IOException;
 import java.util.Date;
 
 import com.v2soft.styxlib.library.messages.base.enums.ModeType;
@@ -37,8 +38,14 @@ public abstract interface IVirtualStyxFile {
 	/**
 	 * Open file
 	 * @param mode
+	 * @throws IOException 
 	 */
-    public boolean open(ClientState client, ModeType mode);
+    public boolean open(ClientState client, ModeType mode) throws IOException;
+    /**
+     * Close file
+     * @param mode
+     */
+    public void close(ClientState client);
     /**
      * Read from file
      * @param offset offset from begining of the file

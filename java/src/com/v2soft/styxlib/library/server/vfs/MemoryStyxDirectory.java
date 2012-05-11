@@ -1,9 +1,14 @@
 package com.v2soft.styxlib.library.server.vfs;
 
+import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
+import com.v2soft.styxlib.library.core.StyxByteBuffer;
+import com.v2soft.styxlib.library.exceptions.StyxException;
 import com.v2soft.styxlib.library.messages.base.enums.ModeType;
 import com.v2soft.styxlib.library.messages.base.enums.QIDType;
 import com.v2soft.styxlib.library.messages.base.structs.StyxQID;
@@ -18,6 +23,7 @@ import com.v2soft.styxlib.library.types.ULong;
  */
 public class MemoryStyxDirectory 
 	implements IVirtualStyxDirectory {
+    private Map<ClientState, StyxByteBuffer> mBuffersMap;
 	private List<IVirtualStyxFile> mFiles;
 	
 	public MemoryStyxDirectory() {
@@ -107,18 +113,38 @@ public class MemoryStyxDirectory
     }
 
     @Override
-    public boolean open(ClientState client, ModeType mode) {
+    public boolean open(ClientState client, ModeType mode) throws IOException {
         boolean result = (mode == ModeType.OREAD);
         if ( result ) {
             // prepare binary structure of the directory
-            int count = mFiles.size();
+            int size = 0;
+            final List<StyxStat> stats = new LinkedList<StyxStat>();
+            for (IVirtualStyxFile file : mFiles) {
+                final StyxStat stat = file.getStat();
+                size += stat.getSize();
+                stats.add(stat);
+            }
+            // allocate buffer
+            StyxByteBuffer buffer = new StyxByteBuffer(ByteBuffer.allocateDirect(size));
+            for (StyxStat state : stats) {
+                state.writeBinaryTo(buffer);
+            }
+            mBuffersMap.put(client, buffer);
         }
         return result;
     }
 
     @Override
     public byte[] read(ClientState client, ULong offset, long count) {
+//        if ( !mBuffersMap.containsKey(client)) throw new StyxException("This file isn't open");
+//        StyxByteBuffer buffer = mBuffersMap.get(client);
         // TODO Auto-generated method stub
         return null;
+    }
+
+    @Override
+    public void close(ClientState client) {
+        // remove buffer
+        mBuffersMap.remove(client);
     }
 }
