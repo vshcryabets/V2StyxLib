@@ -111,6 +111,7 @@ implements Closeable {
                 if ( file == null ) {
                     answer = getNoFIDError(msg, fid);
                 } else {
+                    file.close(this);
                     answer = new StyxRClunkMessage(msg.getTag());
                 }
                 break;
@@ -162,11 +163,12 @@ implements Closeable {
         if ( file == null ) {
             return getNoFIDError(msg, fid);
         }
-        byte [] buffer = file.read(this, msg.getOffset(), msg.getCount());
+        byte [] buffer = new byte[mIOUnit]; 
+        long readed = file.read(this, buffer, msg.getOffset(), msg.getCount());
         if ( buffer == null ) {
             StyxErrorMessageException.doException("Unable to read this file");
         }
-        return new StyxRReadMessage(msg.getTag(), buffer);
+        return new StyxRReadMessage(msg.getTag(), buffer, (int) readed);
     }
 
     /**
@@ -174,15 +176,16 @@ implements Closeable {
      * @param msg
      * @return
      * @throws StyxErrorMessageException 
+     * @throws IOException 
      */
-    private StyxMessage processTopen(StyxTOpenMessage msg) throws StyxErrorMessageException {
+    private StyxMessage processTopen(StyxTOpenMessage msg) throws StyxErrorMessageException, IOException {
         long fid = msg.getFID();
         IVirtualStyxFile file = mAssignedFiles.get(fid);
         if ( file == null ) {
             return getNoFIDError(msg, fid);
         }
         if ( file.open(this, msg.getMode()) ) {
-            return new StyxROpenMessage(msg.getTag());
+            return new StyxROpenMessage(msg.getTag(), file.getQID(), mIOUnit-24 ); // TODO magic number
         } else {
             StyxErrorMessageException.doException("Incorrect mode for specified file");
             return null;

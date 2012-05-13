@@ -99,7 +99,7 @@ public abstract class StyxMessage {
             result = new StyxTOpenMessage(NOFID, null);
             break;
         case Ropen:
-            result = new StyxROpenMessage(tag);
+            result = new StyxROpenMessage(tag, null, 0);
             break;
         case Tcreate:
             result = new StyxTCreateMessage(NOFID, null, 0, null);
@@ -111,7 +111,7 @@ public abstract class StyxMessage {
             result = new StyxTReadMessage(NOFID, null, 0);
             break;
         case Rread:
-            result = new StyxRReadMessage(tag, null);
+            result = new StyxRReadMessage(tag, null, 0);
             break;
         case Twrite:
             result = new StyxTWriteMessage(NOFID, null, null );

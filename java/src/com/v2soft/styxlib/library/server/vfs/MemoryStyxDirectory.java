@@ -3,12 +3,13 @@ package com.v2soft.styxlib.library.server.vfs;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import com.v2soft.styxlib.library.core.StyxByteBuffer;
-import com.v2soft.styxlib.library.exceptions.StyxException;
+import com.v2soft.styxlib.library.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.library.messages.base.enums.ModeType;
 import com.v2soft.styxlib.library.messages.base.enums.QIDType;
 import com.v2soft.styxlib.library.messages.base.structs.StyxQID;
@@ -25,9 +26,12 @@ public class MemoryStyxDirectory
 	implements IVirtualStyxDirectory {
     private Map<ClientState, StyxByteBuffer> mBuffersMap;
 	private List<IVirtualStyxFile> mFiles;
+	private String mName;
 	
-	public MemoryStyxDirectory() {
+	public MemoryStyxDirectory(String name) {
+	    mName = name;
 	    mFiles = new LinkedList<IVirtualStyxFile>();
+	    mBuffersMap = new HashMap<ClientState, StyxByteBuffer>();
     }
 	
 	@Override
@@ -70,7 +74,7 @@ public class MemoryStyxDirectory
 
 	@Override
 	public String getName() {
-		return "memory";
+		return mName;
 	}
 
 	@Override
@@ -135,16 +139,31 @@ public class MemoryStyxDirectory
     }
 
     @Override
-    public byte[] read(ClientState client, ULong offset, long count) {
-//        if ( !mBuffersMap.containsKey(client)) throw new StyxException("This file isn't open");
-//        StyxByteBuffer buffer = mBuffersMap.get(client);
-        // TODO Auto-generated method stub
-        return null;
+    public long read(ClientState client, byte[] outbuffer, ULong offset, long count) throws StyxErrorMessageException {
+        if ( !mBuffersMap.containsKey(client)) StyxErrorMessageException.doException("This file isn't open");
+        final ByteBuffer buffer = mBuffersMap.get(client).getBuffer();
+        int boffset = buffer.limit();
+        if ( offset.asLong() > boffset ) return 0;
+        buffer.position((int) offset.asLong());
+        int bleft = buffer.remaining();
+        if ( count > bleft ) {
+            count = bleft;
+        }
+        buffer.get(outbuffer, 0, (int) count);
+        return count;
     }
 
     @Override
     public void close(ClientState client) {
         // remove buffer
         mBuffersMap.remove(client);
+    }
+
+    /**
+     * Add child file
+     * @param file
+     */
+    public void addFile(IVirtualStyxFile file) {
+        mFiles.add(file);
     }
 }

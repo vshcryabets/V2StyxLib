@@ -56,10 +56,15 @@ public class JavaServerTest {
                 }*/
                 pos++;
             }
+            MemoryStyxDirectory root = new MemoryStyxDirectory("memory");
+            root.addFile(new MemoryStyxDirectory("dir1"));
+            root.addFile(new MemoryStyxDirectory("dir2"));
+            root.addFile(new MemoryStyxDirectory("dir3"));
+            root.addFile(new MemoryStyxDirectory("dir4"));
             StyxServerManager manager = new StyxServerManager(InetAddress.getLocalHost(), 
             		8080, 
             		false,
-            		new MemoryStyxDirectory());
+            		root);
             manager.start();
             while ( true ) {
                 Thread.sleep(1000);

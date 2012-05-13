@@ -3,6 +3,7 @@ package com.v2soft.styxlib.library.core;
 import java.nio.ByteBuffer;
 
 import com.v2soft.styxlib.library.server.StyxBufferOperations;
+import com.v2soft.styxlib.library.types.ULong;
 
 public class StyxByteBuffer extends StyxBufferOperations {
 	private ByteBuffer mBuffer;
@@ -56,5 +57,13 @@ public class StyxByteBuffer extends StyxBufferOperations {
     public int read(byte[] mData, int offset, int count) {
         mBuffer.get(mData, offset, count);
         return count;
+    }
+
+    /**
+     * Seek to specified position in buffer
+     * @param offset
+     */
+    public void setPosition(int offset) {
+        mBuffer.position(offset);
     }
 }

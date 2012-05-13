@@ -3,19 +3,19 @@ package com.v2soft.styxlib.library.messages;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
-import com.v2soft.styxlib.library.io.StyxInputStream;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
 import com.v2soft.styxlib.library.messages.base.structs.StyxQID;
-import com.v2soft.styxlib.library.server.DualStateBuffer;
 import com.v2soft.styxlib.library.server.StyxBufferOperations;
 
 public class StyxROpenMessage extends StyxMessage {
 	private StyxQID mQID;
 	private long mIOUnit;
 
-	public StyxROpenMessage(int tag) {
+	public StyxROpenMessage(int tag, StyxQID qid, long iounit) {
 		super(MessageType.Ropen, tag);
+		mQID = qid;
+		mIOUnit = iounit;
 	}
 	
     @Override
@@ -56,14 +56,14 @@ public class StyxROpenMessage extends StyxMessage {
 	public void writeToBuffer(StyxBufferOperations output)
 	        throws UnsupportedEncodingException, IOException {
 	    super.writeToBuffer(output);
-		getQID().writeBinaryTo(output);
+		mQID.writeBinaryTo(output);
 		output.writeUInt(getIOUnit());
 	}
 
 	@Override
 	protected String internalToString() {
 		return String.format("QID: %s\nIOUnit: %d", 
-				getQID().toString(), getIOUnit());
+				mQID.toString(), getIOUnit());
 	}
 	
 }

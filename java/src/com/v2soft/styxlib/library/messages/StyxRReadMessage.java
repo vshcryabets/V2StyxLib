@@ -10,10 +10,12 @@ import com.v2soft.styxlib.library.server.StyxBufferOperations;
 
 public class StyxRReadMessage extends StyxMessage {
     private byte[] mData;
+    private int mDataLength;
 
-    public StyxRReadMessage(int tag, byte[] data) {
+    public StyxRReadMessage(int tag, byte[] data, int length) {
         super(MessageType.Rread, tag);
         mData = data;
+        mDataLength = length;
     }
 
     @Override
@@ -24,12 +26,7 @@ public class StyxRReadMessage extends StyxMessage {
         input.read(mData, 0, count);
     }
 
-    public int getDataLength()
-    {
-        if (mData == null)
-            return 0;
-        return mData.length;
-    }
+    public int getDataLength() {return mDataLength;}
 
     @Override
     public int getBinarySize() {
@@ -44,7 +41,7 @@ public class StyxRReadMessage extends StyxMessage {
         int length = getDataLength();
         output.writeUInt(length);
         if ( length > 0 ) {
-            output.write(mData);
+            output.write(mData, 0, mDataLength);
         }
     }
 

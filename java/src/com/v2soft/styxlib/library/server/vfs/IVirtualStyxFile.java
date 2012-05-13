@@ -3,6 +3,7 @@ package com.v2soft.styxlib.library.server.vfs;
 import java.io.IOException;
 import java.util.Date;
 
+import com.v2soft.styxlib.library.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.library.messages.base.enums.ModeType;
 import com.v2soft.styxlib.library.messages.base.structs.StyxQID;
 import com.v2soft.styxlib.library.messages.base.structs.StyxStat;
@@ -50,7 +51,7 @@ public abstract interface IVirtualStyxFile {
      * Read from file
      * @param offset offset from begining of the file
      * @param count number of bytes to read
-     * @return
+     * @return number of bytes that was readed into the buffer
      */
-    public byte[] read(ClientState client, ULong offset, long count);
+    public long read(ClientState client, byte[] buffer, ULong offset, long count) throws StyxErrorMessageException;
 }
