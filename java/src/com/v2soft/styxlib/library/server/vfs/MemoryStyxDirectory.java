@@ -29,6 +29,7 @@ public class MemoryStyxDirectory
 	private String mName;
 	
 	public MemoryStyxDirectory(String name) {
+	    if ( name == null ) throw new NullPointerException("Name is null");
 	    mName = name;
 	    mFiles = new LinkedList<IVirtualStyxFile>();
 	    mBuffersMap = new HashMap<ClientState, StyxByteBuffer>();
@@ -108,10 +109,20 @@ public class MemoryStyxDirectory
 	}
 
     @Override
-    public IVirtualStyxFile walk(String path, List<StyxQID> qids) {
-        if ( path.length() < 1 ) {
-            qids.clear();
+    public IVirtualStyxFile walk(List<String> pathElements, List<StyxQID> qids) {
+        if ( pathElements.size() < 1 ) {
             return this;
+        } else {
+            String filename = pathElements.get(0);
+            for (IVirtualStyxFile file : mFiles) {
+                if ( file.getName().equals(filename)) {
+                    pathElements.remove(0);
+                    qids.add(file.getQID());
+                    if ( file instanceof IVirtualStyxDirectory ) {
+                        return ((IVirtualStyxDirectory)file).walk(pathElements, qids);
+                    }
+                }
+            }
         }
         return null;
     }

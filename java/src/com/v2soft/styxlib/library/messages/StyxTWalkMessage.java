@@ -103,7 +103,7 @@ public class StyxTWalkMessage
 		return mPathElements.length;
 	}
 	
-	public String[] getPathIterable()
+	public String[] getPathElements()
 	{
 		return mPathElements;
 	}

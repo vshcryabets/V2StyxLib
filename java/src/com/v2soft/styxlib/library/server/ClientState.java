@@ -5,6 +5,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -202,7 +204,7 @@ implements Closeable {
         if ( file instanceof IVirtualStyxDirectory ) {
             List<StyxQID> QIDList = new LinkedList<StyxQID>();
             IVirtualStyxFile walkFile = ((IVirtualStyxDirectory)file).walk(
-                    msg.getPath(), 
+                    new LinkedList<String>(Arrays.asList(msg.getPathElements())),
                     QIDList);
             if ( walkFile != null ) {
                 mAssignedFiles.put(msg.getNewFID(), walkFile);

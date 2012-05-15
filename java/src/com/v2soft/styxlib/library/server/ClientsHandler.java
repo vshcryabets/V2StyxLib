@@ -1,5 +1,6 @@
 package com.v2soft.styxlib.library.server;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
@@ -9,7 +10,6 @@ import java.util.Map;
 
 import javax.xml.ws.WebServiceException;
 
-import com.sun.xml.internal.ws.Closeable;
 import com.v2soft.styxlib.library.server.vfs.IVirtualStyxDirectory;
 
 /**
