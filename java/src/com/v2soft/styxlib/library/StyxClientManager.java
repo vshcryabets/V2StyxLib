@@ -19,6 +19,7 @@ import com.v2soft.styxlib.library.core.Messenger.StyxMessengerListener;
 import com.v2soft.styxlib.library.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.library.exceptions.StyxException;
 import com.v2soft.styxlib.library.messages.StyxRAttachMessage;
+import com.v2soft.styxlib.library.messages.StyxRAuthMessage;
 import com.v2soft.styxlib.library.messages.StyxRVersionMessage;
 import com.v2soft.styxlib.library.messages.StyxTAttachMessage;
 import com.v2soft.styxlib.library.messages.StyxTAuthMessage;
@@ -76,7 +77,7 @@ implements Closeable, StyxMessengerListener {
 
     public boolean connect() 
             throws IOException, StyxException, InterruptedException, TimeoutException {
-        return connect(getAddress(), getPort(), isSSL(), getUserName(), getPassword());
+        return connect(mAddress, mPort, mSSL, mUserName, mPassword);
     }
 
     public boolean connect(InetAddress address, int port, boolean ssl)
@@ -274,7 +275,17 @@ implements Closeable, StyxMessengerListener {
         mMessenger.send(tAuth);
 
         StyxMessage rMessage = tAuth.waitForAnswer(mTimeout);
-        onReceivedAuth(tAuth, rMessage);
+        StyxErrorMessageException.doException(rMessage);
+        StyxRAuthMessage rAuth = (StyxRAuthMessage) rMessage;
+        mAuthQID = rAuth.getQID();
+
+        // TODO uncomment later
+//        StyxOutputStream output = new StyxOutputStream((new StyxFile(this, 
+//                ((StyxTAuthMessage)tMessage).getAuthFID())).openForWrite());
+//        output.writeString(getPassword());
+//        output.flush();
+
+        sendAttachMessage();
     }
 
     private void sendAttachMessage()
@@ -290,22 +301,6 @@ implements Closeable, StyxMessengerListener {
         StyxRAttachMessage rAttach = (StyxRAttachMessage) rMessage;
         mQID = rAttach.getQID();
         setAttached(true);
-    }
-
-    private void onReceivedAuth(StyxMessage tMessage, StyxMessage rMessage)
-            throws StyxException, InterruptedException, IOException, TimeoutException {
-        throw new RuntimeException();
-        // TODO uncomment later
-/*        StyxErrorMessageException.doException(rMessage);
-        StyxRAuthMessage rAuth = (StyxRAuthMessage) rMessage;
-        mAuthQID = rAuth.getQID();
-
-        StyxOutputStream output = new StyxOutputStream((new StyxFile(this, 
-                ((StyxTAuthMessage)tMessage).getAuthFID())).openForWrite());
-        output.writeString(getPassword());
-        output.flush();
-
-        sendAttachMessage();*/
     }
 
     @Override

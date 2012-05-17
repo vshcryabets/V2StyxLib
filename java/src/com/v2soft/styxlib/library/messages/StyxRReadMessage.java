@@ -21,9 +21,9 @@ public class StyxRReadMessage extends StyxMessage {
     @Override
     public void load(StyxBufferOperations input) 
             throws IOException  {
-        int count = (int)input.readUInt32();
-        mData = new byte[count];
-        input.read(mData, 0, count);
+        mDataLength = (int)input.readUInt32();
+        mData = new byte[mDataLength];
+        input.read(mData, 0, mDataLength);
     }
 
     public int getDataLength() {return mDataLength;}

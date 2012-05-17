@@ -15,6 +15,7 @@ import com.v2soft.styxlib.library.StyxClientManager;
 import com.v2soft.styxlib.library.core.StyxByteBuffer;
 import com.v2soft.styxlib.library.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.library.messages.StyxRAttachMessage;
+import com.v2soft.styxlib.library.messages.StyxRAuthMessage;
 import com.v2soft.styxlib.library.messages.StyxRClunkMessage;
 import com.v2soft.styxlib.library.messages.StyxRErrorMessage;
 import com.v2soft.styxlib.library.messages.StyxRFlushMessage;
@@ -24,6 +25,7 @@ import com.v2soft.styxlib.library.messages.StyxRStatMessage;
 import com.v2soft.styxlib.library.messages.StyxRVersionMessage;
 import com.v2soft.styxlib.library.messages.StyxRWalkMessage;
 import com.v2soft.styxlib.library.messages.StyxTAttachMessage;
+import com.v2soft.styxlib.library.messages.StyxTAuthMessage;
 import com.v2soft.styxlib.library.messages.StyxTClunkMessage;
 import com.v2soft.styxlib.library.messages.StyxTOpenMessage;
 import com.v2soft.styxlib.library.messages.StyxTReadMessage;
@@ -59,7 +61,7 @@ implements Closeable {
         mChannel = channel;
         mServerRoot = root;
         mAssignedFiles = new HashMap<Long, IVirtualStyxFile>();
-        mUserName = "";
+        mUserName = "nobody";
     }
 
     /**
@@ -98,6 +100,9 @@ implements Closeable {
             case Tattach:
                 answer = processAttach((StyxTAttachMessage)msg);
                 break;
+            case Tauth:
+                answer = processAuth((StyxTAuthMessage)msg);
+                break;
             case Tstat:
                 fid = ((StyxTStatMessage)msg).getFID();
                 file = mAssignedFiles.get(fid);
@@ -122,7 +127,7 @@ implements Closeable {
                 answer = new StyxRFlushMessage(msg.getTag());
                 break;
             case Twalk:
-                answer = processTWalk((StyxTWalkMessage) msg);
+                answer = processWalk((StyxTWalkMessage) msg);
                 break;
             case Topen:
                 answer = processTopen((StyxTOpenMessage)msg);
@@ -142,6 +147,11 @@ implements Closeable {
         if ( answer != null ) {
             sendMessage(answer);
         }
+    }
+
+    private StyxMessage processAuth(StyxTAuthMessage msg) {
+        mUserName = msg.getUserName();
+        return new StyxRAuthMessage(msg.getTag(), StyxQID.EMPTY);
     }
 
     private StyxRAttachMessage processAttach(StyxTAttachMessage msg) {
@@ -194,7 +204,14 @@ implements Closeable {
         }
     }
 
-    private StyxMessage processTWalk(StyxTWalkMessage msg) throws StyxErrorMessageException {
+    /**
+     * Handle TWalk message from client
+     * @param msg
+     * @return
+     * @throws StyxErrorMessageException 
+     * @throws IOException 
+     */
+    private StyxMessage processWalk(StyxTWalkMessage msg) throws StyxErrorMessageException {
         long fid = msg.getFID();
         IVirtualStyxFile file = mAssignedFiles.get(fid);
         if ( file == null ) {

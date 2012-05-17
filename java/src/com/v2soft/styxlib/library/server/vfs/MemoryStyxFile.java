@@ -2,6 +2,7 @@ package com.v2soft.styxlib.library.server.vfs;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -86,7 +87,9 @@ public class MemoryStyxFile implements IVirtualStyxFile {
 
     @Override
     public boolean open(ClientState client, ModeType mode) throws IOException {
-        return false;
+        return ( (mode == ModeType.OREAD) || 
+                (mode == ModeType.OWRITE) || 
+                (mode==ModeType.ORDWR) );
     }
 
     @Override
@@ -97,5 +100,30 @@ public class MemoryStyxFile implements IVirtualStyxFile {
     @Override
     public void close(ClientState client) {
     }
-
+    
+    // ==============================================================
+    // Abstract methods
+    // ==============================================================
+    protected int stringReply(String value, byte[] buffer, Charset charset) {
+        byte[] bytes = value.getBytes(charset);
+        System.arraycopy(bytes, 0, buffer, 0, bytes.length);
+        return bytes.length;
+    }
+    protected int stringReplyWithOffset(String value, byte[] buffer, Charset charset, 
+            long offset, int count) {
+        return byteReplyWithOffset(value.getBytes(charset), buffer, offset, count);
+    }
+    protected int byteReplyWithOffset(byte[] reply, byte[] buffer, long offset, int count) {
+        long start = offset;
+        if ( start >= reply.length ) {
+            return 0;
+        } else {
+            if ( start+count > reply.length ) {
+                count = (int) (reply.length-start);
+            }
+            System.arraycopy(reply, 0, buffer, 0, count);
+            return count;
+        }
+    }
+   
 }

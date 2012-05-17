@@ -81,7 +81,7 @@ public abstract class StyxMessage {
             result = new StyxTWalkMessage(NOFID, NOFID, "");
             break;
         case Rauth:
-            result = new StyxRAuthMessage(tag);
+            result = new StyxRAuthMessage(tag, StyxQID.EMPTY);
             break;
         case Rerror:
             result = new StyxRErrorMessage(tag, null);

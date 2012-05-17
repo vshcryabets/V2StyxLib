@@ -120,6 +120,8 @@ public class MemoryStyxDirectory
                     qids.add(file.getQID());
                     if ( file instanceof IVirtualStyxDirectory ) {
                         return ((IVirtualStyxDirectory)file).walk(pathElements, qids);
+                    } else {
+                        return file;
                     }
                 }
             }
