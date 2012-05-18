@@ -10,6 +10,7 @@ import java.util.Map;
 
 import com.v2soft.styxlib.library.core.StyxByteBuffer;
 import com.v2soft.styxlib.library.exceptions.StyxErrorMessageException;
+import com.v2soft.styxlib.library.messages.base.enums.FileMode;
 import com.v2soft.styxlib.library.messages.base.enums.ModeType;
 import com.v2soft.styxlib.library.messages.base.enums.QIDType;
 import com.v2soft.styxlib.library.messages.base.structs.StyxQID;
@@ -70,7 +71,7 @@ public class MemoryStyxDirectory
 
 	@Override
 	public int getMode() {
-		return 0x800001FF;
+		return (int) (FileMode.Directory.getMode() | 0x01FF);
 	}
 
 	@Override

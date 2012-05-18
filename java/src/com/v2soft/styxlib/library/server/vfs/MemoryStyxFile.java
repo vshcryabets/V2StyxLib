@@ -47,7 +47,7 @@ public class MemoryStyxFile implements IVirtualStyxFile {
 
     @Override
     public int getMode() {
-        return 0x800001FF;
+        return 0x000001FF;
     }
 
     @Override
@@ -124,6 +124,15 @@ public class MemoryStyxFile implements IVirtualStyxFile {
             System.arraycopy(reply, 0, buffer, 0, count);
             return count;
         }
+    }
+
+    @Override
+    public IVirtualStyxFile walk(List<String> pathElements, List<StyxQID> qids) {
+        if ( pathElements.size() == 0 ) {
+            qids.add(getQID());
+            return this;
+        }
+        return null;
     }
    
 }

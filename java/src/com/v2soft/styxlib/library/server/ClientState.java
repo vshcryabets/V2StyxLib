@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -177,9 +176,6 @@ implements Closeable {
         }
         byte [] buffer = new byte[mIOUnit]; 
         long readed = file.read(this, buffer, msg.getOffset(), msg.getCount());
-        if ( buffer == null ) {
-            StyxErrorMessageException.doException("Unable to read this file");
-        }
         return new StyxRReadMessage(msg.getTag(), buffer, (int) readed);
     }
 
@@ -217,20 +213,25 @@ implements Closeable {
         if ( file == null ) {
             return getNoFIDError(msg, fid);
         }
-
-        if ( file instanceof IVirtualStyxDirectory ) {
-            List<StyxQID> QIDList = new LinkedList<StyxQID>();
-            IVirtualStyxFile walkFile = ((IVirtualStyxDirectory)file).walk(
-                    new LinkedList<String>(Arrays.asList(msg.getPathElements())),
-                    QIDList);
-            if ( walkFile != null ) {
-                mAssignedFiles.put(msg.getNewFID(), walkFile);
-                return new StyxRWalkMessage(msg.getTag(), QIDList);
-            } else {
-                return new StyxRErrorMessage(msg.getTag(), "file does not exist");
-            }
+        
+        IVirtualStyxFile walkFile;
+        String[] pathElementsArray = msg.getPathElements();
+        List<StyxQID> QIDList = new LinkedList<StyxQID>();
+        
+        if ( pathElementsArray.length == 0 ) {
+            walkFile = file;
+        } else {
+            walkFile = file.walk(
+                    new LinkedList<String>(Arrays.asList(pathElementsArray)),
+                    QIDList);    
         }
-        return new StyxRErrorMessage(msg.getTag(), "file does not exist");
+        
+        if ( walkFile != null ) {
+            mAssignedFiles.put(msg.getNewFID(), walkFile);
+            return new StyxRWalkMessage(msg.getTag(), QIDList);
+        } else {
+            return new StyxRErrorMessage(msg.getTag(), "file does not exist");
+        }
     }
 
     /**

@@ -2,6 +2,7 @@ package com.v2soft.styxlib.library.server.vfs;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.List;
 
 import com.v2soft.styxlib.library.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.library.messages.base.enums.ModeType;
@@ -15,7 +16,7 @@ import com.v2soft.styxlib.library.types.ULong;
  * @author vschryabets@gmail.com
  *
  */
-public abstract interface IVirtualStyxFile {
+public interface IVirtualStyxFile {
 	/**
 	 * @return unic ID of the file
 	 */
@@ -54,4 +55,5 @@ public abstract interface IVirtualStyxFile {
      * @return number of bytes that was readed into the buffer
      */
     public long read(ClientState client, byte[] buffer, ULong offset, long count) throws StyxErrorMessageException;
+    public IVirtualStyxFile walk(List<String> pathElements, List<StyxQID> qids);    
 }
