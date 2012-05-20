@@ -6,16 +6,15 @@ import java.io.UnsupportedEncodingException;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.messages.base.StyxTMessage;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
-import com.v2soft.styxlib.library.messages.base.enums.ModeType;
 import com.v2soft.styxlib.library.server.StyxBufferOperations;
 
 public class StyxTCreateMessage extends StyxTMessage {
     private long mFID;
     private String mName;
     private long mPermissions;
-    private ModeType mMode;
+    private int mMode;
 
-    public StyxTCreateMessage(long fid, String name, long permissions, ModeType mode)
+    public StyxTCreateMessage(long fid, String name, long permissions, int mode)
     {
         super(MessageType.Tcreate);
         mFID = fid;
@@ -28,7 +27,7 @@ public class StyxTCreateMessage extends StyxTMessage {
         mFID = input.readUInt32();
         mName = input.readUTF();
         mPermissions = input.readUInt32();
-        mMode = ModeType.factory(input.readUInt8());
+        mMode = input.readUInt8();
     }
 
     public long getFID()
@@ -63,15 +62,9 @@ public class StyxTCreateMessage extends StyxTMessage {
         mPermissions = permissions;
     }
 
-    public ModeType getMode()
-    {
-        return mMode;
-    }
+    public int getMode(){return mMode;}
 
-    public void setMode(ModeType mode)
-    {
-        mMode = mode;
-    }
+    public void setMode(int mode){mMode = mode;}
 
     @Override
     public int getBinarySize() {
@@ -86,13 +79,13 @@ public class StyxTCreateMessage extends StyxTMessage {
         output.writeUInt(getFID());
         output.writeUTF(getName());
         output.writeUInt(getPermissions());
-        output.writeUByte((short)getMode().getByte());  
+        output.writeUByte((short) mMode);  
     }
 
     @Override
     protected String internalToString() {
-        return String.format("FID: %d\nName: %s\nPermissions: %d\nMode: %s", 
-                getFID(), getName(), getPermissions(), getMode().toString());
+        return String.format("FID: %d\nName: %s\nPermissions: %d\nMode: %d", 
+                getFID(), getName(), getPermissions(), mMode);
     }
 
     @Override

@@ -31,6 +31,7 @@ import com.v2soft.styxlib.library.messages.StyxTWStatMessage;
 import com.v2soft.styxlib.library.messages.StyxTWalkMessage;
 import com.v2soft.styxlib.library.messages.StyxTWriteMessage;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
+import com.v2soft.styxlib.library.messages.base.enums.ModeType;
 import com.v2soft.styxlib.library.messages.base.structs.StyxQID;
 import com.v2soft.styxlib.library.server.StyxBufferOperations;
 
@@ -96,13 +97,13 @@ public abstract class StyxMessage {
             result = new StyxRWalkMessage(tag, null); 
             break;
         case Topen:
-            result = new StyxTOpenMessage(NOFID, null);
+            result = new StyxTOpenMessage(NOFID, ModeType.OREAD);
             break;
         case Ropen:
             result = new StyxROpenMessage(tag, null, 0);
             break;
         case Tcreate:
-            result = new StyxTCreateMessage(NOFID, null, 0, null);
+            result = new StyxTCreateMessage(NOFID, null, 0, ModeType.OWRITE);
             break;
         case Rcreate:
             result = new StyxRCreateMessage(tag);

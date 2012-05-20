@@ -5,14 +5,13 @@ import java.io.UnsupportedEncodingException;
 
 import com.v2soft.styxlib.library.messages.base.StyxTMessage;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
-import com.v2soft.styxlib.library.messages.base.enums.ModeType;
 import com.v2soft.styxlib.library.server.StyxBufferOperations;
 
 public class StyxTOpenMessage extends StyxTMessage {
     private long mFID;
-    private ModeType mMode;
+    private int mMode;
 
-    public StyxTOpenMessage(long fid, ModeType mode) {
+    public StyxTOpenMessage(long fid, int mode) {
         super(MessageType.Topen);
         mFID = fid;
         mMode = mode;
@@ -22,7 +21,7 @@ public class StyxTOpenMessage extends StyxTMessage {
     public void load(StyxBufferOperations input) 
             throws IOException  {
         setFID(input.readUInt32());
-        setMode(ModeType.factory(input.readUInt8()));
+        mMode = input.readUInt8();
     }
 
     public long getFID()
@@ -35,12 +34,12 @@ public class StyxTOpenMessage extends StyxTMessage {
         mFID = fid;
     }
 
-    public ModeType getMode()
+    public int getMode()
     {
         return mMode;
     }
 
-    public void setMode(ModeType mode)
+    public void setMode(int mode)
     {
         mMode = mode;
     }
@@ -55,13 +54,13 @@ public class StyxTOpenMessage extends StyxTMessage {
             throws UnsupportedEncodingException, IOException {
         super.writeToBuffer(output);
         output.writeUInt(getFID());
-        output.writeUByte((short)getMode().getByte());     
+        output.writeUByte((short) mMode);     
     }
 
     @Override
     protected String internalToString() {
-        return String.format("FID: %d\nMode: %s", 
-                getFID(), getMode().toString());
+        return String.format("FID: %d\nMode: %d", 
+                getFID(), mMode);
     }
 
     @Override

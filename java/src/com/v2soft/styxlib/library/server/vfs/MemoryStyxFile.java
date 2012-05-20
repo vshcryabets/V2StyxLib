@@ -1,13 +1,10 @@
 package com.v2soft.styxlib.library.server.vfs;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.List;
 
-import com.v2soft.styxlib.library.core.StyxByteBuffer;
 import com.v2soft.styxlib.library.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.library.messages.base.enums.ModeType;
 import com.v2soft.styxlib.library.messages.base.enums.QIDType;
@@ -86,12 +83,25 @@ public class MemoryStyxFile implements IVirtualStyxFile {
     }
 
     @Override
-    public boolean open(ClientState client, ModeType mode) throws IOException {
+    public boolean open(ClientState client, int mode) throws IOException {
         return ( (mode == ModeType.OREAD) || 
                 (mode == ModeType.OWRITE) || 
                 (mode==ModeType.ORDWR) );
     }
 
+    @Override
+    public IVirtualStyxFile walk(List<String> pathElements, List<StyxQID> qids) {
+        if ( pathElements.size() == 0 ) {
+            qids.add(getQID());
+            return this;
+        }
+        return null;
+    }
+    
+    public int write(ClientState client, byte[] data, ULong offset) throws StyxErrorMessageException {
+        return 0;
+    }
+    
     @Override
     public long read(ClientState client, byte[] outbuffer, ULong offset, long count) throws StyxErrorMessageException {
         return 0;
@@ -126,13 +136,6 @@ public class MemoryStyxFile implements IVirtualStyxFile {
         }
     }
 
-    @Override
-    public IVirtualStyxFile walk(List<String> pathElements, List<StyxQID> qids) {
-        if ( pathElements.size() == 0 ) {
-            qids.add(getQID());
-            return this;
-        }
-        return null;
-    }
+
    
 }

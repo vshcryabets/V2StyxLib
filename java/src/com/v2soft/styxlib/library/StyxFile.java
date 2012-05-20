@@ -97,7 +97,7 @@ public class StyxFile implements Closeable {
 		return mFID;
 	}
 	
-	private int open(ModeType mode) 
+	private int open(int mode) 
 	        throws StyxException, InterruptedException, TimeoutException, IOException {
 		StyxTOpenMessage tOpen = new StyxTOpenMessage(getFID(), mode);
 		

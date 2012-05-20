@@ -22,14 +22,18 @@ import com.v2soft.styxlib.library.messages.StyxROpenMessage;
 import com.v2soft.styxlib.library.messages.StyxRReadMessage;
 import com.v2soft.styxlib.library.messages.StyxRStatMessage;
 import com.v2soft.styxlib.library.messages.StyxRVersionMessage;
+import com.v2soft.styxlib.library.messages.StyxRWStatMessage;
 import com.v2soft.styxlib.library.messages.StyxRWalkMessage;
+import com.v2soft.styxlib.library.messages.StyxRWriteMessage;
 import com.v2soft.styxlib.library.messages.StyxTAttachMessage;
 import com.v2soft.styxlib.library.messages.StyxTAuthMessage;
 import com.v2soft.styxlib.library.messages.StyxTClunkMessage;
 import com.v2soft.styxlib.library.messages.StyxTOpenMessage;
 import com.v2soft.styxlib.library.messages.StyxTReadMessage;
 import com.v2soft.styxlib.library.messages.StyxTStatMessage;
+import com.v2soft.styxlib.library.messages.StyxTWStatMessage;
 import com.v2soft.styxlib.library.messages.StyxTWalkMessage;
+import com.v2soft.styxlib.library.messages.StyxTWriteMessage;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.messages.base.structs.StyxQID;
 import com.v2soft.styxlib.library.server.vfs.IVirtualStyxDirectory;
@@ -134,6 +138,11 @@ implements Closeable {
             case Tread:
                 answer = processTread((StyxTReadMessage)msg);
                 break;
+            case Twrite:
+                answer = processWrite((StyxTWriteMessage)msg);
+                break;
+            case Twstat:
+                answer = processWStat((StyxTWStatMessage)msg);
             default:
                 System.out.println("Got message:");
                 System.out.println(msg.toString());
@@ -146,6 +155,27 @@ implements Closeable {
         if ( answer != null ) {
             sendMessage(answer);
         }
+    }
+
+    private StyxMessage processWStat(StyxTWStatMessage msg) {
+        // TODO Auto-generated method stub
+        return new StyxRWStatMessage(msg.getTag());
+    }
+
+    /**
+     * Handle TWrite messages
+     * @param msg
+     * @return
+     * @throws StyxErrorMessageException 
+     */
+    private StyxMessage processWrite(StyxTWriteMessage msg) throws StyxErrorMessageException {
+        long fid = msg.getFID();
+        IVirtualStyxFile file = mAssignedFiles.get(fid);
+        if ( file == null ) {
+            return getNoFIDError(msg, fid);
+        }
+        int writed = file.write(this, msg.getData(), msg.getOffset());
+        return new StyxRWriteMessage(msg.getTag(), (int) writed);        
     }
 
     private StyxMessage processAuth(StyxTAuthMessage msg) {

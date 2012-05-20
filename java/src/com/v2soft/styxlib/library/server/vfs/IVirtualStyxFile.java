@@ -5,7 +5,6 @@ import java.util.Date;
 import java.util.List;
 
 import com.v2soft.styxlib.library.exceptions.StyxErrorMessageException;
-import com.v2soft.styxlib.library.messages.base.enums.ModeType;
 import com.v2soft.styxlib.library.messages.base.structs.StyxQID;
 import com.v2soft.styxlib.library.messages.base.structs.StyxStat;
 import com.v2soft.styxlib.library.server.ClientState;
@@ -17,32 +16,32 @@ import com.v2soft.styxlib.library.types.ULong;
  *
  */
 public interface IVirtualStyxFile {
-	/**
-	 * @return unic ID of the file
-	 */
-	public StyxQID getQID();
+    /**
+     * @return unic ID of the file
+     */
+    public StyxQID getQID();
 
-	public StyxStat getStat();
-	/**
-	 * @return file access mode
-	 */
-	public int getMode();
-	/**
-	 * @return file name
-	 */
-	public String getName();
-	public Date getAccessTime();
-	public Date getModificationTime();
-	public ULong getLength();
-	public String getOwnerName();
-	public String getGroupName();
-	public String getModificationUser();
-	/**
-	 * Open file
-	 * @param mode
-	 * @throws IOException 
-	 */
-    public boolean open(ClientState client, ModeType mode) throws IOException;
+    public StyxStat getStat();
+    /**
+     * @return file access mode
+     */
+    public int getMode();
+    /**
+     * @return file name
+     */
+    public String getName();
+    public Date getAccessTime();
+    public Date getModificationTime();
+    public ULong getLength();
+    public String getOwnerName();
+    public String getGroupName();
+    public String getModificationUser();
+    /**
+     * Open file
+     * @param mode
+     * @throws IOException 
+     */
+    public boolean open(ClientState client, int mode) throws IOException;
     /**
      * Close file
      * @param mode
@@ -55,5 +54,14 @@ public interface IVirtualStyxFile {
      * @return number of bytes that was readed into the buffer
      */
     public long read(ClientState client, byte[] buffer, ULong offset, long count) throws StyxErrorMessageException;
-    public IVirtualStyxFile walk(List<String> pathElements, List<StyxQID> qids);    
+    public IVirtualStyxFile walk(List<String> pathElements, List<StyxQID> qids);
+    /**
+     * Write data to file
+     * @param client
+     * @param data
+     * @param offset
+     * @return
+     * @throws StyxErrorMessageException
+     */
+    public int write(ClientState client, byte[] data, ULong offset) throws StyxErrorMessageException;
 }

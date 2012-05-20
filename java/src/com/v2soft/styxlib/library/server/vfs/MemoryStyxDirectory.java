@@ -131,8 +131,8 @@ public class MemoryStyxDirectory
     }
 
     @Override
-    public boolean open(ClientState client, ModeType mode) throws IOException {
-        boolean result = (mode == ModeType.OREAD);
+    public boolean open(ClientState client, int mode) throws IOException {
+        boolean result = ((mode&0x0F) == ModeType.OREAD);
         if ( result ) {
             // prepare binary structure of the directory
             int size = 0;
@@ -178,6 +178,14 @@ public class MemoryStyxDirectory
      * @param file
      */
     public void addFile(IVirtualStyxFile file) {
+        // TODO check! may be this folder already contains file with same name 
         mFiles.add(file);
+    }
+
+    @Override
+    public int write(ClientState client, byte[] data, ULong offset)
+            throws StyxErrorMessageException {
+        StyxErrorMessageException.doException("Can't write to directory");
+        return 0;
     }
 }

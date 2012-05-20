@@ -5,3 +5,8 @@ Write - 119216
 Read - 98551
 After switching to use StyxBufferOperations for all StyxMessages
 131/96
+
+Sat 19 May 2012 09:52:33 PM EEST
+Last test times on Core2Quad+SATA drive+4GB (Debian x64) + JStyx file server
+write - 73.58
+read - 51.29

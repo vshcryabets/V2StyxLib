@@ -1,8 +1,6 @@
 package com.v2soft.styxlib.library.messages;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 
 import com.v2soft.styxlib.Config;
@@ -24,6 +22,9 @@ public class StyxTWriteMessage extends StyxTMessage {
         mOffset = offset;
         mData = data;
     }
+    // ===========================================================================
+    // Styx message methods
+    // ===========================================================================
 
     @Override
     public void load(StyxBufferOperations input) throws IOException {
@@ -33,55 +34,6 @@ public class StyxTWriteMessage extends StyxTMessage {
         mData = new byte[count];
         input.read(mData, 0, count);
     }
-
-    public long getFID()
-    {
-        return mFID;
-    }
-
-    public void setFID(long fid)
-    {
-        mFID = fid;
-    }
-
-    public ULong getOffset()
-    {
-        return mOffset;
-    }
-
-    public void setOffset(ULong offset)
-    {
-        mOffset = offset;
-    }
-
-    private byte[] getData() {
-        if (mData == null)
-            return new byte[0];
-        return mData;
-    }
-
-    public InputStream getDataStream()
-    {
-        return new ByteArrayInputStream(getData());
-    }
-
-    public int getDataLength()
-    {
-        if (mData == null)
-            return 0;
-        return mData.length;
-    }
-
-    public void setData(byte [] data) {
-        mData = data;
-    }
-
-    @Override
-    public int getBinarySize() {
-        return super.getBinarySize() + 16
-                + getDataLength();
-    }
-
     @Override
     public void writeToBuffer(StyxBufferOperations output)
             throws UnsupportedEncodingException, IOException {
@@ -99,13 +51,37 @@ public class StyxTWriteMessage extends StyxTMessage {
                     getFID(), getOffset().toString(), StyxMessage.toString(getData()));
         } else {
             return String.format("FID: %d\nOffset: %d",
-                    getFID(), getOffset());
+                    getFID(), getOffset().asLong());
         }
+    }    
+    // ===========================================================================
+    // Getters
+    // ===========================================================================
+    public long getFID(){return mFID;}
+    public ULong getOffset(){return mOffset;}
+    public byte[] getData() {
+        if (mData == null)
+            return new byte[0];
+        return mData;
     }
-
+    @Override
+    public int getBinarySize() {
+        return super.getBinarySize() + 16
+                + getDataLength();
+    }
+    
+    public int getDataLength()
+    {
+        if (mData == null)
+            return 0;
+        return mData.length;
+    }
     @Override
     protected MessageType getRequiredAnswerType() {
         return MessageType.Rwrite;
-    }
-
+    }    
+    // ===========================================================================
+    // Setters
+    // ===========================================================================
+    public void setData(byte [] data) {mData = data;}
 }
