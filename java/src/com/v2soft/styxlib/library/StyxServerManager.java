@@ -16,6 +16,11 @@ import com.v2soft.styxlib.library.server.ClientBalancer;
 import com.v2soft.styxlib.library.server.ConnectionAcceptor;
 import com.v2soft.styxlib.library.server.vfs.IVirtualStyxDirectory;
 
+/**
+ * 
+ * @author V.Shcriyabets (vshcryabets@gmail.com)
+ *
+ */
 public class StyxServerManager 
 implements Closeable, StyxMessengerListener {
     //---------------------------------------------------------------------------
