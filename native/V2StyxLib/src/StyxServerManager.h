@@ -2,7 +2,7 @@
  * StyxServerManager.h
  *
  *  Created on: May 20, 2012
- *      Author: mrco
+ *      Author: V.Shcriyabets (vshcryabets@gmail.com)
  */
 
 #ifndef STYXSERVERMANAGER_H_
@@ -13,8 +13,14 @@ using namespace std;
 
 class StyxServerManager {
 private:
+	int mSocket;
 	int mPort;
 	IVirtualStyxDirectory *mRoot;
+
+	void setAddress(const char * hname,
+			short port,
+			struct sockaddr_in * sap,
+			char * protocol);
 public:
 	StyxServerManager(string address, int port, IVirtualStyxDirectory *root);
 	~StyxServerManager();
@@ -25,7 +31,7 @@ public:
 	/**
 	 * stop server and realease all resources
 	 */
-	void close();
+	void stop();
 };
 
 #endif /* STYXSERVERMANAGER_H_ */
