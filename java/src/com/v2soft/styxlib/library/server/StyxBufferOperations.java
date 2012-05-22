@@ -66,5 +66,5 @@ public abstract class StyxBufferOperations {
         byte[] bytes = new byte[count];
         read(bytes, 0, count);
         return new String(bytes, sUTFCharset);
-    }    
+    }
 }

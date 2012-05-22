@@ -25,7 +25,7 @@ void ClientsHandler::addClient(Socket client) {
 
 bool ClientsHandler::readClient(Socket socket) {
 	ClientState *state = mClientStatesMap->find(socket)->second;
-	bool result = state->read();
+	bool result = state->readSocket();
 	if ( result ) {
 		removeClient(socket);
 	}

@@ -36,8 +36,8 @@ public class DualStateBuffer extends StyxBufferOperations {
      * @param length
      */
     public int get(byte[] out, int i, int length) {
-        assert out != null;
-        assert mStoredBytes > length;
+        if ( out == null ) throw new NullPointerException("Out buffer is null");
+        if ( mStoredBytes < length ) throw new ArrayIndexOutOfBoundsException("Too much bytes to read");
         if ( mReadPosition >= mCapacity ) {
             mReadPosition = 0;
         }
@@ -93,11 +93,11 @@ public class DualStateBuffer extends StyxBufferOperations {
     @Override
     protected long getInteger(int bytes) {
         // TODO this method will work wrong at the buffer end
-        assert bytes < sDataBufferSize;
+        if ( bytes < sDataBufferSize ) throw new ArrayIndexOutOfBoundsException("to much bytes to read");
         long result = 0L;
         int shift = 0;
         int readed = get(mDataBuffer, 0, bytes);
-        assert readed == bytes;
+        if ( readed != bytes ) throw new ArrayIndexOutOfBoundsException("Can't read bytes");
         for (int i=0; i<bytes; i++) {
             long b = (mDataBuffer[i]&0xFF);
             if (shift > 0)

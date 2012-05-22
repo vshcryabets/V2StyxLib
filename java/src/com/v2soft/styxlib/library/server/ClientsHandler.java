@@ -40,7 +40,7 @@ public class ClientsHandler
 
 	protected boolean readClient(SocketChannel channel) throws IOException {
 		final ClientState state = mClientStatesMap.get(channel);
-		boolean result = state.read();
+		boolean result = state.readSocket();
 		if ( result ) {
 		    removeClient(channel);
 		}

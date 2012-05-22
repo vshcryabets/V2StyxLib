@@ -301,7 +301,7 @@ implements Closeable {
      * @return
      * @throws IOException
      */
-    public boolean read() throws IOException {
+    public boolean readSocket() throws IOException {
         int readed = mBuffer.readFromChannel(mChannel);
         if ( readed == -1 ) {
             close();

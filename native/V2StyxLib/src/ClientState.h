@@ -10,23 +10,27 @@
 #include "types.h"
 #include <string>
 #include "classes.h"
+#include <map>
+#include "DualStateBuffer.h"
 
 class ClientState {
 private:
 	std::string mUserName;
-//	DualStateBuffer mBuffer;
+	DualStateBuffer *mBuffer;
 	int mIOUnit;
 	Socket mChannel;
 //	StyxByteBuffer mOutputBuffer;
 	IVirtualStyxDirectory *mServerRoot;
 	IVirtualStyxDirectory *mClientRoot;
-//	HashMap<Long, IVirtualStyxFile> mAssignedFiles;
+	std::map<unsigned int32_t,IVirtualStyxFile*> *mAssignedFiles;
+
+	bool process();
 public:
 	ClientState(int iounit,
 			Socket channel,
 			IVirtualStyxDirectory *root);
 	~ClientState();
-	bool read();
+	bool readSocket();
 };
 
 #endif /* CLIENTSTATE_H_ */
