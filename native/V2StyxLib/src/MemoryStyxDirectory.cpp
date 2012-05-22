@@ -67,14 +67,14 @@ string MemoryStyxDirectory::getModificationUser() {
  * @param mode
  * @throws IOException
  */
-bool MemoryStyxDirectory::open(ClientState client, int mode){
+bool MemoryStyxDirectory::open(ClientState *client, int mode){
 	return false;
 }
 /**
  * Close file
  * @param mode
  */
-void MemoryStyxDirectory::close(ClientState client) {
+void MemoryStyxDirectory::close(ClientState *client) {
 
 }
 /**
@@ -83,7 +83,7 @@ void MemoryStyxDirectory::close(ClientState client) {
  * @param count number of bytes to read
  * @return number of bytes that was readed into the buffer
  */
-long MemoryStyxDirectory::read(ClientState client, int8_t* buffer, int128_t offset, long count)
+long MemoryStyxDirectory::read(ClientState *client, int8_t* buffer, int128_t offset, long count)
 {
 	return 0;
 }
@@ -96,7 +96,7 @@ long MemoryStyxDirectory::read(ClientState client, int8_t* buffer, int128_t offs
  * @return
  * @throws StyxErrorMessageException
  */
-int MemoryStyxDirectory::write(ClientState client, int8_t* data, int128_t offset) {
+int MemoryStyxDirectory::write(ClientState *client, int8_t* data, int128_t offset) {
 	return 0;
 }
 

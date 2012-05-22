@@ -11,10 +11,10 @@ import com.v2soft.styxlib.library.server.vfs.IVirtualStyxDirectory;
 public class ClientBalancer {
     private ClientsHandler mHandler;
     private Thread mThread;
-    private List<SocketChannel> mNewConnetion, mReadable;
+    private List<SocketChannel> mNewConnetions, mReadable;
     
     public ClientBalancer(int iounit, IVirtualStyxDirectory root) throws IOException {
-    	mNewConnetion = new ArrayList<SocketChannel>();
+    	mNewConnetions = new ArrayList<SocketChannel>();
     	mReadable = new ArrayList<SocketChannel>();
         mHandler = new ClientsHandler(iounit, root);
 //        mThread = new Thread(mHandler, "ClientsHandler");
@@ -22,15 +22,15 @@ public class ClientBalancer {
     }
     
     public void pushNewConnection(SocketChannel client) throws IOException {
-    	mNewConnetion.add(client);
+    	mNewConnetions.add(client);
     }
 
 	public void process() throws IOException {
 		// new connections
-		for (SocketChannel channel : mNewConnetion) {
+		for (SocketChannel channel : mNewConnetions) {
 			mHandler.addClient(channel);
 		}
-		mNewConnetion.clear();
+		mNewConnetions.clear();
 		// new readables
 		for (SocketChannel channel : mReadable) {
 			boolean closed = mHandler.readClient(channel);

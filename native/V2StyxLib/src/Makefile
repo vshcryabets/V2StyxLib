@@ -1,5 +1,5 @@
 CC = g++
-SRCS= ClientState.cpp StyxQID.cpp StyxServerManager.cpp StyxStat.cpp Main.cpp MemoryStyxDirectory.cpp
+SRCS= ClientState.cpp StyxQID.cpp StyxServerManager.cpp StyxStat.cpp Main.cpp MemoryStyxDirectory.cpp ClientBalancer.cpp ClientsHandler.cpp ClientState.cpp
 CFLAGS=-g -Wall -D _LINUX
 ## --save-temps
 OBJS=$(SRCS:.cpp=.o)

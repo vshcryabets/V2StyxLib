@@ -7,19 +7,16 @@
 #ifndef IVirtualStyxFile_H_
 #define IVirtualStyxFile_H_
 #include <string>
-#include <stdint.h>
 #include "StyxQID.h"
 #include "StyxStat.h"
 #include "ClientState.h"
+#include "types.h"
 using namespace std;
-
-typedef int64_t Date;
-typedef int64_t int128_t;
 
 class IVirtualStyxFile
 {
 public:
-	~IVirtualStyxFile(){};
+	virtual ~IVirtualStyxFile() = 0;
 	/**
 	 * @return unic ID of the file
 	 */
@@ -45,19 +42,19 @@ public:
 	 * @param mode
 	 * @throws IOException
 	 */
-	virtual bool open(ClientState client, int mode) = 0;
+	virtual bool open(ClientState *client, int mode) = 0;
 	/**
 	 * Close file
 	 * @param mode
 	 */
-	virtual void close(ClientState client) = 0;
+	virtual void close(ClientState *client) = 0;
 	/**
 	 * Read from file
 	 * @param offset offset from begining of the file
 	 * @param count number of bytes to read
-	 * @return number of bytes that was readed into the buffer
+	 * @return number of bytes that was read into the buffer
 	 */
-	virtual long read(ClientState client, int8_t* buffer, int128_t offset, long count) = 0;
+	virtual long read(ClientState *client, int8_t* buffer, int128_t offset, long count) = 0;
 //	virtual IVirtualStyxFile walk(List<String> pathElements, List<StyxQID> qids) = 0;
 	/**
 	 * Write data to file
@@ -67,6 +64,6 @@ public:
 	 * @return
 	 * @throws StyxErrorMessageException
 	 */
-	virtual int write(ClientState client, int8_t* data, int128_t offset) = 0;
+	virtual int write(ClientState *client, int8_t* data, int128_t offset) = 0;
 };
 #endif

@@ -7,7 +7,9 @@
 
 #include "ClientState.h"
 
-ClientState::ClientState() {
+ClientState::ClientState(int iounit,
+		Socket channel,
+		IVirtualStyxDirectory *root) : mIOUnit(iounit), mChannel(channel), mServerRoot(root) {
 	// TODO Auto-generated constructor stub
 
 }

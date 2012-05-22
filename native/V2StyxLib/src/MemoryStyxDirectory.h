@@ -45,19 +45,19 @@ public:
 	 * @param mode
 	 * @throws IOException
 	 */
-	bool open(ClientState client, int mode);
+	bool open(ClientState *client, int mode);
 	/**
 	 * Close file
 	 * @param mode
 	 */
-	void close(ClientState client);
+	void close(ClientState *client);
 	/**
 	 * Read from file
 	 * @param offset offset from begining of the file
 	 * @param count number of bytes to read
 	 * @return number of bytes that was readed into the buffer
 	 */
-	long read(ClientState client, int8_t* buffer, int128_t offset, long count);
+	long read(ClientState *client, int8_t* buffer, int128_t offset, long count);
 	//	IVirtualStyxFile walk(List<String> pathElements, List<StyxQID> qids) = 0;
 	/**
 	 * Write data to file
@@ -67,7 +67,7 @@ public:
 	 * @return
 	 * @throws StyxErrorMessageException
 	 */
-	int write(ClientState client, int8_t* data, int128_t offset);
+	int write(ClientState *client, int8_t* data, int128_t offset);
 	// ================================================================
 	// IVirualStyxDirectory
 	// ================================================================

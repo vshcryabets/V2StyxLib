@@ -11,11 +11,12 @@
 #include <string>
 /* According to POSIX.1-2001 */
 #include <sys/select.h>
+#include "types.h"
 using namespace std;
 
 class StyxServerManager {
 private:
-	int mSocket;
+	Socket mSocket;
 	int mPort;
 	IVirtualStyxDirectory *mRoot;
 

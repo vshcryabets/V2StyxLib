@@ -91,7 +91,7 @@ implements Closeable {
      * @throws IOException 
      */
     private void processMessage(StyxMessage msg) throws IOException {
-        System.out.print("Got message "+msg.toString());
+//        System.out.print("Got message "+msg.toString());
         StyxMessage answer = null;
         IVirtualStyxFile file;
         long fid;
