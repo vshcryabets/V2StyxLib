@@ -20,20 +20,17 @@ import com.v2soft.styxlib.library.server.vfs.IVirtualStyxDirectory;
 public class ClientsHandler 
     implements Closeable {
     private int mIOUnit;
-    private List<SocketChannel> mClients;
     private Map<SocketChannel, ClientState> mClientStatesMap;
     private IVirtualStyxDirectory mRoot;
     
     public ClientsHandler(int iounit, IVirtualStyxDirectory root) throws IOException {
         mIOUnit = iounit;
-        mClients = new ArrayList<SocketChannel>();
         mClientStatesMap = new HashMap<SocketChannel, ClientState>();
         mRoot = root;
     }
 
     public void addClient(SocketChannel client) throws IOException {
         client.configureBlocking(false);
-        mClients.add(client);
         mClientStatesMap.put(client, new ClientState(mIOUnit, client, mRoot));
     }
 

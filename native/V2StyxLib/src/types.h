@@ -13,5 +13,4 @@ typedef int Socket;
 typedef int64_t Date;
 typedef int64_t int128_t;
 
-
 #endif /* TYPES_H_ */

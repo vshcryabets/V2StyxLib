@@ -7,25 +7,27 @@
 
 #ifndef STYXSERVERMANAGER_H_
 #define STYXSERVERMANAGER_H_
-#include "IVirtualStyxDirectory.h"
 #include <string>
 /* According to POSIX.1-2001 */
 #include <sys/select.h>
 #include "types.h"
+#include "classes.h"
 using namespace std;
 
 class StyxServerManager {
 private:
+	ClientBalancer *mBalancer;
+	ConnectionAcceptor *mAcceptor;
 	Socket mSocket;
 	int mPort;
+	int mIOBufSize;
 	IVirtualStyxDirectory *mRoot;
 
 	void setAddress(const char * hname,
 			short port,
 			struct sockaddr_in * sap,
 			char * protocol);
-	void readSockets(fd_set* socks, int *list);
-	void handleNewConnection(int* connectlist);
+
 	void deaWithData(int* list, int id);
 	void setNonBlocking(int socket);
 public:

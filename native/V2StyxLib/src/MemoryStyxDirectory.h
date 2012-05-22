@@ -8,7 +8,11 @@
 #ifndef MEMORYSTYXDIRECTORY_H_
 #define MEMORYSTYXDIRECTORY_H_
 #include <string>
+#include "StyxQID.h"
+#include "StyxStat.h"
+#include "types.h"
 #include "IVirtualStyxDirectory.h"
+using namespace std;
 
 class MemoryStyxDirectory : public IVirtualStyxDirectory
 {
@@ -16,7 +20,7 @@ private:
 	std::string mName;
 public:
 	MemoryStyxDirectory(std::string name);
-	~MemoryStyxDirectory();
+	virtual ~MemoryStyxDirectory();
 	// ================================================================
 	// IVirualStyxFile
 	// ================================================================

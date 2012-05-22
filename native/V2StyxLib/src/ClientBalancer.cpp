@@ -6,6 +6,7 @@
  */
 
 #include "ClientBalancer.h"
+#include "stdio.h"
 
 ClientBalancer::ClientBalancer(int iounit, IVirtualStyxDirectory *root) {
 	mNewConnections = new vector<Socket>();
@@ -19,10 +20,12 @@ ClientBalancer::~ClientBalancer() {
 }
 
 void ClientBalancer::pushNewConnection(Socket socket) {
+	printf("New conection\n");
 	mNewConnections->push_back(socket);
 }
 
 void ClientBalancer::pushReadable(Socket socket) {
+	printf("New data\n");
 	mReadable->push_back(socket);
 }
 
@@ -33,10 +36,11 @@ void ClientBalancer::process() {
 		mHandler->addClient(*socketIterator);
 	}
 	mNewConnections->clear();
+
 	// new readables
 	for (vector<Socket>::iterator socketIterator = mReadable->begin();
 			socketIterator < mReadable->end(); socketIterator++ ) {
-//		boolean closed = mHandler.readClient(channel);
+		bool closed = mHandler->readClient(*socketIterator);
 	}
 	mReadable->clear();
 }

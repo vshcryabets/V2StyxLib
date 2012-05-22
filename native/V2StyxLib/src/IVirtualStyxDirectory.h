@@ -8,10 +8,8 @@
 #ifndef IVIRTUALSTYXDIRECTORY_H_
 #define IVIRTUALSTYXDIRECTORY_H_
 #include <string>
-using namespace std;
-
-class IVirtualStyxDirectory;
 #include "IVirtualStyxFile.h"
+using namespace std;
 
 class IVirtualStyxDirectory : virtual public IVirtualStyxFile
 {

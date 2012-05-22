@@ -9,9 +9,7 @@
 #define CLIENTSTATE_H_
 #include "types.h"
 #include <string>
-
-class ClientState;
-#include "IVirtualStyxDirectory.h"
+#include "classes.h"
 
 class ClientState {
 private:
@@ -27,7 +25,7 @@ public:
 	ClientState(int iounit,
 			Socket channel,
 			IVirtualStyxDirectory *root);
-	virtual ~ClientState();
+	~ClientState();
 	bool read();
 };
 

@@ -6,37 +6,33 @@
  */
 
 #include "ClientsHandler.h"
+#include "ClientState.h"
 
-ClientsHandler::ClientsHandler(int iounit, IVirtualStyxDirectory *root) :
-mIOUnit(iounit), mRoot(root){
-	mClients = new std::vector<Socket>();
+ClientsHandler::ClientsHandler(int iounit,
+		IVirtualStyxDirectory *root) : mIOUnit(iounit), mRoot(root) {
 	mClientStatesMap = new std::map<Socket, ClientState*>();
 }
 
 ClientsHandler::~ClientsHandler() {
-	delete mClients;
 	delete mClientStatesMap;
 }
 
 void ClientsHandler::addClient(Socket client) {
-//	client.configureBlocking(false);
-	mClients->push_back(client);
 	mClientStatesMap->insert(
 			std::pair<Socket, ClientState*>(client,
 					new ClientState(mIOUnit, client, mRoot)));
 }
 
-/*	protected boolean readClient(SocketChannel channel) throws IOException {
-		final ClientState state = mClientStatesMap.get(channel);
-		boolean result = state.read();
-		if ( result ) {
-		    removeClient(channel);
-		}
-		return result;
+bool ClientsHandler::readClient(Socket socket) {
+	ClientState *state = mClientStatesMap->find(socket)->second;
+	bool result = state->read();
+	if ( result ) {
+		removeClient(socket);
 	}
+	return result;
+}
 
-
-	private void removeClient(SocketChannel channel) throws IOException {
-    	mClientStatesMap.remove(channel);
-    	channel.close();
-	}*/
+void ClientsHandler::removeClient(Socket socket) {
+	mClientStatesMap->erase(socket);
+	close(socket);
+}

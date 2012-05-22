@@ -16,13 +16,14 @@
 class ClientsHandler {
 private:
 	int mIOUnit;
-	std::vector<Socket> *mClients;
 	std::map<Socket, ClientState*> *mClientStatesMap;
 	IVirtualStyxDirectory *mRoot;
+	void removeClient(Socket socket);
 public:
 	ClientsHandler(int iounit, IVirtualStyxDirectory *root);
 	~ClientsHandler();
 	void addClient(Socket socket);
+	bool readClient(Socket socket);
 };
 
 #endif /* CLIENTSHANDLER_H_ */

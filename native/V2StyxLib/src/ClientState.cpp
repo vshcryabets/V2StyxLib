@@ -18,3 +18,7 @@ ClientState::~ClientState() {
 	// TODO Auto-generated destructor stub
 }
 
+bool ClientState::read() {
+	return false;
+}
+

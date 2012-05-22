@@ -7,16 +7,14 @@
 #ifndef IVirtualStyxFile_H_
 #define IVirtualStyxFile_H_
 #include <string>
-#include "StyxQID.h"
-#include "StyxStat.h"
-#include "ClientState.h"
+#include "classes.h"
 #include "types.h"
 using namespace std;
 
 class IVirtualStyxFile
 {
 public:
-	virtual ~IVirtualStyxFile() = 0;
+	virtual ~IVirtualStyxFile() {};
 	/**
 	 * @return unic ID of the file
 	 */
