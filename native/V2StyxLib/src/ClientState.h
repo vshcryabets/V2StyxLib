@@ -19,7 +19,6 @@ private:
 	DualStateBuffer *mBuffer;
 	int mIOUnit;
 	Socket mChannel;
-//	StyxByteBuffer mOutputBuffer;
 	IVirtualStyxDirectory *mServerRoot;
 	IVirtualStyxDirectory *mClientRoot;
 	std::map<unsigned int32_t,IVirtualStyxFile*> *mAssignedFiles;

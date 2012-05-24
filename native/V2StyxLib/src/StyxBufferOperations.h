@@ -2,7 +2,7 @@
  * StyxBufferOperations.h
  *
  *  Created on: May 22, 2012
- *      Author: mrco
+ *      Author: vschryabets@gmail.com
  */
 
 #ifndef STYXBUFFEROPERATIONS_H_
@@ -12,7 +12,7 @@
 
 class StyxBufferOperations {
 protected:
-	static const int sDataBufferSize = 16;
+	static const size_t sDataBufferSize = 16;
 private:
 	int8_t  *mDataBuffer;
 public:
@@ -36,7 +36,7 @@ public:
 	// Virtual methods
 	// =========================================================
 	virtual ~StyxBufferOperations();
-	virtual uint32_t getInteger(int bytes) = 0;
+	virtual uint64_t getInteger(size_t bytes) = 0;
 	virtual void clear() = 0;
 	virtual void limit(size_t value) = 0;
 	virtual void write(int8_t* data) = 0;

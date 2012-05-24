@@ -2,7 +2,7 @@
  * DualStateBuffer.h
  *
  *  Created on: May 22, 2012
- *      Author: mrco
+ *      Author: vschryabets@gmail.com
  */
 
 #ifndef DUALSTATEBUFFER_H_
@@ -19,11 +19,11 @@ public:
 	DualStateBuffer(size_t size);
 	virtual ~DualStateBuffer();
 	size_t remainsToRead();
-	size_t readFromFD(Socket fd);
+	int readFromFD(Socket fd);
 	// =========================================================
 	// Virtual methods
 	// =========================================================
-	virtual uint32_t getInteger(int bytes);
+	virtual uint64_t getInteger(size_t bytes);
 	virtual void clear();
 	virtual void limit(size_t value);
 	virtual void write(int8_t* data);

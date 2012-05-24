@@ -24,18 +24,17 @@ bool ClientState::process() {
 	ssize_t inBuffer = mBuffer->remainsToRead();
     if ( inBuffer > 4 ) {
         ssize_t packetSize = mBuffer->getUInt32();
-//        if ( inBuffer >= packetSize ) {
+        if ( inBuffer >= packetSize ) {
 //            final StyxMessage message = StyxMessage.factory(mBuffer, mIOUnit);
 //            processMessage(message);
 //            return true;
-//        }
+        }
     }
-	printf((const char*)mBuffer);
     return false;
 }
 
 bool ClientState::readSocket() {
-	size_t readCount = mBuffer->readFromFD(mChannel);
+	int readCount = mBuffer->readFromFD(mChannel);
 //	int readCount = read(mChannel, mBuffer+mBufferPosition, mIOUnit);
 //	mBufferPosition+=readCount;
     if ( readCount < -1 ) {
