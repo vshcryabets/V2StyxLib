@@ -2,6 +2,7 @@ package com.v2soft.styxlib.library.messages.base;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 
 import com.v2soft.styxlib.library.messages.StyxRAttachMessage;
 import com.v2soft.styxlib.library.messages.StyxRAuthMessage;
@@ -36,6 +37,7 @@ import com.v2soft.styxlib.library.messages.base.structs.StyxQID;
 import com.v2soft.styxlib.library.server.StyxBufferOperations;
 
 public abstract class StyxMessage {
+    public static final Charset sUTFCharset = Charset.forName("utf-8"); 
 	public static final int BASE_BINARY_SIZE = 7;
 	
 	public static final int NOTAG  =      0xFFFF;
@@ -58,7 +60,6 @@ public abstract class StyxMessage {
         if ( packet_size > io_unit ) throw new IOException("Packet size to large");
         MessageType type = MessageType.factory(buffer.readUInt8());
         if ( type == null ) throw new NullPointerException("Type is null");
-        assert type != null;
         int tag = buffer.readUInt16();
         // load other data
         StyxMessage result = null;
@@ -170,27 +171,12 @@ public abstract class StyxMessage {
 	public static int getUTFSize(String utf)
 	{
 		if (utf == null)
-			return getUTFSize("");
+			return 2;
 		return 2 + countUTFBytes(utf);
 	}
 	
-	public static int countUTFBytes(String utf)
-	{
-	    // TODO !!!! Is it working correct??
-		int result = 0;
-		int length = utf.length();
-		for (int i=0; i<length; i++)
-		{
-			int posChar = utf.charAt(i);
-			if (posChar > 0 && posChar <=127)
-				result += 1;
-			else if (posChar <= 2047)
-				result += 2;
-			else 
-				result += 3;
-		}
-		
-		return result;
+	public static int countUTFBytes(String utf)	{
+	    return utf.getBytes(StyxMessage.sUTFCharset).length;
 	}
 	
 	protected StyxMessage(MessageType type, int tag) {

@@ -17,7 +17,7 @@ class ClientState {
 private:
 	std::string mUserName;
 	DualStateBuffer *mBuffer;
-	int mIOUnit;
+	size_t mIOUnit;
 	Socket mChannel;
 	IVirtualStyxDirectory *mServerRoot;
 	IVirtualStyxDirectory *mClientRoot;
@@ -25,7 +25,7 @@ private:
 
 	bool process();
 public:
-	ClientState(int iounit,
+	ClientState(size_t iounit,
 			Socket channel,
 			IVirtualStyxDirectory *root);
 	~ClientState();
