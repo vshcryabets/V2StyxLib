@@ -15,4 +15,4 @@ StyxBufferOperations::~StyxBufferOperations() {
 	delete [] mDataBuffer;
 }
 
-uint32_t getUInt32() {return getInteger(4);}
+uint32_t StyxBufferOperations::getUInt32() {return getInteger(4);}

@@ -17,13 +17,6 @@ private:
 	int8_t  *mDataBuffer;
 public:
 	StyxBufferOperations();
-	virtual ~StyxBufferOperations();
-	virtual uint32_t getInteger(int bytes) = 0;
-	virtual void clear();
-	virtual void limit(size_t value);
-	virtual void write(int8_t* data);
-	virtual void write(int8_t* data, size_t offset, size_t count);
-	virtual int read(int8_t* mData, size_t offset, size_t count);
 	uint32_t readUInt32();
 	uint16_t readUInt16();
 	uint8_t readUInt8();
@@ -39,6 +32,17 @@ public:
 	void writeInteger(int bytes, uint64_t value);
 	uint64_t readInteger(int bytes);
 	std::string readUTF();
+	// =========================================================
+	// Virtual methods
+	// =========================================================
+	virtual ~StyxBufferOperations();
+	virtual uint32_t getInteger(int bytes) = 0;
+	virtual void clear() = 0;
+	virtual void limit(size_t value) = 0;
+	virtual void write(int8_t* data) = 0;
+	virtual void write(int8_t* data, size_t offset, size_t count) = 0;
+	virtual size_t read(int8_t* mData, size_t offset, size_t count) = 0;
+
 };
 
 #endif /* STYXBUFFEROPERATIONS_H_ */

@@ -63,3 +63,42 @@ size_t DualStateBuffer::get(int8_t *out, size_t offset, size_t length) {
     }
     return length;
 }
+
+void DualStateBuffer::clear() {
+	// TODO not implemented
+}
+void DualStateBuffer::limit(size_t value) {
+	// TODO not implemented
+}
+void DualStateBuffer::write(int8_t* data) {
+	// TODO not implemented
+}
+void DualStateBuffer::write(int8_t* data, size_t offset, size_t count) {
+	// TODO not implemented
+}
+size_t DualStateBuffer::read(int8_t* data, size_t offset, size_t count) {
+    if ( data == NULL ) throw "Out is null";
+    if ( mStoredBytes < count ) throw "Too much bytes to read";
+    size_t res = get(data, offset, count);
+    mReadPosition += res;
+    mStoredBytes -= res;
+    return res;
+}
+
+size_t DualStateBuffer::readFromFD(Socket fd) {
+    size_t free = mCapacity-mStoredBytes;
+    if ( free <= 0 ) return 0;
+    if ( mWritePosition >= mCapacity ) {
+        mWritePosition = 0;
+    }
+//    mBuffer.limit( mWritePosition < mReadPosition ? mReadPosition : mCapacity );
+//    mBuffer.position(mWritePosition);
+//    size_t readed = ::read(fd, mDataBuffer+mWritePosition, )
+//    		channel.read(mBuffer);
+//    if ( readed > 0 ) {
+//        mStoredBytes+=readed;
+//        mWritePosition=mBuffer.position();
+//    }
+//    return readed;
+    return -1;
+}

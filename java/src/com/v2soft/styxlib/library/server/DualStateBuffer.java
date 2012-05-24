@@ -66,8 +66,8 @@ public class DualStateBuffer extends StyxBufferOperations {
      * @param length
      */
     public int read(byte[] out, int i, int length) {
-        assert out != null;
-        assert mStoredBytes > length;
+        if ( out == null ) throw new NullPointerException("Out is null");
+        if ( mStoredBytes < length ) throw new ArrayIndexOutOfBoundsException("Too much bytes to read");
         int res = get(out, i, length);
         mReadPosition=mBuffer.position();
         mStoredBytes-=res;

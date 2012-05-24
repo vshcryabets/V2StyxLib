@@ -20,7 +20,15 @@ public:
 	virtual ~DualStateBuffer();
 	size_t remainsToRead();
 	size_t readFromFD(Socket fd);
+	// =========================================================
+	// Virtual methods
+	// =========================================================
 	virtual uint32_t getInteger(int bytes);
+	virtual void clear();
+	virtual void limit(size_t value);
+	virtual void write(int8_t* data);
+	virtual void write(int8_t* data, size_t offset, size_t count);
+	virtual size_t read(int8_t* data, size_t offset, size_t count);
 };
 
 #endif /* DUALSTATEBUFFER_H_ */
