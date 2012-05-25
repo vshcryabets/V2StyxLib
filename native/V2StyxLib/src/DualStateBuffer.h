@@ -14,7 +14,7 @@ class DualStateBuffer : public StyxBufferOperations {
 private:
 	int8_t  *mDataBuffer;
 	size_t mWritePosition, mReadPosition, mCapacity, mStoredBytes;
-	size_t get(int8_t *out, size_t offset, size_t length);
+	size_t get(void *out, size_t offset, size_t length);
 public:
 	DualStateBuffer(size_t size);
 	virtual ~DualStateBuffer();
@@ -28,7 +28,7 @@ public:
 	virtual void limit(size_t value);
 	virtual void write(int8_t* data);
 	virtual void write(int8_t* data, size_t offset, size_t count);
-	virtual size_t read(int8_t* data, size_t offset, size_t count);
+	virtual size_t read(void* data, size_t offset, size_t count);
 };
 
 #endif /* DUALSTATEBUFFER_H_ */

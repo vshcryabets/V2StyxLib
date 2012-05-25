@@ -40,7 +40,7 @@ uint64_t DualStateBuffer::getInteger(size_t bytes) {
 	return result;
 }
 
-size_t DualStateBuffer::get(int8_t *out, size_t offset, size_t length) {
+size_t DualStateBuffer::get(void *out, size_t offset, size_t length) {
 	if ( out == NULL ) throw "Out buffer is null";
 	if ( mStoredBytes < length ) throw "Too much bytes to read";
 	if ( mReadPosition >= mCapacity ) {
@@ -73,7 +73,7 @@ void DualStateBuffer::write(int8_t* data) {
 void DualStateBuffer::write(int8_t* data, size_t offset, size_t count) {
 	// TODO not implemented
 }
-size_t DualStateBuffer::read(int8_t* data, size_t offset, size_t count) {
+size_t DualStateBuffer::read(void* data, size_t offset, size_t count) {
 	if ( data == NULL ) throw "Out is null";
 	if ( mStoredBytes < count ) throw "Too much bytes to read";
 	size_t res = get(data, offset, count);

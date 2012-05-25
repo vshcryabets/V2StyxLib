@@ -41,7 +41,7 @@ public:
 	virtual void limit(size_t value) = 0;
 	virtual void write(int8_t* data) = 0;
 	virtual void write(int8_t* data, size_t offset, size_t count) = 0;
-	virtual size_t read(int8_t* mData, size_t offset, size_t count) = 0;
+	virtual size_t read(void* data, size_t offset, size_t count) = 0;
 
 };
 

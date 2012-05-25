@@ -27,8 +27,8 @@ bool ClientState::process() {
 		ssize_t packetSize = mBuffer->getUInt32();
 		if ( inBuffer >= packetSize ) {
 			StyxMessage *message = StyxMessage::factory(mBuffer, mIOUnit);
-			//            processMessage(message);
-			//            return true;
+//			processMessage(message);
+			return true;
 		}
 	}
 	return false;

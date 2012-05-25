@@ -36,9 +36,9 @@ uint64_t StyxBufferOperations::readInteger(int bytes) {
 
 std::string StyxBufferOperations::readUTF() {
 	size_t count = readUInt16();
-	int8_t* bytes = new int8_t[count];
+	char* bytes = new char[count];
 	read(bytes, 0, count);
-//	std::string result = bytes;
+	std::string result(bytes, count);
 	delete [] bytes;
 	return result;
 }
