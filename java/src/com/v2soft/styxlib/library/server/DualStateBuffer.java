@@ -93,7 +93,7 @@ public class DualStateBuffer extends StyxBufferOperations {
     @Override
     protected long getInteger(int bytes) {
         // TODO this method will work wrong at the buffer end
-        if ( bytes < sDataBufferSize ) throw new ArrayIndexOutOfBoundsException("to much bytes to read");
+        if ( bytes > sDataBufferSize ) throw new ArrayIndexOutOfBoundsException("to much bytes to read");
         long result = 0L;
         int shift = 0;
         int readed = get(mDataBuffer, 0, bytes);
