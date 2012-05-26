@@ -11,9 +11,6 @@ import java.security.InvalidParameterException;
 import java.util.LinkedList;
 import java.util.concurrent.TimeoutException;
 
-import javax.net.SocketFactory;
-import javax.net.ssl.SSLSocketFactory;
-
 import com.v2soft.styxlib.library.core.Messenger;
 import com.v2soft.styxlib.library.core.Messenger.StyxMessengerListener;
 import com.v2soft.styxlib.library.exceptions.StyxErrorMessageException;
@@ -35,7 +32,7 @@ implements Closeable, StyxMessengerListener {
     // Constants
     //---------------------------------------------------------------------------
     public static final String PROTOCOL = "9P2000";
-    public static final int DEFAULT_TIMEOUT = 5000;
+    public static final int DEFAULT_TIMEOUT = 10000;
     //---------------------------------------------------------------------------
     // Class fields
     //---------------------------------------------------------------------------
@@ -107,13 +104,11 @@ implements Closeable, StyxMessengerListener {
         mMountPoint = "/";
         mNeedAuth = (username != null);
 
-        SocketFactory socketFactory = null;
-        if (ssl)
-            socketFactory = SSLSocketFactory.getDefault();
-        else 
-            socketFactory = SocketFactory.getDefault();
-
-        
+//        SocketFactory socketFactory = null;
+//        if (ssl)
+//            socketFactory = SSLSocketFactory.getDefault();
+//        else 
+//            socketFactory = SocketFactory.getDefault();
 //        Socket socket = socketFactory.createSocket();
         
         SocketAddress sa= new InetSocketAddress(address, port);

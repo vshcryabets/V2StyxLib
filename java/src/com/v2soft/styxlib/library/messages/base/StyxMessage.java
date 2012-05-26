@@ -115,7 +115,7 @@ public abstract class StyxMessage {
             result = new StyxRReadMessage(tag, null, 0);
             break;
         case Twrite:
-            result = new StyxTWriteMessage(NOFID, null, null );
+            result = new StyxTWriteMessage(NOFID, null, null, 0, 0 );
             break;
         case Rwrite:
             result = new StyxRWriteMessage(tag, 0);
