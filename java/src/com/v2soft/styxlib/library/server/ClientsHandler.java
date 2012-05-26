@@ -49,6 +49,8 @@ public class ClientsHandler
 
 	
 	private void removeClient(SocketChannel channel) throws IOException {
+	    final ClientState state = mClientStatesMap.get(channel);
+	    mRoot.onConnectionClosed(state);
     	mClientStatesMap.remove(channel);
     	channel.close();
 	}

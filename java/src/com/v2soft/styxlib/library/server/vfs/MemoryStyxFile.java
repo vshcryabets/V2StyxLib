@@ -136,6 +136,8 @@ public class MemoryStyxFile implements IVirtualStyxFile {
         }
     }
 
-
-   
+    @Override
+    public void onConnectionClosed(ClientState state) {
+        // ok, nothing to do
+    }   
 }

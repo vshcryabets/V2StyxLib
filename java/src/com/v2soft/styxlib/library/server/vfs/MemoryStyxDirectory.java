@@ -188,4 +188,12 @@ public class MemoryStyxDirectory
         StyxErrorMessageException.doException("Can't write to directory");
         return 0;
     }
+
+    @Override
+    public void onConnectionClosed(ClientState state) {
+        for (IVirtualStyxFile file : mFiles) {
+            file.onConnectionClosed(state);
+        }
+        mBuffersMap.remove(state);
+    }
 }

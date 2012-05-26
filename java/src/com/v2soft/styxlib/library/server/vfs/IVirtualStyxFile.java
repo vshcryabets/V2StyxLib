@@ -64,4 +64,10 @@ public interface IVirtualStyxFile {
      * @throws StyxErrorMessageException
      */
     public int write(ClientState client, byte[] data, ULong offset) throws StyxErrorMessageException;
+    /**
+     * Will be called when client close connection to this server
+     * @param state
+     */
+    public void onConnectionClosed(ClientState state);
+
 }
