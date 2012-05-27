@@ -14,13 +14,16 @@ public class StyxTWriteMessage extends StyxTMessage {
     private long mFID;
     private ULong mOffset;
     private byte[] mData;
+    private int mDataOffset;
+    private int mDataLength;
 
-    public StyxTWriteMessage(long fid, ULong offset, byte [] data) 
+    public StyxTWriteMessage(long fid, ULong offset, byte [] data, int dataOffset, int dataLength) 
             throws IOException {
         super(MessageType.Twrite);
         mFID = fid;
         mOffset = offset;
         mData = data;
+        mDataLength = dataLength;
     }
     // ===========================================================================
     // Styx message methods
@@ -30,9 +33,10 @@ public class StyxTWriteMessage extends StyxTMessage {
     public void load(StyxBufferOperations input) throws IOException {
         mFID = input.readUInt32();
         mOffset = input.readUInt64();
-        int count = (int)input.readUInt32();
-        mData = new byte[count];
-        input.read(mData, 0, count);
+        mDataLength = (int)input.readUInt32();
+        mDataOffset = 0;
+        mData = new byte[mDataLength];
+        input.read(mData, 0, mDataLength);
     }
     @Override
     public void writeToBuffer(StyxBufferOperations output)
@@ -40,8 +44,8 @@ public class StyxTWriteMessage extends StyxTMessage {
         super.writeToBuffer(output);
         output.writeUInt(mFID);
         output.writeUInt64(mOffset);
-        output.writeUInt(getDataLength());
-        output.write(getData());        
+        output.writeUInt(mDataLength);
+        output.write(mData, mDataOffset, mDataLength);        
     }
 
     @Override
@@ -67,14 +71,11 @@ public class StyxTWriteMessage extends StyxTMessage {
     @Override
     public int getBinarySize() {
         return super.getBinarySize() + 16
-                + getDataLength();
+                + mDataLength;
     }
     
-    public int getDataLength()
-    {
-        if (mData == null)
-            return 0;
-        return mData.length;
+    public int getDataLength() {
+        return mDataLength;
     }
     @Override
     protected MessageType getRequiredAnswerType() {

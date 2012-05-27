@@ -30,7 +30,7 @@ public class JavaClientTest {
             int pos = 0;
             String host = "localhost";
             int port = 8080, count = 100;
-            long size = 1024L*1024L*1024L*2; // 2GB
+            long size = 1024L*1024L*1024L*2; // 2GB 
             while ( pos < args.length ) {
                 String command = args[pos];
                 if ( command.equalsIgnoreCase(PARAM_HOST)) {
