@@ -3,13 +3,8 @@ package com.v2soft.styxlib.library.server;
 import java.io.Closeable;
 import java.io.IOException;
 import java.nio.channels.SocketChannel;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-
-import javax.xml.ws.WebServiceException;
-
 import com.v2soft.styxlib.library.server.vfs.IVirtualStyxDirectory;
 
 /**
@@ -19,23 +14,25 @@ import com.v2soft.styxlib.library.server.vfs.IVirtualStyxDirectory;
  */
 public class ClientsHandler 
     implements Closeable {
+    private String mProtocol;
     private int mIOUnit;
     private Map<SocketChannel, ClientState> mClientStatesMap;
     private IVirtualStyxDirectory mRoot;
     
-    public ClientsHandler(int iounit, IVirtualStyxDirectory root) throws IOException {
+    public ClientsHandler(int iounit, IVirtualStyxDirectory root, String protocol) throws IOException {
         mIOUnit = iounit;
         mClientStatesMap = new HashMap<SocketChannel, ClientState>();
         mRoot = root;
+        mProtocol = protocol;
     }
 
     public void addClient(SocketChannel client) throws IOException {
         client.configureBlocking(false);
-        mClientStatesMap.put(client, new ClientState(mIOUnit, client, mRoot));
+        mClientStatesMap.put(client, new ClientState(mIOUnit, client, mRoot, mProtocol));
     }
 
     @Override
-    public void close() throws WebServiceException {
+    public void close() throws IOException {
     }
 
 	protected boolean readClient(SocketChannel channel) throws IOException {

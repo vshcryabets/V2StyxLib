@@ -9,7 +9,7 @@
 #include "ClientState.h"
 
 ClientsHandler::ClientsHandler(int iounit,
-		IVirtualStyxDirectory *root) : mIOUnit(iounit), mRoot(root) {
+		IVirtualStyxDirectory *root, std::string *protocol) : mIOUnit(iounit), mRoot(root), mProtocol(protocol) {
 	mClientStatesMap = new std::map<Socket, ClientState*>();
 }
 
@@ -20,7 +20,7 @@ ClientsHandler::~ClientsHandler() {
 void ClientsHandler::addClient(Socket client) {
 	mClientStatesMap->insert(
 			std::pair<Socket, ClientState*>(client,
-					new ClientState(mIOUnit, client, mRoot)));
+					new ClientState(mIOUnit, client, mRoot, mProtocol)));
 }
 
 bool ClientsHandler::readClient(Socket socket) {

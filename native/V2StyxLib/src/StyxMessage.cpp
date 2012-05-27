@@ -123,3 +123,23 @@ StyxMessage* StyxMessage::factory(StyxBufferOperations* buffer, size_t io_unit) 
 void StyxMessage::setTag(uint16_t tag) {
 	mTag = tag;
 }
+
+MessageTypeEnum StyxMessage::getType() {
+	return mType;
+}
+
+uint16_t StyxMessage::getTag() {
+	return mTag;
+}
+
+size_t StyxMessage::writeToBuffer(StyxBufferOperations *outputBuffer, size_t ioUnit) {
+	size_t packetSize = getBinarySize();
+	//	output.limit(packetSize);
+	//	output.writeUInt(packetSize);
+	//	output.writeUByte((short) getType().getByte());
+	//	output.writeUShort(getTag());
+}
+
+size_t StyxMessage::getBinarySize()	{
+	return StyxMessage::BASE_BINARY_SIZE;
+}

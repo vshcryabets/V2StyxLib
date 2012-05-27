@@ -17,6 +17,7 @@ private:
 
 public:
 	static const int NOTAG = 0xFFFF;
+	static const size_t BASE_BINARY_SIZE = 7;
 
 	static StyxMessage* factory(StyxBufferOperations *buffer, size_t iounit);
 	StyxMessage(MessageTypeEnum type, uint16_t tag);
@@ -24,9 +25,9 @@ public:
 	// =======================================================
 	// Getters
 	// =======================================================
-	MessageType getType() const;
-	uint16_t getTag() const;
-	int getBinarySize();
+	MessageTypeEnum getType();
+	uint16_t getTag();
+	size_t getBinarySize();
 	// =======================================================
 	// Setters
 	// =======================================================
@@ -35,6 +36,7 @@ public:
 	// Virtual methods
 	// =======================================================
 	virtual void load(StyxBufferOperations *buffer) = 0;
+	virtual size_t writeToBuffer(StyxBufferOperations *outputBuffer, size_t ioUnit);
 };
 
 #endif /* STYXMESSAGE_H_ */

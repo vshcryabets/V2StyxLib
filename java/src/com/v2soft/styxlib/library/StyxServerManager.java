@@ -46,7 +46,8 @@ implements Closeable, StyxMessengerListener {
     private ClientBalancer mBalancer;
     private Thread mAcceptorThread;
 
-    public StyxServerManager(InetAddress address, int port, boolean ssl, IVirtualStyxDirectory root) throws IOException {
+    public StyxServerManager(InetAddress address, int port, boolean ssl, 
+            IVirtualStyxDirectory root, String protocol) throws IOException {
         mPort = port;
         ServerSocketChannel channel = null;
         if ( ssl ) {
@@ -62,7 +63,7 @@ implements Closeable, StyxMessengerListener {
         socket.setReuseAddress(true);
         socket.setSoTimeout(mTimeout);
         
-        mBalancer = new ClientBalancer(mIOBufSize, root);
+        mBalancer = new ClientBalancer(mIOBufSize, root, protocol);
         mAcceptor = new ConnectionAcceptor(channel, mBalancer);
     }
 

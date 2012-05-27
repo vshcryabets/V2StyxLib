@@ -19,7 +19,8 @@
 
 StyxServerManager::StyxServerManager(string address,
 		int port,
-		IVirtualStyxDirectory *root):mPort(port), mRoot(root), mIOBufSize(8192) {
+		IVirtualStyxDirectory *root, std::string *protocol)
+	:mPort(port), mRoot(root), mIOBufSize(8192) {
 	// create socket
 	mSocket = socket(AF_INET, SOCK_STREAM, 0);
 	if ( mSocket == -1 ) {
@@ -39,7 +40,7 @@ StyxServerManager::StyxServerManager(string address,
 		throw "Can't create socket bind()";
 	}
 
-    mBalancer = new ClientBalancer(mIOBufSize, root);
+    mBalancer = new ClientBalancer(mIOBufSize, root, protocol);
     mAcceptor = new ConnectionAcceptor(mSocket, mBalancer);
 }
 

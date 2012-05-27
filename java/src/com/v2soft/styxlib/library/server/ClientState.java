@@ -47,6 +47,7 @@ import com.v2soft.styxlib.library.server.vfs.IVirtualStyxFile;
 public class ClientState 
 implements Closeable {
     private String mUserName;
+    private String mProtocol;
     private DualStateBuffer mBuffer;
     private int mIOUnit;
     private SocketChannel mChannel;
@@ -57,7 +58,11 @@ implements Closeable {
 
     public ClientState(int iounit, 
             SocketChannel channel, 
-            IVirtualStyxDirectory root) throws FileNotFoundException {
+            IVirtualStyxDirectory root,
+            String protocol) throws FileNotFoundException {
+        if ( channel == null ) throw new NullPointerException("Client channel is null");
+        if ( root == null ) throw new NullPointerException("Root is null");
+        if ( protocol == null ) throw new NullPointerException("Protocol is null");
         mIOUnit = iounit;
         mBuffer = new DualStateBuffer(iounit*2);
         mOutputBuffer = new StyxByteBuffer(ByteBuffer.allocateDirect(iounit));
@@ -65,6 +70,7 @@ implements Closeable {
         mServerRoot = root;
         mAssignedFiles = new HashMap<Long, IVirtualStyxFile>();
         mUserName = "nobody";
+        mProtocol = protocol;
     }
 
     /**
@@ -87,18 +93,18 @@ implements Closeable {
 
     /**
      * Processing incoming messages
-     * @param msg
+     * @param msg incomming message
      * @throws IOException 
      */
     private void processMessage(StyxMessage msg) throws IOException {
-//        System.out.print("Got message "+msg.toString());
+        //        System.out.print("Got message "+msg.toString());
         StyxMessage answer = null;
         IVirtualStyxFile file;
         long fid;
         try {
             switch (msg.getType()) {
             case Tversion:
-                answer = new StyxRVersionMessage(mIOUnit, StyxClientManager.PROTOCOL);
+                answer = new StyxRVersionMessage(mIOUnit, mProtocol);
                 break;
             case Tattach:
                 answer = processAttach((StyxTAttachMessage)msg);
@@ -243,11 +249,11 @@ implements Closeable {
         if ( file == null ) {
             return getNoFIDError(msg, fid);
         }
-        
+
         IVirtualStyxFile walkFile;
         String[] pathElementsArray = msg.getPathElements();
         List<StyxQID> QIDList = new LinkedList<StyxQID>();
-        
+
         if ( pathElementsArray.length == 0 ) {
             walkFile = file;
         } else {
@@ -255,7 +261,7 @@ implements Closeable {
                     new LinkedList<String>(Arrays.asList(pathElementsArray)),
                     QIDList);    
         }
-        
+
         if ( walkFile != null ) {
             mAssignedFiles.put(msg.getNewFID(), walkFile);
             return new StyxRWalkMessage(msg.getTag(), QIDList);

@@ -12,6 +12,7 @@ using namespace std;
 int main(int argc, char **argv) {
 	string serveraddr = "127.0.0.1";
 	IVirtualStyxDirectory *root = new MemoryStyxDirectory("root");
-	StyxServerManager manager(serveraddr, 8080, root);
+	string protocol = "9p2000";
+	StyxServerManager manager(serveraddr, 8080, root, &protocol);
 	manager.start();
 }

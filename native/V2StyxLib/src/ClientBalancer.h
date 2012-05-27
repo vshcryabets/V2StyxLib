@@ -19,7 +19,7 @@ private:
 	vector<Socket> *mNewConnections;
 	vector<Socket> *mReadable;
 public:
-	ClientBalancer(int iounit, IVirtualStyxDirectory *root);
+	ClientBalancer(int iounit, IVirtualStyxDirectory *root, std::string *protocol);
 	~ClientBalancer();
 	void pushNewConnection(Socket socket);
 	void pushReadable(Socket socket);

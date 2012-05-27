@@ -31,7 +31,7 @@ private:
 	void deaWithData(int* list, int id);
 	void setNonBlocking(int socket);
 public:
-	StyxServerManager(string address, int port, IVirtualStyxDirectory *root);
+	StyxServerManager(string address, int port, IVirtualStyxDirectory *root, string *protocol);
 	~StyxServerManager();
 	/**
 	 * start server

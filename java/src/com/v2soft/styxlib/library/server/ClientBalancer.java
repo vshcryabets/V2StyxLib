@@ -9,14 +9,15 @@ import com.v2soft.styxlib.library.server.vfs.IVirtualStyxDirectory;
 
 
 public class ClientBalancer {
+//    private String mProtocol;
     private ClientsHandler mHandler;
     private Thread mThread;
     private List<SocketChannel> mNewConnetions, mReadable;
     
-    public ClientBalancer(int iounit, IVirtualStyxDirectory root) throws IOException {
+    public ClientBalancer(int iounit, IVirtualStyxDirectory root, String protocol) throws IOException {
     	mNewConnetions = new ArrayList<SocketChannel>();
     	mReadable = new ArrayList<SocketChannel>();
-        mHandler = new ClientsHandler(iounit, root);
+        mHandler = new ClientsHandler(iounit, root, protocol);
 //        mThread = new Thread(mHandler, "ClientsHandler");
 //        mThread.start();
     }

@@ -10,7 +10,7 @@ public class StyxByteBuffer extends StyxBufferOperations {
 	
 	public StyxByteBuffer(ByteBuffer buffer) {
 	    super();
-		assert buffer != null;
+	    if ( buffer == null ) throw new NullPointerException("Buffer is null");
 		mBuffer = buffer;
 	}
 

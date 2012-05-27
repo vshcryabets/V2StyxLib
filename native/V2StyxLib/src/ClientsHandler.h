@@ -12,15 +12,18 @@
 #include <map>
 #include "types.h"
 #include "ClientState.h"
+#include <string>
 
 class ClientsHandler {
 private:
 	int mIOUnit;
 	std::map<Socket, ClientState*> *mClientStatesMap;
 	IVirtualStyxDirectory *mRoot;
+	std::string *mProtocol;
+
 	void removeClient(Socket socket);
 public:
-	ClientsHandler(int iounit, IVirtualStyxDirectory *root);
+	ClientsHandler(int iounit, IVirtualStyxDirectory *root, std::string *protocol);
 	~ClientsHandler();
 	void addClient(Socket socket);
 	bool readClient(Socket socket);
