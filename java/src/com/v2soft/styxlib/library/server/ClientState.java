@@ -11,7 +11,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.v2soft.styxlib.library.exceptions.StyxErrorMessageException;
-import com.v2soft.styxlib.library.io.DualStateBuffer;
+import com.v2soft.styxlib.library.io.StyxByteBufferReadable;
 import com.v2soft.styxlib.library.io.StyxByteBufferWriteable;
 import com.v2soft.styxlib.library.messages.StyxRAttachMessage;
 import com.v2soft.styxlib.library.messages.StyxRAuthMessage;
@@ -48,7 +48,7 @@ public class ClientState
 implements Closeable {
     private String mUserName;
     private String mProtocol;
-    private DualStateBuffer mBuffer;
+    private StyxByteBufferReadable mBuffer;
     private int mIOUnit;
     private SocketChannel mChannel;
     private StyxByteBufferWriteable mOutputBuffer;
@@ -64,7 +64,7 @@ implements Closeable {
         if ( root == null ) throw new NullPointerException("Root is null");
         if ( protocol == null ) throw new NullPointerException("Protocol is null");
         mIOUnit = iounit;
-        mBuffer = new DualStateBuffer(iounit*2);
+        mBuffer = new StyxByteBufferReadable(iounit*2);
         mOutputBuffer = new StyxByteBufferWriteable(ByteBuffer.allocateDirect(iounit));
         mChannel = channel;
         mServerRoot = root;

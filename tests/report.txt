@@ -10,3 +10,13 @@ Sat 19 May 2012 09:52:33 PM EEST
 Last test times on Core2Quad+SATA drive+4GB (Debian x64) + JStyx file server
 write - 73.58
 read - 51.29
+
+Sat 26 May 2012 11:20:26 PM EEST
+Last test times on Core2Quad+SATA drive+4GB (Debian x64) + JStyx file server
+write ~ 62
+read ~ 50
+
+Mon 28 May 2012 09:09:21 PM EEST
+Last test times on Core2Quad+SATA drive+4GB (Debian x64) + JStyx file server
+write ~ 61
+read ~ 49

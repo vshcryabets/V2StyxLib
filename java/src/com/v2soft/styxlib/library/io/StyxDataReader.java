@@ -14,8 +14,6 @@ public abstract class StyxDataReader implements IStyxDataReader {
         mDataBuffer = new byte[sDataBufferSize];
     }    
     protected abstract long getInteger(int bytes);
-    public abstract void clear();
-    public abstract void limit(int value);
 
     protected long readInteger(int bytes) {
         long result = 0L;

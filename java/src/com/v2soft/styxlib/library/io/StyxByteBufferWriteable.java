@@ -32,21 +32,6 @@ public class StyxByteBufferWriteable extends StyxDataWriter {
 		return mBuffer;
 	}
 
-//    @Override
-//    public void write(byte[] data) {
-//        mBuffer.put(data);
-//    }
-//
-//    @Override
-//    public void write(byte[] data, int offset, int count) {
-//        mBuffer.put(data, offset, count);
-//    }
-//    @Override
-//    public int read(byte[] mData, int offset, int count) {
-//        mBuffer.get(mData, offset, count);
-//        return count;
-//    }
-
     /**
      * Seek to specified position in buffer
      * @param offset
@@ -57,11 +42,12 @@ public class StyxByteBufferWriteable extends StyxDataWriter {
 
     @Override
     public int write(byte[] data, int offset, int count) {
+        mBuffer.put(data, offset, count);
         return count;
     }
     @Override
     public int read(byte[] data, int offset, int count) {
-        // TODO Auto-generated method stub
+        mBuffer.get(data, offset, count);
         return 0;
     }
 }
