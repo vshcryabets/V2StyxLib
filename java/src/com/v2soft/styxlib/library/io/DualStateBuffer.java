@@ -23,7 +23,6 @@ public class DualStateBuffer extends StyxDataReader {
         mCapacity = capacity;
         mBuffer = ByteBuffer.allocateDirect(mCapacity);
         mDataBuffer = new byte[sDataBufferSize];
-
     }
 
     public int remainsToRead() {

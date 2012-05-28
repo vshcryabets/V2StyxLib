@@ -3,8 +3,8 @@ package com.v2soft.styxlib.library.messages;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
+import com.v2soft.styxlib.library.io.IStyxDataReader;
 import com.v2soft.styxlib.library.io.IStyxDataWriter;
-import com.v2soft.styxlib.library.io.StyxDataReader;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
 import com.v2soft.styxlib.library.messages.base.structs.StyxQID;
@@ -47,7 +47,7 @@ public class StyxRAuthMessage extends StyxMessage {
 	}
 
     @Override
-    protected void load(StyxDataReader is) throws IOException {
+    protected void load(IStyxDataReader is) throws IOException {
         mQID = new StyxQID(is);
     }	
 }

@@ -9,9 +9,7 @@ public interface IStyxDataReader {
     int readUInt16() throws IOException;
     long readUInt32() throws IOException;
     ULong readUInt64() throws IOException;
-    
     long getUInt32();
-//    int read(byte[] mData, int offset, int count);
-    
     String readUTFString() throws IOException;
+    int read(byte[] data, int offset, int dataLength) throws IOException;
 }

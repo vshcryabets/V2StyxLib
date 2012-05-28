@@ -4,8 +4,8 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 
+import com.v2soft.styxlib.library.io.IStyxDataReader;
 import com.v2soft.styxlib.library.io.IStyxDataWriter;
-import com.v2soft.styxlib.library.io.StyxDataReader;
 import com.v2soft.styxlib.library.messages.StyxRAttachMessage;
 import com.v2soft.styxlib.library.messages.StyxRAuthMessage;
 import com.v2soft.styxlib.library.messages.StyxRClunkMessage;
@@ -54,7 +54,7 @@ public abstract class StyxMessage {
      * @return constructed Message object
      * @throws IOException
      */
-    public static StyxMessage factory(StyxDataReader buffer, int io_unit) 
+    public static StyxMessage factory(IStyxDataReader buffer, int io_unit) 
             throws IOException {
         // get common packet data
         long packet_size = buffer.readUInt32();
@@ -205,6 +205,8 @@ public abstract class StyxMessage {
 		return BASE_BINARY_SIZE;
 	}
 	
+    protected void load(IStyxDataReader buffer) throws IOException {
+    }
 	public void writeToBuffer(IStyxDataWriter output)  
 	        throws UnsupportedEncodingException, IOException {
 		output.clear();
@@ -216,7 +218,6 @@ public abstract class StyxMessage {
 	}
 
 	protected abstract String internalToString();
-    protected abstract void load(StyxDataReader buffer) throws IOException;
 	
 	@Override
 	public String toString() {

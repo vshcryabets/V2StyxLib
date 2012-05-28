@@ -4,7 +4,8 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
 import com.v2soft.styxlib.library.StyxFile;
-import com.v2soft.styxlib.library.io.StyxDataReader;
+import com.v2soft.styxlib.library.io.IStyxDataReader;
+import com.v2soft.styxlib.library.io.IStyxDataWriter;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.messages.base.StyxTMessage;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
@@ -23,7 +24,7 @@ public class StyxTWalkMessage
 	}
 	
     @Override
-    public void load(StyxDataReader input) throws IOException  {
+    public void load(IStyxDataReader input) throws IOException  {
         String path = "";
         setFID(input.readUInt32());
         setNewFID(input.readUInt32());
@@ -37,18 +38,18 @@ public class StyxTWalkMessage
         setPath(path);
     }
     @Override
-    public void writeToBuffer(StyxDataReader output)
+    public void writeToBuffer(IStyxDataWriter output)
             throws UnsupportedEncodingException, IOException {
         super.writeToBuffer(output);
-        output.writeUInt(getFID());
-        output.writeUInt(getNewFID());
+        output.writeUInt32(getFID());
+        output.writeUInt32(getNewFID());
         if (mPathElements != null)
         {
-            output.writeUShort(mPathElements.length);
+            output.writeUInt16(mPathElements.length);
             for (String pathElement : mPathElements)
-                output.writeUTF(pathElement);
+                output.writeUTFString(pathElement);
         } else {
-            output.writeUShort(0);
+            output.writeUInt16(0);
         }
     }
 	

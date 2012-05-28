@@ -3,6 +3,8 @@ package com.v2soft.styxlib.library.messages;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
+import com.v2soft.styxlib.library.io.IStyxDataReader;
+import com.v2soft.styxlib.library.io.IStyxDataWriter;
 import com.v2soft.styxlib.library.io.StyxDataReader;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
@@ -18,7 +20,7 @@ public class StyxRVersionMessage extends StyxMessage {
 	}
 
     @Override
-    public void load(StyxDataReader input) 
+    public void load(IStyxDataReader input) 
         throws IOException  {
         setMaxPacketSize(input.readUInt32());
         setProtocolVersion(input.readUTFString());
@@ -51,11 +53,11 @@ public class StyxRVersionMessage extends StyxMessage {
 	}
 	
 	@Override
-	public void writeToBuffer(StyxDataReader output) 
+	public void writeToBuffer(IStyxDataWriter output) 
 	        throws UnsupportedEncodingException, IOException {
 		super.writeToBuffer(output);
-		output.writeUInt(getMaxPacketSize());
-		output.writeUTF(getProtocolVersion());		
+		output.writeUInt32(getMaxPacketSize());
+		output.writeUTFString(getProtocolVersion());		
 	}	
 
 	@Override

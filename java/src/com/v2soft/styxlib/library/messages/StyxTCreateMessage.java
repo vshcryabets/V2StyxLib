@@ -3,7 +3,8 @@ package com.v2soft.styxlib.library.messages;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
-import com.v2soft.styxlib.library.io.StyxDataReader;
+import com.v2soft.styxlib.library.io.IStyxDataReader;
+import com.v2soft.styxlib.library.io.IStyxDataWriter;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.messages.base.StyxTMessage;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
@@ -23,7 +24,8 @@ public class StyxTCreateMessage extends StyxTMessage {
         mMode = mode;
     }
 
-    public void load(StyxDataReader input) throws IOException {
+    @Override
+    public void load(IStyxDataReader input) throws IOException {
         mFID = input.readUInt32();
         mName = input.readUTFString();
         mPermissions = input.readUInt32();
@@ -73,13 +75,13 @@ public class StyxTCreateMessage extends StyxTMessage {
     }
 
     @Override
-    public void writeToBuffer(StyxDataReader output)
+    public void writeToBuffer(IStyxDataWriter output)
             throws UnsupportedEncodingException, IOException {
         super.writeToBuffer(output);
-        output.writeUInt(getFID());
-        output.writeUTF(getName());
-        output.writeUInt(getPermissions());
-        output.writeUByte((short) mMode);  
+        output.writeUInt32(getFID());
+        output.writeUTFString(getName());
+        output.writeUInt32(getPermissions());
+        output.writeUInt8((short) mMode);  
     }
 
     @Override

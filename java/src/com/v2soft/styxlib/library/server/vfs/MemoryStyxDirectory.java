@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.v2soft.styxlib.library.exceptions.StyxErrorMessageException;
-import com.v2soft.styxlib.library.io.StyxByteBuffer;
+import com.v2soft.styxlib.library.io.StyxByteBufferWriteable;
 import com.v2soft.styxlib.library.messages.base.enums.FileMode;
 import com.v2soft.styxlib.library.messages.base.enums.ModeType;
 import com.v2soft.styxlib.library.messages.base.enums.QIDType;
@@ -25,7 +25,7 @@ import com.v2soft.styxlib.library.types.ULong;
  */
 public class MemoryStyxDirectory 
 	implements IVirtualStyxDirectory {
-    private Map<ClientState, StyxByteBuffer> mBuffersMap;
+    private Map<ClientState, StyxByteBufferWriteable> mBuffersMap;
 	private List<IVirtualStyxFile> mFiles;
 	private String mName;
 	
@@ -33,7 +33,7 @@ public class MemoryStyxDirectory
 	    if ( name == null ) throw new NullPointerException("Name is null");
 	    mName = name;
 	    mFiles = new LinkedList<IVirtualStyxFile>();
-	    mBuffersMap = new HashMap<ClientState, StyxByteBuffer>();
+	    mBuffersMap = new HashMap<ClientState, StyxByteBufferWriteable>();
     }
 	
 	@Override
@@ -143,7 +143,7 @@ public class MemoryStyxDirectory
                 stats.add(stat);
             }
             // allocate buffer
-            StyxByteBuffer buffer = new StyxByteBuffer(ByteBuffer.allocateDirect(size));
+            StyxByteBufferWriteable buffer = new StyxByteBufferWriteable(ByteBuffer.allocateDirect(size));
             for (StyxStat state : stats) {
                 state.writeBinaryTo(buffer);
             }

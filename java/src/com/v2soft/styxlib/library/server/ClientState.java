@@ -10,10 +10,9 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.v2soft.styxlib.library.StyxClientManager;
 import com.v2soft.styxlib.library.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.library.io.DualStateBuffer;
-import com.v2soft.styxlib.library.io.StyxByteBuffer;
+import com.v2soft.styxlib.library.io.StyxByteBufferWriteable;
 import com.v2soft.styxlib.library.messages.StyxRAttachMessage;
 import com.v2soft.styxlib.library.messages.StyxRAuthMessage;
 import com.v2soft.styxlib.library.messages.StyxRClunkMessage;
@@ -52,7 +51,7 @@ implements Closeable {
     private DualStateBuffer mBuffer;
     private int mIOUnit;
     private SocketChannel mChannel;
-    private StyxByteBuffer mOutputBuffer;
+    private StyxByteBufferWriteable mOutputBuffer;
     private IVirtualStyxDirectory mServerRoot;
     private IVirtualStyxDirectory mClientRoot;
     private HashMap<Long, IVirtualStyxFile> mAssignedFiles;
@@ -66,7 +65,7 @@ implements Closeable {
         if ( protocol == null ) throw new NullPointerException("Protocol is null");
         mIOUnit = iounit;
         mBuffer = new DualStateBuffer(iounit*2);
-        mOutputBuffer = new StyxByteBuffer(ByteBuffer.allocateDirect(iounit));
+        mOutputBuffer = new StyxByteBufferWriteable(ByteBuffer.allocateDirect(iounit));
         mChannel = channel;
         mServerRoot = root;
         mAssignedFiles = new HashMap<Long, IVirtualStyxFile>();

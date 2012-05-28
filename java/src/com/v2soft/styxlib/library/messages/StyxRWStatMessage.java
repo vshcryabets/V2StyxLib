@@ -1,8 +1,5 @@
 package com.v2soft.styxlib.library.messages;
 
-import java.io.IOException;
-
-import com.v2soft.styxlib.library.io.StyxDataReader;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
 
@@ -11,11 +8,6 @@ public class StyxRWStatMessage extends StyxMessage {
 	public StyxRWStatMessage(int tag) {
 		super(MessageType.Rwstat, tag);
 	}
-	
-    @Override
-    public void load(StyxDataReader input) 
-        throws IOException  {
-    }
 	
 	@Override
 	public int getBinarySize() {

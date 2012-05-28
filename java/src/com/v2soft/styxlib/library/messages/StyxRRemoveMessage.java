@@ -1,8 +1,5 @@
 package com.v2soft.styxlib.library.messages;
 
-import java.io.IOException;
-
-import com.v2soft.styxlib.library.io.StyxDataReader;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
 
@@ -12,11 +9,6 @@ public class StyxRRemoveMessage extends StyxMessage {
 	{
 		super(MessageType.Rremove, tag);
 	}
-	
-    @Override
-    public void load(StyxDataReader input) 
-        throws IOException  {
-    }	
 	@Override
 	public int getBinarySize() {
 		return super.getBinarySize();

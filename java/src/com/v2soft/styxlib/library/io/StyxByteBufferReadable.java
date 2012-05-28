@@ -2,12 +2,10 @@ package com.v2soft.styxlib.library.io;
 
 import java.nio.ByteBuffer;
 
-import com.v2soft.styxlib.library.types.ULong;
-
-public class StyxByteBuffer extends StyxDataReader {
+public class StyxByteBufferReadable extends StyxDataReader {
 	private ByteBuffer mBuffer;
 	
-	public StyxByteBuffer(ByteBuffer buffer) {
+	public StyxByteBufferReadable(ByteBuffer buffer) {
 	    super();
 	    if ( buffer == null ) throw new NullPointerException("Buffer is null");
 		mBuffer = buffer;
@@ -41,16 +39,6 @@ public class StyxByteBuffer extends StyxDataReader {
 	public ByteBuffer getBuffer() {
 		return mBuffer;
 	}
-
-//    @Override
-//    public void write(byte[] data) {
-//        mBuffer.put(data);
-//    }
-//
-//    @Override
-//    public void write(byte[] data, int offset, int count) {
-//        mBuffer.put(data, offset, count);
-//    }
 
     @Override
     public int read(byte[] mData, int offset, int count) {
