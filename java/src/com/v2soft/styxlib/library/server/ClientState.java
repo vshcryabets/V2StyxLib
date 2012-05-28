@@ -11,8 +11,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.v2soft.styxlib.library.StyxClientManager;
-import com.v2soft.styxlib.library.core.StyxByteBuffer;
 import com.v2soft.styxlib.library.exceptions.StyxErrorMessageException;
+import com.v2soft.styxlib.library.io.DualStateBuffer;
+import com.v2soft.styxlib.library.io.StyxByteBuffer;
 import com.v2soft.styxlib.library.messages.StyxRAttachMessage;
 import com.v2soft.styxlib.library.messages.StyxRAuthMessage;
 import com.v2soft.styxlib.library.messages.StyxRClunkMessage;

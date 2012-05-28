@@ -3,10 +3,10 @@ package com.v2soft.styxlib.library.messages;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
+import com.v2soft.styxlib.library.io.StyxDataReader;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.messages.base.StyxTMessage;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
-import com.v2soft.styxlib.library.server.StyxBufferOperations;
 
 public class StyxTCreateMessage extends StyxTMessage {
     private long mFID;
@@ -23,9 +23,9 @@ public class StyxTCreateMessage extends StyxTMessage {
         mMode = mode;
     }
 
-    public void load(StyxBufferOperations input) throws IOException {
+    public void load(StyxDataReader input) throws IOException {
         mFID = input.readUInt32();
-        mName = input.readUTF();
+        mName = input.readUTFString();
         mPermissions = input.readUInt32();
         mMode = input.readUInt8();
     }
@@ -73,7 +73,7 @@ public class StyxTCreateMessage extends StyxTMessage {
     }
 
     @Override
-    public void writeToBuffer(StyxBufferOperations output)
+    public void writeToBuffer(StyxDataReader output)
             throws UnsupportedEncodingException, IOException {
         super.writeToBuffer(output);
         output.writeUInt(getFID());

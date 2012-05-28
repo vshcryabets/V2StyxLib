@@ -2,10 +2,10 @@ package com.v2soft.styxlib.library.messages;
 
 import java.io.IOException;
 
+import com.v2soft.styxlib.library.io.StyxDataReader;
 import com.v2soft.styxlib.library.messages.base.StyxTMessage;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
 import com.v2soft.styxlib.library.messages.base.structs.StyxStat;
-import com.v2soft.styxlib.library.server.StyxBufferOperations;
 
 public class StyxTWStatMessage extends StyxTMessage {
 	private long mFID;
@@ -17,7 +17,7 @@ public class StyxTWStatMessage extends StyxTMessage {
 		mStat = stat;
 	}
     @Override
-    public void load(StyxBufferOperations input) throws IOException {
+    public void load(StyxDataReader input) throws IOException {
         mFID = input.readUInt32();
         input.readUInt16();
         mStat = new StyxStat(input);
@@ -46,7 +46,7 @@ public class StyxTWStatMessage extends StyxTMessage {
 			+ getStat().getSize();
 	}
     @Override
-    public void writeToBuffer(StyxBufferOperations output)
+    public void writeToBuffer(StyxDataReader output)
             throws IOException {
         super.writeToBuffer(output);
         output.writeUInt(getFID());

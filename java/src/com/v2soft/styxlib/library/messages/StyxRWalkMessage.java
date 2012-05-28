@@ -8,10 +8,10 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.v2soft.styxlib.library.io.StyxDataReader;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
 import com.v2soft.styxlib.library.messages.base.structs.StyxQID;
-import com.v2soft.styxlib.library.server.StyxBufferOperations;
 
 public class StyxRWalkMessage extends StyxMessage {
 	private List<StyxQID> mQIDList;
@@ -22,7 +22,7 @@ public class StyxRWalkMessage extends StyxMessage {
 	}
 	
     @Override
-    public void load(StyxBufferOperations input) 
+    public void load(StyxDataReader input) 
         throws IOException  {
         int count = input.readUInt16();
         
@@ -75,7 +75,7 @@ public class StyxRWalkMessage extends StyxMessage {
 	}
 	
 	@Override
-	public void writeToBuffer(StyxBufferOperations output)
+	public void writeToBuffer(StyxDataReader output)
 	        throws UnsupportedEncodingException, IOException {
 	    super.writeToBuffer(output);
 		output.writeUShort(getQIDListLength());

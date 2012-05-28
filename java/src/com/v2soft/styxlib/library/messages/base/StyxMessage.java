@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 
+import com.v2soft.styxlib.library.io.IStyxDataWriter;
+import com.v2soft.styxlib.library.io.StyxDataReader;
 import com.v2soft.styxlib.library.messages.StyxRAttachMessage;
 import com.v2soft.styxlib.library.messages.StyxRAuthMessage;
 import com.v2soft.styxlib.library.messages.StyxRClunkMessage;
@@ -34,7 +36,6 @@ import com.v2soft.styxlib.library.messages.StyxTWriteMessage;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
 import com.v2soft.styxlib.library.messages.base.enums.ModeType;
 import com.v2soft.styxlib.library.messages.base.structs.StyxQID;
-import com.v2soft.styxlib.library.server.StyxBufferOperations;
 
 public abstract class StyxMessage {
     public static final Charset sUTFCharset = Charset.forName("utf-8"); 
@@ -53,7 +54,7 @@ public abstract class StyxMessage {
      * @return constructed Message object
      * @throws IOException
      */
-    public static StyxMessage factory(StyxBufferOperations buffer, int io_unit) 
+    public static StyxMessage factory(StyxDataReader buffer, int io_unit) 
             throws IOException {
         // get common packet data
         long packet_size = buffer.readUInt32();
@@ -204,18 +205,18 @@ public abstract class StyxMessage {
 		return BASE_BINARY_SIZE;
 	}
 	
-	public void writeToBuffer(StyxBufferOperations output)  
+	public void writeToBuffer(IStyxDataWriter output)  
 	        throws UnsupportedEncodingException, IOException {
 		output.clear();
 		int packetSize = getBinarySize();
 		output.limit(packetSize);
-		output.writeUInt(packetSize);
-		output.writeUByte((short) getType().getByte());
-		output.writeUShort(getTag());
+		output.writeUInt32(packetSize);
+		output.writeUInt8((short) getType().getByte());
+		output.writeUInt16(getTag());
 	}
 
 	protected abstract String internalToString();
-    protected abstract void load(StyxBufferOperations buffer) throws IOException;
+    protected abstract void load(StyxDataReader buffer) throws IOException;
 	
 	@Override
 	public String toString() {

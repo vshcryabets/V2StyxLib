@@ -3,9 +3,10 @@ package com.v2soft.styxlib.library.messages;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
+import com.v2soft.styxlib.library.io.IStyxDataWriter;
+import com.v2soft.styxlib.library.io.StyxDataReader;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
-import com.v2soft.styxlib.library.server.StyxBufferOperations;
 
 public class StyxRErrorMessage extends StyxMessage {
 	private String mError;
@@ -16,9 +17,9 @@ public class StyxRErrorMessage extends StyxMessage {
 	}
 	
     @Override
-    public void load(StyxBufferOperations input) 
+    public void load(StyxDataReader input) 
         throws IOException  {
-        setError(input.readUTF());
+        setError(input.readUTFString());
     }	
 	public String getError()
 	{
@@ -38,10 +39,10 @@ public class StyxRErrorMessage extends StyxMessage {
 	}
 	
 	@Override
-	public void writeToBuffer(StyxBufferOperations output)
+	public void writeToBuffer(IStyxDataWriter output)
 	        throws UnsupportedEncodingException, IOException {
 	    super.writeToBuffer(output);
-		output.writeUTF(getError());
+		output.writeUTFString(getError());
 	}
 
 	@Override

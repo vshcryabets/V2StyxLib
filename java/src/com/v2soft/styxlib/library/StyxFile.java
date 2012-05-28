@@ -13,9 +13,9 @@ import java.util.concurrent.TimeoutException;
 import com.v2soft.styxlib.library.core.Messenger;
 import com.v2soft.styxlib.library.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.library.exceptions.StyxException;
+import com.v2soft.styxlib.library.io.StyxDataInputStream;
 import com.v2soft.styxlib.library.io.StyxFileBufferedInputStream;
 import com.v2soft.styxlib.library.io.StyxFileBufferedOutputStream;
-import com.v2soft.styxlib.library.io.StyxInputStream;
 import com.v2soft.styxlib.library.messages.StyxROpenMessage;
 import com.v2soft.styxlib.library.messages.StyxRStatMessage;
 import com.v2soft.styxlib.library.messages.StyxRWalkMessage;
@@ -134,7 +134,7 @@ public class StyxFile implements Closeable {
         try
         {
             is = new StyxFileBufferedInputStream(mMessenger, this, iounit);
-            StyxInputStream sis = new StyxInputStream(is);
+            StyxDataInputStream sis = new StyxDataInputStream(is);
             while (true) {
                 StyxStat stat = new StyxStat(sis);
                 stats.add(stat);

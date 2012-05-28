@@ -1,11 +1,10 @@
-package com.v2soft.styxlib.library.core;
+package com.v2soft.styxlib.library.io;
 
 import java.nio.ByteBuffer;
 
-import com.v2soft.styxlib.library.server.StyxBufferOperations;
 import com.v2soft.styxlib.library.types.ULong;
 
-public class StyxByteBuffer extends StyxBufferOperations {
+public class StyxByteBuffer extends StyxDataReader {
 	private ByteBuffer mBuffer;
 	
 	public StyxByteBuffer(ByteBuffer buffer) {
@@ -43,15 +42,15 @@ public class StyxByteBuffer extends StyxBufferOperations {
 		return mBuffer;
 	}
 
-    @Override
-    public void write(byte[] data) {
-        mBuffer.put(data);
-    }
-
-    @Override
-    public void write(byte[] data, int offset, int count) {
-        mBuffer.put(data, offset, count);
-    }
+//    @Override
+//    public void write(byte[] data) {
+//        mBuffer.put(data);
+//    }
+//
+//    @Override
+//    public void write(byte[] data, int offset, int count) {
+//        mBuffer.put(data, offset, count);
+//    }
 
     @Override
     public int read(byte[] mData, int offset, int count) {

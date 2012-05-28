@@ -3,9 +3,9 @@ package com.v2soft.styxlib.library.messages.base.structs;
 import java.io.IOException;
 import java.util.Date;
 
-import com.v2soft.styxlib.library.io.StyxInputStream;
+import com.v2soft.styxlib.library.io.IStyxDataReader;
+import com.v2soft.styxlib.library.io.IStyxDataWriter;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
-import com.v2soft.styxlib.library.server.StyxBufferOperations;
 import com.v2soft.styxlib.library.types.ULong;
 
 public class StyxStat {
@@ -52,8 +52,8 @@ public class StyxStat {
         setGroupName(groupName);
         setModificationUser(modificationUser);
     }
-    // TODO remove next method...
-    public StyxStat(StyxInputStream input) throws IOException {
+    
+    public StyxStat(IStyxDataReader input) throws IOException {
         int size = input.readUInt16(); // skip size bytes
         mType = input.readUInt16();
         mDev = input.readUInt32();
@@ -62,24 +62,10 @@ public class StyxStat {
         mAccessTime = IntToDate(input.readUInt32());
         mModificationTime = IntToDate(input.readUInt32());
         mLength = input.readUInt64();
-        mName = input.readUTF();
-        mUserName = input.readUTF();
-        mGroupName = input.readUTF();
-        mModificationUser = input.readUTF();
-    }
-    public StyxStat(StyxBufferOperations input) throws IOException {
-        int size = input.readUInt16(); // skip size bytes
-        mType = input.readUInt16();
-        mDev = input.readUInt32();
-        mQID = new StyxQID(input);
-        mMode = input.readUInt32();
-        mAccessTime = IntToDate(input.readUInt32());
-        mModificationTime = IntToDate(input.readUInt32());
-        mLength = input.readUInt64();
-        mName = input.readUTF();
-        mUserName = input.readUTF();
-        mGroupName = input.readUTF();
-        mModificationUser = input.readUTF();
+        mName = input.readUTFString();
+        mUserName = input.readUTFString();
+        mGroupName = input.readUTFString();
+        mModificationUser = input.readUTFString();
     }
 
     public int getSize()
@@ -215,19 +201,19 @@ public class StyxStat {
         mModificationUser = modificationUser;
     }
 
-    public void writeBinaryTo(StyxBufferOperations output) throws IOException {
-        output.writeUShort(getSize() - 2); // TODO -2??? what does it mean?
-        output.writeUShort(getType());
-        output.writeUInt(getDev());
+    public void writeBinaryTo(IStyxDataWriter output) throws IOException {
+        output.writeUInt16(getSize() - 2); // TODO -2??? what does it mean?
+        output.writeUInt16(getType());
+        output.writeUInt32(getDev());
         getQID().writeBinaryTo(output);
-        output.writeUInt(getMode());
-        output.writeUInt(DateToInt(getAccessTime()));
-        output.writeUInt(DateToInt(getModificationTime()));
+        output.writeUInt32(getMode());
+        output.writeUInt32(DateToInt(getAccessTime()));
+        output.writeUInt32(DateToInt(getModificationTime()));
         output.writeUInt64(getLength());
-        output.writeUTF(getName());
-        output.writeUTF(getUserName());
-        output.writeUTF(getGroupName());
-        output.writeUTF(getModificationUser());
+        output.writeUTFString(getName());
+        output.writeUTFString(getUserName());
+        output.writeUTFString(getGroupName());
+        output.writeUTFString(getModificationUser());
     }	
     @Override
     public String toString() {

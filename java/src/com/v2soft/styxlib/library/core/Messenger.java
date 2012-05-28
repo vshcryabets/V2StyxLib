@@ -13,10 +13,11 @@ import java.util.Map;
 import com.v2soft.styxlib.Config;
 import com.v2soft.styxlib.library.Consts;
 import com.v2soft.styxlib.library.exceptions.StyxException;
+import com.v2soft.styxlib.library.io.DualStateBuffer;
+import com.v2soft.styxlib.library.io.StyxByteBuffer;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.messages.base.StyxTMessage;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
-import com.v2soft.styxlib.library.server.DualStateBuffer;
 import com.v2soft.styxlib.library.types.ObjectsPoll;
 import com.v2soft.styxlib.library.types.ObjectsPoll.ObjectsPollFactory;
 

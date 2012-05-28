@@ -4,10 +4,10 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
 import com.v2soft.styxlib.library.StyxFile;
+import com.v2soft.styxlib.library.io.StyxDataReader;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.messages.base.StyxTMessage;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
-import com.v2soft.styxlib.library.server.StyxBufferOperations;
 
 public class StyxTWalkMessage 
     extends StyxTMessage {
@@ -23,13 +23,13 @@ public class StyxTWalkMessage
 	}
 	
     @Override
-    public void load(StyxBufferOperations input) throws IOException  {
+    public void load(StyxDataReader input) throws IOException  {
         String path = "";
         setFID(input.readUInt32());
         setNewFID(input.readUInt32());
         int count = input.readUInt16();
         for (int i=0; i<count; i++) {
-            String stmp = input.readUTF();
+            String stmp = input.readUTFString();
             if (!path.equals(""))
                 path += "/";
             path += stmp;
@@ -37,7 +37,7 @@ public class StyxTWalkMessage
         setPath(path);
     }
     @Override
-    public void writeToBuffer(StyxBufferOperations output)
+    public void writeToBuffer(StyxDataReader output)
             throws UnsupportedEncodingException, IOException {
         super.writeToBuffer(output);
         output.writeUInt(getFID());

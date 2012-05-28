@@ -3,10 +3,11 @@ package com.v2soft.styxlib.library.messages;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
+import com.v2soft.styxlib.library.io.IStyxDataWriter;
+import com.v2soft.styxlib.library.io.StyxDataReader;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
 import com.v2soft.styxlib.library.messages.base.structs.StyxQID;
-import com.v2soft.styxlib.library.server.StyxBufferOperations;
 
 public class StyxROpenMessage extends StyxMessage {
 	private StyxQID mQID;
@@ -19,7 +20,7 @@ public class StyxROpenMessage extends StyxMessage {
 	}
 	
     @Override
-    public void load(StyxBufferOperations stream) throws IOException {
+    public void load(StyxDataReader stream) throws IOException {
         mQID = new StyxQID(stream);
         mIOUnit = stream.readUInt32();
     }
@@ -53,11 +54,11 @@ public class StyxROpenMessage extends StyxMessage {
 	}
 	
 	@Override
-	public void writeToBuffer(StyxBufferOperations output)
+	public void writeToBuffer(IStyxDataWriter output)
 	        throws UnsupportedEncodingException, IOException {
 	    super.writeToBuffer(output);
 		mQID.writeBinaryTo(output);
-		output.writeUInt(getIOUnit());
+		output.writeUInt32(mIOUnit);
 	}
 
 	@Override

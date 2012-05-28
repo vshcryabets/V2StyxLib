@@ -4,9 +4,10 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
 import com.v2soft.styxlib.Config;
+import com.v2soft.styxlib.library.io.IStyxDataWriter;
+import com.v2soft.styxlib.library.io.StyxDataReader;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
-import com.v2soft.styxlib.library.server.StyxBufferOperations;
 
 public class StyxRReadMessage extends StyxMessage {
     private byte[] mData;
@@ -19,7 +20,7 @@ public class StyxRReadMessage extends StyxMessage {
     }
 
     @Override
-    public void load(StyxBufferOperations input) 
+    public void load(StyxDataReader input) 
             throws IOException  {
         mDataLength = (int)input.readUInt32();
         mData = new byte[mDataLength];
@@ -35,11 +36,11 @@ public class StyxRReadMessage extends StyxMessage {
     }
 
     @Override
-    public void writeToBuffer(StyxBufferOperations output)
+    public void writeToBuffer(IStyxDataWriter output)
             throws UnsupportedEncodingException, IOException {
         super.writeToBuffer(output);
         int length = getDataLength();
-        output.writeUInt(length);
+        output.writeUInt32(length);
         if ( length > 0 ) {
             output.write(mData, 0, mDataLength);
         }

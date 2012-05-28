@@ -8,8 +8,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import com.v2soft.styxlib.library.core.StyxByteBuffer;
 import com.v2soft.styxlib.library.exceptions.StyxErrorMessageException;
+import com.v2soft.styxlib.library.io.StyxByteBuffer;
 import com.v2soft.styxlib.library.messages.base.enums.FileMode;
 import com.v2soft.styxlib.library.messages.base.enums.ModeType;
 import com.v2soft.styxlib.library.messages.base.enums.QIDType;

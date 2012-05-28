@@ -1,15 +1,16 @@
-package com.v2soft.styxlib.library.server;
+package com.v2soft.styxlib.library.io;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
+
 
 /**
  * 
  * @author V.Shcriyabets (vshcryabets@gmail.com)
  *
  */
-public class DualStateBuffer extends StyxBufferOperations {
+public class DualStateBuffer extends StyxDataReader {
     private static final int sDataBufferSize = 16; 
     private byte [] mDataBuffer;
     private ByteBuffer mBuffer;
@@ -115,18 +116,6 @@ public class DualStateBuffer extends StyxBufferOperations {
 
     @Override
     public void limit(int value) {
-        throw new RuntimeException();
-    }
-
-    @Override
-    public void write(byte[] data) {
-        // TODO Auto-generated method stub
-        throw new RuntimeException();
-    }
-
-    @Override
-    public void write(byte[] data, int offset, int count) {
-        // TODO Auto-generated method stub
         throw new RuntimeException();
     }
 }
