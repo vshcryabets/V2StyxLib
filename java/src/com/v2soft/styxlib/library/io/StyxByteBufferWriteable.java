@@ -5,10 +5,9 @@ import java.nio.ByteBuffer;
 public class StyxByteBufferWriteable extends StyxDataWriter {
 	private ByteBuffer mBuffer;
 	
-	public StyxByteBufferWriteable(ByteBuffer buffer) {
+	public StyxByteBufferWriteable(int capacity) {
 	    super();
-	    if ( buffer == null ) throw new NullPointerException("Buffer is null");
-		mBuffer = buffer;
+	    mBuffer = ByteBuffer.allocateDirect(capacity);
 	}
 
 	/**
@@ -44,10 +43,5 @@ public class StyxByteBufferWriteable extends StyxDataWriter {
     public int write(byte[] data, int offset, int count) {
         mBuffer.put(data, offset, count);
         return count;
-    }
-    @Override
-    public int read(byte[] data, int offset, int count) {
-        mBuffer.get(data, offset, count);
-        return 0;
     }
 }

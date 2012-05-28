@@ -6,9 +6,9 @@ import java.nio.charset.Charset;
 import com.v2soft.styxlib.library.types.ULong;
 
 public abstract class StyxDataReader implements IStyxDataReader {
-    private static final int sDataBufferSize = 16;
+    protected static final int sDataBufferSize = 16;
     private static final Charset sUTFCharset = Charset.forName("utf-8");
-    private byte [] mDataBuffer;
+    protected byte [] mDataBuffer;
 
     public StyxDataReader() {
         mDataBuffer = new byte[sDataBufferSize];

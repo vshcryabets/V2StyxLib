@@ -191,7 +191,7 @@ public class Messenger implements Runnable, Closeable, ObjectsPollFactory<StyxBy
     @Override
     public StyxByteBufferWriteable create() {
         mBuffersAllocated++;
-        return new StyxByteBufferWriteable(ByteBuffer.allocateDirect(mIOBufferSize));
+        return new StyxByteBufferWriteable(mIOBufferSize);
     }
 
 }

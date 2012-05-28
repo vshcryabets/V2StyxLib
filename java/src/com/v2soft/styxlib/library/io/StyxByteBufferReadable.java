@@ -11,8 +11,6 @@ import java.nio.channels.SocketChannel;
  *
  */
 public class StyxByteBufferReadable extends StyxDataReader {
-    private static final int sDataBufferSize = 16; 
-    private byte [] mDataBuffer;
     private ByteBuffer mBuffer;
     private int mWritePosition, mReadPosition, mCapacity, mStoredBytes;
 
@@ -22,7 +20,6 @@ public class StyxByteBufferReadable extends StyxDataReader {
         mStoredBytes = 0;
         mCapacity = capacity;
         mBuffer = ByteBuffer.allocateDirect(mCapacity);
-        mDataBuffer = new byte[sDataBufferSize];
     }
     // ==========================================================
     // Public methods

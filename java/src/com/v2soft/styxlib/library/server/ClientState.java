@@ -3,7 +3,6 @@ package com.v2soft.styxlib.library.server;
 import java.io.Closeable;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -65,7 +64,7 @@ implements Closeable {
         if ( protocol == null ) throw new NullPointerException("Protocol is null");
         mIOUnit = iounit;
         mBuffer = new StyxByteBufferReadable(iounit*2);
-        mOutputBuffer = new StyxByteBufferWriteable(ByteBuffer.allocateDirect(iounit));
+        mOutputBuffer = new StyxByteBufferWriteable(iounit);
         mChannel = channel;
         mServerRoot = root;
         mAssignedFiles = new HashMap<Long, IVirtualStyxFile>();

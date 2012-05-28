@@ -143,7 +143,7 @@ public class MemoryStyxDirectory
                 stats.add(stat);
             }
             // allocate buffer
-            StyxByteBufferWriteable buffer = new StyxByteBufferWriteable(ByteBuffer.allocateDirect(size));
+            StyxByteBufferWriteable buffer = new StyxByteBufferWriteable(size);
             for (StyxStat state : stats) {
                 state.writeBinaryTo(buffer);
             }

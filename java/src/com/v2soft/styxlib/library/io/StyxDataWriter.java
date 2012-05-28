@@ -9,40 +9,42 @@ public abstract class StyxDataWriter implements IStyxDataWriter {
     private static final int sDataBufferSize = 16;
     private static final Charset sUTFCharset = Charset.forName("utf-8");
     private byte [] mDataBuffer;
-    
+
     public StyxDataWriter() {
         mDataBuffer = new byte[sDataBufferSize];
     }    
-    @Override
-    public abstract void clear();
-    @Override
-    public abstract void limit(int value);
-    @Override
-    public abstract int write(byte[] data, int offset, int count);
-    public abstract int read(byte[] data, int offset, int count);
 
     public void write(byte[] data) {
         write(data, 0, data.length);
     }
-    public void writeUInt8(short val) {writeInteger(1, val);}
+
     @Override
-    public void writeUInt16(int val) {writeInteger(2, val);}
+    public void writeUInt8(short val) {
+        mDataBuffer[0] = (byte) val;
+        write(mDataBuffer, 0, 1);
+    }
     @Override
-    public void writeUInt32(long val) {writeInteger(4, val);}
+    public void writeUInt16(int val) {
+        mDataBuffer[0] = (byte) ((byte) val&0xFF);
+        mDataBuffer[1] = (byte) ((byte) (val>>8)&0xFF);
+        write(mDataBuffer, 0, 2);
+    }
     @Override
-    public void writeUInt64(ULong value) {write(value.getBytes());}
+    public void writeUInt32(long val) {
+        mDataBuffer[0] = (byte) ((byte) val&0xFF);
+        mDataBuffer[1] = (byte) ((byte) (val>>8)&0xFF);
+        mDataBuffer[2] = (byte) ((byte) (val>>16)&0xFF);
+        mDataBuffer[3] = (byte) ((byte) (val>>24)&0xFF);
+        write(mDataBuffer, 0, 4);
+    }
+    @Override
+    public void writeUInt64(ULong value) {
+        write(value.getBytes());
+    }
     @Override
     public void writeUTFString(String string) throws UnsupportedEncodingException {
         byte [] data = string.getBytes(sUTFCharset);
-        int count = data.length;
-        writeUInt16(count);
+        writeUInt16(data.length);
         write(data);
     }    
-    protected void writeInteger(int bytes, long value) {
-        for (int i=0; i<bytes; i++) {
-            mDataBuffer[i] = (byte) (value & 0xFF);
-            value >>= 8;
-        }
-        write(mDataBuffer, 0, bytes);
-    }
 }
