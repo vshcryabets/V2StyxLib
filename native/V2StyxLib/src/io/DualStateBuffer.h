@@ -7,7 +7,7 @@
 
 #ifndef DUALSTATEBUFFER_H_
 #define DUALSTATEBUFFER_H_
-#include "types.h"
+#include "../types.h"
 #include "StyxBufferOperations.h"
 
 class DualStateBuffer : public StyxBufferOperations {

@@ -9,8 +9,8 @@
 #define CLIENTBALANCER_H_
 #include <vector>
 #include "ClientsHandler.h"
-#include "IVirtualStyxDirectory.h"
-#include "types.h"
+#include "../vfs/IVirtualStyxDirectory.h"
+#include "../types.h"
 using namespace std;
 
 class ClientBalancer {

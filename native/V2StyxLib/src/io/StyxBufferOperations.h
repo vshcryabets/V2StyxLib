@@ -8,7 +8,7 @@
 #ifndef STYXBUFFEROPERATIONS_H_
 #define STYXBUFFEROPERATIONS_H_
 #include <string>
-#include "types.h"
+#include "../types.h"
 
 class StyxBufferOperations {
 protected:

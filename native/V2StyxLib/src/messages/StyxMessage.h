@@ -7,8 +7,8 @@
 
 #ifndef STYXMESSAGE_H_
 #define STYXMESSAGE_H_
-#include "types.h"
-#include "StyxBufferOperations.h"
+#include "../types.h"
+#include "../io/StyxBufferOperations.h"
 
 class StyxMessage {
 private:

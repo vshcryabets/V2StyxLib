@@ -7,9 +7,9 @@
 
 #include "ClientState.h"
 #include "stdio.h"
-#include "StyxMessage.h"
-#include "StyxRVersionMessage.h"
-#include "StyxErrorMessageException.h"
+#include "../messages/StyxMessage.h"
+#include "../messages/StyxRVersionMessage.h"
+#include "../StyxErrorMessageException.h"
 
 ClientState::ClientState(size_t iounit,
 		Socket channel,

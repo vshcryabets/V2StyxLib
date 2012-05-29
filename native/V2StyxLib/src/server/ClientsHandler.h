@@ -7,10 +7,10 @@
 
 #ifndef CLIENTSHANDLER_H_
 #define CLIENTSHANDLER_H_
-#include "IVirtualStyxDirectory.h"
+#include "../vfs/IVirtualStyxDirectory.h"
 #include <vector>
 #include <map>
-#include "types.h"
+#include "../types.h"
 #include "ClientState.h"
 #include <string>
 

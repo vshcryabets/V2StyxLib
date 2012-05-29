@@ -7,13 +7,13 @@
 
 #ifndef CLIENTSTATE_H_
 #define CLIENTSTATE_H_
-#include "types.h"
+#include "../types.h"
 #include <string>
-#include "classes.h"
+#include "../classes.h"
 #include <map>
-#include "DualStateBuffer.h"
-#include "StyxMessage.h"
-#include "StyxByteBuffer.h"
+#include "../io/DualStateBuffer.h"
+#include "../messages/StyxMessage.h"
+#include "../io/StyxByteBuffer.h"
 
 class ClientState {
 private:

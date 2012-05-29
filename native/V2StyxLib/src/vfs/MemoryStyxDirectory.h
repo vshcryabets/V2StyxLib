@@ -8,10 +8,10 @@
 #ifndef MEMORYSTYXDIRECTORY_H_
 #define MEMORYSTYXDIRECTORY_H_
 #include <string>
-#include "StyxQID.h"
-#include "StyxStat.h"
-#include "types.h"
-#include "IVirtualStyxDirectory.h"
+#include "../structs/StyxQID.h"
+#include "../structs/StyxStat.h"
+#include "../types.h"
+#include "../vfs/IVirtualStyxDirectory.h"
 using namespace std;
 
 class MemoryStyxDirectory : public IVirtualStyxDirectory

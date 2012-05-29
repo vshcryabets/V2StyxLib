@@ -10,7 +10,7 @@ OBJS=$(SRCS:.cpp=.o)
 .cpp.o:
 	$(CC) $(CFLAGS) -c $<
 
-all: $(OBJS)	
+all: $(OBJS)
 	$(CC) $(CFLAGS) $(OBJS) -o test
 	
 clean:

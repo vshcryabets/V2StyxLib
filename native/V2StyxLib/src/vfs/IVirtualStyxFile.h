@@ -7,8 +7,8 @@
 #ifndef IVirtualStyxFile_H_
 #define IVirtualStyxFile_H_
 #include <string>
-#include "classes.h"
-#include "types.h"
+#include "../classes.h"
+#include "../types.h"
 using namespace std;
 
 class IVirtualStyxFile
