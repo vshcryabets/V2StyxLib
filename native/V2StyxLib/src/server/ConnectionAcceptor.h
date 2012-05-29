@@ -7,8 +7,8 @@
 
 #ifndef CONNECTIONACCEPTOR_H_
 #define CONNECTIONACCEPTOR_H_
-#include "types.h"
-#include "classes.h"
+#include "../types.h"
+#include "../classes.h"
 
 class ConnectionAcceptor {
 private:

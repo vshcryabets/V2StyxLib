@@ -11,21 +11,21 @@
 #include <string>
 #include "../classes.h"
 #include <map>
-#include "../io/DualStateBuffer.h"
 #include "../messages/StyxMessage.h"
-#include "../io/StyxByteBuffer.h"
+#include "../io/StyxByteBufferReadable.h"
+#include "../io/StyxByteBufferWritable.h"
 
 class ClientState {
 private:
 	std::string mUserName;
 	std::string *mProtocol;
-	DualStateBuffer *mBuffer;
+	StyxByteBufferReadable *mBuffer;
+	StyxByteBufferWritable *mOutputBuffer;
 	size_t mIOUnit;
 	Socket mChannel;
 	IVirtualStyxDirectory *mServerRoot;
 	IVirtualStyxDirectory *mClientRoot;
 	std::map<unsigned int32_t,IVirtualStyxFile*> *mAssignedFiles;
-	StyxByteBuffer* mOutputBuffer;
 
 	bool process();
 	/**

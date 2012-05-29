@@ -8,7 +8,7 @@
 #ifndef STYXTVERSIONMESSAGE_H_
 #define STYXTVERSIONMESSAGE_H_
 #include <string>
-#include "types.h"
+#include "../types.h"
 #include "StyxMessage.h"
 
 class StyxTVersionMessage : public StyxMessage {
@@ -18,7 +18,7 @@ private:
 public:
 	StyxTVersionMessage(uint32_t maxPacketSize, std::string protocolVersion);
 	~StyxTVersionMessage();
-	void load(StyxBufferOperations*);
+	virtual void load(IStyxDataReader*);
 };
 
 #endif /* STYXTVERSIONMESSAGE_H_ */

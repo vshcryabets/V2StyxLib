@@ -17,14 +17,14 @@ ClientState::ClientState(size_t iounit,
 		std::string *protocol) : mIOUnit(iounit),
 		mChannel(channel), mServerRoot(root),
 		mProtocol(protocol) {
-	mBuffer = new DualStateBuffer(mIOUnit*2);
+	mBuffer = new StyxByteBufferReadable(mIOUnit*2);
 	mAssignedFiles = new std::map<unsigned int32_t,IVirtualStyxFile*>();
-	mOutputBuffer = new StyxByteBuffer(iounit);
+	mOutputBuffer = new StyxByteBufferWritable(iounit);
 }
 
 ClientState::~ClientState() {
-	delete [] mOutputBuffer;
-	delete [] mBuffer;
+	delete mOutputBuffer;
+	delete mBuffer;
 	delete mAssignedFiles;
 }
 

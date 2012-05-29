@@ -6,7 +6,6 @@
  */
 
 #include "StyxTVersionMessage.h"
-#include "types.h"
 
 StyxTVersionMessage::StyxTVersionMessage(uint32_t maxPacketSize, std::string protocolVersion):
 	StyxMessage( Tversion, StyxMessage::NOTAG ) {
@@ -19,8 +18,8 @@ StyxTVersionMessage::~StyxTVersionMessage() {
 	// TODO Auto-generated destructor stub
 }
 
-void StyxTVersionMessage::load(StyxBufferOperations* input) {
+void StyxTVersionMessage::load(IStyxDataReader* input) {
 	mMaxPacketSize = input->readUInt32();
-	mProtocolVersion = input->readUTF();
+	mProtocolVersion = input->readUTFString();
 }
 

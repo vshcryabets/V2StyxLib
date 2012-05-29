@@ -7,6 +7,7 @@
 
 #include "StyxMessage.h"
 #include "StyxTVersionMessage.h"
+#include "../io/IStyxDataReader.h"
 
 StyxMessage::StyxMessage(MessageTypeEnum type, uint16_t tag) :
 mType(type), mTag(tag) {
@@ -23,7 +24,7 @@ StyxMessage::~StyxMessage() {
  * @return constructed Message object
  * @throws IOException
  */
-StyxMessage* StyxMessage::factory(StyxBufferOperations* buffer, size_t io_unit) {
+StyxMessage* StyxMessage::factory(IStyxDataReader* buffer, size_t io_unit) {
 	// get common packet data
 	size_t packet_size = buffer->readUInt32();
 	if ( packet_size > io_unit ) throw "Packet size to large";
@@ -132,12 +133,12 @@ uint16_t StyxMessage::getTag() {
 	return mTag;
 }
 
-size_t StyxMessage::writeToBuffer(StyxBufferOperations *outputBuffer, size_t ioUnit) {
+size_t StyxMessage::writeToBuffer(IStyxDataWriter *output, size_t ioUnit) {
 	size_t packetSize = getBinarySize();
-	//	output.limit(packetSize);
-	//	output.writeUInt(packetSize);
-	//	output.writeUByte((short) getType().getByte());
-	//	output.writeUShort(getTag());
+	output->limit(packetSize);
+	output->writeUInt32(packetSize);
+	output->writeUInt8(mType);
+	output->writeUInt16(getTag());
 }
 
 size_t StyxMessage::getBinarySize()	{

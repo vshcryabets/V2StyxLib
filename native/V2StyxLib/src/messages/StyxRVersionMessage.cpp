@@ -17,7 +17,7 @@ StyxRVersionMessage::~StyxRVersionMessage() {
 	// TODO Auto-generated destructor stub
 }
 
-void StyxRVersionMessage::load(StyxBufferOperations *buffer) {
+void StyxRVersionMessage::load(IStyxDataReader *buffer) {
     mIOUnit  = buffer->readUInt32();
-    mProtocol = &(buffer->readUTF()); // TODO this is wrong, memory leak
+    mProtocol = &(buffer->readUTFString()); // TODO this is wrong, memory leak
 }

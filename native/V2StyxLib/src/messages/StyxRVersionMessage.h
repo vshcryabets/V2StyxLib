@@ -20,7 +20,7 @@ public:
 	// =======================================================
 	// Virtual methods
 	// =======================================================
-	void load(StyxBufferOperations *buffer);
+	virtual void load(IStyxDataReader *buffer);
 };
 
 #endif /* STYXRVERSIONMESSAGE_H_ */

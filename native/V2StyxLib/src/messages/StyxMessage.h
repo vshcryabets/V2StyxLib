@@ -8,7 +8,8 @@
 #ifndef STYXMESSAGE_H_
 #define STYXMESSAGE_H_
 #include "../types.h"
-#include "../io/StyxBufferOperations.h"
+#include "../io/IStyxDataReader.h"
+#include "../io/IStyxDataWriter.h"
 
 class StyxMessage {
 private:
@@ -19,7 +20,7 @@ public:
 	static const int NOTAG = 0xFFFF;
 	static const size_t BASE_BINARY_SIZE = 7;
 
-	static StyxMessage* factory(StyxBufferOperations *buffer, size_t iounit);
+	static StyxMessage* factory(IStyxDataReader *buffer, size_t iounit);
 	StyxMessage(MessageTypeEnum type, uint16_t tag);
 	virtual ~StyxMessage();
 	// =======================================================
@@ -35,8 +36,8 @@ public:
 	// =======================================================
 	// Virtual methods
 	// =======================================================
-	virtual void load(StyxBufferOperations *buffer) = 0;
-	virtual size_t writeToBuffer(StyxBufferOperations *outputBuffer, size_t ioUnit);
+	virtual void load(IStyxDataReader *buffer) = 0;
+	virtual size_t writeToBuffer(IStyxDataWriter *outputBuffer, size_t ioUnit);
 };
 
 #endif /* STYXMESSAGE_H_ */
