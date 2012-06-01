@@ -28,7 +28,6 @@ public:
 	// =======================================================
 	MessageTypeEnum getType();
 	uint16_t getTag();
-	size_t getBinarySize();
 	// =======================================================
 	// Setters
 	// =======================================================
@@ -37,7 +36,8 @@ public:
 	// Virtual methods
 	// =======================================================
 	virtual void load(IStyxDataReader *buffer) = 0;
-	virtual size_t writeToBuffer(IStyxDataWriter *outputBuffer, size_t ioUnit);
+	virtual size_t writeToBuffer(IStyxDataWriter *outputBuffer);
+	virtual size_t getBinarySize();
 };
 
 #endif /* STYXMESSAGE_H_ */

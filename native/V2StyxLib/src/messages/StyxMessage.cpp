@@ -133,7 +133,7 @@ uint16_t StyxMessage::getTag() {
 	return mTag;
 }
 
-size_t StyxMessage::writeToBuffer(IStyxDataWriter *output, size_t ioUnit) {
+size_t StyxMessage::writeToBuffer(IStyxDataWriter *output) {
 	size_t packetSize = getBinarySize();
 	output->limit(packetSize);
 	output->writeUInt32(packetSize);

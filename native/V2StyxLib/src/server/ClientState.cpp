@@ -38,7 +38,7 @@ bool ClientState::process() {
 		ssize_t packetSize = mBuffer->getUInt32();
 		if ( inBuffer >= packetSize ) {
 			StyxMessage *message = StyxMessage::factory(mBuffer, mIOUnit);
-			//			processMessage(message);
+			processMessage(message);
 			return true;
 		}
 	}
@@ -58,7 +58,7 @@ void ClientState::processMessage(StyxMessage *msg) {
 		case Tversion:
 			answer = new StyxRVersionMessage(mIOUnit, mProtocol);
 			break;
-/*		case Tattach:
+			/*		case Tattach:
 			answer = processAttach((StyxTAttachMessage)msg);
 			break;
 		case Tauth:
@@ -103,7 +103,7 @@ void ClientState::processMessage(StyxMessage *msg) {
 			answer = processWStat((StyxTWStatMessage)msg);*/
 		default:
 			printf("Got unknown message:");
-//			System.out.println(msg.toString());
+			//			System.out.println(msg.toString());
 			break;
 		}
 	} catch (StyxErrorMessageException *e) {
@@ -116,8 +116,8 @@ void ClientState::processMessage(StyxMessage *msg) {
 }
 
 void ClientState::sendMessage(StyxMessage *answer) {
-    int writed = answer->writeToBuffer(mOutputBuffer, mIOUnit);
-    write(mChannel, mOutputBuffer, writed);
+	int writed = answer->writeToBuffer(mOutputBuffer);
+	::write(mChannel, mOutputBuffer->getBuffer(), writed);
 }
 
 bool ClientState::readSocket() {

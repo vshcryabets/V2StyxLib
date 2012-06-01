@@ -33,3 +33,7 @@ void StyxByteBufferWritable::clear() {
 void StyxByteBufferWritable::limit(size_t limit) {
 	mLimit = limit;
 }
+
+uint8_t* StyxByteBufferWritable::getBuffer() {
+	return mBuffer;
+}

@@ -17,6 +17,7 @@ private:
 public:
 	StyxByteBufferWritable(int capacity);
 	~StyxByteBufferWritable();
+	uint8_t* getBuffer();
 	// ==================================================
 	// IStyxDataWriter methods
 	// ==================================================
