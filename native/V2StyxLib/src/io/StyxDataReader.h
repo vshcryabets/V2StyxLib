@@ -24,7 +24,6 @@ public:
 	virtual uint16_t readUInt16();
 	virtual uint32_t readUInt32();
 	virtual uint64_t readUInt64();
-	virtual uint32_t getUInt32();
 };
 
 #endif /* STYXDATAREADER_H_ */

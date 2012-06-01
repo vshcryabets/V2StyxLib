@@ -20,7 +20,7 @@ public:
 	// ==================================================
 	// IStyxDataWriter methods
 	// ==================================================
-	virtual size_t write(uint8_t* data, size_t offset, size_t count);
+	virtual size_t write(const uint8_t* data, size_t offset, size_t count);
 	virtual void clear();
 	virtual void limit(size_t limit);
 };

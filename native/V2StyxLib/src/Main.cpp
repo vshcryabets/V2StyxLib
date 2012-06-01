@@ -6,7 +6,7 @@
  */
 #include <string>
 #include "StyxServerManager.h"
-#include "MemoryStyxDirectory.h"
+#include "vfs/MemoryStyxDirectory.h"
 using namespace std;
 
 int main(int argc, char **argv) {

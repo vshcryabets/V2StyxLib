@@ -36,6 +36,7 @@ public:
 	 * @param length
 	 */
 	virtual size_t read(uint8_t *out, size_t i, size_t length);
+	virtual uint32_t getUInt32();
 };
 
 #endif /* DUALSTATEBUFFER_H_ */

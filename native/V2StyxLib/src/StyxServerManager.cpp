@@ -13,14 +13,14 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <stdio.h>
-#include "ClientBalancer.h"
-#include "ConnectionAcceptor.h"
+#include "server/ClientBalancer.h"
+#include "server/ConnectionAcceptor.h"
 
 
 StyxServerManager::StyxServerManager(string address,
 		int port,
 		IVirtualStyxDirectory *root, std::string *protocol)
-	:mPort(port), mRoot(root), mIOBufSize(8192) {
+	:mPort(port),  mIOBufSize(8192), mRoot(root) {
 	// create socket
 	mSocket = socket(AF_INET, SOCK_STREAM, 0);
 	if ( mSocket == -1 ) {

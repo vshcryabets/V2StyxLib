@@ -8,16 +8,15 @@
 #include "StyxDataReader.h"
 
 StyxDataReader::StyxDataReader() {
-	mDataBuffer = new uint8_t[sDataBufferSize];
 }
 
 StyxDataReader::~StyxDataReader() {
-	delete [] mDataBuffer;
 }
 
 uint64_t StyxDataReader::readInteger(size_t bytes) {
 	uint64_t result = 0L;
 	int shift = 0;
+	uint8_t mDataBuffer[bytes];
 	read(mDataBuffer, 0, bytes);
 	for (int i=0; i<bytes; i++) {
 		long b = (mDataBuffer[i]&0xFF);
@@ -31,8 +30,8 @@ uint64_t StyxDataReader::readInteger(size_t bytes) {
 
 std::string StyxDataReader::readUTFString() {
 	size_t count = readUInt16();
-	unsigned char* bytes = new char[count];
-	read(bytes, 0, count);
+	char* bytes = new char[count];
+	read((uint8_t*)bytes, 0, count);
 	std::string result(bytes, count);
 	delete [] bytes;
 	return result;
@@ -54,6 +53,3 @@ uint64_t StyxDataReader::readUInt64() {
 	return readInteger(8);
 }
 
-uint32_t StyxDataReader::getUInt32() {
-	return getInteger(4) & 0xFFFFFFFFL;
-}

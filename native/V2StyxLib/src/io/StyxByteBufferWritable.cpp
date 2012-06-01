@@ -6,6 +6,7 @@
  */
 
 #include "StyxByteBufferWritable.h"
+#include "string.h"
 
 StyxByteBufferWritable::StyxByteBufferWritable(int capacity) {
 	mCapacity = capacity;
@@ -19,7 +20,7 @@ StyxByteBufferWritable::~StyxByteBufferWritable() {
 // ==================================================
 // IStyxDataWriter methods
 // ==================================================
-size_t StyxByteBufferWritable::write(uint8_t* data, size_t offset, size_t count) {
+size_t StyxByteBufferWritable::write(const uint8_t* data, size_t offset, size_t count) {
 	// TODO check buffer boundaries
 	memcpy(mBuffer+mPosition, data+offset, count);
 	mPosition+=count;
