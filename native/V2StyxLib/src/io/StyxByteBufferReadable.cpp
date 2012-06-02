@@ -72,24 +72,6 @@ size_t StyxByteBufferReadable::read(uint8_t *out, size_t i, size_t length) {
 	return res;
 }
 
-//uint64_t getInteger(int bytes) {
-//	// TODO this method will work wrong at the buffer end
-//	if ( bytes > sizeof(uint64_t) ) throw "Too much bytes to read";
-//	long result = 0L;
-//	int shift = 0;
-//	int readed = get(mDataBuffer, 0, bytes);
-//	if ( readed != bytes ) throw new ArrayIndexOutOfBoundsException("Can't read bytes");
-//	for (int i=0; i<bytes; i++) {
-//		long b = (mDataBuffer[i]&0xFF);
-//		if (shift > 0)
-//			b <<= shift;
-//		shift += 8;
-//		result |= b;
-//	}
-//	return result;
-//}
-
-
 uint32_t StyxByteBufferReadable::getUInt32() {
 	uint32_t result = 0;
 	get((uint8_t*)&result, 0, 4);
