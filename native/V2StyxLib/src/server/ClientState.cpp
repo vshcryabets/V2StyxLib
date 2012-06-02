@@ -9,6 +9,7 @@
 #include "stdio.h"
 #include "../messages/StyxMessage.h"
 #include "../messages/StyxRVersionMessage.h"
+#include "../messages/StyxTAttachMessage.h"
 #include "../StyxErrorMessageException.h"
 
 ClientState::ClientState(size_t iounit,
@@ -58,10 +59,10 @@ void ClientState::processMessage(StyxMessage *msg) {
 		case Tversion:
 			answer = new StyxRVersionMessage(mIOUnit, mProtocol);
 			break;
-			/*		case Tattach:
-			answer = processAttach((StyxTAttachMessage)msg);
+		case Tattach:
+			answer = processAttach((StyxTAttachMessage*)msg);
 			break;
-		case Tauth:
+		/*case Tauth:
 			answer = processAuth((StyxTAuthMessage)msg);
 			break;
 		case Tstat:

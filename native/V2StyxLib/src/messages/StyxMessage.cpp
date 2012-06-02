@@ -7,6 +7,7 @@
 
 #include "StyxMessage.h"
 #include "StyxTVersionMessage.h"
+#include "StyxRVersionMessage.h"
 #include "../io/IStyxDataReader.h"
 
 StyxMessage::StyxMessage(MessageTypeEnum type, uint16_t tag) :
@@ -36,9 +37,9 @@ StyxMessage* StyxMessage::factory(IStyxDataReader* buffer, size_t io_unit) {
 	case Tversion:
 		result = new StyxTVersionMessage(0, "");
 		break;
-		//	case Rversion:
-		//		result = new StyxRVersionMessage(0, null);
-		//		break;
+	case Rversion:
+		result = new StyxRVersionMessage(0, null);
+		break;
 		//	case Tauth:
 		//		result = new StyxTAuthMessage(NOFID);
 		//		break;
