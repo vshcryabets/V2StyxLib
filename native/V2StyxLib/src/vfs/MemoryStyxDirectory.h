@@ -64,7 +64,7 @@ public:
 	 * @return number of bytes that was readed into the buffer
 	 */
 	long read(ClientState *client, int8_t* buffer, int128_t offset, long count);
-	//	IVirtualStyxFile walk(List<String> pathElements, List<StyxQID> qids) = 0;
+	virtual IVirtualStyxFile* walk(std::vector<std::string> *pathElements, std::vector<StyxQID> *qids);
 	/**
 	 * Write data to file
 	 * @param client

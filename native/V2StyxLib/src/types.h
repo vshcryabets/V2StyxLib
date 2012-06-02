@@ -54,5 +54,7 @@ enum QIDTypeEnum {
 
 typedef uint8_t MessageType;
 typedef uint8_t QIDType;
+typedef uint32_t StyxFID;
+typedef uint16_t StyxTAG;
 
 #endif /* TYPES_H_ */

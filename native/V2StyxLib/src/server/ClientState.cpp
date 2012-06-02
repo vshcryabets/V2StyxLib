@@ -12,15 +12,18 @@
 #include "../messages/StyxRAttachMessage.h"
 #include "../messages/StyxTAttachMessage.h"
 #include "../StyxErrorMessageException.h"
+#include <vector>
 
 ClientState::ClientState(size_t iounit,
 		Socket channel,
 		IVirtualStyxDirectory *root,
-		std::string *protocol) : mIOUnit(iounit),
-		mChannel(channel),
-		mProtocol(protocol), mServerRoot(root) {
+		std::string *protocol)  {
+	mIOUnit = iounit;
+	mChannel = channel;
+	mProtocol = protocol;
+	mServerRoot = root;
 	mBuffer = new StyxByteBufferReadable(mIOUnit*2);
-	mAssignedFiles = new std::map<uint32_t,IVirtualStyxFile*>();
+	mAssignedFiles = new std::map<StyxFID,IVirtualStyxFile*>();
 	mOutputBuffer = new StyxByteBufferWritable(iounit);
 }
 
@@ -55,7 +58,6 @@ bool ClientState::process() {
 void ClientState::processMessage(StyxMessage *msg) {
 	//        System.out.print("Got message "+msg.toString());
 	StyxMessage *answer = NULL;
-	long fid;
 	try {
 		switch (msg->getType()) {
 		case Tversion:
@@ -89,11 +91,11 @@ void ClientState::processMessage(StyxMessage *msg) {
 		case Tflush:
 			// TODO do something there
 			answer = new StyxRFlushMessage(msg.getTag());
-			break;
+			break;*/
 		case Twalk:
-			answer = processWalk((StyxTWalkMessage) msg);
+			answer = processWalk((StyxTWalkMessage*) msg);
 			break;
-		case Topen:
+			/*case Topen:
 			answer = processTopen((StyxTOpenMessage)msg);
 			break;
 		case Tread:
@@ -148,4 +150,35 @@ StyxRAttachMessage* ClientState::processAttach(StyxTAttachMessage *msg) {
 void ClientState::registerOpenedFile(uint32_t fid, IVirtualStyxFile* file) {
 	mAssignedFiles->insert(
 			std::pair<uint32_t, IVirtualStyxFile*>(fid, file));
+}
+/**
+ * Handle TWalk message from client
+ * @param msg
+ */
+StyxMessage* ClientState::processWalk(StyxTWalkMessage* msg) {
+	uint32_t fid = msg->getFID();
+	map<uint32_t,IVirtualStyxFile*>::iterator iterator = mAssignedFiles->find(fid);
+	if ( iterator == mAssignedFiles->end() ) {
+		return getNoFIDError(msg, fid);
+	}
+
+	IVirtualStyxFile *walkFile;
+	std::vector<std::string> *pathElementsArray = msg->getPathElements();
+	std::vector<StyxQID> *QIDList = new std::vector<StyxQID>();
+
+	if ( pathElementsArray->size() == 0 ) {
+		walkFile = iterator->second;
+	} else {
+		walkFile = iterator->second->walk(
+				pathElementsArray,
+				QIDList);
+	}
+
+	if ( walkFile != NULL ) {
+		mAssignedFiles->insert(
+				std::pair<uint32_t, IVirtualStyxFile*>(msg->getNewFID(), walkFile));
+		return new StyxRWalkMessage(msg->getTag(), QIDList);
+	} else {
+		return new StyxRErrorMessage(msg->getTag(), "file does not exist");
+	}
 }

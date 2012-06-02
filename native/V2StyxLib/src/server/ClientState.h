@@ -14,6 +14,8 @@
 #include "../messages/StyxMessage.h"
 #include "../messages/StyxTAttachMessage.h"
 #include "../messages/StyxRAttachMessage.h"
+#include "../messages/StyxTWalkMessage.h"
+#include "../messages/StyxRWalkMessage.h"
 #include "../io/StyxByteBufferReadable.h"
 #include "../io/StyxByteBufferWritable.h"
 #include "../vfs/IVirtualStyxDirectory.h"
@@ -28,7 +30,7 @@ private:
 	Socket mChannel;
 	IVirtualStyxDirectory *mServerRoot;
 	IVirtualStyxDirectory *mClientRoot;
-	std::map<uint32_t,IVirtualStyxFile*> *mAssignedFiles;
+	std::map<StyxFID,IVirtualStyxFile*> *mAssignedFiles;
 
 	bool process();
 	/**
@@ -45,7 +47,13 @@ private:
 	 * Process incoming Tattach message
 	 */
 	StyxRAttachMessage* processAttach(StyxTAttachMessage *msg);
+	/**
+	 * Handle TWalk message from client
+	 * @param msg
+	 */
+	StyxMessage* processWalk(StyxTWalkMessage* msg);
 	void registerOpenedFile(uint32_t fid, IVirtualStyxFile* file);
+	StyxMessage* getNoFIDError(StyxMessage* message, uint32_t fid);
 public:
 	ClientState(size_t iounit,
 			Socket channel,

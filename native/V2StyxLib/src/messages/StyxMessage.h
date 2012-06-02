@@ -13,26 +13,26 @@
 
 class StyxMessage {
 private:
-	uint16_t mTag;
+	StyxTAG mTag;
 	MessageTypeEnum mType;
 
 public:
-	static const uint16_t NOTAG = 0xFFFF;
-	static const uint32_t NOFID = 0xFFFFFFFFL;
+	static const StyxTAG NOTAG = 0xFFFF;
+	static const StyxFID NOFID = 0xFFFFFFFFL;
 	static const size_t BASE_BINARY_SIZE = 7;
 
 	static StyxMessage* factory(IStyxDataReader *buffer, size_t iounit);
-	StyxMessage(MessageTypeEnum type, uint16_t tag);
+	StyxMessage(MessageTypeEnum type, StyxTAG tag);
 	virtual ~StyxMessage();
 	// =======================================================
 	// Getters
 	// =======================================================
 	MessageTypeEnum getType();
-	uint16_t getTag();
+	StyxTAG getTag();
 	// =======================================================
 	// Setters
 	// =======================================================
-	void setTag(uint16_t tag);
+	void setTag(StyxTAG tag);
 	// =======================================================
 	// Virtual methods
 	// =======================================================

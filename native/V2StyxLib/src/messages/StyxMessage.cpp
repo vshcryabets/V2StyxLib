@@ -12,8 +12,9 @@
 #include "../io/IStyxDataReader.h"
 #include "stdio.h"
 
-StyxMessage::StyxMessage(MessageTypeEnum type, uint16_t tag) :
-mType(type), mTag(tag) {
+StyxMessage::StyxMessage(MessageTypeEnum type, StyxTAG tag) {
+	mType = type;
+	mTag = tag;
 }
 
 StyxMessage::~StyxMessage() {
@@ -146,6 +147,7 @@ size_t StyxMessage::writeToBuffer(IStyxDataWriter *output) {
 	output->writeUInt32(packetSize);
 	output->writeUInt8(mType);
 	output->writeUInt16(getTag());
+	return getBinarySize();
 }
 
 size_t StyxMessage::getBinarySize()	{

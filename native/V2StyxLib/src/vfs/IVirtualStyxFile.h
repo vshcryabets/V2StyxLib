@@ -9,6 +9,7 @@
 #include <string>
 #include "../classes.h"
 #include "../types.h"
+#include <vector>
 using namespace std;
 
 class IVirtualStyxFile
@@ -53,14 +54,13 @@ public:
 	 * @return number of bytes that was read into the buffer
 	 */
 	virtual long read(ClientState *client, int8_t* buffer, int128_t offset, long count) = 0;
-//	virtual IVirtualStyxFile walk(List<String> pathElements, List<StyxQID> qids) = 0;
+	virtual IVirtualStyxFile* walk(std::vector<std::string> *pathElements, std::vector<StyxQID> *qids) = 0;
 	/**
 	 * Write data to file
 	 * @param client
 	 * @param data
 	 * @param offset
 	 * @return
-	 * @throws StyxErrorMessageException
 	 */
 	virtual int write(ClientState *client, int8_t* data, int128_t offset) = 0;
 };

@@ -10,13 +10,21 @@
 #include "StyxMessage.h"
 #include <string>
 #include "StyxRErrorMessage.h"
+#include "../types.h"
 
 class StyxRErrorMessage : public StyxMessage {
 private:
-	std::string *mMessage;
+	char *mMessage;
 public:
-	StyxRErrorMessage(int tag, std::string *message);
+	StyxRErrorMessage(StyxTAG tag, std::string message);
+	StyxRErrorMessage(StyxTAG tag, const char *message);
 	virtual ~StyxRErrorMessage();
+	// =======================================================
+	// Virtual methods
+	// =======================================================
+	virtual void load(IStyxDataReader *buffer);
+	virtual size_t writeToBuffer(IStyxDataWriter* output);
+	virtual size_t getBinarySize();
 };
 
 #endif /* STYXRERRORMESSAGE_H_ */
