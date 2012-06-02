@@ -16,8 +16,8 @@ ClientState::ClientState(size_t iounit,
 		Socket channel,
 		IVirtualStyxDirectory *root,
 		std::string *protocol) : mIOUnit(iounit),
-		mChannel(channel), mServerRoot(root),
-		mProtocol(protocol) {
+		mChannel(channel),
+		mProtocol(protocol), mServerRoot(root) {
 	mBuffer = new StyxByteBufferReadable(mIOUnit*2);
 	mAssignedFiles = new std::map<unsigned int32_t,IVirtualStyxFile*>();
 	mOutputBuffer = new StyxByteBufferWritable(iounit);
@@ -62,7 +62,7 @@ void ClientState::processMessage(StyxMessage *msg) {
 		case Tattach:
 			answer = processAttach((StyxTAttachMessage*)msg);
 			break;
-		/*case Tauth:
+			/*case Tauth:
 			answer = processAuth((StyxTAuthMessage)msg);
 			break;
 		case Tstat:
@@ -133,3 +133,11 @@ bool ClientState::readSocket() {
 	return false;
 }
 
+StyxRAttachMessage* ClientState::processAttach(StyxTAttachMessage *msg) {
+	std::string mountPoint = msg.getMountPoint();
+	mClientRoot = mServerRoot.getDirectory(mountPoint);
+	mUserName = msg.getUserName();
+	StyxRAttachMessage answer = new StyxRAttachMessage(msg.getTag(), mClientRoot.getQID());
+	registerOpenedFile(((StyxTAttachMessage)msg).getFID(), mClientRoot );
+	return answer;
+}

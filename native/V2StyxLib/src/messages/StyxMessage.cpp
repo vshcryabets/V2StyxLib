@@ -8,6 +8,7 @@
 #include "StyxMessage.h"
 #include "StyxTVersionMessage.h"
 #include "StyxRVersionMessage.h"
+#include "StyxTAttachMessage.h"
 #include "../io/IStyxDataReader.h"
 #include "stdio.h"
 
@@ -47,9 +48,9 @@ StyxMessage* StyxMessage::factory(IStyxDataReader* buffer, size_t io_unit) {
 		//	case Tflush:
 		//		result = new StyxTFlushMessage(NOTAG);
 		//		break;
-		//	case Tattach:
-		//		result = new StyxTAttachMessage(NOFID, NOFID, null, null);
-		//		break;
+	case Tattach:
+		result = new StyxTAttachMessage(NOFID, NOFID, null, null);
+		break;
 		//	case Twalk:
 		//		result = new StyxTWalkMessage(NOFID, NOFID, "");
 		//		break;

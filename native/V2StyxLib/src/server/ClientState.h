@@ -12,6 +12,8 @@
 #include "../classes.h"
 #include <map>
 #include "../messages/StyxMessage.h"
+#include "../messages/StyxTAttachMessage.h"
+#include "../messages/StyxRAttachMessage.h"
 #include "../io/StyxByteBufferReadable.h"
 #include "../io/StyxByteBufferWritable.h"
 
@@ -38,6 +40,10 @@ private:
 	 * @param answer
 	 */
 	void sendMessage(StyxMessage *answer);
+	/**
+	 * Process incoming Tattach message
+	 */
+	StyxRAttachMessage* processAttach(StyxTAttachMessage *msg);
 public:
 	ClientState(size_t iounit,
 			Socket channel,

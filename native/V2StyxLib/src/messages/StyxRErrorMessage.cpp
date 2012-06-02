@@ -7,12 +7,12 @@
 
 #include "StyxRErrorMessage.h"
 
-StyxRErrorMessage::StyxRErrorMessage(int tag, std::string *message)
+StyxRAttachMessage::StyxRAttachMessage(int tag, std::string *message)
 	: StyxMessage( Rerror, tag) {
 	mMessage = message;
 }
 
-StyxRErrorMessage::~StyxRErrorMessage() {
+StyxRAttachMessage::~StyxRAttachMessage() {
 	// TODO Auto-generated destructor stub
 }
 
