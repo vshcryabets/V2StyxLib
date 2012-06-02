@@ -13,7 +13,7 @@ import com.v2soft.styxlib.library.messages.base.enums.MessageType;
 public class StyxTWalkMessage 
     extends StyxTMessage {
 	private long mFID, mNewFID;
-	private String mPath;
+	private String mPath; // TODO remove me
 	private String[] mPathElements;
 
 	public StyxTWalkMessage(long fid, long new_fid, String path){
@@ -26,8 +26,8 @@ public class StyxTWalkMessage
     @Override
     public void load(IStyxDataReader input) throws IOException  {
         String path = "";
-        setFID(input.readUInt32());
-        setNewFID(input.readUInt32());
+        mFID = input.readUInt32();
+        mNewFID = input.readUInt32();
         int count = input.readUInt16();
         for (int i=0; i<count; i++) {
             String stmp = input.readUTFString();
@@ -41,8 +41,8 @@ public class StyxTWalkMessage
     public void writeToBuffer(IStyxDataWriter output)
             throws UnsupportedEncodingException, IOException {
         super.writeToBuffer(output);
-        output.writeUInt32(getFID());
-        output.writeUInt32(getNewFID());
+        output.writeUInt32(mFID);
+        output.writeUInt32(mNewFID);
         if (mPathElements != null)
         {
             output.writeUInt16(mPathElements.length);
@@ -58,21 +58,10 @@ public class StyxTWalkMessage
 		return mFID;
 	}
 	
-	public void setFID(long fid)
-	{
-		mFID = fid;
-	}
-	
 	public long getNewFID()
 	{
 		return mNewFID;
 	}
-	
-	public void setNewFID(long new_fid)
-	{
-		mNewFID = new_fid;
-	}
-	
 	public String getPath()
 	{
 		if (mPath == null)

@@ -8,6 +8,7 @@
 #ifndef TYPES_H_
 #define TYPES_H_
 #include <stdint.h>
+#include <string>
 
 typedef int Socket;
 typedef int64_t Date;
@@ -56,5 +57,6 @@ typedef uint8_t MessageType;
 typedef uint8_t QIDType;
 typedef uint32_t StyxFID;
 typedef uint16_t StyxTAG;
+typedef std::string StyxString;
 
 #endif /* TYPES_H_ */

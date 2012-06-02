@@ -2,7 +2,7 @@
  * StyxTWalkMessage.h
  *
  *  Created on: Jun 2, 2012
- *      Author: mrco
+ *      Author: vschryabets@gmail.com
  */
 
 #ifndef STYXTWALKMESSAGE_H_
@@ -13,12 +13,16 @@
 #include <string>
 
 class StyxTWalkMessage: public StyxMessage {
+private:
+	StyxFID mFID, mNewFID;
+	StyxString mPath;
+	std::vector<StyxString*> *mPathElements;
 public:
-	StyxTWalkMessage(StyxFID fid, StyxFID new_fid, std::string path);
+	StyxTWalkMessage(StyxFID fid, StyxFID new_fid);
 	virtual ~StyxTWalkMessage();
 	uint32_t getFID();
 	uint32_t getNewFID();
-	std::vector<std::string>* getPathElements();
+	std::vector<StyxString*>* getPathElements();
 	// =======================================================
 	// Virtual methods
 	// =======================================================

@@ -56,6 +56,10 @@ bool ClientState::process() {
  * @param msg incomming message
  */
 void ClientState::processMessage(StyxMessage *msg) {
+	if ( msg == NULL ) {
+		printf("Got unknown message:\n");
+		return;
+	}
 	//        System.out.print("Got message "+msg.toString());
 	StyxMessage *answer = NULL;
 	try {
@@ -107,7 +111,7 @@ void ClientState::processMessage(StyxMessage *msg) {
 		case Twstat:
 			answer = processWStat((StyxTWStatMessage)msg);*/
 		default:
-			printf("Got unknown message:");
+			printf("Got unknown message:\n");
 			//			System.out.println(msg.toString());
 			break;
 		}
@@ -163,8 +167,8 @@ StyxMessage* ClientState::processWalk(StyxTWalkMessage* msg) {
 	}
 
 	IVirtualStyxFile *walkFile;
-	std::vector<std::string> *pathElementsArray = msg->getPathElements();
-	std::vector<StyxQID> *QIDList = new std::vector<StyxQID>();
+	std::vector<StyxString*> *pathElementsArray = msg->getPathElements();
+	std::vector<StyxQID*> *QIDList = new std::vector<StyxQID*>();
 
 	if ( pathElementsArray->size() == 0 ) {
 		walkFile = iterator->second;
@@ -179,6 +183,15 @@ StyxMessage* ClientState::processWalk(StyxTWalkMessage* msg) {
 				std::pair<uint32_t, IVirtualStyxFile*>(msg->getNewFID(), walkFile));
 		return new StyxRWalkMessage(msg->getTag(), QIDList);
 	} else {
-		return new StyxRErrorMessage(msg->getTag(), "file does not exist");
+		return new StyxRErrorMessage(msg->getTag(), "File does not exist");
 	}
+}
+/**
+ *
+ * @param tag message tag
+ * @param fid File ID
+ * @return new Rerror message
+ */
+StyxRErrorMessage* ClientState::getNoFIDError(StyxMessage *message, StyxFID fid) {
+	return new StyxRErrorMessage(message->getTag(),"Unknown FID (%d)"); // TODO add this , fid);
 }

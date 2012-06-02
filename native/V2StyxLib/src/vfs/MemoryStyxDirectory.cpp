@@ -11,6 +11,7 @@
 
 MemoryStyxDirectory::MemoryStyxDirectory(std::string name):mName(name) {
 	mQID = new StyxQID(QTDIR, 0, (uint64_t)this);
+	mOwner = new StyxString("nobody");
 }
 
 MemoryStyxDirectory::~MemoryStyxDirectory() {
@@ -44,8 +45,8 @@ int MemoryStyxDirectory::getMode() {
 /**
  * @return file name
  */
-string MemoryStyxDirectory::getName() {
-	return mName;
+StyxString* MemoryStyxDirectory::getName() {
+	return &mName;
 }
 Date MemoryStyxDirectory::getAccessTime() {
 	return 0;
@@ -53,18 +54,18 @@ Date MemoryStyxDirectory::getAccessTime() {
 Date MemoryStyxDirectory::getModificationTime() {
 	return 0;
 }
-int128_t MemoryStyxDirectory::getLength() {
+uint64_t MemoryStyxDirectory::getLength() {
 	return 0;
 }
 
-string MemoryStyxDirectory::getOwnerName() {
-	return "nobody";
+StyxString* MemoryStyxDirectory::getOwnerName() {
+	return mOwner;
 }
-string MemoryStyxDirectory::getGroupName() {
-	return "nobody";
+StyxString* MemoryStyxDirectory::getGroupName() {
+	return mOwner;
 }
-string MemoryStyxDirectory::getModificationUser() {
-	return "nobody";
+StyxString* MemoryStyxDirectory::getModificationUser() {
+	return mOwner;
 }
 /**
  * Open file
@@ -87,28 +88,23 @@ void MemoryStyxDirectory::close(ClientState *client) {
  * @param count number of bytes to read
  * @return number of bytes that was readed into the buffer
  */
-long MemoryStyxDirectory::read(ClientState *client, int8_t* buffer, int128_t offset, long count)
-{
+size_t MemoryStyxDirectory::read(ClientState *client, uint8_t* buffer, uint64_t offset, size_t count) {
 	return 0;
 }
-IVirtualStyxFile* MemoryStyxDirectory::walk(std::vector<std::string> *pathElements, std::vector<StyxQID> *qids) {
+IVirtualStyxFile* MemoryStyxDirectory::walk(std::vector<StyxString*> *pathElements, std::vector<StyxQID*> *qids) {
 	if ( pathElements->size() < 1 ) {
 		return this;
 	} else {
-		std::string filename = *(pathElements->begin());
-		for (IVirtualStyxFile file : mFiles) {
-			if ( file.getName().equals(filename)) {
-				pathElements.remove(0);
-				qids.add(file.getQID());
-				if ( file instanceof IVirtualStyxDirectory ) {
-					return ((IVirtualStyxDirectory)file).walk(pathElements, qids);
-				} else {
-					return file;
-				}
+		StyxString* filename = *(pathElements->begin());
+		for ( vector<IVirtualStyxFile*>::iterator iterator = mFiles->begin(); iterator < mFiles->end(); iterator++ ) {
+			if ( (*iterator)->getName()->compare(*filename)) {
+				pathElements->erase(pathElements->begin());
+				qids->push_back((*iterator)->getQID());
+				return (*iterator)->walk(pathElements, qids);
 			}
 		}
 	}
-	return null;
+	return NULL;
 }
 /**
  * Write data to file
@@ -118,7 +114,7 @@ IVirtualStyxFile* MemoryStyxDirectory::walk(std::vector<std::string> *pathElemen
  * @return
  * @throws StyxErrorMessageException
  */
- int MemoryStyxDirectory::write(ClientState *client, int8_t* data, int128_t offset) {
-	 return 0;
- }
+int MemoryStyxDirectory::write(ClientState *client, uint8_t* data, uint64_t offset) {
+	return 0;
+}
 

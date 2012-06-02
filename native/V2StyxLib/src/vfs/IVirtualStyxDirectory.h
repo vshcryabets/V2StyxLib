@@ -14,8 +14,8 @@ using namespace std;
 class IVirtualStyxDirectory : virtual public IVirtualStyxFile
 {
 public:
-	virtual IVirtualStyxFile* getFile(string *path) = 0;
-	virtual IVirtualStyxDirectory* getDirectory(string *path) = 0;
+	virtual IVirtualStyxFile* getFile(StyxString *path) = 0;
+	virtual IVirtualStyxDirectory* getDirectory(StyxString *path) = 0;
 };
 
 

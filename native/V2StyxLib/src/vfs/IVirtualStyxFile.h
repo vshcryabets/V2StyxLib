@@ -29,13 +29,13 @@ public:
 	/**
 	 * @return file name
 	 */
-	virtual string getName() = 0;
+	virtual StyxString* getName() = 0;
 	virtual Date getAccessTime() = 0;
 	virtual Date getModificationTime() = 0;
-	virtual int128_t getLength() = 0;
-	virtual string getOwnerName() = 0;
-	virtual string getGroupName() = 0;
-	virtual string getModificationUser() = 0;
+	virtual uint64_t getLength() = 0;
+	virtual StyxString* getOwnerName() = 0;
+	virtual StyxString* getGroupName() = 0;
+	virtual StyxString* getModificationUser() = 0;
 	/**
 	 * Open file
 	 * @param mode
@@ -53,8 +53,8 @@ public:
 	 * @param count number of bytes to read
 	 * @return number of bytes that was read into the buffer
 	 */
-	virtual long read(ClientState *client, int8_t* buffer, int128_t offset, long count) = 0;
-	virtual IVirtualStyxFile* walk(std::vector<std::string> *pathElements, std::vector<StyxQID> *qids) = 0;
+	virtual size_t read(ClientState *client, uint8_t* buffer, uint64_t offset, size_t count) = 0;
+	virtual IVirtualStyxFile* walk(std::vector<StyxString*> *pathElements, std::vector<StyxQID*> *qids) = 0;
 	/**
 	 * Write data to file
 	 * @param client
@@ -62,6 +62,6 @@ public:
 	 * @param offset
 	 * @return
 	 */
-	virtual int write(ClientState *client, int8_t* data, int128_t offset) = 0;
+	virtual int write(ClientState *client, uint8_t* data, uint64_t offset) = 0;
 };
 #endif

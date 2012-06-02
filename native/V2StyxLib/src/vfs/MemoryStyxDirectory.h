@@ -2,7 +2,7 @@
  * MemoryStyxDirectory.h
  *
  *  Created on: May 20, 2012
- *      Author: mrco
+ *      Author: vshcryabets@gmail.com
  */
 
 #ifndef MEMORYSTYXDIRECTORY_H_
@@ -13,13 +13,16 @@
 #include "../types.h"
 #include "../vfs/IVirtualStyxDirectory.h"
 #include "../structs/StyxQID.h"
+#include <vector>
 using namespace std;
 
 class MemoryStyxDirectory : public IVirtualStyxDirectory
 {
 private:
-	std::string mName;
+	StyxString mName;
+	StyxString *mOwner;
 	StyxQID *mQID;
+	vector<IVirtualStyxFile*> *mFiles;
 public:
 	MemoryStyxDirectory(std::string name);
 	virtual ~MemoryStyxDirectory();
@@ -39,13 +42,13 @@ public:
 	/**
 	 * @return file name
 	 */
-	string getName();
+	StyxString* getName();
 	Date getAccessTime();
 	Date getModificationTime();
-	int128_t getLength();
-	string getOwnerName();
-	string getGroupName();
-	string getModificationUser();
+	uint64_t getLength();
+	StyxString* getOwnerName();
+	StyxString* getGroupName();
+	StyxString* getModificationUser();
 	/**
 	 * Open file
 	 * @param mode
@@ -63,8 +66,8 @@ public:
 	 * @param count number of bytes to read
 	 * @return number of bytes that was readed into the buffer
 	 */
-	long read(ClientState *client, int8_t* buffer, int128_t offset, long count);
-	virtual IVirtualStyxFile* walk(std::vector<std::string> *pathElements, std::vector<StyxQID> *qids);
+	size_t read(ClientState *client, uint8_t* buffer, uint64_t offset, size_t count);
+	virtual IVirtualStyxFile* walk(std::vector<StyxString*> *pathElements, std::vector<StyxQID*> *qids);
 	/**
 	 * Write data to file
 	 * @param client
@@ -73,12 +76,12 @@ public:
 	 * @return
 	 * @throws StyxErrorMessageException
 	 */
-	int write(ClientState *client, int8_t* data, int128_t offset);
+	int write(ClientState *client, uint8_t* data, uint64_t offset);
 	// ================================================================
 	// IVirualStyxDirectory
 	// ================================================================
-	IVirtualStyxFile* getFile(string *path);
-	IVirtualStyxDirectory* getDirectory(string *path);
+	IVirtualStyxFile* getFile(StyxString *path);
+	IVirtualStyxDirectory* getDirectory(StyxString *path);
 };
 
 #endif /* MEMORYSTYXDIRECTORY_H_ */

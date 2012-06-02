@@ -16,6 +16,7 @@
 #include "../messages/StyxRAttachMessage.h"
 #include "../messages/StyxTWalkMessage.h"
 #include "../messages/StyxRWalkMessage.h"
+#include "../messages/StyxRErrorMessage.h"
 #include "../io/StyxByteBufferReadable.h"
 #include "../io/StyxByteBufferWritable.h"
 #include "../vfs/IVirtualStyxDirectory.h"
@@ -53,7 +54,7 @@ private:
 	 */
 	StyxMessage* processWalk(StyxTWalkMessage* msg);
 	void registerOpenedFile(uint32_t fid, IVirtualStyxFile* file);
-	StyxMessage* getNoFIDError(StyxMessage* message, uint32_t fid);
+	StyxRErrorMessage* getNoFIDError(StyxMessage* message, StyxFID fid);
 public:
 	ClientState(size_t iounit,
 			Socket channel,

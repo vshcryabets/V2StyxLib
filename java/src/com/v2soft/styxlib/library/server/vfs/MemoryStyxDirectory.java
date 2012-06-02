@@ -24,92 +24,92 @@ import com.v2soft.styxlib.library.types.ULong;
  *
  */
 public class MemoryStyxDirectory 
-	implements IVirtualStyxDirectory {
+implements IVirtualStyxDirectory {
     private Map<ClientState, StyxByteBufferWriteable> mBuffersMap;
-	private List<IVirtualStyxFile> mFiles;
-	private String mName;
-	private StyxQID mQID;
-	
-	public MemoryStyxDirectory(String name) {
-	    if ( name == null ) throw new NullPointerException("Name is null");
-	    mQID = new StyxQID(QIDType.QTDIR, 0, new ULong(this.hashCode()));
-	    mName = name;
-	    mFiles = new LinkedList<IVirtualStyxFile>();
-	    mBuffersMap = new HashMap<ClientState, StyxByteBufferWriteable>();
+    private List<IVirtualStyxFile> mFiles;
+    private String mName;
+    private StyxQID mQID;
+
+    public MemoryStyxDirectory(String name) {
+        if ( name == null ) throw new NullPointerException("Name is null");
+        mQID = new StyxQID(QIDType.QTDIR, 0, new ULong(this.hashCode()));
+        mName = name;
+        mFiles = new LinkedList<IVirtualStyxFile>();
+        mBuffersMap = new HashMap<ClientState, StyxByteBufferWriteable>();
     }
-	
-	@Override
-	public StyxQID getQID() {
-		return mQID;
-	}
 
-	@Override
-	public IVirtualStyxFile getFile(String path) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public StyxQID getQID() {
+        return mQID;
+    }
 
-	@Override
-	public IVirtualStyxDirectory getDirectory(String path) {
-		if ( path.length() == 0 || path.equals("/")) return this;
-		return null;
-	}
+    @Override
+    public IVirtualStyxFile getFile(String path) {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	@Override
-	public StyxStat getStat() {
-		StyxStat result = new StyxStat((short)0, 
-				1, 
-				getQID(), 
-				getMode(),
-				getAccessTime(), 
-				getModificationTime(), 
-				getLength(), 
-				getName(), 
-				getOwnerName(), 
-				getGroupName(), 
-				getModificationUser());
-		return result;
-	}
+    @Override
+    public IVirtualStyxDirectory getDirectory(String path) {
+        if ( path.length() == 0 || path.equals("/")) return this;
+        return null;
+    }
 
-	@Override
-	public int getMode() {
-		return (int) (FileMode.Directory.getMode() | 0x01FF);
-	}
+    @Override
+    public StyxStat getStat() {
+        StyxStat result = new StyxStat((short)0, 
+                1, 
+                getQID(), 
+                getMode(),
+                getAccessTime(), 
+                getModificationTime(), 
+                getLength(), 
+                getName(), 
+                getOwnerName(), 
+                getGroupName(), 
+                getModificationUser());
+        return result;
+    }
 
-	@Override
-	public String getName() {
-		return mName;
-	}
+    @Override
+    public int getMode() {
+        return (int) (FileMode.Directory.getMode() | 0x01FF);
+    }
 
-	@Override
-	public Date getAccessTime() {
-		return new Date();
-	}
+    @Override
+    public String getName() {
+        return mName;
+    }
 
-	@Override
-	public Date getModificationTime() {
-		return new Date();
-	}
+    @Override
+    public Date getAccessTime() {
+        return new Date();
+    }
 
-	@Override
-	public ULong getLength() {
-		return new ULong(0);
-	}
+    @Override
+    public Date getModificationTime() {
+        return new Date();
+    }
 
-	@Override
-	public String getOwnerName() {
-		return "nobody";
-	}
+    @Override
+    public ULong getLength() {
+        return new ULong(0);
+    }
 
-	@Override
-	public String getGroupName() {
-		return "nobody";
-	}
+    @Override
+    public String getOwnerName() {
+        return "nobody";
+    }
 
-	@Override
-	public String getModificationUser() {
-		return "nobody";
-	}
+    @Override
+    public String getGroupName() {
+        return "nobody";
+    }
+
+    @Override
+    public String getModificationUser() {
+        return "nobody";
+    }
 
     @Override
     public IVirtualStyxFile walk(List<String> pathElements, List<StyxQID> qids) {
@@ -121,11 +121,7 @@ public class MemoryStyxDirectory
                 if ( file.getName().equals(filename)) {
                     pathElements.remove(0);
                     qids.add(file.getQID());
-                    if ( file instanceof IVirtualStyxDirectory ) {
-                        return ((IVirtualStyxDirectory)file).walk(pathElements, qids);
-                    } else {
-                        return file;
-                    }
+                    return file.walk(pathElements, qids);
                 }
             }
         }

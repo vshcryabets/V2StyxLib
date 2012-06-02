@@ -2,7 +2,7 @@
  * StyxRErrorMessage.h
  *
  *  Created on: May 27, 2012
- *      Author: mrco
+ *      Author: vschryabets@gmail.com
  */
 
 #ifndef STYXRERRORMESSAGE_H_
@@ -14,10 +14,11 @@
 
 class StyxRErrorMessage : public StyxMessage {
 private:
-	char *mMessage;
+	StyxString *mMessage;
 public:
 	StyxRErrorMessage(StyxTAG tag, std::string message);
 	StyxRErrorMessage(StyxTAG tag, const char *message);
+//	StyxRErrorMessage(StyxTAG tag, const char *fmt, ...);
 	virtual ~StyxRErrorMessage();
 	// =======================================================
 	// Virtual methods

@@ -2,7 +2,7 @@
  * StyxRWalkMessage.h
  *
  *  Created on: Jun 2, 2012
- *      Author: mrco
+ *      Author: vschryabets@gmail.com
  */
 
 #ifndef STYXRWALKMESSAGE_H_
@@ -12,8 +12,10 @@
 #include <vector>
 
 class StyxRWalkMessage: public StyxMessage {
+private:
+	std::vector<StyxQID*> *mQIDList;
 public:
-	StyxRWalkMessage(StyxTAG tag, std::vector<StyxQID> *QIDList);
+	StyxRWalkMessage(StyxTAG tag, std::vector<StyxQID*> *QIDList);
 	virtual ~StyxRWalkMessage();
 	// =======================================================
 	// Virtual methods

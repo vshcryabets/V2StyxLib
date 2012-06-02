@@ -2,24 +2,36 @@
  * StyxRErrorMessage.cpp
  *
  *  Created on: May 27, 2012
- *      Author: mrco
+ *      Author: vschryabets@gmail.com
  */
 
 #include "StyxRErrorMessage.h"
 #include "string.h"
 
-StyxRErrorMessage::StyxRErrorMessage(StyxTAG tag, std::string message)
+StyxRErrorMessage::StyxRErrorMessage(StyxTAG tag, StyxString message)
 	: StyxMessage( Rerror, tag) {
-	StyxRErrorMessage(tag, message.c_str());
+	mMessage = new StyxString(message);
 }
 StyxRErrorMessage::StyxRErrorMessage(StyxTAG tag, const char *message)
 	: StyxMessage( Rerror, tag) {
-	size_t size = strlen(message);
-	mMessage = new char[size+1];
-	strncpy(mMessage, message, size);
+	mMessage = new StyxString(message);
 }
 
 StyxRErrorMessage::~StyxRErrorMessage() {
-	delete [] mMessage;
+	delete mMessage;
 }
-
+// =======================================================
+// Virtual methods
+// =======================================================
+void StyxRErrorMessage::load(IStyxDataReader *buffer) {
+	mMessage = new StyxString(buffer->readUTFString());
+}
+size_t StyxRErrorMessage::writeToBuffer(IStyxDataWriter* output) {
+	StyxMessage::writeToBuffer(output);
+	output->writeUTFString(mMessage);
+	return getBinarySize();
+}
+size_t StyxRErrorMessage::getBinarySize() {
+	return StyxMessage::getBinarySize()
+		+ mMessage->size()+2;
+}
