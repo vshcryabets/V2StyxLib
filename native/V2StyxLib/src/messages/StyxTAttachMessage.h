@@ -18,6 +18,9 @@ private:
 public:
 	StyxTAttachMessage(uint32_t fid, uint32_t afid, std::string *username, std::string *mountpoint);
 	virtual ~StyxTAttachMessage();
+	std::string* getMountPoint();
+	std::string* getUserName();
+	uint32_t getFID();
 	// =======================================================
 	// Virtual methods
 	// =======================================================

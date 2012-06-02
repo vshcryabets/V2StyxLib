@@ -49,7 +49,7 @@ StyxMessage* StyxMessage::factory(IStyxDataReader* buffer, size_t io_unit) {
 		//		result = new StyxTFlushMessage(NOTAG);
 		//		break;
 	case Tattach:
-		result = new StyxTAttachMessage(NOFID, NOFID, null, null);
+		result = new StyxTAttachMessage(NOFID, NOFID, NULL, NULL);
 		break;
 		//	case Twalk:
 		//		result = new StyxTWalkMessage(NOFID, NOFID, "");
@@ -141,6 +141,7 @@ uint16_t StyxMessage::getTag() {
 
 size_t StyxMessage::writeToBuffer(IStyxDataWriter *output) {
 	size_t packetSize = getBinarySize();
+	output->clear();
 	output->limit(packetSize);
 	output->writeUInt32(packetSize);
 	output->writeUInt8(mType);

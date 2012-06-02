@@ -17,7 +17,8 @@ private:
 	MessageTypeEnum mType;
 
 public:
-	static const int NOTAG = 0xFFFF;
+	static const uint16_t NOTAG = 0xFFFF;
+	static const uint32_t NOFID = 0xFFFFFFFFL;
 	static const size_t BASE_BINARY_SIZE = 7;
 
 	static StyxMessage* factory(IStyxDataReader *buffer, size_t iounit);

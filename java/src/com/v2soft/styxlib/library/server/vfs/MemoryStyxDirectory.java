@@ -28,9 +28,11 @@ public class MemoryStyxDirectory
     private Map<ClientState, StyxByteBufferWriteable> mBuffersMap;
 	private List<IVirtualStyxFile> mFiles;
 	private String mName;
+	private StyxQID mQID;
 	
 	public MemoryStyxDirectory(String name) {
 	    if ( name == null ) throw new NullPointerException("Name is null");
+	    mQID = new StyxQID(QIDType.QTDIR, 0, new ULong(this.hashCode()));
 	    mName = name;
 	    mFiles = new LinkedList<IVirtualStyxFile>();
 	    mBuffersMap = new HashMap<ClientState, StyxByteBufferWriteable>();
@@ -38,7 +40,7 @@ public class MemoryStyxDirectory
 	
 	@Override
 	public StyxQID getQID() {
-		return new StyxQID(QIDType.QTDIR, 0, new ULong(this.hashCode()));
+		return mQID;
 	}
 
 	@Override

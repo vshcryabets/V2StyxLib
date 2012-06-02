@@ -193,7 +193,7 @@ implements Closeable {
         mClientRoot = mServerRoot.getDirectory(mountPoint);
         mUserName = msg.getUserName(); 
         StyxRAttachMessage answer = new StyxRAttachMessage(msg.getTag(), mClientRoot.getQID());
-        registerOpenedFile(((StyxTAttachMessage)msg).getFID(), mClientRoot );
+        registerOpenedFile(msg.getFID(), mClientRoot );
         return answer;
     }
 

@@ -9,6 +9,7 @@
 #include "stdio.h"
 #include "../messages/StyxMessage.h"
 #include "../messages/StyxRVersionMessage.h"
+#include "../messages/StyxRAttachMessage.h"
 #include "../messages/StyxTAttachMessage.h"
 #include "../StyxErrorMessageException.h"
 
@@ -19,7 +20,7 @@ ClientState::ClientState(size_t iounit,
 		mChannel(channel),
 		mProtocol(protocol), mServerRoot(root) {
 	mBuffer = new StyxByteBufferReadable(mIOUnit*2);
-	mAssignedFiles = new std::map<unsigned int32_t,IVirtualStyxFile*>();
+	mAssignedFiles = new std::map<uint32_t,IVirtualStyxFile*>();
 	mOutputBuffer = new StyxByteBufferWritable(iounit);
 }
 
@@ -40,6 +41,7 @@ bool ClientState::process() {
 		if ( inBuffer >= packetSize ) {
 			StyxMessage *message = StyxMessage::factory(mBuffer, mIOUnit);
 			processMessage(message);
+			delete message;
 			return true;
 		}
 	}
@@ -113,6 +115,7 @@ void ClientState::processMessage(StyxMessage *msg) {
 	}
 	if ( answer != NULL ) {
 		sendMessage(answer);
+		delete answer;
 	}
 }
 
@@ -134,10 +137,15 @@ bool ClientState::readSocket() {
 }
 
 StyxRAttachMessage* ClientState::processAttach(StyxTAttachMessage *msg) {
-	std::string mountPoint = msg.getMountPoint();
-	mClientRoot = mServerRoot.getDirectory(mountPoint);
-	mUserName = msg.getUserName();
-	StyxRAttachMessage answer = new StyxRAttachMessage(msg.getTag(), mClientRoot.getQID());
-	registerOpenedFile(((StyxTAttachMessage)msg).getFID(), mClientRoot );
+	std::string* mountPoint = msg->getMountPoint();
+	mClientRoot = mServerRoot->getDirectory(mountPoint);
+	mUserName = msg->getUserName();
+	StyxRAttachMessage *answer = new StyxRAttachMessage(msg->getTag(), mClientRoot->getQID());
+	registerOpenedFile(msg->getFID(), mClientRoot );
 	return answer;
+}
+
+void ClientState::registerOpenedFile(uint32_t fid, IVirtualStyxFile* file) {
+	mAssignedFiles->insert(
+			std::pair<uint32_t, IVirtualStyxFile*>(fid, file));
 }

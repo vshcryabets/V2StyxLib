@@ -42,6 +42,17 @@ enum MessageTypeEnum {
 	Twstat = 126,
 	Rwstat = 127
 };
+
+enum QIDTypeEnum {
+	QTDIR = 0x80,
+	QTAPPEND = 0x40,
+	QTEXCL = 0x20,
+	QTMOUNT = 0x10,
+	QTAUTH = 0x08,
+	QTFILE = 0x00
+};
+
 typedef uint8_t MessageType;
+typedef uint8_t QIDType;
 
 #endif /* TYPES_H_ */

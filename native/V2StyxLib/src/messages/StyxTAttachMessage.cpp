@@ -17,7 +17,23 @@ StyxTAttachMessage::StyxTAttachMessage(uint32_t fid, uint32_t afid,
 }
 
 StyxTAttachMessage::~StyxTAttachMessage() {
-	// TODO Auto-generated destructor stub
+	if ( mUserName != NULL ) {
+		delete mUserName;
+		mUserName = NULL;
+	}
+	if ( mMountPoint != NULL ) {
+		delete mMountPoint;
+		mMountPoint = NULL;
+	}
+}
+std::string* StyxTAttachMessage::getMountPoint() {
+	return mMountPoint;
+}
+std::string* StyxTAttachMessage::getUserName() {
+	return mUserName;
+}
+uint32_t StyxTAttachMessage::getFID() {
+	return mFID;
 }
 // =======================================================
 // Virtual methods
@@ -25,8 +41,8 @@ StyxTAttachMessage::~StyxTAttachMessage() {
 void StyxTAttachMessage::load(IStyxDataReader *input) {
 	mFID = input->readUInt32();
     mAuthFID = input->readUInt32();
-    mUserName = input->readUTFString();
-    mMountPoint = input->readUTFString();
+    mUserName = new std::string(input->readUTFString());
+    mMountPoint = new std::string(input->readUTFString());
 }
 size_t StyxTAttachMessage::writeToBuffer(IStyxDataWriter* output) {
 	StyxMessage::writeToBuffer(output);

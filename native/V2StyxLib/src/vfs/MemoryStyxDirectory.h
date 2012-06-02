@@ -12,12 +12,14 @@
 #include "../structs/StyxStat.h"
 #include "../types.h"
 #include "../vfs/IVirtualStyxDirectory.h"
+#include "../structs/StyxQID.h"
 using namespace std;
 
 class MemoryStyxDirectory : public IVirtualStyxDirectory
 {
 private:
 	std::string mName;
+	StyxQID *mQID;
 public:
 	MemoryStyxDirectory(std::string name);
 	virtual ~MemoryStyxDirectory();
@@ -75,8 +77,8 @@ public:
 	// ================================================================
 	// IVirualStyxDirectory
 	// ================================================================
-	IVirtualStyxFile* getFile(string path);
-	IVirtualStyxDirectory* getDirectory(string path);
+	IVirtualStyxFile* getFile(string *path);
+	IVirtualStyxDirectory* getDirectory(string *path);
 };
 
 #endif /* MEMORYSTYXDIRECTORY_H_ */

@@ -6,18 +6,22 @@
  */
 
 #include "MemoryStyxDirectory.h"
+#include "../types.h"
+#include "../structs/StyxQID.h"
 
 MemoryStyxDirectory::MemoryStyxDirectory(std::string name):mName(name) {
+	mQID = new StyxQID(QTDIR, 0, (uint64_t)this);
 }
 
 MemoryStyxDirectory::~MemoryStyxDirectory() {
-	// TODO Auto-generated destructor stub
+	delete mQID;
 }
 
-IVirtualStyxFile* MemoryStyxDirectory::getFile(string path) {
+IVirtualStyxFile* MemoryStyxDirectory::getFile(string *path) {
 	return NULL;
 }
-IVirtualStyxDirectory* MemoryStyxDirectory::getDirectory(string path) {
+IVirtualStyxDirectory* MemoryStyxDirectory::getDirectory(string *path) {
+	if ( path->length() == 0 || path->compare("/")) return this;
 	return NULL;
 }
 
@@ -25,7 +29,7 @@ IVirtualStyxDirectory* MemoryStyxDirectory::getDirectory(string path) {
  * @return unic ID of the file
  */
 StyxQID* MemoryStyxDirectory::getQID() {
-	return NULL;
+	return mQID;
 }
 
 StyxStat* MemoryStyxDirectory::getStat() {

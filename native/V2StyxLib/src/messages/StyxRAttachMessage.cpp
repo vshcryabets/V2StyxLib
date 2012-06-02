@@ -7,29 +7,25 @@
 
 #include "StyxRAttachMessage.h"
 
-StyxRVersionMessage::StyxRVersionMessage(int tag, StyxQID *qid)
-: StyxMessage( Rattach, StyxMessage::NOTAG ) {
-	mIOUnit = iounit;
-	mProtocol = protocol;
+StyxRAttachMessage::StyxRAttachMessage(int tag, StyxQID *qid)
+: StyxMessage( Rattach, tag ) {
+	mQID = qid;
 }
 
-StyxRVersionMessage::~StyxRVersionMessage() {
+StyxRAttachMessage::~StyxRAttachMessage() {
 	// TODO Auto-generated destructor stub
 }
 
-void StyxRVersionMessage::load(IStyxDataReader *buffer) {
-	mIOUnit  = buffer->readUInt32();
-	mProtocol = &(buffer->readUTFString()); // TODO this is wrong, memory leak
+void StyxRAttachMessage::load(IStyxDataReader *buffer) {
+	mQID = new StyxQID(buffer);
 }
 
-size_t StyxRVersionMessage::writeToBuffer(IStyxDataWriter* output) {
+size_t StyxRAttachMessage::writeToBuffer(IStyxDataWriter* output) {
 	StyxMessage::writeToBuffer(output);
-	output->writeUInt32(mIOUnit);
-	output->writeUTFString(mProtocol);
+	mQID->writeBinaryTo(output);
 	return getBinarySize();
 }
 
-size_t StyxRVersionMessage::getBinarySize() {
-	return StyxMessage::getBinarySize() + sizeof(uint32_t)
-			+ sizeof(uint16_t)+mProtocol->length();
+size_t StyxRAttachMessage::getBinarySize() {
+	return StyxMessage::getBinarySize() + StyxQID::CONTENT_SIZE;
 }

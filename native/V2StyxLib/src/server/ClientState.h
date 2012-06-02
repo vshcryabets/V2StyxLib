@@ -16,10 +16,11 @@
 #include "../messages/StyxRAttachMessage.h"
 #include "../io/StyxByteBufferReadable.h"
 #include "../io/StyxByteBufferWritable.h"
+#include "../vfs/IVirtualStyxDirectory.h"
 
 class ClientState {
 private:
-	std::string mUserName;
+	std::string *mUserName;
 	std::string *mProtocol;
 	StyxByteBufferReadable *mBuffer;
 	StyxByteBufferWritable *mOutputBuffer;
@@ -27,7 +28,7 @@ private:
 	Socket mChannel;
 	IVirtualStyxDirectory *mServerRoot;
 	IVirtualStyxDirectory *mClientRoot;
-	std::map<unsigned int32_t,IVirtualStyxFile*> *mAssignedFiles;
+	std::map<uint32_t,IVirtualStyxFile*> *mAssignedFiles;
 
 	bool process();
 	/**
@@ -44,6 +45,7 @@ private:
 	 * Process incoming Tattach message
 	 */
 	StyxRAttachMessage* processAttach(StyxTAttachMessage *msg);
+	void registerOpenedFile(uint32_t fid, IVirtualStyxFile* file);
 public:
 	ClientState(size_t iounit,
 			Socket channel,
