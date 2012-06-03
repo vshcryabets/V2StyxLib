@@ -138,10 +138,10 @@ implements Closeable {
                 answer = processWalk((StyxTWalkMessage) msg);
                 break;
             case Topen:
-                answer = processTopen((StyxTOpenMessage)msg);
+                answer = processOpen((StyxTOpenMessage)msg);
                 break;
             case Tread:
-                answer = processTread((StyxTReadMessage)msg);
+                answer = processRead((StyxTReadMessage)msg);
                 break;
             case Twrite:
                 answer = processWrite((StyxTWriteMessage)msg);
@@ -203,13 +203,16 @@ implements Closeable {
      * @return
      * @throws StyxErrorMessageException 
      */
-    private StyxMessage processTread(StyxTReadMessage msg) throws StyxErrorMessageException {
-        long fid = msg.getFID();
+    private StyxMessage processRead(StyxTReadMessage msg) throws StyxErrorMessageException {
+        if ( msg.getCount() > mIOUnit ) {
+            return new StyxRErrorMessage(msg.getTag(), "IOUnit overflow");
+        }
+        long fid = msg.getFID();        
         IVirtualStyxFile file = mAssignedFiles.get(fid);
         if ( file == null ) {
             return getNoFIDError(msg, fid);
         }
-        byte [] buffer = new byte[mIOUnit]; 
+        byte [] buffer = new byte[(int) msg.getCount()]; 
         long readed = file.read(this, buffer, msg.getOffset(), msg.getCount());
         return new StyxRReadMessage(msg.getTag(), buffer, (int) readed);
     }
@@ -221,7 +224,7 @@ implements Closeable {
      * @throws StyxErrorMessageException 
      * @throws IOException 
      */
-    private StyxMessage processTopen(StyxTOpenMessage msg) throws StyxErrorMessageException, IOException {
+    private StyxMessage processOpen(StyxTOpenMessage msg) throws StyxErrorMessageException, IOException {
         long fid = msg.getFID();
         IVirtualStyxFile file = mAssignedFiles.get(fid);
         if ( file == null ) {

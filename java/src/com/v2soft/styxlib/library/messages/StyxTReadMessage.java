@@ -25,9 +25,9 @@ public class StyxTReadMessage extends StyxTMessage {
     @Override
     public void load(IStyxDataReader input) 
         throws IOException  {
-        setFID(input.readUInt32());
-        setOffset(input.readUInt64());
-        setCount(input.readUInt32());
+        mFID = input.readUInt32();
+        mOffset = input.readUInt64();
+        mCount = input.readUInt32();
     }
 	
 	public long getFID()
@@ -62,16 +62,16 @@ public class StyxTReadMessage extends StyxTMessage {
 	
 	@Override
 	public int getBinarySize() {
-		return super.getBinarySize() + 16;
+		return super.getBinarySize() + 4 + 8 + 4;
 	}
 	
 	@Override
 	public void writeToBuffer(IStyxDataWriter output)
 	        throws UnsupportedEncodingException, IOException {
 	    super.writeToBuffer(output);
-        output.writeUInt32(getFID());
-        output.writeUInt64(getOffset());
-        output.writeUInt32(getCount());
+        output.writeUInt32(mFID);
+        output.writeUInt64(mOffset);
+        output.writeUInt32(mCount);
 	}
 
 	@Override

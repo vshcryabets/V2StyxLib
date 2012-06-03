@@ -12,6 +12,8 @@
 #include "StyxTWalkMessage.h"
 #include "StyxTStatMessage.h"
 #include "StyxTOpenMessage.h"
+#include "StyxTReadMessage.h"
+#include "StyxTClunkMessage.h"
 #include "../io/IStyxDataReader.h"
 #include "stdio.h"
 
@@ -85,9 +87,9 @@ StyxMessage* StyxMessage::factory(IStyxDataReader* buffer, size_t io_unit) {
 		//	case Rcreate:
 		//		result = new StyxRCreateMessage(tag);
 		//		break;
-		//	case Tread:
-		//		result = new StyxTReadMessage(NOFID, null, 0);
-		//		break;
+	case Tread:
+		result = new StyxTReadMessage(NOFID, 0, 0);
+		break;
 		//	case Rread:
 		//		result = new StyxRReadMessage(tag, null, 0);
 		//		break;
@@ -97,9 +99,9 @@ StyxMessage* StyxMessage::factory(IStyxDataReader* buffer, size_t io_unit) {
 		//	case Rwrite:
 		//		result = new StyxRWriteMessage(tag, 0);
 		//		break;
-		//	case Tclunk:
-		//		result = new StyxTClunkMessage(tag);
-		//		break;
+	case Tclunk:
+		result = new StyxTClunkMessage(tag);
+		break;
 		//	case Rclunk:
 		//		result = new StyxRClunkMessage(tag);
 		//		break;

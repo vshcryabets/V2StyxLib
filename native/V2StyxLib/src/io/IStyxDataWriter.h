@@ -23,5 +23,6 @@ public:
 	virtual size_t write(const uint8_t* data, size_t offset, size_t count) = 0;
 	virtual void clear() = 0;
 	virtual void limit(size_t limit) = 0;
+	virtual size_t getPosition() = 0;
 };
 #endif

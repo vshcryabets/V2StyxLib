@@ -14,6 +14,8 @@
 #include "../messages/StyxRStatMessage.h"
 #include "../messages/StyxTOpenMessage.h"
 #include "../messages/StyxROpenMessage.h"
+#include "../messages/StyxRReadMessage.h"
+#include "../messages/StyxRClunkMessage.h"
 #include "../StyxErrorMessageException.h"
 #include <vector>
 
@@ -79,38 +81,31 @@ void ClientState::processMessage(StyxMessage *msg) {
 		case Tstat:
 			answer = processStat((StyxTStatMessage*)msg);
 			break;
-			/*case Tclunk:
-			fid = ((StyxTClunkMessage)msg).getFID();
-			file = mAssignedFiles.remove(fid);
-			if ( file == null ) {
-				answer = getNoFIDError(msg, fid);
-			} else {
-				file.close(this);
-				answer = new StyxRClunkMessage(msg.getTag());
-			}
+		case Tclunk:
+			answer = processClunk((StyxTClunkMessage*) msg);
 			break;
-		case Tflush:
-			// TODO do something there
-			answer = new StyxRFlushMessage(msg.getTag());
-			break;*/
+//		case Tflush:
+//			// TODO do something there
+//			answer = new StyxRFlushMessage(msg.getTag());
+//			break;
 		case Twalk:
 			answer = processWalk((StyxTWalkMessage*) msg);
 			break;
 		case Topen:
 			answer = processTopen((StyxTOpenMessage*)msg);
 			break;
-			/*case Tread:
-			answer = processTread((StyxTReadMessage)msg);
+		case Tread:
+			answer = processRead((StyxTReadMessage*)msg);
 			break;
-		case Twrite:
+			/*case Twrite:
 			answer = processWrite((StyxTWriteMessage)msg);
 			break;
 		case Twstat:
 			answer = processWStat((StyxTWStatMessage)msg);*/
-			default:
-				printf("Got unknown message:\n");
-				//			System.out.println(msg.toString());
-				break;
+		default:
+			printf("Got unknown message:\n");
+			//			System.out.println(msg.toString());
+			break;
 		}
 	} catch (StyxErrorMessageException *e) {
 		answer = e->getErrorMessage();
@@ -211,6 +206,34 @@ StyxMessage* ClientState::processTopen(StyxTOpenMessage *msg) {
 	if ( iterator->second->open(this, msg->getMode()) ) {
 		return new StyxROpenMessage(msg->getTag(), iterator->second->getQID(), mIOUnit-24 ); // TODO magic number
 	} else {
-//		return new StyxRErrorMessage(msg->getTag, "Incorrect mode for specified file");
+		//		return new StyxRErrorMessage(msg->getTag, "Incorrect mode for specified file");
 	}
+}
+/**
+ * Handle read operation
+ * @param msg
+ */
+StyxMessage* ClientState::processRead(StyxTReadMessage *msg) {
+	if ( msg->getCount() > mIOUnit ) {
+		return new StyxRErrorMessage(msg->getTag(), "IOUnit overflow");
+	}
+	map<uint32_t,IVirtualStyxFile*>::iterator iterator = mAssignedFiles->find(msg->getFID());
+	if ( iterator == mAssignedFiles->end() ) {
+		return getNoFIDError(msg, msg->getFID());
+	}
+	uint8_t *buffer = new uint8_t[msg->getCount()];
+	size_t readed = iterator->second->read(this, buffer, msg->getOffset(), msg->getCount());
+	return new StyxRReadMessage(msg->getTag(), buffer, readed);
+}
+/**
+ * Handle clunk request
+ * @param msg
+ */
+StyxMessage* ClientState::processClunk(StyxTClunkMessage *msg) {
+	map<uint32_t,IVirtualStyxFile*>::iterator iterator = mAssignedFiles->find(msg->getFID());
+	if ( iterator == mAssignedFiles->end() ) {
+		return getNoFIDError(msg, msg->getFID());
+	}
+	iterator->second->close(this);
+	return new StyxRClunkMessage(msg->getTag());
 }

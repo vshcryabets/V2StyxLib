@@ -17,6 +17,9 @@ StyxByteBufferWritable::StyxByteBufferWritable(int capacity) {
 StyxByteBufferWritable::~StyxByteBufferWritable() {
 	delete [] mBuffer;
 }
+size_t StyxByteBufferWritable::getCapacity() {
+	return mCapacity;
+}
 // ==================================================
 // IStyxDataWriter methods
 // ==================================================
@@ -36,4 +39,7 @@ void StyxByteBufferWritable::limit(size_t limit) {
 
 uint8_t* StyxByteBufferWritable::getBuffer() {
 	return mBuffer;
+}
+size_t StyxByteBufferWritable::getPosition() {
+	return mPosition;
 }

@@ -20,7 +20,7 @@ public class StyxTClunkMessage extends StyxTMessage {
     @Override
     public void load(IStyxDataReader input) 
             throws IOException  {
-        setFID(input.readUInt32());
+        mFID = input.readUInt32();
     }
 
     public long getFID()
@@ -42,7 +42,7 @@ public class StyxTClunkMessage extends StyxTMessage {
     public void writeToBuffer(IStyxDataWriter output)
             throws UnsupportedEncodingException, IOException {
         super.writeToBuffer(output);
-        output.writeUInt32(getFID());
+        output.writeUInt32(mFID);
     }
 
     @Override

@@ -19,6 +19,8 @@
 #include "../messages/StyxRErrorMessage.h"
 #include "../messages/StyxTStatMessage.h"
 #include "../messages/StyxTOpenMessage.h"
+#include "../messages/StyxTReadMessage.h"
+#include "../messages/StyxTClunkMessage.h"
 #include "../io/StyxByteBufferReadable.h"
 #include "../io/StyxByteBufferWritable.h"
 #include "../vfs/IVirtualStyxDirectory.h"
@@ -63,6 +65,16 @@ private:
 	 * Handle TOpen message from client
 	 */
 	StyxMessage* processTopen(StyxTOpenMessage *msg);
+	/**
+	 * Handle read operation
+	 * @param msg request message
+	 */
+	StyxMessage* processRead(StyxTReadMessage *msg);
+	/**
+	 * Handle clunk request
+	 * @param msg
+	 */
+	StyxMessage* processClunk(StyxTClunkMessage *msg);
 	void registerOpenedFile(uint32_t fid, IVirtualStyxFile* file);
 	StyxRErrorMessage* getNoFIDError(StyxMessage* message, StyxFID fid);
 public:

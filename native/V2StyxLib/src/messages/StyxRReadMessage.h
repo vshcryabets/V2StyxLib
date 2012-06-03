@@ -1,22 +1,23 @@
 /*
- * StyxRVersionMessage.h
+ * StyxRReadMessage.h
  *
- *  Created on: May 27, 2012
+ *  Created on: Jun 3, 2012
  *      Author: vschryabets@gmail.com
  */
 
-#ifndef STYXRATTACHMESSAGE_H_
-#define STYXRATTACHMESSAGE_H_
-#include <string>
-#include "../structs/StyxQID.h"
+#ifndef STYXRREADMESSAGE_H_
+#define STYXRREADMESSAGE_H_
+
 #include "StyxMessage.h"
 
-class StyxRAttachMessage : public StyxMessage {
+class StyxRReadMessage: public StyxMessage {
 private:
-	StyxQID *mQID;
+	uint8_t *mData;
+	size_t mDataLength;
+	bool mDelete;
 public:
-	StyxRAttachMessage(int tag, StyxQID *qid);
-	virtual ~StyxRAttachMessage();
+	StyxRReadMessage(StyxTAG tag, uint8_t *data, size_t length);
+	virtual ~StyxRReadMessage();
 	// =======================================================
 	// Virtual methods
 	// =======================================================
@@ -25,4 +26,4 @@ public:
 	virtual size_t getBinarySize();
 };
 
-#endif /* STYXRVERSIONMESSAGE_H_ */
+#endif /* STYXRREADMESSAGE_H_ */

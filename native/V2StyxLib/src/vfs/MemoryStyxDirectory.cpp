@@ -9,6 +9,7 @@
 #include "../types.h"
 #include "../structs/StyxQID.h"
 #include <vector>
+#include "string.h"
 
 MemoryStyxDirectory::MemoryStyxDirectory(std::string name):mName(name) {
 	mQID = new StyxQID(QTDIR, 0, (uint64_t)this);
@@ -126,7 +127,19 @@ void MemoryStyxDirectory::close(ClientState *client) {
  * @return number of bytes that was readed into the buffer
  */
 size_t MemoryStyxDirectory::read(ClientState *client, uint8_t* buffer, uint64_t offset, size_t count) {
-	return 0;
+	ClientsMap::iterator it = mBuffersMap.find(client);
+	if ( it == mBuffersMap.end() ) {
+		return -1; // TODO there we should send Rerror with message "This file isn't open"
+	}
+	StyxByteBufferWritable *preparedData = it->second;
+	size_t dataSize = preparedData->getCapacity();
+	if ( offset > dataSize ) return 0;
+	int remaining = dataSize - offset;
+	if ( count > remaining ) {
+		count = remaining;
+	}
+	memcpy(buffer, preparedData->getBuffer()+offset, count);
+	return count;
 }
 IVirtualStyxFile* MemoryStyxDirectory::walk(std::vector<StyxString*> *pathElements, std::vector<StyxQID*> *qids) {
 	if ( pathElements->size() < 1 ) {
