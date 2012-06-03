@@ -11,6 +11,7 @@
 #include "../messages/StyxRVersionMessage.h"
 #include "../messages/StyxRAttachMessage.h"
 #include "../messages/StyxTAttachMessage.h"
+#include "../messages/StyxRStatMessage.h"
 #include "../StyxErrorMessageException.h"
 #include <vector>
 
@@ -72,17 +73,11 @@ void ClientState::processMessage(StyxMessage *msg) {
 			break;
 			/*case Tauth:
 			answer = processAuth((StyxTAuthMessage)msg);
-			break;
+			break;*/
 		case Tstat:
-			fid = ((StyxTStatMessage)msg).getFID();
-			file = mAssignedFiles.get(fid);
-			if ( file != null ) {
-				answer = new StyxRStatMessage(msg.getTag(), file.getStat());
-			} else {
-				answer = getNoFIDError(msg, fid);
-			}
+			answer = processStat((StyxTStatMessage*)msg);
 			break;
-		case Tclunk:
+			/*case Tclunk:
 			fid = ((StyxTClunkMessage)msg).getFID();
 			file = mAssignedFiles.remove(fid);
 			if ( file == null ) {
@@ -132,9 +127,7 @@ void ClientState::sendMessage(StyxMessage *answer) {
 
 bool ClientState::readSocket() {
 	int readCount = mBuffer->readFromFD(mChannel);
-	//	int readCount = read(mChannel, mBuffer+mBufferPosition, mIOUnit);
-	//	mBufferPosition+=readCount;
-	if ( readCount < -1 ) {
+	if ( readCount < 1 ) {
 		return true;
 	} else {
 		while ( process() );
@@ -194,4 +187,14 @@ StyxMessage* ClientState::processWalk(StyxTWalkMessage* msg) {
  */
 StyxRErrorMessage* ClientState::getNoFIDError(StyxMessage *message, StyxFID fid) {
 	return new StyxRErrorMessage(message->getTag(),"Unknown FID (%d)"); // TODO add this , fid);
+}
+/**
+ * Process incoming Tstat message
+ */
+StyxMessage* ClientState::processStat(StyxTStatMessage *msg) {
+	map<uint32_t,IVirtualStyxFile*>::iterator iterator = mAssignedFiles->find(msg->getFID());
+	if ( iterator == mAssignedFiles->end() ) {
+		return getNoFIDError(msg, msg->getFID());
+	}
+	return new StyxRStatMessage(msg->getTag(), iterator->second->getStat());
 }

@@ -12,10 +12,22 @@
 MemoryStyxDirectory::MemoryStyxDirectory(std::string name):mName(name) {
 	mQID = new StyxQID(QTDIR, 0, (uint64_t)this);
 	mOwner = new StyxString("nobody");
+    mStat = new StyxStat(0,
+            1,
+            mQID,
+            getMode(),
+            getAccessTime(),
+            getModificationTime(),
+            getLength(),
+            name,
+            *mOwner,
+            *mOwner,
+            *mOwner);
 }
 
 MemoryStyxDirectory::~MemoryStyxDirectory() {
 	delete mQID;
+	delete mStat;
 }
 
 IVirtualStyxFile* MemoryStyxDirectory::getFile(string *path) {
@@ -34,7 +46,7 @@ StyxQID* MemoryStyxDirectory::getQID() {
 }
 
 StyxStat* MemoryStyxDirectory::getStat() {
-	return NULL;
+	return mStat;
 }
 /**
  * @return file access mode

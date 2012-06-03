@@ -7,6 +7,7 @@
 
 #include "StyxByteBufferReadable.h"
 #include "string.h"
+#include "stdio.h"
 
 StyxByteBufferReadable::StyxByteBufferReadable(size_t capacity) {
 	mWritePosition = 0;
@@ -33,6 +34,7 @@ size_t StyxByteBufferReadable::readFromFD(Socket fd) {
 	size_t count = ( mWritePosition < mReadPosition ? mReadPosition-mWritePosition : mCapacity-mWritePosition );
 	size_t position = mWritePosition;
 	int readed = ::read(fd, mBuffer+position, count);
+	printf("Readed %d\n", readed);
 	if ( readed > 0 ) {
 		mStoredBytes+=readed;
 		mWritePosition+=readed;

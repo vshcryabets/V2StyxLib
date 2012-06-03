@@ -16,6 +16,7 @@ using namespace std;
 class ClientBalancer {
 private:
 	ClientsHandler *mHandler;
+	vector<Socket> *mAllConnections;
 	vector<Socket> *mNewConnections;
 	vector<Socket> *mReadable;
 public:
@@ -24,6 +25,7 @@ public:
 	void pushNewConnection(Socket socket);
 	void pushReadable(Socket socket);
 	void process();
+	vector<Socket> *getAllConnections();
 };
 
 #endif /* CLIENTBALANCER_H_ */

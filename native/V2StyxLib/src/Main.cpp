@@ -7,6 +7,7 @@
 #include <string>
 #include "StyxServerManager.h"
 #include "vfs/MemoryStyxDirectory.h"
+#include "stdio.h"
 using namespace std;
 
 int main(int argc, char **argv) {
@@ -14,5 +15,9 @@ int main(int argc, char **argv) {
 	IVirtualStyxDirectory *root = new MemoryStyxDirectory("root");
 	string protocol = "9P2000";
 	StyxServerManager manager(serveraddr, 8080, root, &protocol);
+	try {
 	manager.start();
+	} catch (const char *e) {
+		printf("Exception: %s \n", e);
+	}
 }

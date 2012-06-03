@@ -10,6 +10,7 @@
 #include "StyxRVersionMessage.h"
 #include "StyxTAttachMessage.h"
 #include "StyxTWalkMessage.h"
+#include "StyxTStatMessage.h"
 #include "../io/IStyxDataReader.h"
 #include "stdio.h"
 
@@ -107,9 +108,9 @@ StyxMessage* StyxMessage::factory(IStyxDataReader* buffer, size_t io_unit) {
 		//	case Rremove:
 		//		result = new StyxRRemoveMessage(tag);
 		//		break;
-		//	case Tstat:
-		//		result = new StyxTStatMessage(tag);
-		//		break;
+	case Tstat:
+		result = new StyxTStatMessage(tag);
+		break;
 		//	case Rstat:
 		//		result = new StyxRStatMessage(tag);
 		//		break;

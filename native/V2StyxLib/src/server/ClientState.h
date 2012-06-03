@@ -17,6 +17,7 @@
 #include "../messages/StyxTWalkMessage.h"
 #include "../messages/StyxRWalkMessage.h"
 #include "../messages/StyxRErrorMessage.h"
+#include "../messages/StyxTStatMessage.h"
 #include "../io/StyxByteBufferReadable.h"
 #include "../io/StyxByteBufferWritable.h"
 #include "../vfs/IVirtualStyxDirectory.h"
@@ -48,6 +49,10 @@ private:
 	 * Process incoming Tattach message
 	 */
 	StyxRAttachMessage* processAttach(StyxTAttachMessage *msg);
+	/**
+	 * Process incoming Tstat message
+	 */
+	StyxMessage* processStat(StyxTStatMessage *msg);
 	/**
 	 * Handle TWalk message from client
 	 * @param msg

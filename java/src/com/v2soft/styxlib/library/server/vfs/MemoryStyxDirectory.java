@@ -29,6 +29,7 @@ implements IVirtualStyxDirectory {
     private List<IVirtualStyxFile> mFiles;
     private String mName;
     private StyxQID mQID;
+    private StyxStat mStat;
 
     public MemoryStyxDirectory(String name) {
         if ( name == null ) throw new NullPointerException("Name is null");
@@ -36,6 +37,17 @@ implements IVirtualStyxDirectory {
         mName = name;
         mFiles = new LinkedList<IVirtualStyxFile>();
         mBuffersMap = new HashMap<ClientState, StyxByteBufferWriteable>();
+        mStat = new StyxStat((short)0, 
+                1, 
+                mQID, 
+                getMode(),
+                getAccessTime(), 
+                getModificationTime(), 
+                getLength(), 
+                name, 
+                getOwnerName(), 
+                getGroupName(), 
+                getModificationUser());
     }
 
     @Override
@@ -57,18 +69,7 @@ implements IVirtualStyxDirectory {
 
     @Override
     public StyxStat getStat() {
-        StyxStat result = new StyxStat((short)0, 
-                1, 
-                getQID(), 
-                getMode(),
-                getAccessTime(), 
-                getModificationTime(), 
-                getLength(), 
-                getName(), 
-                getOwnerName(), 
-                getGroupName(), 
-                getModificationUser());
-        return result;
+        return mStat;
     }
 
     @Override

@@ -14,6 +14,7 @@
 #include "../vfs/IVirtualStyxDirectory.h"
 #include "../structs/StyxQID.h"
 #include <vector>
+#include "../structs/StyxStat.h"
 using namespace std;
 
 class MemoryStyxDirectory : public IVirtualStyxDirectory
@@ -22,6 +23,7 @@ private:
 	StyxString mName;
 	StyxString *mOwner;
 	StyxQID *mQID;
+	StyxStat *mStat;
 	vector<IVirtualStyxFile*> *mFiles;
 public:
 	MemoryStyxDirectory(std::string name);

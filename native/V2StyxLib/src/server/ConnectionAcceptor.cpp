@@ -31,16 +31,16 @@ void ConnectionAcceptor::start() {
 	/* Since we start with only one socket, the listening socket,
 			   it is the highest socket so far. */
 	int highsock = mSocket;
-	vector<Socket> connectionList;
+	vector<Socket> *connectionList = mBalancer->getAllConnections();
 	fd_set socks;
 	struct timeval timeout;
 
-	while (1) { /* Main server loop - forever */
+	while (true) { /* Main server loop - forever */
 		FD_ZERO(&socks);
 		FD_SET(mSocket,&socks);
 
-		for ( vector<Socket>::iterator it = connectionList.begin();
-				it < connectionList.end();
+		for ( vector<Socket>::iterator it = connectionList->begin();
+				it < connectionList->end();
 				it++ ) {
 			if ( *it > highsock ) {
 				highsock = *it;
@@ -50,24 +50,24 @@ void ConnectionAcceptor::start() {
 
 		timeout.tv_sec = 1;
 		timeout.tv_usec = 0;
-		int readsocks = select(highsock+1,
+		size_t readsocks = select(highsock+1,
 				&socks,
 				(fd_set*) 0,
 				(fd_set*) 0,
 				&timeout);
 		if (readsocks < 0) {
+			// something wrong with our socket
 			return;
 		} else if (readsocks > 0) {
 			if (FD_ISSET( mSocket, &socks )) {
 				Socket inSocket = accept(mSocket, NULL, NULL);
 				if ( inSocket > 0 ) {
 					this->setNonBlocking(inSocket);
-					connectionList.push_back(inSocket);
 					mBalancer->pushNewConnection(inSocket);
 				}
 			}
-			for ( vector<Socket>::iterator it = connectionList.begin();
-					it < connectionList.end();
+			for ( vector<Socket>::iterator it = connectionList->begin();
+					it < connectionList->end();
 					it++ ) {
 				if (FD_ISSET(*it, &socks)) {
 					mBalancer->pushReadable(*it);
@@ -77,7 +77,6 @@ void ConnectionAcceptor::start() {
 		}
 	}
 }
-
 
 void ConnectionAcceptor::setNonBlocking(Socket socket) {
 	int opts;

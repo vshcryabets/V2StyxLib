@@ -14,6 +14,7 @@ ClientsHandler::ClientsHandler(int iounit,
 }
 
 ClientsHandler::~ClientsHandler() {
+	// TODO delete ClientSTatet objects
 	delete mClientStatesMap;
 }
 
@@ -27,12 +28,7 @@ bool ClientsHandler::readClient(Socket socket) {
 	ClientState *state = mClientStatesMap->find(socket)->second;
 	bool result = state->readSocket();
 	if ( result ) {
-		removeClient(socket);
+		mClientStatesMap->erase(socket);
 	}
 	return result;
-}
-
-void ClientsHandler::removeClient(Socket socket) {
-	mClientStatesMap->erase(socket);
-	close(socket);
 }
