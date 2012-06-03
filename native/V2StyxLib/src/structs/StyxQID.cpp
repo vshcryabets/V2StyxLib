@@ -26,3 +26,6 @@ void StyxQID::writeBinaryTo(IStyxDataWriter *output) {
 	output->writeUInt32(mVersion);
 	output->writeUInt64(mPath);
 }
+void StyxQID::setType(QIDTypeEnum type) {
+	mType = type;
+}

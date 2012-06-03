@@ -9,7 +9,7 @@
 #include "ClientState.h"
 
 ClientsHandler::ClientsHandler(int iounit,
-		IVirtualStyxDirectory *root, std::string *protocol) : mIOUnit(iounit), mRoot(root), mProtocol(protocol) {
+		IVirtualStyxFile *root, std::string *protocol) : mIOUnit(iounit), mRoot(root), mProtocol(protocol) {
 }
 
 ClientsHandler::~ClientsHandler() {

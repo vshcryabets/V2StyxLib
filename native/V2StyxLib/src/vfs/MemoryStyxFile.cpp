@@ -1,0 +1,99 @@
+/*
+ * MemoryStyxFile.cpp
+ *
+ *  Created on: Jun 3, 2012
+ *      Author: mrco
+ */
+
+#include "MemoryStyxFile.h"
+
+MemoryStyxFile::MemoryStyxFile(std::string name) {
+	mName = name;
+	mQID = new StyxQID(QTFILE, 0, (uint64_t)this);
+	mOwner = "nobody";
+	mStat = new StyxStat(0,
+			1,
+			mQID,
+			getMode(),
+			getAccessTime(),
+			getModificationTime(),
+			getLength(),
+			name,
+			mOwner,
+			mOwner,
+			mOwner);
+}
+
+MemoryStyxFile::~MemoryStyxFile() {
+	delete mQID;
+	delete mStat;
+}
+
+/**
+ * @return unic ID of the file
+ */
+StyxQID* MemoryStyxFile::getQID() {
+	return mQID;
+}
+
+StyxStat* MemoryStyxFile::getStat() {
+	return mStat;
+}
+/**
+ * @return file name
+ */
+StyxString MemoryStyxFile::getName() {
+	return mName;
+}
+Date MemoryStyxFile::getAccessTime() {
+	return 0;
+}
+Date MemoryStyxFile::getModificationTime() {
+	return 0;
+}
+uint64_t MemoryStyxFile::getLength() {
+	return 0;
+}
+
+StyxString MemoryStyxFile::getOwnerName() {
+	return mOwner;
+}
+StyxString MemoryStyxFile::getGroupName() {
+	return mOwner;
+}
+StyxString MemoryStyxFile::getModificationUser() {
+	return mOwner;
+}
+/**
+ * @return file access mode
+ */
+int MemoryStyxFile::getMode() {
+	return 0x01FF;
+}
+
+bool MemoryStyxFile::open(ClientState *client, int mode) {
+	bool result = (
+			(mode&0x0F) == OREAD ||
+			(mode&0x0F) == OWRITE ||
+			(mode&0x0F) == ORDWR
+			);
+	return result;
+}
+IVirtualStyxFile* MemoryStyxFile::walk(std::vector<StyxString*> *pathElements, std::vector<StyxQID*> *qids) {
+	if ( pathElements->size() == 0 ) {
+		qids->push_back(mQID);
+		return this;
+	}
+	return NULL;
+}
+size_t MemoryStyxFile::write(ClientState *client, uint8_t* data, uint64_t offset) {
+	return 0;
+}
+size_t MemoryStyxFile::read(ClientState *client, uint8_t* buffer, uint64_t offset, size_t count) {
+	return 0;
+}
+void MemoryStyxFile::close(ClientState *client) {
+}
+void MemoryStyxFile::onConnectionClosed(ClientState *state) {
+	// ok, nothing to do
+}

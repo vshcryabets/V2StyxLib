@@ -5,7 +5,7 @@ import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.v2soft.styxlib.library.server.vfs.IVirtualStyxDirectory;
+import com.v2soft.styxlib.library.server.vfs.IVirtualStyxFile;
 
 
 public class ClientBalancer {
@@ -14,7 +14,7 @@ public class ClientBalancer {
     private Thread mThread;
     private List<SocketChannel> mNewConnetions, mReadable;
     
-    public ClientBalancer(int iounit, IVirtualStyxDirectory root, String protocol) throws IOException {
+    public ClientBalancer(int iounit, IVirtualStyxFile root, String protocol) throws IOException {
     	mNewConnetions = new ArrayList<SocketChannel>();
     	mReadable = new ArrayList<SocketChannel>();
         mHandler = new ClientsHandler(iounit, root, protocol);

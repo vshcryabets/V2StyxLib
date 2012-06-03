@@ -32,16 +32,15 @@ public class StyxRReadMessage extends StyxMessage {
     @Override
     public int getBinarySize() {
         return super.getBinarySize() + 4
-                + getDataLength();
+                + mDataLength;
     }
 
     @Override
     public void writeToBuffer(IStyxDataWriter output)
             throws UnsupportedEncodingException, IOException {
         super.writeToBuffer(output);
-        int length = getDataLength();
-        output.writeUInt32(length);
-        if ( length > 0 ) {
+        output.writeUInt32(mDataLength);
+        if ( mDataLength > 0 ) {
             output.write(mData, 0, mDataLength);
         }
     }

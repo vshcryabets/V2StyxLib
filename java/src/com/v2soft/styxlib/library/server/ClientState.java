@@ -35,7 +35,6 @@ import com.v2soft.styxlib.library.messages.StyxTWalkMessage;
 import com.v2soft.styxlib.library.messages.StyxTWriteMessage;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.messages.base.structs.StyxQID;
-import com.v2soft.styxlib.library.server.vfs.IVirtualStyxDirectory;
 import com.v2soft.styxlib.library.server.vfs.IVirtualStyxFile;
 
 /**
@@ -51,13 +50,13 @@ implements Closeable {
     private int mIOUnit;
     private SocketChannel mChannel;
     private StyxByteBufferWriteable mOutputBuffer;
-    private IVirtualStyxDirectory mServerRoot;
-    private IVirtualStyxDirectory mClientRoot;
+    private IVirtualStyxFile mServerRoot;
+    private IVirtualStyxFile mClientRoot;
     private HashMap<Long, IVirtualStyxFile> mAssignedFiles;
 
     public ClientState(int iounit, 
             SocketChannel channel, 
-            IVirtualStyxDirectory root,
+            IVirtualStyxFile root,
             String protocol) throws FileNotFoundException {
         if ( channel == null ) throw new NullPointerException("Client channel is null");
         if ( root == null ) throw new NullPointerException("Root is null");
@@ -190,7 +189,7 @@ implements Closeable {
 
     private StyxRAttachMessage processAttach(StyxTAttachMessage msg) {
         String mountPoint = msg.getMountPoint();
-        mClientRoot = mServerRoot.getDirectory(mountPoint);
+        mClientRoot = mServerRoot; // TODO .getDirectory(mountPoint); there should be some logic with mountPoint?
         mUserName = msg.getUserName(); 
         StyxRAttachMessage answer = new StyxRAttachMessage(msg.getTag(), mClientRoot.getQID());
         registerOpenedFile(msg.getFID(), mClientRoot );

@@ -9,7 +9,6 @@
 #define CLASSES_H_
 
 class IVirtualStyxFile;
-class IVirtualStyxDirectory;
 class ClientBalancer;
 class ClientState;
 class StyxQID;

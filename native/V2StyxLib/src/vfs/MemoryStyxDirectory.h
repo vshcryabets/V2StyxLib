@@ -11,55 +11,40 @@
 #include "../structs/StyxQID.h"
 #include "../structs/StyxStat.h"
 #include "../types.h"
-#include "../vfs/IVirtualStyxDirectory.h"
 #include "../structs/StyxQID.h"
 #include <vector>
 #include "../structs/StyxStat.h"
 #include <map>
 #include "../io/StyxByteBufferWritable.h"
+#include "MemoryStyxFile.h"
 using namespace std;
 
 typedef map<ClientState*, StyxByteBufferWritable*> ClientsMap;
+typedef vector<IVirtualStyxFile*> FileList;
 
-class MemoryStyxDirectory : public IVirtualStyxDirectory
+class MemoryStyxDirectory : public MemoryStyxFile
 {
 private:
-	StyxString mName;
-	StyxString *mOwner;
-	StyxQID *mQID;
-	StyxStat *mStat;
 	FileList mFiles;
 	ClientsMap mBuffersMap;
 public:
 	MemoryStyxDirectory(std::string name);
 	virtual ~MemoryStyxDirectory();
+    /**
+     * Add child file to this directory
+     * @param file child file
+     */
+    void addFile(IVirtualStyxFile *file);
 	// ================================================================
 	// IVirualStyxFile
 	// ================================================================
-	/**
-	 * @return unic ID of the file
-	 */
-	StyxQID* getQID();
-
-	StyxStat* getStat();
 	/**
 	 * @return file access mode
 	 */
 	int getMode();
 	/**
-	 * @return file name
-	 */
-	StyxString* getName();
-	Date getAccessTime();
-	Date getModificationTime();
-	uint64_t getLength();
-	StyxString* getOwnerName();
-	StyxString* getGroupName();
-	StyxString* getModificationUser();
-	/**
 	 * Open file
 	 * @param mode
-	 * @throws IOException
 	 */
 	bool open(ClientState *client, int mode);
 	/**
@@ -80,15 +65,7 @@ public:
 	 * @param client
 	 * @param data
 	 * @param offset
-	 * @return
-	 * @throws StyxErrorMessageException
 	 */
-	int write(ClientState *client, uint8_t* data, uint64_t offset);
-	// ================================================================
-	// IVirualStyxDirectory
-	// ================================================================
-	IVirtualStyxFile* getFile(StyxString *path);
-	IVirtualStyxDirectory* getDirectory(StyxString *path);
 	void onConnectionClosed(ClientState *state);
 };
 

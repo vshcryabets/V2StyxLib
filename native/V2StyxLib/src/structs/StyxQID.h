@@ -22,6 +22,7 @@ public:
 	StyxQID(QIDTypeEnum type, uint32_t version, uint64_t path);
 	virtual ~StyxQID();
 	void writeBinaryTo(IStyxDataWriter *output);
+	void setType(QIDTypeEnum type);
 };
 
 #endif /* STYXQID_H_ */

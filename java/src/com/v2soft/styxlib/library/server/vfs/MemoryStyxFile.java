@@ -13,34 +13,37 @@ import com.v2soft.styxlib.library.messages.base.structs.StyxStat;
 import com.v2soft.styxlib.library.server.ClientState;
 import com.v2soft.styxlib.library.types.ULong;
 
+/**
+ * In-Memory file
+ * @author vshcryabets@gmail.com
+ *
+ */
 public class MemoryStyxFile implements IVirtualStyxFile {
-    private String mName;
+    protected String mName;
+    protected StyxQID mQID;
+    protected StyxStat mStat;
     
     public MemoryStyxFile(String name) {
         if ( name == null ) throw new NullPointerException("Filename is null");
         mName = name;
-    }
-
-    @Override
-    public StyxQID getQID() {
-        return new StyxQID(QIDType.QTFILE, 0, new ULong(this.hashCode()));
-    }
-
-    @Override
-    public StyxStat getStat() {
-        StyxStat result = new StyxStat((short)0, 
+        mQID = new StyxQID(QIDType.QTFILE, 0, new ULong(this.hashCode()));
+        mStat = new StyxStat((short)0, 
                 1, 
-                getQID(), 
+                mQID, 
                 getMode(),
                 getAccessTime(), 
                 getModificationTime(), 
                 getLength(), 
-                getName(), 
+                name, 
                 getOwnerName(), 
                 getGroupName(), 
-                getModificationUser());
-        return result;
+                getModificationUser());        
     }
+
+    @Override
+    public StyxQID getQID() {return mQID;}
+    @Override
+    public StyxStat getStat() {return mStat;}
 
     @Override
     public int getMode() {
@@ -92,7 +95,7 @@ public class MemoryStyxFile implements IVirtualStyxFile {
     @Override
     public IVirtualStyxFile walk(List<String> pathElements, List<StyxQID> qids) {
         if ( pathElements.size() == 0 ) {
-            qids.add(getQID());
+            qids.add(mQID);
             return this;
         }
         return null;

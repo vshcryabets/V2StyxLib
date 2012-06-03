@@ -21,7 +21,7 @@ private:
 	Socket mSocket;
 	int mPort;
 	int mIOBufSize;
-	IVirtualStyxDirectory *mRoot;
+	IVirtualStyxFile *mRoot;
 
 	void setAddress(const char * hname,
 			short port,
@@ -31,7 +31,7 @@ private:
 	void deaWithData(int* list, int id);
 	void setNonBlocking(int socket);
 public:
-	StyxServerManager(string address, int port, IVirtualStyxDirectory *root, string *protocol);
+	StyxServerManager(string address, int port, IVirtualStyxFile *root, string *protocol);
 	~StyxServerManager();
 	/**
 	 * start server

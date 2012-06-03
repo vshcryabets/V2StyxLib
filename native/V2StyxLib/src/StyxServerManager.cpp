@@ -19,7 +19,7 @@
 
 StyxServerManager::StyxServerManager(string address,
 		int port,
-		IVirtualStyxDirectory *root, std::string *protocol)
+		IVirtualStyxFile *root, std::string *protocol)
 	:mPort(port),  mIOBufSize(8192), mRoot(root) {
 	// create socket
 	mSocket = socket(AF_INET, SOCK_STREAM, 0);

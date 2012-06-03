@@ -23,7 +23,7 @@
 #include "../messages/StyxTClunkMessage.h"
 #include "../io/StyxByteBufferReadable.h"
 #include "../io/StyxByteBufferWritable.h"
-#include "../vfs/IVirtualStyxDirectory.h"
+#include "../vfs/IVirtualStyxFile.h"
 
 class ClientState {
 private:
@@ -33,8 +33,8 @@ private:
 	StyxByteBufferWritable *mOutputBuffer;
 	size_t mIOUnit;
 	Socket mChannel;
-	IVirtualStyxDirectory *mServerRoot;
-	IVirtualStyxDirectory *mClientRoot;
+	IVirtualStyxFile *mServerRoot;
+	IVirtualStyxFile *mClientRoot;
 	std::map<StyxFID,IVirtualStyxFile*> *mAssignedFiles;
 
 	bool process();
@@ -80,7 +80,7 @@ private:
 public:
 	ClientState(size_t iounit,
 			Socket channel,
-			IVirtualStyxDirectory *root,
+			IVirtualStyxFile *root,
 			std::string *protocol);
 	~ClientState();
 	bool readSocket();

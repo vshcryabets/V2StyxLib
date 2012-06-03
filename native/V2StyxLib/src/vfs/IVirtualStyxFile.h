@@ -29,13 +29,13 @@ public:
 	/**
 	 * @return file name
 	 */
-	virtual StyxString* getName() = 0;
+	virtual StyxString getName() = 0;
 	virtual Date getAccessTime() = 0;
 	virtual Date getModificationTime() = 0;
 	virtual uint64_t getLength() = 0;
-	virtual StyxString* getOwnerName() = 0;
-	virtual StyxString* getGroupName() = 0;
-	virtual StyxString* getModificationUser() = 0;
+	virtual StyxString getOwnerName() = 0;
+	virtual StyxString getGroupName() = 0;
+	virtual StyxString getModificationUser() = 0;
 	/**
 	 * Open file
 	 * @param mode
@@ -62,7 +62,7 @@ public:
 	 * @param offset
 	 * @return
 	 */
-	virtual int write(ClientState *client, uint8_t* data, uint64_t offset) = 0;
+	virtual size_t write(ClientState *client, uint8_t* data, uint64_t offset) = 0;
     /**
      * Will be called when client close connection to this server
      * @param state

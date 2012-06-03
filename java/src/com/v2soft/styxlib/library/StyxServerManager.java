@@ -14,7 +14,7 @@ import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.messages.base.structs.StyxQID;
 import com.v2soft.styxlib.library.server.ClientBalancer;
 import com.v2soft.styxlib.library.server.ConnectionAcceptor;
-import com.v2soft.styxlib.library.server.vfs.IVirtualStyxDirectory;
+import com.v2soft.styxlib.library.server.vfs.IVirtualStyxFile;
 
 /**
  * 
@@ -47,7 +47,7 @@ implements Closeable, StyxMessengerListener {
     private Thread mAcceptorThread;
 
     public StyxServerManager(InetAddress address, int port, boolean ssl, 
-            IVirtualStyxDirectory root, String protocol) throws IOException {
+            IVirtualStyxFile root, String protocol) throws IOException {
         mPort = port;
         ServerSocketChannel channel = null;
         if ( ssl ) {

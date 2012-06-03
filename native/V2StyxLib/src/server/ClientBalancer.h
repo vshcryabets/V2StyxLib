@@ -9,7 +9,7 @@
 #define CLIENTBALANCER_H_
 #include <vector>
 #include "ClientsHandler.h"
-#include "../vfs/IVirtualStyxDirectory.h"
+#include "../vfs/IVirtualStyxFile.h"
 #include "../types.h"
 using namespace std;
 
@@ -20,7 +20,7 @@ private:
 	vector<Socket> *mNewConnections;
 	vector<Socket> *mReadable;
 public:
-	ClientBalancer(int iounit, IVirtualStyxDirectory *root, std::string *protocol);
+	ClientBalancer(int iounit, IVirtualStyxFile *root, std::string *protocol);
 	~ClientBalancer();
 	void pushNewConnection(Socket socket);
 	void pushReadable(Socket socket);

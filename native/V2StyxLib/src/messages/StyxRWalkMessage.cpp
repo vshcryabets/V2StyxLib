@@ -10,10 +10,11 @@
 
 StyxRWalkMessage::StyxRWalkMessage(StyxTAG tag, std::vector<StyxQID*> *QIDList)
 : StyxMessage(Rwalk, tag) {
-	mQIDList = new std::vector<StyxQID*>();
+	mQIDList = QIDList;
 }
 
 StyxRWalkMessage::~StyxRWalkMessage() {
+	// TODO delete???
 	for ( std::vector<StyxQID*>::iterator it = mQIDList->begin();
 			it != mQIDList->end();) {
 		delete * it;

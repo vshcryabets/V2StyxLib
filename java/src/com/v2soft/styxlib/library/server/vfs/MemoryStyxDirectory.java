@@ -2,7 +2,6 @@ package com.v2soft.styxlib.library.server.vfs;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -23,93 +22,27 @@ import com.v2soft.styxlib.library.types.ULong;
  * @author vshcryabets@gmail.com
  *
  */
-public class MemoryStyxDirectory 
-implements IVirtualStyxDirectory {
+public class MemoryStyxDirectory
+extends MemoryStyxFile {
     private Map<ClientState, StyxByteBufferWriteable> mBuffersMap;
     private List<IVirtualStyxFile> mFiles;
-    private String mName;
-    private StyxQID mQID;
-    private StyxStat mStat;
 
     public MemoryStyxDirectory(String name) {
-        if ( name == null ) throw new NullPointerException("Name is null");
-        mQID = new StyxQID(QIDType.QTDIR, 0, new ULong(this.hashCode()));
-        mName = name;
+        super(name);
+        mQID.setType(QIDType.QTDIR);
         mFiles = new LinkedList<IVirtualStyxFile>();
         mBuffersMap = new HashMap<ClientState, StyxByteBufferWriteable>();
-        mStat = new StyxStat((short)0, 
-                1, 
-                mQID, 
-                getMode(),
-                getAccessTime(), 
-                getModificationTime(), 
-                getLength(), 
-                name, 
-                getOwnerName(), 
-                getGroupName(), 
-                getModificationUser());
     }
 
-    @Override
-    public StyxQID getQID() {
-        return mQID;
-    }
-
-    @Override
-    public IVirtualStyxFile getFile(String path) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public IVirtualStyxDirectory getDirectory(String path) {
-        if ( path.length() == 0 || path.equals("/")) return this;
-        return null;
-    }
-
-    @Override
-    public StyxStat getStat() {
-        return mStat;
-    }
+//    @Override
+//    public IVirtualStyxDirectory getDirectory(String path) {
+//        if ( path.length() == 0 || path.equals("/")) return this;
+//        return null;
+//    }
 
     @Override
     public int getMode() {
         return (int) (FileMode.Directory.getMode() | 0x01FF);
-    }
-
-    @Override
-    public String getName() {
-        return mName;
-    }
-
-    @Override
-    public Date getAccessTime() {
-        return new Date();
-    }
-
-    @Override
-    public Date getModificationTime() {
-        return new Date();
-    }
-
-    @Override
-    public ULong getLength() {
-        return new ULong(0);
-    }
-
-    @Override
-    public String getOwnerName() {
-        return "nobody";
-    }
-
-    @Override
-    public String getGroupName() {
-        return "nobody";
-    }
-
-    @Override
-    public String getModificationUser() {
-        return "nobody";
     }
 
     @Override

@@ -8,7 +8,7 @@
 #include "ClientBalancer.h"
 #include "stdio.h"
 
-ClientBalancer::ClientBalancer(int iounit, IVirtualStyxDirectory *root, std::string *protocol) {
+ClientBalancer::ClientBalancer(int iounit, IVirtualStyxFile *root, std::string *protocol) {
 	mNewConnections = new vector<Socket>();
 	mReadable = new vector<Socket>();
 	mAllConnections = new vector<Socket>();

@@ -21,7 +21,7 @@
 
 ClientState::ClientState(size_t iounit,
 		Socket channel,
-		IVirtualStyxDirectory *root,
+		IVirtualStyxFile *root,
 		std::string *protocol)  {
 	mIOUnit = iounit;
 	mChannel = channel;
@@ -134,7 +134,7 @@ bool ClientState::readSocket() {
 
 StyxRAttachMessage* ClientState::processAttach(StyxTAttachMessage *msg) {
 	std::string* mountPoint = msg->getMountPoint();
-	mClientRoot = mServerRoot->getDirectory(mountPoint);
+	mClientRoot = mServerRoot; // FIXME later ->getDirectory(mountPoint);
 	mUserName = msg->getUserName();
 	StyxRAttachMessage *answer = new StyxRAttachMessage(msg->getTag(), mClientRoot->getQID());
 	registerOpenedFile(msg->getFID(), mClientRoot );
@@ -235,5 +235,6 @@ StyxMessage* ClientState::processClunk(StyxTClunkMessage *msg) {
 		return getNoFIDError(msg, msg->getFID());
 	}
 	iterator->second->close(this);
+	mAssignedFiles->erase(iterator);
 	return new StyxRClunkMessage(msg->getTag());
 }

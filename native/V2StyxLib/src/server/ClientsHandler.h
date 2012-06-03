@@ -7,7 +7,7 @@
 
 #ifndef CLIENTSHANDLER_H_
 #define CLIENTSHANDLER_H_
-#include "../vfs/IVirtualStyxDirectory.h"
+#include "../vfs/IVirtualStyxFile.h"
 #include <vector>
 #include <map>
 #include "../types.h"
@@ -19,12 +19,12 @@ class ClientsHandler {
 private:
 	int mIOUnit;
 	SocketsMap mClientStatesMap;
-	IVirtualStyxDirectory *mRoot;
+	IVirtualStyxFile *mRoot;
 	std::string *mProtocol;
 
 	void removeClient(Socket socket);
 public:
-	ClientsHandler(int iounit, IVirtualStyxDirectory *root, std::string *protocol);
+	ClientsHandler(int iounit, IVirtualStyxFile *root, std::string *protocol);
 	~ClientsHandler();
 	void addClient(Socket socket);
 	bool readClient(Socket socket);

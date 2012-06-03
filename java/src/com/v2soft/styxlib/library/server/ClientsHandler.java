@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.nio.channels.SocketChannel;
 import java.util.HashMap;
 import java.util.Map;
-import com.v2soft.styxlib.library.server.vfs.IVirtualStyxDirectory;
+import com.v2soft.styxlib.library.server.vfs.IVirtualStyxFile;
 
 /**
  * 
@@ -17,9 +17,9 @@ public class ClientsHandler
     private String mProtocol;
     private int mIOUnit;
     private Map<SocketChannel, ClientState> mClientStatesMap;
-    private IVirtualStyxDirectory mRoot;
+    private IVirtualStyxFile mRoot;
     
-    public ClientsHandler(int iounit, IVirtualStyxDirectory root, String protocol) throws IOException {
+    public ClientsHandler(int iounit, IVirtualStyxFile root, String protocol) throws IOException {
         mIOUnit = iounit;
         mClientStatesMap = new HashMap<SocketChannel, ClientState>();
         mRoot = root;
