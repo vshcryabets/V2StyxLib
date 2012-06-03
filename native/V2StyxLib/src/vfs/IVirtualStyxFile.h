@@ -63,5 +63,10 @@ public:
 	 * @return
 	 */
 	virtual int write(ClientState *client, uint8_t* data, uint64_t offset) = 0;
+    /**
+     * Will be called when client close connection to this server
+     * @param state
+     */
+   virtual void onConnectionClosed(ClientState *state) = 0;
 };
 #endif

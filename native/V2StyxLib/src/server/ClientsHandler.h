@@ -14,10 +14,11 @@
 #include "ClientState.h"
 #include <string>
 
+typedef std::map<Socket, ClientState*> SocketsMap;
 class ClientsHandler {
 private:
 	int mIOUnit;
-	std::map<Socket, ClientState*> *mClientStatesMap;
+	SocketsMap mClientStatesMap;
 	IVirtualStyxDirectory *mRoot;
 	std::string *mProtocol;
 

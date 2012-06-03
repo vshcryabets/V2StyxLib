@@ -11,6 +11,7 @@
 #include "StyxTAttachMessage.h"
 #include "StyxTWalkMessage.h"
 #include "StyxTStatMessage.h"
+#include "StyxTOpenMessage.h"
 #include "../io/IStyxDataReader.h"
 #include "stdio.h"
 
@@ -72,9 +73,9 @@ StyxMessage* StyxMessage::factory(IStyxDataReader* buffer, size_t io_unit) {
 		//	case Rwalk:
 		//		result = new StyxRWalkMessage(tag, null);
 		//		break;
-		//	case Topen:
-		//		result = new StyxTOpenMessage(NOFID, ModeType.OREAD);
-		//		break;
+	case Topen:
+		result = new StyxTOpenMessage(NOFID, OREAD);
+		break;
 		//	case Ropen:
 		//		result = new StyxROpenMessage(tag, null, 0);
 		//		break;
@@ -138,7 +139,7 @@ MessageTypeEnum StyxMessage::getType() {
 	return mType;
 }
 
-uint16_t StyxMessage::getTag() {
+StyxTAG StyxMessage::getTag() {
 	return mTag;
 }
 

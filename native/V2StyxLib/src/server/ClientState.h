@@ -18,6 +18,7 @@
 #include "../messages/StyxRWalkMessage.h"
 #include "../messages/StyxRErrorMessage.h"
 #include "../messages/StyxTStatMessage.h"
+#include "../messages/StyxTOpenMessage.h"
 #include "../io/StyxByteBufferReadable.h"
 #include "../io/StyxByteBufferWritable.h"
 #include "../vfs/IVirtualStyxDirectory.h"
@@ -58,6 +59,10 @@ private:
 	 * @param msg
 	 */
 	StyxMessage* processWalk(StyxTWalkMessage* msg);
+	/**
+	 * Handle TOpen message from client
+	 */
+	StyxMessage* processTopen(StyxTOpenMessage *msg);
 	void registerOpenedFile(uint32_t fid, IVirtualStyxFile* file);
 	StyxRErrorMessage* getNoFIDError(StyxMessage* message, StyxFID fid);
 public:

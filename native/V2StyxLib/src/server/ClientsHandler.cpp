@@ -10,25 +10,25 @@
 
 ClientsHandler::ClientsHandler(int iounit,
 		IVirtualStyxDirectory *root, std::string *protocol) : mIOUnit(iounit), mRoot(root), mProtocol(protocol) {
-	mClientStatesMap = new std::map<Socket, ClientState*>();
 }
 
 ClientsHandler::~ClientsHandler() {
-	// TODO delete ClientSTatet objects
-	delete mClientStatesMap;
 }
 
 void ClientsHandler::addClient(Socket client) {
-	mClientStatesMap->insert(
+	mClientStatesMap.insert(
 			std::pair<Socket, ClientState*>(client,
 					new ClientState(mIOUnit, client, mRoot, mProtocol)));
 }
 
 bool ClientsHandler::readClient(Socket socket) {
-	ClientState *state = mClientStatesMap->find(socket)->second;
-	bool result = state->readSocket();
-	if ( result ) {
-		mClientStatesMap->erase(socket);
+	SocketsMap::iterator it = mClientStatesMap.find(socket);
+	if ( it != mClientStatesMap.end() ) {
+		bool result = it->second->readSocket();
+		if ( result ) {
+			mClientStatesMap.erase(it);
+		}
+		return result;
 	}
-	return result;
+	return true;
 }

@@ -53,10 +53,19 @@ enum QIDTypeEnum {
 	QTFILE = 0x00
 };
 
+enum ModeTypeEnum {
+    OREAD = 0,
+    OWRITE = 1,
+    ORDWR = 2,
+    OEXEC = 3,
+    OTRUNC = 0x10
+};
+
 typedef uint8_t MessageType;
 typedef uint8_t QIDType;
 typedef uint32_t StyxFID;
 typedef uint16_t StyxTAG;
 typedef std::string StyxString;
+typedef ModeTypeEnum StyxMode;
 
 #endif /* TYPES_H_ */

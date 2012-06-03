@@ -11,6 +11,7 @@
 #include "IVirtualStyxFile.h"
 using namespace std;
 
+typedef vector<IVirtualStyxFile*> FileList;
 class IVirtualStyxDirectory : virtual public IVirtualStyxFile
 {
 public:

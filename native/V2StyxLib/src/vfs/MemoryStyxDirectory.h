@@ -15,7 +15,11 @@
 #include "../structs/StyxQID.h"
 #include <vector>
 #include "../structs/StyxStat.h"
+#include <map>
+#include "../io/StyxByteBufferWritable.h"
 using namespace std;
+
+typedef map<ClientState*, StyxByteBufferWritable*> ClientsMap;
 
 class MemoryStyxDirectory : public IVirtualStyxDirectory
 {
@@ -24,7 +28,8 @@ private:
 	StyxString *mOwner;
 	StyxQID *mQID;
 	StyxStat *mStat;
-	vector<IVirtualStyxFile*> *mFiles;
+	FileList mFiles;
+	ClientsMap mBuffersMap;
 public:
 	MemoryStyxDirectory(std::string name);
 	virtual ~MemoryStyxDirectory();
@@ -84,6 +89,7 @@ public:
 	// ================================================================
 	IVirtualStyxFile* getFile(StyxString *path);
 	IVirtualStyxDirectory* getDirectory(StyxString *path);
+	void onConnectionClosed(ClientState *state);
 };
 
 #endif /* MEMORYSTYXDIRECTORY_H_ */

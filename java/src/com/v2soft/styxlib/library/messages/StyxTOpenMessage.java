@@ -21,7 +21,7 @@ public class StyxTOpenMessage extends StyxTMessage {
     @Override
     public void load(IStyxDataReader input) 
             throws IOException  {
-        setFID(input.readUInt32());
+        mFID = input.readUInt32();
         mMode = input.readUInt8();
     }
 

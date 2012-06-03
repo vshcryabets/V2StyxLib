@@ -12,6 +12,8 @@
 #include "../messages/StyxRAttachMessage.h"
 #include "../messages/StyxTAttachMessage.h"
 #include "../messages/StyxRStatMessage.h"
+#include "../messages/StyxTOpenMessage.h"
+#include "../messages/StyxROpenMessage.h"
 #include "../StyxErrorMessageException.h"
 #include <vector>
 
@@ -94,10 +96,10 @@ void ClientState::processMessage(StyxMessage *msg) {
 		case Twalk:
 			answer = processWalk((StyxTWalkMessage*) msg);
 			break;
-			/*case Topen:
-			answer = processTopen((StyxTOpenMessage)msg);
+		case Topen:
+			answer = processTopen((StyxTOpenMessage*)msg);
 			break;
-		case Tread:
+			/*case Tread:
 			answer = processTread((StyxTReadMessage)msg);
 			break;
 		case Twrite:
@@ -105,10 +107,10 @@ void ClientState::processMessage(StyxMessage *msg) {
 			break;
 		case Twstat:
 			answer = processWStat((StyxTWStatMessage)msg);*/
-		default:
-			printf("Got unknown message:\n");
-			//			System.out.println(msg.toString());
-			break;
+			default:
+				printf("Got unknown message:\n");
+				//			System.out.println(msg.toString());
+				break;
 		}
 	} catch (StyxErrorMessageException *e) {
 		answer = e->getErrorMessage();
@@ -197,4 +199,18 @@ StyxMessage* ClientState::processStat(StyxTStatMessage *msg) {
 		return getNoFIDError(msg, msg->getFID());
 	}
 	return new StyxRStatMessage(msg->getTag(), iterator->second->getStat());
+}
+/**
+ * Handle TOpen message from client
+ */
+StyxMessage* ClientState::processTopen(StyxTOpenMessage *msg) {
+	map<uint32_t,IVirtualStyxFile*>::iterator iterator = mAssignedFiles->find(msg->getFID());
+	if ( iterator == mAssignedFiles->end() ) {
+		return getNoFIDError(msg, msg->getFID());
+	}
+	if ( iterator->second->open(this, msg->getMode()) ) {
+		return new StyxROpenMessage(msg->getTag(), iterator->second->getQID(), mIOUnit-24 ); // TODO magic number
+	} else {
+//		return new StyxRErrorMessage(msg->getTag, "Incorrect mode for specified file");
+	}
 }

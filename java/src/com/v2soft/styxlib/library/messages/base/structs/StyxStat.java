@@ -38,19 +38,18 @@ public class StyxStat {
 
     public StyxStat(short type, int dev, StyxQID qid, int mode, Date accessTime,
             Date modificationTime, ULong length, String name, String userName, 
-            String groupName, String modificationUser)
-    {
-        setType(type);
-        setDev(dev);
-        setQID(qid);
-        setMode(mode);
-        setAccessTime(accessTime);
-        setModificationTime(modificationTime);
-        setLength(length);
-        setName(name);
-        setUserName(userName);
-        setGroupName(groupName);
-        setModificationUser(modificationUser);
+            String groupName, String modificationUser) {
+        mType = type;
+        mDev = dev;
+        mQID = qid;
+        mMode = mode;
+        mAccessTime = accessTime;
+        mModificationTime = modificationTime;
+        mLength = length;
+        mName = name;
+        mUserName = userName;
+        mGroupName = groupName;
+        mModificationUser = modificationUser;
     }
     
     public StyxStat(IStyxDataReader input) throws IOException {
@@ -71,10 +70,10 @@ public class StyxStat {
     public int getSize()
     {
         return 28 + StyxQID.CONTENT_SIZE
-                + StyxMessage.getUTFSize(getName())
-                + StyxMessage.getUTFSize(getUserName())
-                + StyxMessage.getUTFSize(getGroupName())
-                + StyxMessage.getUTFSize(getModificationUser());
+                + StyxMessage.getUTFSize(mName)
+                + StyxMessage.getUTFSize(mUserName)
+                + StyxMessage.getUTFSize(mGroupName)
+                + StyxMessage.getUTFSize(mModificationUser);
     }
 
     public int getType()
@@ -203,17 +202,17 @@ public class StyxStat {
 
     public void writeBinaryTo(IStyxDataWriter output) throws IOException {
         output.writeUInt16(getSize() - 2); // TODO -2??? what does it mean?
-        output.writeUInt16(getType());
-        output.writeUInt32(getDev());
-        getQID().writeBinaryTo(output);
-        output.writeUInt32(getMode());
-        output.writeUInt32(DateToInt(getAccessTime()));
-        output.writeUInt32(DateToInt(getModificationTime()));
-        output.writeUInt64(getLength());
-        output.writeUTFString(getName());
-        output.writeUTFString(getUserName());
-        output.writeUTFString(getGroupName());
-        output.writeUTFString(getModificationUser());
+        output.writeUInt16(mType);
+        output.writeUInt32(mDev);
+        mQID.writeBinaryTo(output);
+        output.writeUInt32(mMode);
+        output.writeUInt32(DateToInt(mAccessTime));
+        output.writeUInt32(DateToInt(mModificationTime));
+        output.writeUInt64(mLength);
+        output.writeUTFString(mName);
+        output.writeUTFString(mUserName);
+        output.writeUTFString(mGroupName);
+        output.writeUTFString(mModificationUser);
     }	
     @Override
     public String toString() {
