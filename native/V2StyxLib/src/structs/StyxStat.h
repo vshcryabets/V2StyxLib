@@ -34,6 +34,7 @@ public:
 	virtual ~StyxStat();
 	uint16_t getSize();
 	size_t writeBinaryTo(IStyxDataWriter *output);
+	void setMode(uint32_t mode);
 };
 
 #endif /* STYXSTAT_H_ */

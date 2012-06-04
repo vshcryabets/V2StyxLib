@@ -66,3 +66,6 @@ size_t StyxStat::writeBinaryTo(IStyxDataWriter *output) {
 	output->writeUTFString(&mModificationUser);
 	return getSize();
 }
+void StyxStat::setMode(uint32_t mode) {
+	mMode = mode;
+}

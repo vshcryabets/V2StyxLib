@@ -14,6 +14,7 @@
 MemoryStyxDirectory::MemoryStyxDirectory(std::string name):
 	MemoryStyxFile(name) {
 	mQID->setType(QTDIR);
+	mStat->setMode(getMode());
 }
 
 MemoryStyxDirectory::~MemoryStyxDirectory() {
@@ -22,7 +23,7 @@ MemoryStyxDirectory::~MemoryStyxDirectory() {
  * @return file access mode
  */
 int MemoryStyxDirectory::getMode() {
-	return 0x01FF;
+	return Directory | 0x01FF;
 }
 /**
  * Open file
