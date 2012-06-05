@@ -6,6 +6,7 @@
  */
 
 #include "MemoryStyxFile.h"
+#include "../structs/StyxQID.h"
 
 MemoryStyxFile::MemoryStyxFile(std::string name) {
 	mName = name;

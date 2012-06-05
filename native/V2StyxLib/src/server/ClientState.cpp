@@ -171,7 +171,9 @@ StyxMessage* ClientState::processWalk(StyxTWalkMessage* msg) {
 	if ( walkFile != NULL ) {
 		mAssignedFiles->insert(
 				std::pair<uint32_t, IVirtualStyxFile*>(msg->getNewFID(), walkFile));
-		return new StyxRWalkMessage(msg->getTag(), QIDList);
+		StyxRWalkMessage* result = new StyxRWalkMessage(msg->getTag(), QIDList);
+//		result->setDeleteQIDs(true);
+		return result;
 	} else {
 		return new StyxRErrorMessage(msg->getTag(), "File does not exist");
 	}

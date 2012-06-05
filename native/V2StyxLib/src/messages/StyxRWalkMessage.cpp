@@ -11,21 +11,25 @@
 StyxRWalkMessage::StyxRWalkMessage(StyxTAG tag, std::vector<StyxQID*> *QIDList)
 : StyxMessage(Rwalk, tag) {
 	mQIDList = QIDList;
+	mDelete = false;
 }
 
 StyxRWalkMessage::~StyxRWalkMessage() {
-	// TODO delete???
-	for ( std::vector<StyxQID*>::iterator it = mQIDList->begin();
-			it != mQIDList->end();) {
-		delete * it;
-		it = mQIDList->erase(it);
+	if ( mDelete ) {
+		for ( std::vector<StyxQID*>::iterator it = mQIDList->begin();
+				it != mQIDList->end();) {
+			delete * it;
+			it = mQIDList->erase(it);
+		}
+		delete mQIDList;
 	}
-	delete mQIDList;
 }
 // =======================================================
 // Virtual methods
 // =======================================================
 void StyxRWalkMessage::load(IStyxDataReader *buffer) {
+	mQIDList = new std::vector<StyxQID*>();
+	mDelete = true;
 	int count = buffer->readUInt16();
 	for (int i=0; i<count; i++) {
 		mQIDList->push_back(new StyxQID(buffer));
@@ -41,6 +45,9 @@ size_t StyxRWalkMessage::writeToBuffer(IStyxDataWriter* output) {
 }
 size_t StyxRWalkMessage::getBinarySize() {
 	size_t size = StyxMessage::getBinarySize() + 2
-		+ mQIDList->size() * StyxQID::CONTENT_SIZE;
+			+ mQIDList->size() * StyxQID::CONTENT_SIZE;
 	return size;
+}
+void StyxRWalkMessage::setDeleteQIDs(bool value) {
+	mDelete = value;
 }

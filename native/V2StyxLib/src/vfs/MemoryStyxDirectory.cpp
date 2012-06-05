@@ -86,20 +86,18 @@ size_t MemoryStyxDirectory::read(ClientState *client, uint8_t* buffer, uint64_t 
 	return count;
 }
 IVirtualStyxFile* MemoryStyxDirectory::walk(std::vector<StyxString*> *pathElements, std::vector<StyxQID*> *qids) {
-	if ( pathElements->size() < 1 ) {
-		return this;
-	} else {
+	if ( pathElements->size() > 0 ) {
+		// TODO something are wrong in this logic, why we don't put to result QIDs this->mQID?
 		StyxString* filename = *(pathElements->begin());
 		for ( FileList::iterator iterator = mFiles.begin(); iterator < mFiles.end(); iterator++ ) {
 			StyxString itemFileName = (*iterator)->getName();
 			if ( itemFileName.compare(*filename) == 0 ) {
 				pathElements->erase(pathElements->begin());
-				qids->push_back((*iterator)->getQID());
 				return (*iterator)->walk(pathElements, qids);
 			}
 		}
 	}
-	return NULL;
+	return MemoryStyxFile::walk(pathElements, qids);
 }
 void MemoryStyxDirectory::onConnectionClosed(ClientState *state) {
 	for ( FileList::iterator it = mFiles.begin();
