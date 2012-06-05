@@ -33,11 +33,14 @@ size_t StyxByteBufferReadable::readFromFD(Socket fd) {
 	}
 	size_t count = ( mWritePosition < mReadPosition ? mReadPosition-mWritePosition : mCapacity-mWritePosition );
 	size_t position = mWritePosition;
+//	printf("\tRFD: before wp=%d\n", mWritePosition);
 	int readed = ::read(fd, mBuffer+position, count);
+//	printf("\tRFD: c=%d, r=%d\n", count, readed);
 //	printf("Readed %d\n", readed);
 	if ( readed > 0 ) {
 		mStoredBytes+=readed;
 		mWritePosition+=readed;
+//		printf("\tRFD: after wp=%d, stroed=%d\n", mWritePosition, mStoredBytes);
 	}
 	return readed;
 }
@@ -47,7 +50,7 @@ size_t StyxByteBufferReadable::get(uint8_t* out, size_t i, size_t length) {
 	if ( out == NULL ) throw "Out buffer is null";
 	if ( mStoredBytes < length ) throw "Too much bytes to read";
 	if ( mReadPosition >= mCapacity ) {
-		mReadPosition = 0;
+		mReadPosition -= mCapacity;
 	}
 	size_t position = mReadPosition;
 	size_t limit = mWritePosition <= mReadPosition ? mCapacity : mWritePosition;
@@ -62,15 +65,18 @@ size_t StyxByteBufferReadable::get(uint8_t* out, size_t i, size_t length) {
 		// single block
 		memcpy(out+i,mBuffer+position, length);
 	}
+//	printf("GET: p=%d, l=%d\n", position, limit);
 	return length;
 }
 
 size_t StyxByteBufferReadable::read(uint8_t *out, size_t i, size_t length) {
 	if ( out == NULL ) throw "Out is null";
 	if ( mStoredBytes < length ) throw "Too much bytes to read";
+//	printf("READ: ps=%d, len=%d\n", mReadPosition, length);
 	size_t res = get(out, i, length);
 	mReadPosition += res;
 	mStoredBytes-=res;
+//	printf("READ: ps=%d, stored=%d\n", mReadPosition, mStoredBytes);
 	return res;
 }
 
