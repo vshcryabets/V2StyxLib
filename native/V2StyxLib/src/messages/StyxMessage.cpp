@@ -14,6 +14,9 @@
 #include "StyxTOpenMessage.h"
 #include "StyxTReadMessage.h"
 #include "StyxTClunkMessage.h"
+#include "StyxTFlushMessage.h"
+#include "StyxTWriteMessage.h"
+#include "StyxTWStatMessage.h"
 #include "../io/IStyxDataReader.h"
 #include "stdio.h"
 
@@ -51,9 +54,9 @@ StyxMessage* StyxMessage::factory(IStyxDataReader* buffer, size_t io_unit) {
 		//	case Tauth:
 		//		result = new StyxTAuthMessage(NOFID);
 		//		break;
-		//	case Tflush:
-		//		result = new StyxTFlushMessage(NOTAG);
-		//		break;
+	case Tflush:
+		result = new StyxTFlushMessage(NOTAG);
+		break;
 	case Tattach:
 		result = new StyxTAttachMessage(NOFID, NOFID, NULL, NULL);
 		break;
@@ -93,9 +96,9 @@ StyxMessage* StyxMessage::factory(IStyxDataReader* buffer, size_t io_unit) {
 		//	case Rread:
 		//		result = new StyxRReadMessage(tag, null, 0);
 		//		break;
-		//	case Twrite:
-		//		result = new StyxTWriteMessage(NOFID, null, null );
-		//		break;
+	case Twrite:
+		result = new StyxTWriteMessage( );
+		break;
 		//	case Rwrite:
 		//		result = new StyxRWriteMessage(tag, 0);
 		//		break;
@@ -117,15 +120,15 @@ StyxMessage* StyxMessage::factory(IStyxDataReader* buffer, size_t io_unit) {
 		//	case Rstat:
 		//		result = new StyxRStatMessage(tag);
 		//		break;
-		//	case Twstat:
-		//		result = new StyxTWStatMessage(NOFID, null);
-		//		break;
+	case Twstat:
+		result = new StyxTWStatMessage(NOFID, NULL);
+		break;
 		//	case Rwstat:
 		//		result = new StyxRWStatMessage(tag);
 		//		break;
 		//	}
 	default:
-		printf("Unknown message");
+		throw "Unknown message";
 		return NULL;
 	}
 	result->setTag(tag);

@@ -87,7 +87,7 @@ IVirtualStyxFile* MemoryStyxFile::walk(std::vector<StyxString*> *pathElements, s
 	}
 	return NULL;
 }
-size_t MemoryStyxFile::write(ClientState *client, uint8_t* data, uint64_t offset) {
+size_t MemoryStyxFile::write(ClientState *client, uint8_t* data, uint64_t offset, size_t count) {
 	return 0;
 }
 size_t MemoryStyxFile::read(ClientState *client, uint8_t* buffer, uint64_t offset, size_t count) {

@@ -9,21 +9,21 @@ import com.v2soft.styxlib.library.messages.base.StyxTMessage;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
 
 public class StyxTFlushMessage extends StyxTMessage {
-	private int mTag;
+	private int mOldTag;
 
 	public StyxTFlushMessage(int tag){
 		super(MessageType.Tflush);
-		mTag = tag;
+		mOldTag = tag;
 	}
 
     @Override
     public void load(IStyxDataReader input) 
         throws IOException  {
-        mTag = input.readUInt16();
+        mOldTag = input.readUInt16();
     }
 
-	public int getOldTag(){return mTag;}
-	public void setOldTag(int oldTag){mTag = oldTag;}
+	public int getOldTag(){return mOldTag;}
+	public void setOldTag(int oldTag){mOldTag = oldTag;}
 	
 	@Override
 	public int getBinarySize() {
@@ -34,7 +34,7 @@ public class StyxTFlushMessage extends StyxTMessage {
 	public void writeToBuffer(IStyxDataWriter output)
 	        throws UnsupportedEncodingException, IOException {
 	    super.writeToBuffer(output);
-	    output.writeUInt16(getOldTag());
+	    output.writeUInt16(mOldTag);
 	}
 
 	@Override

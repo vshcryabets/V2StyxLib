@@ -21,6 +21,8 @@
 #include "../messages/StyxTOpenMessage.h"
 #include "../messages/StyxTReadMessage.h"
 #include "../messages/StyxTClunkMessage.h"
+#include "../messages/StyxTWriteMessage.h"
+#include "../messages/StyxTWStatMessage.h"
 #include "../io/StyxByteBufferReadable.h"
 #include "../io/StyxByteBufferWritable.h"
 #include "../vfs/IVirtualStyxFile.h"
@@ -72,9 +74,17 @@ private:
 	StyxMessage* processRead(StyxTReadMessage *msg);
 	/**
 	 * Handle clunk request
-	 * @param msg
 	 */
 	StyxMessage* processClunk(StyxTClunkMessage *msg);
+	/**
+	 * Handle Write request
+	 */
+	StyxMessage* processWrite(StyxTWriteMessage *msg);
+	/**
+	 * Handle TWStat messages
+	 * @param msg
+	 */
+	StyxMessage* processWStat(StyxTWStatMessage *msg);
 	void registerOpenedFile(uint32_t fid, IVirtualStyxFile* file);
 	StyxRErrorMessage* getNoFIDError(StyxMessage* message, StyxFID fid);
 public:

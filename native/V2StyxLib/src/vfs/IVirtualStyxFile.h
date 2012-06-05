@@ -62,7 +62,7 @@ public:
 	 * @param offset
 	 * @return
 	 */
-	virtual size_t write(ClientState *client, uint8_t* data, uint64_t offset) = 0;
+	virtual size_t write(ClientState *client, uint8_t* data, uint64_t offset, size_t count) = 0;
     /**
      * Will be called when client close connection to this server
      * @param state

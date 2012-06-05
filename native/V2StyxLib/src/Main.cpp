@@ -8,6 +8,7 @@
 #include "StyxServerManager.h"
 #include "vfs/IVirtualStyxFile.h"
 #include "vfs/MemoryStyxDirectory.h"
+#include "vfs/StdOutFile.h"
 #include "stdio.h"
 using namespace std;
 
@@ -29,6 +30,7 @@ int main(int argc, char **argv) {
 		s1.addFile(new MemoryStyxFile("testfile12"));
 		s1.addFile(new MemoryStyxFile("testfile22"));
 		s1.addFile(new MemoryStyxFile("testfile32"));
+		s2.addFile(new StdOutFile("out"));
 		StyxServerManager manager(serveraddr, 8080, &root, &protocol);
 		manager.start();
 	} catch (const char *e) {

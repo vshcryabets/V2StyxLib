@@ -19,19 +19,14 @@ public class StyxRWriteMessage extends StyxMessage {
     @Override
     public void load(IStyxDataReader input) 
         throws IOException  {
-        setCount(input.readUInt32());
+        mCount = input.readUInt32();
     }
 	
 	public long getCount()
 	{
 		return mCount;
 	}
-	
-	public void setCount(long count)
-	{
-		mCount = count;
-	}
-	
+		
 	@Override
 	public int getBinarySize() {
 		return super.getBinarySize() + 4;
@@ -41,12 +36,12 @@ public class StyxRWriteMessage extends StyxMessage {
 	public void writeToBuffer(IStyxDataWriter output)
 	        throws UnsupportedEncodingException, IOException {
 	    super.writeToBuffer(output);
-		output.writeUInt32(getCount());
+		output.writeUInt32(mCount);
 	}
 
 	@Override
 	protected String internalToString() {
-		return String.format("Count: %d", getCount());
+		return String.format("Count: %d", mCount);
 	}
 	
 }

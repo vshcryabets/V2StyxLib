@@ -44,14 +44,14 @@ public class StyxTWStatMessage extends StyxTMessage {
 	@Override
 	public int getBinarySize() {
 		return super.getBinarySize() + 4
-			+ getStat().getSize();
+			+ mStat.getSize();
 	}
     @Override
     public void writeToBuffer(IStyxDataWriter output)
             throws IOException {
         super.writeToBuffer(output);
-        output.writeUInt32(getFID());
-        output.writeUInt16(getStat().getSize());
+        output.writeUInt32(mFID);
+        output.writeUInt16(mStat.getSize());
         mStat.writeBinaryTo(output);        
     }	
 

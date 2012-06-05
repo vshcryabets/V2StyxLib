@@ -16,6 +16,9 @@
 #include "../messages/StyxROpenMessage.h"
 #include "../messages/StyxRReadMessage.h"
 #include "../messages/StyxRClunkMessage.h"
+#include "../messages/StyxRFlushMessage.h"
+#include "../messages/StyxRWriteMessage.h"
+#include "../messages/StyxRWStatMessage.h"
 #include "../StyxErrorMessageException.h"
 #include <vector>
 
@@ -84,10 +87,10 @@ void ClientState::processMessage(StyxMessage *msg) {
 		case Tclunk:
 			answer = processClunk((StyxTClunkMessage*) msg);
 			break;
-//		case Tflush:
-//			// TODO do something there
-//			answer = new StyxRFlushMessage(msg.getTag());
-//			break;
+		case Tflush:
+			// TODO do something there
+			answer = new StyxRFlushMessage(msg->getTag());
+			break;
 		case Twalk:
 			answer = processWalk((StyxTWalkMessage*) msg);
 			break;
@@ -97,11 +100,12 @@ void ClientState::processMessage(StyxMessage *msg) {
 		case Tread:
 			answer = processRead((StyxTReadMessage*)msg);
 			break;
-			/*case Twrite:
-			answer = processWrite((StyxTWriteMessage)msg);
+		case Twrite:
+			answer = processWrite((StyxTWriteMessage*)msg);
 			break;
 		case Twstat:
-			answer = processWStat((StyxTWStatMessage)msg);*/
+			answer = processWStat((StyxTWStatMessage*)msg);
+			break;
 		default:
 			printf("Got unknown message:\n");
 			//			System.out.println(msg.toString());
@@ -172,7 +176,7 @@ StyxMessage* ClientState::processWalk(StyxTWalkMessage* msg) {
 		mAssignedFiles->insert(
 				std::pair<uint32_t, IVirtualStyxFile*>(msg->getNewFID(), walkFile));
 		StyxRWalkMessage* result = new StyxRWalkMessage(msg->getTag(), QIDList);
-//		result->setDeleteQIDs(true);
+		//		result->setDeleteQIDs(true);
 		return result;
 	} else {
 		return new StyxRErrorMessage(msg->getTag(), "File does not exist");
@@ -239,4 +243,27 @@ StyxMessage* ClientState::processClunk(StyxTClunkMessage *msg) {
 	iterator->second->close(this);
 	mAssignedFiles->erase(iterator);
 	return new StyxRClunkMessage(msg->getTag());
+}
+/**
+ * Handle TWrite messages
+ * @param msg
+ */
+StyxMessage* ClientState::processWrite(StyxTWriteMessage *msg) {
+	printf("Got TWrite %dx%d\n", msg->getOffset(), msg->getCount());
+	map<uint32_t,IVirtualStyxFile*>::iterator iterator = mAssignedFiles->find(msg->getFID());
+	if ( iterator == mAssignedFiles->end() ) {
+		return getNoFIDError(msg, msg->getFID());
+	}
+	size_t writed = iterator->second->write(this,
+			msg->getData(),
+			msg->getOffset(),
+			msg->getCount());
+	return new StyxRWriteMessage(msg->getTag(), writed);
+}
+/**
+ * Handle TWStat messages
+ * @param msg
+ */
+StyxMessage* ClientState::processWStat(StyxTWStatMessage *msg) {
+	return new StyxRWStatMessage(msg->getTag());
 }
