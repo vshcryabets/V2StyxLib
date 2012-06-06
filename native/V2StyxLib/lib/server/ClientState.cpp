@@ -52,9 +52,9 @@ bool ClientState::process() {
 		size_t packetSize = mBuffer->getUInt32();
 		//		::printf("PacketSize=%d\n", packetSize);
 		if ( inBuffer >= packetSize ) {
-			::printf("We have new message!\n");
+//			::printf("We have new message!\n");
 			StyxMessage *message = StyxMessage::factory(mBuffer, mIOUnit);
-			::printf("We have new message type=%d\n", message->getType());
+//			::printf("We have new message type=%d\n", message->getType());
 			processMessage(message);
 			delete message;
 			return true;

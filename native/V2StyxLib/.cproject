@@ -34,6 +34,9 @@
 								<option id="gnu.cpp.compiler.option.debugging.prof.2143022797" name="Generate prof information (-p)" superClass="gnu.cpp.compiler.option.debugging.prof" value="false" valueType="boolean"/>
 								<option id="gnu.cpp.compiler.option.debugging.gprof.1421310894" name="Generate gprof information (-pg)" superClass="gnu.cpp.compiler.option.debugging.gprof" value="false" valueType="boolean"/>
 								<option id="gnu.cpp.compiler.option.other.pic.2061938536" name="Position Independent Code (-fPIC)" superClass="gnu.cpp.compiler.option.other.pic" value="true" valueType="boolean"/>
+								<option id="gnu.cpp.compiler.option.include.paths.1247199810" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/include}&quot;"/>
+								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.2038270725" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.c.compiler.so.debug.1047115855" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.so.debug">
@@ -131,10 +134,10 @@
 		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.so.debug.798164034;cdt.managedbuild.config.gnu.so.debug.798164034.;cdt.managedbuild.tool.gnu.cpp.compiler.so.debug.1974866429;cdt.managedbuild.tool.gnu.cpp.compiler.input.2038270725">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileCPP"/>
 		</scannerConfigBuildInfo>
-		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.so.release.1180003990;cdt.managedbuild.config.gnu.so.release.1180003990.;cdt.managedbuild.tool.gnu.c.compiler.so.release.359925152;cdt.managedbuild.tool.gnu.c.compiler.input.232671271">
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.so.debug.798164034;cdt.managedbuild.config.gnu.so.debug.798164034.;cdt.managedbuild.tool.gnu.c.compiler.so.debug.1047115855;cdt.managedbuild.tool.gnu.c.compiler.input.1139228095">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileC"/>
 		</scannerConfigBuildInfo>
-		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.so.debug.798164034;cdt.managedbuild.config.gnu.so.debug.798164034.;cdt.managedbuild.tool.gnu.c.compiler.so.debug.1047115855;cdt.managedbuild.tool.gnu.c.compiler.input.1139228095">
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.so.release.1180003990;cdt.managedbuild.config.gnu.so.release.1180003990.;cdt.managedbuild.tool.gnu.c.compiler.so.release.359925152;cdt.managedbuild.tool.gnu.c.compiler.input.232671271">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileC"/>
 		</scannerConfigBuildInfo>
 	</storageModule>

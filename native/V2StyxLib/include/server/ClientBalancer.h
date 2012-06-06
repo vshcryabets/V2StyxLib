@@ -17,8 +17,8 @@ class ClientBalancer {
 private:
 	ClientsHandler *mHandler;
 	vector<Socket> *mAllConnections;
-	vector<Socket> *mNewConnections;
-	vector<Socket> *mReadable;
+	vector<Socket> mNewConnections;
+	vector<Socket> mReadable;
 public:
 	ClientBalancer(int iounit, IVirtualStyxFile *root, std::string protocol);
 	~ClientBalancer();

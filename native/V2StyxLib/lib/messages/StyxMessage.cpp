@@ -58,7 +58,7 @@ StyxMessage* StyxMessage::factory(IStyxDataReader* buffer, size_t io_unit) {
 		result = new StyxTFlushMessage(NOTAG);
 		break;
 	case Tattach:
-		result = new StyxTAttachMessage(NOFID, NOFID, NULL, NULL);
+		result = new StyxTAttachMessage(NOFID, NOFID, "", "");
 		break;
 	case Twalk:
 		result = new StyxTWalkMessage(NOFID, NOFID);
