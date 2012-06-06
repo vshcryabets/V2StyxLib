@@ -46,10 +46,10 @@ ClientState::~ClientState() {
  * @return true if message was processed
  */
 bool ClientState::process() {
-	ssize_t inBuffer = mBuffer->remainsToRead();
+	size_t inBuffer = mBuffer->remainsToRead();
 //	::printf("inBuffer=%p\n", inBuffer);
 	if ( inBuffer > 4 ) {
-		ssize_t packetSize = mBuffer->getUInt32();
+		size_t packetSize = mBuffer->getUInt32();
 		::printf("PacketSize=%d\n", packetSize);
 		if ( inBuffer >= packetSize ) {
 			::printf("We have new message!\n");
