@@ -7,4 +7,4 @@ ADD_DEFINITIONS(-g -O2 -fsigned-char -freg-struct-return -Wall)
 
 ADD_DEFINITIONS(-g -O2 -Wall)
 ADD_SUBDIRECTORY( lib bin )
-#ADD_SUBDIRECTORY( testserver bin )
+ADD_SUBDIRECTORY( testserver bin )

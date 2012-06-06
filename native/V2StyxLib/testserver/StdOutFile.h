@@ -8,7 +8,7 @@
 #ifndef STDOUTFILE_H_
 #define STDOUTFILE_H_
 
-#include "./vfs/MemoryStyxFile.h"
+#include "vfs/MemoryStyxFile.h"
 
 class StdOutFile: public MemoryStyxFile {
 public:
