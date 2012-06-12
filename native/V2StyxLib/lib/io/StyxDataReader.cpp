@@ -13,10 +13,11 @@ StyxDataReader::StyxDataReader() {
 StyxDataReader::~StyxDataReader() {
 }
 
-uint64_t StyxDataReader::readInteger(size_t bytes) {
+uint64_t StyxDataReader::readInteger(const size_t bytes) {
 	uint64_t result = 0L;
 	int shift = 0;
-	uint8_t mDataBuffer[bytes];
+	const int q = 10;
+	uint8_t mDataBuffer[q];
 	read(mDataBuffer, 0, bytes);
 	for (size_t i=0; i<bytes; i++) {
 		long b = (mDataBuffer[i]&0xFF);

@@ -10,7 +10,12 @@
 #include <stdint.h>
 #include <string>
 
+#ifdef WIN32
+#include <winsock2.h>
+typedef SOCKET Socket;
+#else
 typedef int Socket;
+#endif
 typedef int64_t Date;
 typedef int64_t int128_t;
 

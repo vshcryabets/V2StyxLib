@@ -43,7 +43,11 @@ void ClientBalancer::process() {
 			socketIterator != mReadable.end(); socketIterator++ ) {
 		bool closed = mHandler->readClient(*socketIterator);
 		if ( closed ) {
+#ifdef WIN32
+			closesocket(*socketIterator);
+#else
 			::close(*socketIterator);
+#endif
 			for (vector<Socket>::iterator it = mAllConnections->begin();
 					it != mAllConnections->end(); it++ ) {
 				if ( *it == *socketIterator ) {

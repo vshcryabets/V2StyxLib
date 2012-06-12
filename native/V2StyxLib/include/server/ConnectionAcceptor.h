@@ -14,8 +14,6 @@ class ConnectionAcceptor {
 private:
 	Socket mSocket;
 	ClientBalancer *mBalancer;
-
-	void setNonBlocking(Socket socket);
 public:
 	ConnectionAcceptor(Socket socket, ClientBalancer *balancer);
 	~ConnectionAcceptor();

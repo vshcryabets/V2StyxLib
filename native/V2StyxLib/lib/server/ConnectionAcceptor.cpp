@@ -6,12 +6,18 @@
  */
 
 #include "server/ConnectionAcceptor.h"
+#include "StyxServerManager.h"
+
+#ifdef WIN32
+#include <WinSock2.h>
+#else
 #include "sys/socket.h"
 #include "fcntl.h"
-#include "string.h"
 #include "netinet/in.h"
 #include <arpa/inet.h>
 #include <netdb.h>
+#endif
+#include "string.h"
 #include <stdio.h>
 #include "server/ClientBalancer.h"
 #include <vector>
@@ -62,7 +68,7 @@ void ConnectionAcceptor::start() {
 			if (FD_ISSET( mSocket, &socks )) {
 				Socket inSocket = accept(mSocket, NULL, NULL);
 				if ( inSocket > 0 ) {
-					this->setNonBlocking(inSocket);
+					StyxServerManager::setNonBlocking(inSocket);
 					mBalancer->pushNewConnection(inSocket);
 				}
 			}
@@ -75,18 +81,6 @@ void ConnectionAcceptor::start() {
 			}
 			mBalancer->process();
 		}
-	}
-}
-
-void ConnectionAcceptor::setNonBlocking(Socket socket) {
-	int opts;
-	opts = fcntl(socket,F_GETFL);
-	if (opts < 0) {
-		throw "Can't create socket fcntl(F_GETFL)";
-	}
-	opts = (opts | O_NONBLOCK);
-	if (fcntl(socket,F_SETFL,opts) < 0) {
-		throw "Can't create socket fcntl(F_SETFL)";
 	}
 }
 

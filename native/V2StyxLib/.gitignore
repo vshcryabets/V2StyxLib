@@ -6,4 +6,7 @@ Makefile
 *.cmake
 *.a
 *.dir
-
+*.vcxproj.*
+*.sln
+*.suo
+*.sdf

@@ -33,14 +33,14 @@ size_t StyxByteBufferReadable::readFromFD(Socket fd) {
 	}
 	size_t count = ( mWritePosition < mReadPosition ? mReadPosition-mWritePosition : mCapacity-mWritePosition );
 	size_t position = mWritePosition;
-//	printf("\tRFD: before wp=%d\n", mWritePosition);
+#ifdef WIN32
+	int readed = ::recv(fd, (char*)(mBuffer+position), count, 0);
+#else
 	int readed = ::read(fd, mBuffer+position, count);
-//	printf("\tRFD: c=%d, r=%d\n", count, readed);
-//	printf("Readed %d\n", readed);
+#endif
 	if ( readed > 0 ) {
 		mStoredBytes+=readed;
 		mWritePosition+=readed;
-//		printf("\tRFD: after wp=%d, stroed=%d\n", mWritePosition, mStoredBytes);
 	}
 	return readed;
 }

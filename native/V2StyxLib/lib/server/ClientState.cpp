@@ -127,7 +127,11 @@ void ClientState::processMessage(StyxMessage *msg) {
 
 void ClientState::sendMessage(StyxMessage *answer) {
 	int writed = answer->writeToBuffer(mOutputBuffer);
+#ifdef WIN32
+	::send(mChannel, (const char*)(mOutputBuffer->getBuffer()), writed, 0 );
+#else
 	::write(mChannel, mOutputBuffer->getBuffer(), writed);
+#endif
 }
 
 bool ClientState::readSocket() {

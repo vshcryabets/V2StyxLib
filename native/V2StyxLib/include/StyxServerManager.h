@@ -8,8 +8,13 @@
 #ifndef STYXSERVERMANAGER_H_
 #define STYXSERVERMANAGER_H_
 #include <string>
+#ifdef WIN32
+#include <WinSock2.h>
+#else
 /* According to POSIX.1-2001 */
 #include <sys/select.h>
+#endif
+
 #include "types.h"
 #include "classes.h"
 using namespace std;
@@ -27,9 +32,8 @@ private:
 			short port,
 			struct sockaddr_in * sap,
 			char* protocol);
-
-	void deaWithData(int* list, int id);
-	void setNonBlocking(int socket);
+	// create and bind socket
+	Socket createSocket(string address, int port);
 public:
 	StyxServerManager(string address, int port, IVirtualStyxFile *root, string protocol);
 	~StyxServerManager();
@@ -41,6 +45,10 @@ public:
 	 * stop server and realease all resources
 	 */
 	void stop();
+	/**
+	* Set non-blocking mode
+	*/
+	static void setNonBlocking(Socket socket);
 };
 
 #endif /* STYXSERVERMANAGER_H_ */
