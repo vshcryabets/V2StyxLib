@@ -15,6 +15,7 @@
 typedef SOCKET Socket;
 #define errno WSAGetLastError()
 #else
+#include "errno.h"
 typedef int Socket;
 #endif
 typedef int64_t Date;

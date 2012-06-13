@@ -126,12 +126,13 @@ void ClientState::processMessage(StyxMessage *msg) {
 }
 
 void ClientState::sendMessage(StyxMessage *answer) {
-	int writed = answer->writeToBuffer(mOutputBuffer);
+	size_t inbuffer = answer->writeToBuffer(mOutputBuffer);
 #ifdef WIN32
-	::send(mChannel, (const char*)(mOutputBuffer->getBuffer()), writed, 0 );
+	size_t writed = ::send(mChannel, (const char*)(mOutputBuffer->getBuffer()), inbuffer, 0 );
 #else
-	::write(mChannel, mOutputBuffer->getBuffer(), writed);
+	size_t writed =  ::write(mChannel, mOutputBuffer->getBuffer(), inbuffer);
 #endif
+	inbuffer = inbuffer - writed;
 }
 
 bool ClientState::readSocket() {
