@@ -28,7 +28,6 @@ private:
 			struct sockaddr_in * sap,
 			char* protocol);
 
-	void deaWithData(int* list, int id);
 	void setNonBlocking(int socket);
 public:
 	StyxServerManager(string address, int port, IVirtualStyxFile *root, string protocol);

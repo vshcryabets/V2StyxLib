@@ -126,8 +126,9 @@ void ClientState::processMessage(StyxMessage *msg) {
 }
 
 void ClientState::sendMessage(StyxMessage *answer) {
-	int writed = answer->writeToBuffer(mOutputBuffer);
-	::write(mChannel, mOutputBuffer->getBuffer(), writed);
+	size_t inbuffer = answer->writeToBuffer(mOutputBuffer);
+	ssize_t writed = ::write(mChannel, mOutputBuffer->getBuffer(), inbuffer);
+	inbuffer = inbuffer - writed;
 }
 
 bool ClientState::readSocket() {

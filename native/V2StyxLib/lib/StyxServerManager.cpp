@@ -70,28 +70,6 @@ void StyxServerManager::setAddress(const char * hname,
 	sap->sin_port = htons(port);
 }
 
-void StyxServerManager::deaWithData(int* list, int idx) {
-	char buffer[80];     /* Buffer for socket reads */
-	char *cur_char;      /* Used in processing buffer */
-
-	ssize_t readed = read(list[idx], buffer, 80);
-	if (readed < 0) {
-		/* Connection closed, close this end
-		   and free up entry in connectlist */
-		close(list[idx]);
-		list[idx] = 0;
-	} else {
-		/* We got some data, so upper case it
-		   and send it back. */
-		cur_char = buffer;
-		while (cur_char[0] != 0) {
-			cur_char[0] = toupper(cur_char[0]);
-			cur_char++;
-		}
-		write(list[idx],(const void*)buffer,readed);
-	}
-}
-
 void StyxServerManager::setNonBlocking(Socket socket) {
 	int opts;
 	opts = fcntl(socket,F_GETFL);
