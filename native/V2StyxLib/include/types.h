@@ -13,6 +13,7 @@
 #ifdef WIN32
 #include <winsock2.h>
 typedef SOCKET Socket;
+#define errno WSAGetLastError()
 #else
 typedef int Socket;
 #endif

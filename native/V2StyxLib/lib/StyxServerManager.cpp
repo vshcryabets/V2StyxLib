@@ -92,14 +92,11 @@ Socket StyxServerManager::createSocket(string address,
 	Socket res = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 #ifdef WIN32
 	if ( res == INVALID_SOCKET ) {
-		int qwe = WSAGetLastError();
-		throw new StyxLibraryException(__FILE__, "Can't create socket");
-	}
 #else
 	if ( res == -1 ) {
-		throw new StyxLibraryException(__FILE__, "Can't create socket");
-	}
 #endif
+		throw new StyxLibraryException(__FILE__, "Can't create socket", errno);
+	}
 	int reuse_addr = 1;
 	setsockopt(res, 
 		SOL_SOCKET, 
@@ -111,14 +108,16 @@ Socket StyxServerManager::createSocket(string address,
 	// resolve address and bind socket
 	struct sockaddr_in server_address;
 	this->setAddress(address.c_str(), port, &server_address, NULL);
-	if (bind(mSocket, (struct sockaddr *) &server_address,
+	if (bind(res, 
+		(struct sockaddr *) &server_address,
 			sizeof(server_address)) < 0 ) {
 #ifdef WIN32
 		closesocket(res);
 #else
 		close(res);
 #endif
-		throw new StyxLibraryException(__FILE__, "Can't create socket bind()");
+		throw new StyxLibraryException(__FILE__, "Can't bind socket", errno);
+		
 	}
 	return res;
 }

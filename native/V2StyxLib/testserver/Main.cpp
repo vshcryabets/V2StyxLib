@@ -27,7 +27,7 @@ int main(int argc, char **argv) {
     }
 #endif
 	try {
-		string serveraddr = "127.0.0.1";
+		string serveraddr = "0.0.0.0";
 		MemoryStyxDirectory root ("root");
 		string protocol = "9P2000";
 		MemoryStyxDirectory s1("s1");
@@ -47,7 +47,7 @@ int main(int argc, char **argv) {
 		StyxServerManager manager(serveraddr, 8080, &root, protocol);
 		manager.start();
 	} catch (StyxLibraryException *e) {
-		printf("Exception: %s \n", e->getMessage().c_str());
+		printf("Exception: %s (ac:%d)\n", e->getMessage().c_str(), e->getAdditionalCode());
 	} catch (const char *e) {
 		printf("Exception: %s \n", e);
 	}

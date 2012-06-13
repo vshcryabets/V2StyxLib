@@ -2,10 +2,17 @@
  * StdOutFile.cpp
  *
  *  Created on: Jun 5, 2012
- *      Author: mrco
+ *      Author: vshcryabets@gmail.com
  */
 
 #include "StdOutFile.h"
+#ifdef WIN32
+#include "io.h"
+#define STDIN_FILENO 0
+#define STDOUT_FILENO 1
+#define STDERR_FILENO 2
+
+#endif
 
 StdOutFile::StdOutFile(std::string name) :
 	MemoryStyxFile(name) {
