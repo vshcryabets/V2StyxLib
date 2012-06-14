@@ -7,9 +7,12 @@
 
 #include "StyxErrorMessageException.h"
 
-StyxErrorMessageException::StyxErrorMessageException() {
-	// TODO Auto-generated constructor stub
+StyxErrorMessageException::StyxErrorMessageException(StyxRErrorMessage *message) {
+	mMessage = message;
+}
 
+StyxErrorMessageException::StyxErrorMessageException(const char *message) {
+	mMessage = new StyxRErrorMessage(StyxMessage::NOTAG, message);
 }
 
 StyxErrorMessageException::~StyxErrorMessageException() {

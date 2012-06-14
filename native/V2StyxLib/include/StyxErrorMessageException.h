@@ -13,7 +13,8 @@ class StyxErrorMessageException {
 private:
 	StyxRErrorMessage *mMessage;
 public:
-	StyxErrorMessageException();
+	StyxErrorMessageException(const char *message);
+	StyxErrorMessageException(StyxRErrorMessage *message);
 	virtual ~StyxErrorMessageException();
 	StyxRErrorMessage* getErrorMessage();
 };
