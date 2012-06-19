@@ -8,6 +8,7 @@ import java.util.concurrent.TimeoutException;
 import com.v2soft.styxlib.library.StyxServerManager;
 import com.v2soft.styxlib.library.exceptions.StyxException;
 import com.v2soft.styxlib.library.server.vfs.MemoryStyxDirectory;
+import com.v2soft.styxlib.library.server.vfs.MemoryStyxFile;
 
 /**
  * 
@@ -57,14 +58,19 @@ public class JavaServerTest {
                 pos++;
             }
             MemoryStyxDirectory root = new MemoryStyxDirectory("memory");
-            root.addFile(new MemoryStyxDirectory("dir1"));
-            root.addFile(new MemoryStyxDirectory("dir2"));
-            root.addFile(new MemoryStyxDirectory("dir3"));
-            root.addFile(new MemoryStyxDirectory("dir4"));
+            MemoryStyxDirectory dir = new MemoryStyxDirectory("vdir1"); 
+            root.addFile(dir);
+            dir = new MemoryStyxDirectory("vdir2");
+            root.addFile(dir);
+            dir.addFile(new MemoryStyxFile("vfile1"));
+            dir.addFile(new MemoryStyxFile("vfile2"));
+            dir.addFile(new MemoryStyxFile("vfile3"));
+            dir.addFile(new MemoryStyxFile("vfile4"));
             StyxServerManager manager = new StyxServerManager(InetAddress.getLocalHost(), 
             		8080, 
             		false,
-            		root);
+            		root,
+            		StyxServerManager.PROTOCOL);
             manager.start();
             while ( true ) {
                 Thread.sleep(1000);

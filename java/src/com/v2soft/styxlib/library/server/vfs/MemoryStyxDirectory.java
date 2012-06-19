@@ -34,12 +34,6 @@ extends MemoryStyxFile {
         mBuffersMap = new HashMap<ClientState, StyxByteBufferWriteable>();
     }
 
-//    @Override
-//    public IVirtualStyxDirectory getDirectory(String path) {
-//        if ( path.length() == 0 || path.equals("/")) return this;
-//        return null;
-//    }
-
     @Override
     public int getMode() {
         return (int) (FileMode.Directory.getMode() | 0x01FF);
@@ -47,19 +41,16 @@ extends MemoryStyxFile {
 
     @Override
     public IVirtualStyxFile walk(List<String> pathElements, List<StyxQID> qids) {
-        if ( pathElements.size() < 1 ) {
-            return this;
-        } else {
+        if ( pathElements.size() > 0 ) {
             String filename = pathElements.get(0);
             for (IVirtualStyxFile file : mFiles) {
                 if ( file.getName().equals(filename)) {
                     pathElements.remove(0);
-                    qids.add(file.getQID());
                     return file.walk(pathElements, qids);
                 }
             }
         }
-        return null;
+        return super.walk(pathElements, qids);
     }
 
     @Override
