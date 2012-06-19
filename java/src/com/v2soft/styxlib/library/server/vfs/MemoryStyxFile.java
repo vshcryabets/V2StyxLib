@@ -22,7 +22,7 @@ public class MemoryStyxFile implements IVirtualStyxFile {
     protected String mName;
     protected StyxQID mQID;
     protected StyxStat mStat;
-    
+
     public MemoryStyxFile(String name) {
         if ( name == null ) throw new NullPointerException("Filename is null");
         mName = name;
@@ -94,17 +94,13 @@ public class MemoryStyxFile implements IVirtualStyxFile {
 
     @Override
     public IVirtualStyxFile walk(List<String> pathElements, List<StyxQID> qids) {
-        if ( pathElements.size() == 0 ) {
-            qids.add(mQID);
-            return this;
-        }
-        return null;
+        return this;
     }
-    
+
     public int write(ClientState client, byte[] data, ULong offset) throws StyxErrorMessageException {
         return 0;
     }
-    
+
     @Override
     public long read(ClientState client, byte[] outbuffer, ULong offset, long count) throws StyxErrorMessageException {
         return 0;
@@ -113,7 +109,7 @@ public class MemoryStyxFile implements IVirtualStyxFile {
     @Override
     public void close(ClientState client) {
     }
-    
+
     // ==============================================================
     // Abstract methods
     // ==============================================================

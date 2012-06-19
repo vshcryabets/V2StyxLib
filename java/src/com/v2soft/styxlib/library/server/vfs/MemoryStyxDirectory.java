@@ -46,6 +46,7 @@ extends MemoryStyxFile {
             for (IVirtualStyxFile file : mFiles) {
                 if ( file.getName().equals(filename)) {
                     pathElements.remove(0);
+                    qids.add(file.getQID());
                     return file.walk(pathElements, qids);
                 }
             }

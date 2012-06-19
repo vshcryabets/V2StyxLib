@@ -30,8 +30,9 @@ int main(int argc, char **argv) {
 		string serveraddr = "0.0.0.0";
 		MemoryStyxDirectory root ("root");
 		string protocol = "9P2000";
-		MemoryStyxDirectory s1("s1");
+		MemoryStyxDirectory s1("server");
 		root.addFile(&s1);
+		s1.addFile(new MemoryStyxFile("players"));
 		MemoryStyxDirectory s2("s2");
 		root.addFile(&s2);
 		s1.addFile(new MemoryStyxFile("testfile1"));

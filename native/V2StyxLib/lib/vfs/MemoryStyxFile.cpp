@@ -77,15 +77,11 @@ bool MemoryStyxFile::open(ClientState *client, int mode) {
 			(mode&0x0F) == OREAD ||
 			(mode&0x0F) == OWRITE ||
 			(mode&0x0F) == ORDWR
-			);
+	);
 	return result;
 }
 IVirtualStyxFile* MemoryStyxFile::walk(std::vector<StyxString*> *pathElements, std::vector<StyxQID*> *qids) {
-	if ( pathElements->size() == 0 ) {
-		qids->push_back(mQID);
-		return this;
-	}
-	return NULL;
+	return this;
 }
 size_t MemoryStyxFile::write(ClientState *client, uint8_t* data, uint64_t offset, size_t count) {
 	return 0;
