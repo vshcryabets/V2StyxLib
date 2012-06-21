@@ -38,23 +38,23 @@ import com.v2soft.styxlib.library.types.ULong;
 public class StyxFile implements Closeable {
     public static final String SEPARATOR = "/";
 
-    private StyxClientManager mManager;
+    private StyxClientConnection mManager;
     private long mFID = StyxMessage.NOFID;
     private long mParentFID = StyxMessage.NOFID;
     private StyxStat mStat;
     private String mPath;
     private Messenger mMessenger;
-    private long mTimeout = StyxClientManager.DEFAULT_TIMEOUT;
+    private long mTimeout = StyxClientConnection.DEFAULT_TIMEOUT;
 
-    public StyxFile(StyxClientManager manager) throws StyxException, TimeoutException, IOException, InterruptedException {
+    public StyxFile(StyxClientConnection manager) throws StyxException, TimeoutException, IOException, InterruptedException {
         this(manager, null);
     }
 
-    public StyxFile(StyxClientManager manager, String path) throws StyxException, TimeoutException, IOException, InterruptedException {
+    public StyxFile(StyxClientConnection manager, String path) throws StyxException, TimeoutException, IOException, InterruptedException {
         this(manager, path, null);
     }
 
-    public StyxFile(StyxClientManager manager, String path, StyxFile parent) 
+    public StyxFile(StyxClientConnection manager, String path, StyxFile parent) 
             throws StyxException, TimeoutException, IOException, InterruptedException {
         if ( !manager.isConnected() )
             throw new IOException("Styx connection wasn't established");
@@ -70,7 +70,7 @@ public class StyxFile implements Closeable {
         }
     }
 
-    public StyxFile(StyxClientManager manager, long fid) throws IOException {
+    public StyxFile(StyxClientConnection manager, long fid) throws IOException {
         if ( !manager.isConnected() )
             throw new IOException("Styx connection wasn't established");
         mManager = manager;
@@ -133,7 +133,7 @@ public class StyxFile implements Closeable {
         ArrayList<StyxStat> stats = new ArrayList<StyxStat>();
         try
         {
-            is = new StyxFileBufferedInputStream(mMessenger, this, iounit);
+            is = new StyxFileBufferedInputStream(mMessenger, this, iounit, false);
             StyxDataInputStream sis = new StyxDataInputStream(is);
             while (true) {
                 StyxStat stat = new StyxStat(sis);
@@ -219,7 +219,7 @@ public class StyxFile implements Closeable {
             throw new IOException("Not connected to server");
         }
         int iounit = open(ModeType.OREAD);
-        return new StyxFileBufferedInputStream(mMessenger, this, iounit);
+        return new StyxFileBufferedInputStream(mMessenger, this, iounit, false);
     }
 
     public OutputStream openForWrite() 
@@ -248,7 +248,7 @@ public class StyxFile implements Closeable {
         return openForWrite();
     }
 
-    public static boolean exists(StyxClientManager manager, String fileName) 
+    public static boolean exists(StyxClientConnection manager, String fileName) 
             throws InterruptedException, StyxException, TimeoutException, IOException
             {
         StyxFile file = new StyxFile(manager, fileName);
@@ -298,7 +298,7 @@ public class StyxFile implements Closeable {
         mFID = StyxMessage.NOFID;
     }
 
-    public static void delete(StyxClientManager manager, String fileName, boolean recurse)
+    public static void delete(StyxClientConnection manager, String fileName, boolean recurse)
             throws InterruptedException, StyxException, TimeoutException, IOException {
         final StyxFile file = new StyxFile(manager, fileName);
         file.delete(recurse);

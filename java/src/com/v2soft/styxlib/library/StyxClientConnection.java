@@ -26,7 +26,7 @@ import com.v2soft.styxlib.library.messages.StyxTVersionMessage;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.messages.base.structs.StyxQID;
 
-public class StyxClientManager 
+public class StyxClientConnection 
 implements Closeable, StyxMessengerListener {
     //---------------------------------------------------------------------------
     // Constants
@@ -54,17 +54,17 @@ implements Closeable, StyxMessengerListener {
     private long mFID = StyxMessage.NOFID;
     private ActiveFids mActiveFids = new ActiveFids();
 
-    public StyxClientManager() {
+    public StyxClientConnection() {
         this(null, 0, false, null, null);
     }
 
-    public StyxClientManager(InetAddress address, int port, boolean ssl)
+    public StyxClientConnection(InetAddress address, int port, boolean ssl)
     {
         this(address, port, ssl, null, null);
         setConnected(false);
     }
 
-    public StyxClientManager(InetAddress address, int port, boolean ssl, String username, String password) {
+    public StyxClientConnection(InetAddress address, int port, boolean ssl, String username, String password) {
         mAddress = address;
         mPort = port;
         mSSL = ssl;

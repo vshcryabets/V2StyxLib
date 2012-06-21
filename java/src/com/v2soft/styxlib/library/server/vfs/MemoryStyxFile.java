@@ -3,6 +3,7 @@ package com.v2soft.styxlib.library.server.vfs;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 import com.v2soft.styxlib.library.exceptions.StyxErrorMessageException;
@@ -93,7 +94,7 @@ public class MemoryStyxFile implements IVirtualStyxFile {
     }
 
     @Override
-    public IVirtualStyxFile walk(List<String> pathElements, List<StyxQID> qids) {
+    public IVirtualStyxFile walk(Iterator<String> pathElements, List<StyxQID> qids) {
         return this;
     }
 

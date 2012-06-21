@@ -3,7 +3,7 @@ package com.v2soft.styxlib.library.io;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import com.v2soft.styxlib.library.StyxClientManager;
+import com.v2soft.styxlib.library.StyxClientConnection;
 import com.v2soft.styxlib.library.StyxFile;
 import com.v2soft.styxlib.library.core.Messenger;
 import com.v2soft.styxlib.library.exceptions.StyxErrorMessageException;
@@ -18,7 +18,7 @@ import com.v2soft.styxlib.library.types.ULong;
  *
  */
 public class StyxUnbufferedOutputStream extends OutputStream {
-    private long mTimeout = StyxClientManager.DEFAULT_TIMEOUT;
+    private long mTimeout = StyxClientConnection.DEFAULT_TIMEOUT;
     private byte[] mSingleByteArray = new byte[1];
     private StyxFile mFile;
     private Messenger mMessenger;

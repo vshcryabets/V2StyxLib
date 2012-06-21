@@ -3,6 +3,7 @@ package com.v2soft.styxlib.library.server.vfs;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -40,16 +41,16 @@ extends MemoryStyxFile {
     }
 
     @Override
-    public IVirtualStyxFile walk(List<String> pathElements, List<StyxQID> qids) {
-        if ( pathElements.size() > 0 ) {
-            String filename = pathElements.get(0);
+    public IVirtualStyxFile walk(Iterator<String> pathElements, List<StyxQID> qids) {
+        if ( pathElements.hasNext() ) {
+            String filename = pathElements.next();
             for (IVirtualStyxFile file : mFiles) {
                 if ( file.getName().equals(filename)) {
-                    pathElements.remove(0);
                     qids.add(file.getQID());
                     return file.walk(pathElements, qids);
                 }
             }
+            return null;
         }
         return super.walk(pathElements, qids);
     }
@@ -119,5 +120,13 @@ extends MemoryStyxFile {
             file.onConnectionClosed(state);
         }
         mBuffersMap.remove(state);
+    }
+
+    /**
+     * Delete child file
+     * @param file file that should be removed from this directory
+     */
+    public boolean deleteFile(IVirtualStyxFile file) {
+        return mFiles.remove(file);
     }
 }

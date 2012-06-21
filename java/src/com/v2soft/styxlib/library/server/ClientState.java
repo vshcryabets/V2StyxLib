@@ -4,7 +4,6 @@ import java.io.Closeable;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.channels.SocketChannel;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -112,22 +111,11 @@ implements Closeable {
                 break;
             case Tstat:
                 fid = ((StyxTStatMessage)msg).getFID();
-                file = mAssignedFiles.get(fid);
-                if ( file != null ) {
-                    answer = new StyxRStatMessage(msg.getTag(), file.getStat());
-                } else {
-                    answer = getNoFIDError(msg, fid);
-                }
+                file = getAssignedFile(fid);
+                answer = new StyxRStatMessage(msg.getTag(), file.getStat());
                 break;
             case Tclunk:
-                fid = ((StyxTClunkMessage)msg).getFID();
-                file = mAssignedFiles.remove(fid);
-                if ( file == null ) {
-                    answer = getNoFIDError(msg, fid);
-                } else {
-                    file.close(this);
-                    answer = new StyxRClunkMessage(msg.getTag());
-                }
+                answer = processClunk((StyxTClunkMessage)msg);
                 break;
             case Tflush:
                 // TODO do something there
@@ -161,6 +149,27 @@ implements Closeable {
         }
     }
 
+    /**
+     * Handle Tclunk message
+     * @param msg
+     * @return
+     * @throws StyxErrorMessageException
+     */
+    private StyxMessage processClunk(StyxTClunkMessage msg) throws StyxErrorMessageException {
+        IVirtualStyxFile file = getAssignedFile(msg.getFID());
+        file.close(this);
+        mAssignedFiles.remove(msg.getFID());
+        return new StyxRClunkMessage(msg.getTag());
+    }
+
+    private IVirtualStyxFile getAssignedFile(long fid) throws StyxErrorMessageException {
+        if ( !mAssignedFiles.containsKey(fid) ) {
+            StyxErrorMessageException.doException(
+                    String.format("Unknown FID (%d)", fid));
+        }
+        return mAssignedFiles.get(fid); 
+    }
+
     private StyxMessage processWStat(StyxTWStatMessage msg) {
         // TODO Auto-generated method stub
         return new StyxRWStatMessage(msg.getTag());
@@ -174,10 +183,7 @@ implements Closeable {
      */
     private StyxMessage processWrite(StyxTWriteMessage msg) throws StyxErrorMessageException {
         long fid = msg.getFID();
-        IVirtualStyxFile file = mAssignedFiles.get(fid);
-        if ( file == null ) {
-            return getNoFIDError(msg, fid);
-        }
+        IVirtualStyxFile file = getAssignedFile(fid);
         int writed = file.write(this, msg.getData(), msg.getOffset());
         return new StyxRWriteMessage(msg.getTag(), (int) writed);        
     }
@@ -207,10 +213,7 @@ implements Closeable {
             return new StyxRErrorMessage(msg.getTag(), "IOUnit overflow");
         }
         long fid = msg.getFID();        
-        IVirtualStyxFile file = mAssignedFiles.get(fid);
-        if ( file == null ) {
-            return getNoFIDError(msg, fid);
-        }
+        IVirtualStyxFile file = getAssignedFile(fid);
         byte [] buffer = new byte[(int) msg.getCount()]; 
         long readed = file.read(this, buffer, msg.getOffset(), msg.getCount());
         return new StyxRReadMessage(msg.getTag(), buffer, (int) readed);
@@ -225,10 +228,7 @@ implements Closeable {
      */
     private StyxMessage processOpen(StyxTOpenMessage msg) throws StyxErrorMessageException, IOException {
         long fid = msg.getFID();
-        IVirtualStyxFile file = mAssignedFiles.get(fid);
-        if ( file == null ) {
-            return getNoFIDError(msg, fid);
-        }
+        IVirtualStyxFile file = getAssignedFile(fid);
         if ( file.open(this, msg.getMode()) ) {
             return new StyxROpenMessage(msg.getTag(), file.getQID(), mIOUnit-24 ); // TODO magic number
         } else {
@@ -246,28 +246,17 @@ implements Closeable {
      */
     private StyxMessage processWalk(StyxTWalkMessage msg) throws StyxErrorMessageException {
         long fid = msg.getFID();
-        IVirtualStyxFile file = mAssignedFiles.get(fid);
-        if ( file == null ) {
-            return getNoFIDError(msg, fid);
-        }
-
-        IVirtualStyxFile walkFile;
-        String[] pathElementsArray = msg.getPathElements();
+        IVirtualStyxFile file = getAssignedFile(fid);
         List<StyxQID> QIDList = new LinkedList<StyxQID>();
-
-        if ( pathElementsArray.length == 0 ) {
-            walkFile = file;
-        } else {
-            walkFile = file.walk(
-                    new LinkedList<String>(Arrays.asList(pathElementsArray)),
-                    QIDList);    
-        }
-
+        final IVirtualStyxFile walkFile = file.walk(
+                msg.getPathElements().iterator(), 
+                QIDList);    
         if ( walkFile != null ) {
             mAssignedFiles.put(msg.getNewFID(), walkFile);
             return new StyxRWalkMessage(msg.getTag(), QIDList);
         } else {
-            return new StyxRErrorMessage(msg.getTag(), "file does not exist");
+            return new StyxRErrorMessage(msg.getTag(), 
+                    String.format("file \"%s\" does not exist",msg.getPath()));
         }
     }
 
@@ -278,10 +267,10 @@ implements Closeable {
      * @return new Rerror message
      * @throws StyxErrorMessageException 
      */
-    private StyxRErrorMessage getNoFIDError(StyxMessage message, long fid) throws StyxErrorMessageException {
-        StyxErrorMessageException.doException(String.format("Unknown FID (%d)", fid));
-        return null;
-    }
+    //    private StyxRErrorMessage getNoFIDError(StyxMessage message, long fid) throws StyxErrorMessageException {
+    //        
+    //        return null;
+    //    }
 
     private void registerOpenedFile(long fid, IVirtualStyxFile file) {
         mAssignedFiles.put(fid, file);
