@@ -23,11 +23,12 @@ public class StyxUnbufferedInputStream extends InputStream {
     private StyxFile mFile;
     private Messenger mMessenger;
     private ULong mFileOffset = ULong.ZERO;
+    private int mIOUnitSize;
 
-    StyxUnbufferedInputStream(StyxFile file, Messenger messnger) {
+    StyxUnbufferedInputStream(StyxFile file, Messenger messnger, int iounit) {
         if ( file == null ) throw new NullPointerException("File is null");
         if ( messnger == null ) throw new NullPointerException("messnger is null");
-
+        mIOUnitSize = iounit;
         mFile = file;
         mMessenger = messnger;
     }
@@ -42,6 +43,9 @@ public class StyxUnbufferedInputStream extends InputStream {
 
     @Override
     public int read(byte[] b, int off, int len) throws IOException {
+        if ( len > mIOUnitSize ) {
+            len = mIOUnitSize;
+        }
         int readed = 0;
         try {
             // send Tread

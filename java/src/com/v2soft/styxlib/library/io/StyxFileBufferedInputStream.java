@@ -25,7 +25,7 @@ public class StyxFileBufferedInputStream extends BufferedInputStream {
             StyxFile file, 
             int iounit, 
             boolean autocloseFile) {
-        super(new StyxUnbufferedInputStream(file, messenger), iounit);
+        super(new StyxUnbufferedInputStream(file, messenger, iounit), iounit);
         if ( autocloseFile ) {
             mFile = file;
         }
