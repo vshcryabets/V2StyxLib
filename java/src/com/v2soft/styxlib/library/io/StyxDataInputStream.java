@@ -67,6 +67,6 @@ public class StyxDataInputStream
         int count = readUInt16();
         byte[] bytes = new byte[count];
         read(bytes, 0, count);
-        return new String(bytes, sUTFCharset);        
+        return new String(bytes, "utf-8");        
     }
 }

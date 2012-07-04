@@ -7,7 +7,7 @@ import com.v2soft.styxlib.library.types.ULong;
 
 public abstract class StyxDataWriter implements IStyxDataWriter {
     private static final int sDataBufferSize = 16;
-    private static final Charset sUTFCharset = Charset.forName("utf-8");
+    private static final String sUTFCharset = "utf-8";
     private byte [] mDataBuffer;
 
     public StyxDataWriter() {

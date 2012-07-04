@@ -39,14 +39,14 @@ import com.v2soft.styxlib.library.messages.base.structs.StyxQID;
 
 public abstract class StyxMessage {
     public static final Charset sUTFCharset = Charset.forName("utf-8"); 
-	public static final int BASE_BINARY_SIZE = 7;
-	
-	public static final int NOTAG  =      0xFFFF;
-	public static final long NOFID = 0xFFFFFFFFL;
-	
-	private int mTag;
-	private MessageType mType;
-	
+    public static final int BASE_BINARY_SIZE = 7;
+
+    public static final int NOTAG  =      0xFFFF;
+    public static final long NOFID = 0xFFFFFFFFL;
+
+    private int mTag;
+    private MessageType mType;
+
     /**
      * Construct message from DoubleStateBuffer
      * @param is intput stream
@@ -151,83 +151,93 @@ public abstract class StyxMessage {
         result.load(buffer);
         return result;
     }	
-	
-	public static String toString(byte[] bytes)
-	{
-		if ( (bytes == null) || (bytes.length==0))
-			return "-";
-		StringBuilder result = new StringBuilder();
-		result.append(Integer.toHexString(((int)bytes[0])&0xFF));
-		result.append(",");
-		int count = bytes.length;
-		for (int i=1; i<count; i++)
-		{
-			result.append(Integer.toHexString(((int)bytes[i])&0xFF));
-			result.append(',');
-		}
-		
-		return String.format("(%s)", result);
-	}
-	
-	public static int getUTFSize(String utf)
-	{
-		if (utf == null)
-			return 2;
-		return 2 + countUTFBytes(utf);
-	}
-	
-	public static int countUTFBytes(String utf)	{
-	    return utf.getBytes(StyxMessage.sUTFCharset).length;
-	}
-	
-	protected StyxMessage(MessageType type, int tag) {
-		mType = type;
-		mTag = tag;
-	}
-	
-	public MessageType getType()
-	{
-		return mType;
-	}
-	
-	public int getTag()
-	{
-		return mTag;
-	}
-	
-	public void setTag(int tag)
-	{
-		mTag = (tag & 0xFFFF);
-	}
-	
-	public int getBinarySize()
-	{
-		return BASE_BINARY_SIZE;
-	}
-	
+
+    public static String toString(byte[] bytes)
+    {
+        if ( (bytes == null) || (bytes.length==0))
+            return "-";
+        StringBuilder result = new StringBuilder();
+        result.append(Integer.toHexString(((int)bytes[0])&0xFF));
+        result.append(",");
+        int count = bytes.length;
+        for (int i=1; i<count; i++)
+        {
+            result.append(Integer.toHexString(((int)bytes[i])&0xFF));
+            result.append(',');
+        }
+
+        return String.format("(%s)", result);
+    }
+
+    public static int getUTFSize(String utf) {
+        if (utf == null)
+            return 2;
+        return 2 + countUTFBytes(utf);
+    }
+
+    public static int countUTFBytes(String utf)	{
+        String test = new String(utf);
+        byte[] data = null;
+        try {
+            data = test.getBytes("utf-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        if ( data == null ) {
+            return 0;
+        } else {
+            return data.length;
+        }
+    }
+
+    protected StyxMessage(MessageType type, int tag) {
+        mType = type;
+        mTag = tag;
+    }
+
+    public MessageType getType()
+    {
+        return mType;
+    }
+
+    public int getTag()
+    {
+        return mTag;
+    }
+
+    public void setTag(int tag)
+    {
+        mTag = (tag & 0xFFFF);
+    }
+
+    public int getBinarySize()
+    {
+        return BASE_BINARY_SIZE;
+    }
+
     protected void load(IStyxDataReader buffer) throws IOException {
     }
-	public void writeToBuffer(IStyxDataWriter output)  
-	        throws UnsupportedEncodingException, IOException {
-		output.clear();
-		int packetSize = getBinarySize();
-		output.limit(packetSize);
-		output.writeUInt32(packetSize);
-		output.writeUInt8((short) getType().getByte());
-		output.writeUInt16(getTag());
-	}
+    public void writeToBuffer(IStyxDataWriter output)  
+            throws UnsupportedEncodingException, IOException {
+        output.clear();
+        int packetSize = getBinarySize();
+        output.limit(packetSize);
+        output.writeUInt32(packetSize);
+        output.writeUInt8((short) getType().getByte());
+        output.writeUInt16(getTag());
+    }
 
-	protected abstract String internalToString();
-	
-	@Override
-	public String toString() {
-		String stmp = String.format("Type: %s\nTag: %d", 
-				getType().toString(), getTag());
-		
-		String internal = internalToString();
-		if (internal != null)
-			stmp = String.format("%s\n%s", stmp, internal);
-		
-		return String.format("(\n%s\n)", stmp);
-	}
+    protected abstract String internalToString();
+
+    @Override
+    public String toString() {
+        String stmp = String.format("Type: %s\nTag: %d", 
+                getType().toString(), getTag());
+
+        String internal = internalToString();
+        if (internal != null)
+            stmp = String.format("%s\n%s", stmp, internal);
+
+        return String.format("(\n%s\n)", stmp);
+    }
 }

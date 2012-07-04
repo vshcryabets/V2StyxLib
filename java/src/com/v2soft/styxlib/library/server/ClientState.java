@@ -298,8 +298,14 @@ implements Closeable {
      * @throws IOException
      */
     public boolean readSocket() throws IOException {
-        int readed = mBuffer.readFromChannel(mChannel);
-        if ( readed == -1 ) {
+        int read = 0;
+        try {
+            read = mBuffer.readFromChannel(mChannel);
+        }
+        catch (IOException e) {
+            read = -1;
+        }
+        if ( read == -1 ) {
             close();
             return true;
         } else {

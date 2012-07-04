@@ -35,12 +35,12 @@ public class StyxByteBufferReadable extends StyxDataReader {
         }
         mBuffer.limit( mWritePosition < mReadPosition ? mReadPosition : mCapacity );
         mBuffer.position(mWritePosition);
-        int readed = channel.read(mBuffer);
-        if ( readed > 0 ) {
-            mStoredBytes+=readed;
+        int read = channel.read(mBuffer);
+        if ( read > 0 ) {
+            mStoredBytes+=read;
             mWritePosition=mBuffer.position();
         }
-        return readed;
+        return read;
     }
     /**
      * Get byte array from buffer, this operation will not move read position pointer

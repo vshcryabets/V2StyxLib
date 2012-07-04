@@ -103,15 +103,7 @@ implements Closeable, StyxMessengerListener {
         mPassword = password;
         mMountPoint = "/";
         mNeedAuth = (username != null);
-
-//        SocketFactory socketFactory = null;
-//        if (ssl)
-//            socketFactory = SSLSocketFactory.getDefault();
-//        else 
-//            socketFactory = SocketFactory.getDefault();
-//        Socket socket = socketFactory.createSocket();
-        
-        SocketAddress sa= new InetSocketAddress(address, port);
+        SocketAddress sa = new InetSocketAddress(address, port);
         SocketChannel channel = SocketChannel.open(sa);
         channel.configureBlocking(true);
         Socket socket = channel.socket();
