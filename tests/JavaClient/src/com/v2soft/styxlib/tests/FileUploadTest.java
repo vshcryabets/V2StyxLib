@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.concurrent.TimeoutException;
 
-import com.v2soft.styxlib.library.StyxClientManager;
+import com.v2soft.styxlib.library.StyxClientConnection;
 import com.v2soft.styxlib.library.StyxFile;
 import com.v2soft.styxlib.library.exceptions.StyxException;
 import com.v2soft.styxlib.library.messages.base.enums.FileMode;
@@ -13,7 +13,7 @@ import com.v2soft.styxlib.library.messages.base.enums.FileMode;
 public class FileUploadTest implements RunTest {
 
 	@Override
-	public String doTest(StyxClientManager manager)
+	public String doTest(StyxClientConnection manager)
 			throws InterruptedException, StyxException, IOException, TimeoutException
 	{
 		StyxFile file = new StyxFile(manager, "/About_these_files.odt");

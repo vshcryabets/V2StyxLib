@@ -1,19 +1,18 @@
 package com.v2soft.styxlib.tests;
 
-import java.io.EOFException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.concurrent.TimeoutException;
 
-import com.v2soft.styxlib.library.StyxClientManager;
+import com.v2soft.styxlib.library.StyxClientConnection;
 import com.v2soft.styxlib.library.StyxFile;
 import com.v2soft.styxlib.library.exceptions.StyxException;
 
 public class FileCopyTest implements RunTest {
 
 	@Override
-	public String doTest(StyxClientManager manager)
+	public String doTest(StyxClientConnection manager)
 			throws InterruptedException, StyxException, IOException, TimeoutException 
 	{
 		StyxFile file = new StyxFile(manager, "/android-sdk_r06-linux_86.tgz");

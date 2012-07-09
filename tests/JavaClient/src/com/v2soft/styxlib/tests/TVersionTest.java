@@ -5,14 +5,14 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.concurrent.TimeoutException;
 
-import com.v2soft.styxlib.library.StyxClientManager;
+import com.v2soft.styxlib.library.StyxClientConnection;
 import com.v2soft.styxlib.library.exceptions.StyxException;
 
 public class TVersionTest {
-    private StyxClientManager mManager;
+    private StyxClientConnection mManager;
     
     public TVersionTest(String server, int port) throws UnknownHostException {
-        mManager = new  StyxClientManager(InetAddress.getByName(server),
+        mManager = new  StyxClientConnection(InetAddress.getByName(server),
                 port, false);
     }
     

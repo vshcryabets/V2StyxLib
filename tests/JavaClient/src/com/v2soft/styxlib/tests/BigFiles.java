@@ -7,16 +7,21 @@ import java.net.UnknownHostException;
 import java.util.Random;
 import java.util.zip.CRC32;
 
-import com.v2soft.styxlib.library.StyxClientManager;
+import com.v2soft.styxlib.library.StyxClientConnection;
 import com.v2soft.styxlib.library.StyxFile;
 import com.v2soft.styxlib.library.messages.base.enums.FileMode;
 
+/**
+ * Big files transfer test
+ * @author vshcryabets@gmail.com
+ *
+ */
 public class BigFiles {
-    private StyxClientManager mManager;
+    private StyxClientConnection mManager;
 
     public BigFiles(String server, int port) throws UnknownHostException {
-        mManager = new  StyxClientManager(InetAddress.getByName(server),
-                port, false);
+        mManager = new  StyxClientConnection(InetAddress.getByName(server),
+                port, true);
     }
 
     public void start(long size) throws Exception {
