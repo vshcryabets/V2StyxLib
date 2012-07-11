@@ -4,6 +4,11 @@ import com.v2soft.styxlib.library.messages.StyxRErrorMessage;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
 
+/**
+ * 
+ * @author V.Shcriyabets (vshcryabets@gmail.com)
+ *
+ */
 public class StyxErrorMessageException extends StyxException {
     private static final long serialVersionUID = 1;
     private StyxRErrorMessage mMessage;
@@ -20,9 +25,14 @@ public class StyxErrorMessageException extends StyxException {
 
     public static void doException(String message) 
             throws StyxErrorMessageException {
+        throw newInstance(message);
+    }
+
+    public static StyxErrorMessageException newInstance(String message) 
+            throws StyxErrorMessageException {
         if (message == null)
             throw new NullPointerException("Message is null");
-        throw new StyxErrorMessageException(new StyxRErrorMessage(StyxMessage.NOTAG, message));
+        return new StyxErrorMessageException(new StyxRErrorMessage(StyxMessage.NOTAG, message));
     }
 
     public static void doException(StyxMessage rMessage, String fileName) 

@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.nio.ByteBuffer;
+import java.nio.channels.ClosedByInterruptException;
 import java.nio.channels.SocketChannel;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -98,11 +99,11 @@ public class Messenger implements Runnable, Closeable, ObjectsPollFactory<StyxBy
                     int readed = buffer.readFromChannel(mSocketChannel);
                     if ( readed > 0 ) {
                         // try to decode
-                        int inBuffer = buffer.remainsToRead();
+                        final int inBuffer = buffer.remainsToRead();
                         if ( inBuffer > 4 ) {
-                            long packetSize = buffer.getUInt32();
+                            final long packetSize = buffer.getUInt32();
                             if ( inBuffer >= packetSize ) {
-                                StyxMessage message = StyxMessage.factory(buffer, mIOBufferSize);
+                                final StyxMessage message = StyxMessage.factory(buffer, mIOBufferSize);
                                 if ( Config.LOG_RMESSAGES) {
                                     System.out.println("Got message "+message.toString());
                                 }
@@ -115,6 +116,9 @@ public class Messenger implements Runnable, Closeable, ObjectsPollFactory<StyxBy
                 catch (SocketTimeoutException e) {
                     // Nothing to read
                     //                    e.printStackTrace();
+                } catch (ClosedByInterruptException e) {
+                    // finish
+                    break;
                 }
                 catch (StyxException e)	{ 
                     e.printStackTrace();

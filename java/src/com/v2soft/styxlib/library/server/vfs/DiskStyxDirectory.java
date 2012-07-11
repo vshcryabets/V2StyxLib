@@ -23,12 +23,12 @@ import com.v2soft.styxlib.library.types.ULong;
  * @author vshcryabets@gmail.com
  *
  */
-public class MemoryStyxDirectory
+public class DiskStyxDirectory
 extends MemoryStyxFile {
     private Map<ClientState, StyxByteBufferWriteable> mBuffersMap;
     private List<IVirtualStyxFile> mFiles;
 
-    public MemoryStyxDirectory(String name) {
+    public DiskStyxDirectory(String name) {
         super(name);
         mQID.setType(QIDType.QTDIR);
         mFiles = new LinkedList<IVirtualStyxFile>();
@@ -119,7 +119,7 @@ extends MemoryStyxFile {
         for (IVirtualStyxFile file : mFiles) {
             file.onConnectionClosed(state);
         }
-        close(state);
+        mBuffersMap.remove(state);
     }
 
     /**
