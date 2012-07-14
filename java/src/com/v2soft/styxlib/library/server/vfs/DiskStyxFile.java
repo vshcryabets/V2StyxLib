@@ -22,10 +22,10 @@ public class DiskStyxFile extends MemoryStyxFile {
     protected File mFile;
     protected Map<ClientState, RandomAccessFile> mFilesMap;
 
-    public DiskStyxFile(DiskStyxFile parent, String name) {
+    public DiskStyxFile(File parent, String name) {
         super(name);
         mFilesMap = new HashMap<ClientState, RandomAccessFile>();
-        mFile = new File(parent.getFile(), name);
+        mFile = new File(parent, name);
         mStat = new StyxStat((short)0, 
                 1, 
                 mQID,
@@ -36,7 +36,11 @@ public class DiskStyxFile extends MemoryStyxFile {
                 name, 
                 getOwnerName(), 
                 getGroupName(), 
-                getModificationUser());        
+                getModificationUser());
+    }
+
+    public DiskStyxFile(File file) {
+        this(file.getParentFile(), file.getName());
     }
 
     @Override

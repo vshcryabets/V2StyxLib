@@ -1,12 +1,15 @@
 package com.v2soft.styxlib.library.server.vfs;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Vector;
 
 import com.v2soft.styxlib.library.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.library.io.StyxByteBufferWriteable;
@@ -19,19 +22,21 @@ import com.v2soft.styxlib.library.server.ClientState;
 import com.v2soft.styxlib.library.types.ULong;
 
 /**
- * In-Memory directory
+ * Disk directory
  * @author vshcryabets@gmail.com
  *
  */
 public class DiskStyxDirectory
-extends MemoryStyxFile {
+extends DiskStyxFile {
     private Map<ClientState, StyxByteBufferWriteable> mBuffersMap;
-    private List<IVirtualStyxFile> mFiles;
+    protected Vector<IVirtualStyxFile> mFiles;
+    protected List<IVirtualStyxFile> mDirectoryFiles;
 
-    public DiskStyxDirectory(String name) {
-        super(name);
+    public DiskStyxDirectory(File parent, String name) {
+        super(parent, name);
         mQID.setType(QIDType.QTDIR);
-        mFiles = new LinkedList<IVirtualStyxFile>();
+        mFiles = new Vector<IVirtualStyxFile>();
+        mDirectoryFiles = new ArrayList<IVirtualStyxFile>();
         mBuffersMap = new HashMap<ClientState, StyxByteBufferWriteable>();
     }
 
@@ -58,7 +63,8 @@ extends MemoryStyxFile {
     @Override
     public boolean open(ClientState client, int mode) throws IOException {
         boolean result = ((mode&0x0F) == ModeType.OREAD);
-        if ( result ) {
+        if ( result && mFile.canRead() ) {
+            // load files
             // prepare binary structure of the directory
             int size = 0;
             final List<StyxStat> stats = new LinkedList<StyxStat>();
@@ -67,19 +73,32 @@ extends MemoryStyxFile {
                 size += stat.getSize();
                 stats.add(stat);
             }
+            // reload disk files
+            mDirectoryFiles.clear();
+            for (File file : mFile.listFiles()) {
+                final DiskStyxFile item = new DiskStyxFile(file);
+                mDirectoryFiles.add(item);
+                final StyxStat stat = item.getStat();
+                size += stat.getSize();
+                stats.add(stat);
+            }
+            
             // allocate buffer
-            StyxByteBufferWriteable buffer = new StyxByteBufferWriteable(size);
+            final StyxByteBufferWriteable buffer = new StyxByteBufferWriteable(size);
             for (StyxStat state : stats) {
                 state.writeBinaryTo(buffer);
             }
             mBuffersMap.put(client, buffer);
+            return true;
         }
-        return result;
+        return false;
     }
 
     @Override
     public long read(ClientState client, byte[] outbuffer, ULong offset, long count) throws StyxErrorMessageException {
-        if ( !mBuffersMap.containsKey(client)) StyxErrorMessageException.doException("This file isn't open");
+        if ( !mBuffersMap.containsKey(client)) {
+            throw StyxErrorMessageException.newInstance("This file isn't open");
+        }
         final ByteBuffer buffer = mBuffersMap.get(client).getBuffer();
         int boffset = buffer.limit();
         if ( offset.asLong() > boffset ) return 0;
@@ -94,6 +113,9 @@ extends MemoryStyxFile {
 
     @Override
     public void close(ClientState client) {
+//        if ( !mBuffersMap.containsKey(client)) {
+//            throw StyxErrorMessageException.newInstance("This file isn't open");
+//        }
         // remove buffer
         mBuffersMap.remove(client);
     }
@@ -110,8 +132,7 @@ extends MemoryStyxFile {
     @Override
     public int write(ClientState client, byte[] data, ULong offset)
             throws StyxErrorMessageException {
-        StyxErrorMessageException.doException("Can't write to directory");
-        return 0;
+        throw StyxErrorMessageException.newInstance("Can't write to directory");
     }
 
     @Override
@@ -127,6 +148,8 @@ extends MemoryStyxFile {
      * @param file file that should be removed from this directory
      */
     public boolean deleteFile(IVirtualStyxFile file) {
-        return mFiles.remove(file);
+        // FIXME
+        return false;
+//        return mFiles.remove(file);
     }
 }

@@ -90,11 +90,7 @@ void StyxServerManager::stop() {
 Socket StyxServerManager::createSocket(string address,
 		int port) {
 	Socket res = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-#ifdef WIN32
 	if ( res == INVALID_SOCKET ) {
-#else
-	if ( res == -1 ) {
-#endif
 		throw new StyxLibraryException(__FILE__, "Can't create socket", errno);
 	}
 	int reuse_addr = 1;

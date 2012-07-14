@@ -14,9 +14,14 @@
 #include <winsock2.h>
 typedef SOCKET Socket;
 #define errno WSAGetLastError()
+
 #else
+
 #include "errno.h"
 typedef int Socket;
+// Constants
+const int INVALID_SOCKET = -1;
+
 #endif
 typedef int64_t Date;
 typedef int64_t int128_t;
@@ -84,5 +89,6 @@ typedef uint32_t StyxFID;
 typedef uint16_t StyxTAG;
 typedef std::string StyxString;
 typedef ModeTypeEnum StyxMode;
+
 
 #endif /* TYPES_H_ */
