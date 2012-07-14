@@ -96,7 +96,7 @@ IVirtualStyxFile* MemoryStyxDirectory::walk(std::vector<StyxString*> *pathElemen
 				return (*iterator)->walk(pathElements, qids);
 			}
 		}
-		return null;
+		return NULL;
 	}
 	return MemoryStyxFile::walk(pathElements, qids);
 }
