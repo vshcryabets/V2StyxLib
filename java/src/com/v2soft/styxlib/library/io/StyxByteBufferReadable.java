@@ -1,6 +1,7 @@
 package com.v2soft.styxlib.library.io;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 
@@ -42,6 +43,24 @@ public class StyxByteBufferReadable extends StyxDataReader {
         }
         return read;
     }
+    public int readFromStream(InputStream is) throws IOException {
+        int free = mCapacity-mStoredBytes;
+        if ( free <= 0 ) return 0;
+        if ( mWritePosition >= mCapacity ) {
+            mWritePosition = 0;
+        }
+        mBuffer.limit( mWritePosition < mReadPosition ? mReadPosition : mCapacity );
+        mBuffer.position(mWritePosition);
+        // FIXME
+        byte buffer[] = new byte[free];
+        int read = is.read(buffer);
+        mBuffer.put(buffer, 0, read);
+        if ( read > 0 ) {
+            mStoredBytes+=read;
+            mWritePosition=mBuffer.position();
+        }
+        return 0;
+    }    
     /**
      * Get byte array from buffer, this operation will not move read position pointer
      * @param out

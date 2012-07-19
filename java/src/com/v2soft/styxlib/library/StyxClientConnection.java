@@ -11,6 +11,12 @@ import java.security.InvalidParameterException;
 import java.util.LinkedList;
 import java.util.concurrent.TimeoutException;
 
+import javax.net.ssl.SSLException;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.SSLSocketFactory;
+
+import com.v2soft.styxlib.Config;
 import com.v2soft.styxlib.library.core.Messenger;
 import com.v2soft.styxlib.library.core.Messenger.StyxMessengerListener;
 import com.v2soft.styxlib.library.exceptions.StyxErrorMessageException;
@@ -58,65 +64,92 @@ implements Closeable, StyxMessengerListener {
         this(null, 0, false, null, null);
     }
 
-    public StyxClientConnection(InetAddress address, int port, boolean ssl)
-    {
+    public StyxClientConnection(InetAddress address, int port, boolean ssl) {
         this(address, port, ssl, null, null);
-        setConnected(false);
     }
 
-    public StyxClientConnection(InetAddress address, int port, boolean ssl, String username, String password) {
+    public StyxClientConnection(InetAddress address, int port, 
+            boolean ssl, 
+            String username, String password) {
         mAddress = address;
         mPort = port;
         mSSL = ssl;
         mUserName = username;
         mPassword = password;
-    }
-
-    public boolean connect() 
-            throws IOException, StyxException, InterruptedException, TimeoutException {
-        return connect(mAddress, mPort, mSSL, mUserName, mPassword);
-    }
-
-    public boolean connect(InetAddress address, int port, boolean ssl)
-            throws IOException, StyxException, InterruptedException, TimeoutException {
-        return connect(address, port, ssl, null, null);
+        setConnected(false);
     }
 
     /**
      * Connect to server with specified parameters
-     * @param address server name
-     * @param port server port
-     * @param ssl use SSL
-     * @param username user name
-     * @param password password 
      * @return true if connected
      * @throws IOException
      * @throws StyxException
      * @throws TimeoutException 
      */
-    public boolean connect(InetAddress address, int port, boolean ssl, String username, String password)
+    public boolean connect()
             throws IOException, StyxException, InterruptedException, TimeoutException {
-        mAddress = address;
-        mPort = port;
-        mSSL = ssl;
-        mUserName = username;
-        mPassword = password;
         mMountPoint = "/";
-        mNeedAuth = (username != null);
-        SocketAddress sa = new InetSocketAddress(address, port);
-        SocketChannel channel = SocketChannel.open(sa);
+        mNeedAuth = (mUserName != null);
+        final SocketAddress sa = new InetSocketAddress(mAddress, mPort);
+        final SocketChannel channel = SocketChannel.open(sa);
         channel.configureBlocking(true);
         Socket socket = channel.socket();
         socket.setSoTimeout(mTimeout);
-        mMessenger = new Messenger(channel, mIOBufSize, this);
+
+        if ( mSSL ) {
+            SSLSocketFactory factory = (SSLSocketFactory) SSLSocketFactory.getDefault();
+            SSLSocket sslSocket = (SSLSocket) factory.createSocket(socket, 
+                    mAddress.getHostAddress(), mPort, true);
+            // Ensure that when we start reading on this socket it
+            // acts the part of the server during the SSL handshake.
+            sslSocket.setUseClientMode(false);
+
+            mMessenger = new Messenger(sslSocket, mIOBufSize, this);
+        } else {
+            mMessenger = new Messenger(socket, mIOBufSize, this);
+        }
+
+
+
 
         sendVersionMessage();
         setConnected(socket.isConnected());
         return socket.isConnected();
     }
 
-    public StyxFile getRoot() throws StyxException, InterruptedException, TimeoutException, IOException
-    {
+    private void configureSSLSocket(Socket socket, SSLSocket sslSocket) throws IOException {
+        // We need a timeout here for the case where the server is not using SSL,
+        // in which case both sides simply sit waiting for something from the
+        // other side.
+        sslSocket.setSoTimeout(500);
+
+        // Get the SSL session. This forces a handshake and is used
+        // to indicate that we've performed the handshake for this
+        // SSLSocket.
+        SSLSession session = sslSocket.getSession();
+        //        this.sslSessionMap.put(socket, session);
+
+        // Since we don't have isValid() in 1.4 this is the closest we can get to
+        // a validity check.
+        if (session.getId() != null && session.getId().length != 0) {
+            if ( Config.LOG_NETWORK ) {
+                System.out.println("SSL session details: " + session);
+            }
+        } else {
+            if (sslSocket.getUseClientMode()) {
+                throw new SSLException("SSL session handshake failed (is the server SSL enabled?)");
+            }
+            // For server's we'll leave it to JSSE to raise an exception
+            // when the client first tries to communicate with us.
+        }
+        // Set the read timeout to the smallest legal value so
+        // when data is available we can read it in blocking mode.
+        // This must be done only after the handshake has completed.
+        sslSocket.setSoTimeout(1);
+    }
+
+    public StyxFile getRoot() throws StyxException, InterruptedException, 
+    TimeoutException, IOException {
         if (mRoot == null)
             mRoot = new StyxFile(this);
         return mRoot;
@@ -222,7 +255,7 @@ implements Closeable, StyxMessengerListener {
      */
     public void remove(long fid) throws InterruptedException, TimeoutException, StyxErrorMessageException, IOException {
         StyxTRemoveMessage tRemove = new StyxTRemoveMessage(fid);
-        
+
         mMessenger.send(tRemove);
         StyxMessage rMessage = tRemove.waitForAnswer(mTimeout);
         getActiveFids().releaseFid(fid);
@@ -267,10 +300,10 @@ implements Closeable, StyxMessengerListener {
         mAuthQID = rAuth.getQID();
 
         // TODO uncomment later
-//        StyxOutputStream output = new StyxOutputStream((new StyxFile(this, 
-//                ((StyxTAuthMessage)tMessage).getAuthFID())).openForWrite());
-//        output.writeString(getPassword());
-//        output.flush();
+        //        StyxOutputStream output = new StyxOutputStream((new StyxFile(this, 
+        //                ((StyxTAuthMessage)tMessage).getAuthFID())).openForWrite());
+        //        output.writeString(getPassword());
+        //        output.flush();
 
         sendAttachMessage();
     }
