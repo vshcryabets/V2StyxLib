@@ -100,53 +100,70 @@ implements Closeable, StyxMessengerListener {
             SSLSocketFactory factory = (SSLSocketFactory) SSLSocketFactory.getDefault();
             SSLSocket sslSocket = (SSLSocket) factory.createSocket(socket, 
                     mAddress.getHostAddress(), mPort, true);
-            // Ensure that when we start reading on this socket it
-            // acts the part of the server during the SSL handshake.
-            sslSocket.setUseClientMode(false);
+            printSocketInfo(sslSocket);
 
-            mMessenger = new Messenger(sslSocket, mIOBufSize, this);
+            // Connect to the server
+            sslSocket.startHandshake();
+
+            // We need a timeout here for the case where the server is not using SSL,
+            // in which case both sides simply sit waiting for something from the
+            // other side.
+            sslSocket.setSoTimeout(500);
+            // Get the SSL session. This forces a handshake and is used
+            // to indicate that we've performed the handshake for this
+            // SSLSocket.
+            SSLSession session = sslSocket.getSession();
+            //        this.sslSessionMap.put(socket, session);
+
+            // Retrieve the server's certificate chain
+            java.security.cert.Certificate[] serverCerts =
+                    session.getPeerCertificates();
+
+            // Since we don't have isValid() in 1.4 this is the closest we can get to
+            // a validity check.
+            if (session.getId() != null && session.getId().length != 0) {
+                if ( Config.LOG_NETWORK ) {
+                    System.out.println("SSL session details: " + session);
+                }
+            } else {
+                if (sslSocket.getUseClientMode()) {
+                    throw new SSLException("SSL session handshake failed (is the server SSL enabled?)");
+                }
+                // For server's we'll leave it to JSSE to raise an exception
+                // when the client first tries to communicate with us.
+            }
+            // Set the read timeout to the smallest legal value so
+            // when data is available we can read it in blocking mode.
+            // This must be done only after the handshake has completed.
+            sslSocket.setSoTimeout(1);
+
+            SocketChannel channel2 = sslSocket.getChannel();
+            mMessenger = new Messenger(channel2, mIOBufSize, this);
         } else {
-            mMessenger = new Messenger(socket, mIOBufSize, this);
+            mMessenger = new Messenger(socket.getChannel(), mIOBufSize, this);
         }
-
-
-
 
         sendVersionMessage();
         setConnected(socket.isConnected());
         return socket.isConnected();
     }
-
-    private void configureSSLSocket(Socket socket, SSLSocket sslSocket) throws IOException {
-        // We need a timeout here for the case where the server is not using SSL,
-        // in which case both sides simply sit waiting for something from the
-        // other side.
-        sslSocket.setSoTimeout(500);
-
-        // Get the SSL session. This forces a handshake and is used
-        // to indicate that we've performed the handshake for this
-        // SSLSocket.
-        SSLSession session = sslSocket.getSession();
-        //        this.sslSessionMap.put(socket, session);
-
-        // Since we don't have isValid() in 1.4 this is the closest we can get to
-        // a validity check.
-        if (session.getId() != null && session.getId().length != 0) {
-            if ( Config.LOG_NETWORK ) {
-                System.out.println("SSL session details: " + session);
-            }
-        } else {
-            if (sslSocket.getUseClientMode()) {
-                throw new SSLException("SSL session handshake failed (is the server SSL enabled?)");
-            }
-            // For server's we'll leave it to JSSE to raise an exception
-            // when the client first tries to communicate with us.
-        }
-        // Set the read timeout to the smallest legal value so
-        // when data is available we can read it in blocking mode.
-        // This must be done only after the handshake has completed.
-        sslSocket.setSoTimeout(1);
-    }
+    
+    private static void printSocketInfo(SSLSocket s) {
+        System.out.println("Socket class: "+s.getClass());
+        System.out.println("   Remote address = "
+           +s.getInetAddress().toString());
+        System.out.println("   Remote port = "+s.getPort());
+        System.out.println("   Local socket address = "
+           +s.getLocalSocketAddress().toString());
+        System.out.println("   Local address = "
+           +s.getLocalAddress().toString());
+        System.out.println("   Local port = "+s.getLocalPort());
+        System.out.println("   Need client authentication = "
+           +s.getNeedClientAuth());
+        SSLSession ss = s.getSession();
+        System.out.println("   Cipher suite = "+ss.getCipherSuite());
+        System.out.println("   Protocol = "+ss.getProtocol());
+     }
 
     public StyxFile getRoot() throws StyxException, InterruptedException, 
     TimeoutException, IOException {

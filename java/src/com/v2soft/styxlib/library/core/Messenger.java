@@ -9,9 +9,12 @@ import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.nio.ByteBuffer;
 import java.nio.channels.ClosedByInterruptException;
+import java.nio.channels.SocketChannel;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
+
+import javax.net.ssl.SSLSocket;
 
 import com.v2soft.styxlib.Config;
 import com.v2soft.styxlib.library.Consts;
@@ -32,14 +35,14 @@ public class Messenger implements Runnable, Closeable, ObjectsPollFactory<StyxBy
     private StyxMessengerListener mListener;
     private Map<Integer, StyxTMessage> mMessages = new HashMap<Integer, StyxTMessage>();
     private Thread mThread;
-    private Socket mSocketChannel;
+    private SocketChannel mSocketChannel;
     private ActiveTags mActiveTags = new ActiveTags();
     private boolean isWorking;
     private int mIOBufferSize;
     private int mTransmitedCount, mReceivedCount, mErrorCount, mBuffersAllocated;
     private ObjectsPoll<StyxByteBufferWriteable> mBufferPoll;
 
-    public Messenger(Socket socket, int io_unit, StyxMessengerListener listener) 
+    public Messenger(SocketChannel socket, int io_unit, StyxMessengerListener listener) 
             throws IOException {
         resetStatistics();
         mIOBufferSize = io_unit;
@@ -80,9 +83,7 @@ public class Messenger implements Runnable, Closeable, ObjectsPollFactory<StyxBy
             message.writeToBuffer(buffer);
             final ByteBuffer inbuf = buffer.getBuffer();
             inbuf.flip();
-            
-            final OutputStream os = mSocketChannel.getOutputStream();
-            os.write(inbuf.array());
+            mSocketChannel.write(inbuf);
             
             mTransmitedCount++;
             return true;
@@ -97,12 +98,12 @@ public class Messenger implements Runnable, Closeable, ObjectsPollFactory<StyxBy
         try {
             final StyxByteBufferReadable buffer = new StyxByteBufferReadable(mIOBufferSize*2);
             isWorking = true;
-            InputStream is = mSocketChannel.getInputStream();
+//            InputStream is = mSocketChannel.getInputStream();
             while (isWorking) {
                 if (Thread.interrupted()) break;
                 // read from socket
                 try {
-                    int readed = buffer.readFromStream(is);
+                    int readed = buffer.readFromChannel(mSocketChannel);
                     if ( readed > 0 ) {
                         // try to decode
                         final int inBuffer = buffer.remainsToRead();
