@@ -13,7 +13,7 @@ public class TVersionTest {
     
     public TVersionTest(String server, int port) throws UnknownHostException {
         mManager = new  StyxClientConnection(InetAddress.getByName(server),
-                port, false);
+                port, null);
     }
     
     public void start(int count) throws IOException, StyxException, InterruptedException, TimeoutException {
@@ -23,13 +23,14 @@ public class TVersionTest {
             mManager.sendVersionMessage();
         }
         long diff = System.currentTimeMillis()-startTime;
-        System.out.println(String.format("\tTransmited %d messages\n\t" +
-        		"Received %d messages\n\t" +
-        		"Error %d messages\n\t" +
+        System.out.println(String.format(
+//                "\tTransmited %d messages\n\t" +
+//        		"Received %d messages\n\t" +
+//        		"Error %d messages\n\t" +
         		"Average time for connection %d ms", 
-        		mManager.getMessenger().getTransmitedCount(),
-        		mManager.getMessenger().getReceivedCount(),
-        		mManager.getMessenger().getErrorsCount(),
+//        		mManager.getMessenger().getTransmitedCount(),
+//        		mManager.getMessenger().getReceivedCount(),
+//        		mManager.getMessenger().getErrorsCount(),
         		diff/count
         		));
     }

@@ -4,7 +4,7 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 
 import com.v2soft.styxlib.library.StyxFile;
-import com.v2soft.styxlib.library.core.Messenger;
+import com.v2soft.styxlib.library.core.StyxSessionHandler;
 
 /**
  * 
@@ -21,7 +21,7 @@ public class StyxFileBufferedInputStream extends BufferedInputStream {
      * @param iounit
      * @param autocloseFile close StyxFile object with this stream
      */
-    public StyxFileBufferedInputStream(Messenger messenger, 
+    public StyxFileBufferedInputStream(StyxSessionHandler messenger, 
             StyxFile file, 
             int iounit, 
             boolean autocloseFile) {

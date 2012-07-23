@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.concurrent.TimeoutException;
 
-import com.v2soft.styxlib.library.core.Messenger;
+import com.v2soft.styxlib.library.core.StyxSessionHandler;
 import com.v2soft.styxlib.library.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.library.exceptions.StyxException;
 import com.v2soft.styxlib.library.io.StyxDataInputStream;
@@ -43,7 +43,7 @@ public class StyxFile implements Closeable {
     private long mParentFID = StyxMessage.NOFID;
     private StyxStat mStat;
     private String mPath;
-    private Messenger mMessenger;
+    private StyxSessionHandler mMessenger;
     private long mTimeout = StyxClientConnection.DEFAULT_TIMEOUT;
 
     public StyxFile(StyxClientConnection manager) throws StyxException, TimeoutException, IOException, InterruptedException {

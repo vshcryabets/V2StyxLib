@@ -3,5 +3,25 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="libsrc"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="libs/commons-lang-2.6.jar"/>
+	<classpathentry kind="lib" path="libs/commons-logging-1.0.3.jar"/>
+	<classpathentry kind="lib" path="libs/javassist-3.11.0.GA.jar"/>
+	<classpathentry kind="lib" path="libs/javassist-3.7.ga.jar"/>
+	<classpathentry kind="lib" path="libs/jcl-over-slf4j-1.6.1.jar"/>
+	<classpathentry kind="lib" path="libs/jzlib-1.0.7.jar"/>
+	<classpathentry kind="lib" path="libs/ognl-3.0.1.jar"/>
+	<classpathentry kind="lib" path="libs/slf4j-api-1.6.1.jar"/>
+	<classpathentry kind="lib" path="libs/spring-2.5.6.jar"/>
+	<classpathentry kind="lib" path="libs/tomcat-apr-5.5.23.jar"/>
+	<classpathentry kind="lib" path="libs/xbean-spring-3.7.jar"/>
+	<classpathentry kind="lib" path="libs/mina-core-2.0.4.jar"/>
+	<classpathentry kind="lib" path="libs/mina-example-2.0.4.jar"/>
+	<classpathentry kind="lib" path="libs/mina-filter-compression-2.0.4.jar"/>
+	<classpathentry kind="lib" path="libs/mina-integration-beans-2.0.4.jar"/>
+	<classpathentry kind="lib" path="libs/mina-integration-jmx-2.0.4.jar"/>
+	<classpathentry kind="lib" path="libs/mina-integration-ognl-2.0.4.jar"/>
+	<classpathentry kind="lib" path="libs/mina-integration-xbean-2.0.4.jar"/>
+	<classpathentry kind="lib" path="libs/mina-statemachine-2.0.4.jar"/>
+	<classpathentry kind="lib" path="libs/mina-transport-apr-2.0.4.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

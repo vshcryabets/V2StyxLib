@@ -21,7 +21,7 @@ public class BigFiles {
 
     public BigFiles(String server, int port) throws UnknownHostException {
         mManager = new  StyxClientConnection(InetAddress.getByName(server),
-                port, true);
+                port, null);
     }
 
     public void start(long size) throws Exception {
@@ -90,9 +90,9 @@ public class BigFiles {
         long diff = System.currentTimeMillis()-writeTime;
         System.out.println(String.format("Write done in %d ms", (writeTime-startTime)));
         System.out.println(String.format("Read done in %d ms", diff));
-        System.out.println(String.format("\tTransmited %d messages", mManager.getMessenger().getTransmitedCount()));
-        System.out.println(String.format("\tReceived %d messages", mManager.getMessenger().getReceivedCount()));
-        System.out.println(String.format("\tError %d messages", mManager.getMessenger().getErrorsCount()));
+//        System.out.println(String.format("\tTransmited %d messages", mManager.getMessenger().getTransmitedCount()));
+//        System.out.println(String.format("\tReceived %d messages", mManager.getMessenger().getReceivedCount()));
+//        System.out.println(String.format("\tError %d messages", mManager.getMessenger().getErrorsCount()));
         //        System.out.println(String.format("\tAverage time for connection %d ms",diff/count));
         mManager.close();
     }

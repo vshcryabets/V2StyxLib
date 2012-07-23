@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
+import org.apache.mina.core.buffer.IoBuffer;
+
 import com.v2soft.styxlib.library.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.library.io.StyxByteBufferWriteable;
 import com.v2soft.styxlib.library.messages.base.enums.FileMode;
@@ -99,7 +101,7 @@ extends DiskStyxFile {
         if ( !mBuffersMap.containsKey(client)) {
             throw StyxErrorMessageException.newInstance("This file isn't open");
         }
-        final ByteBuffer buffer = mBuffersMap.get(client).getBuffer();
+        final IoBuffer buffer = mBuffersMap.get(client).getBuffer();
         int boffset = buffer.limit();
         if ( offset.asLong() > boffset ) return 0;
         buffer.position((int) offset.asLong());

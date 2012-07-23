@@ -9,7 +9,6 @@ import java.nio.channels.ServerSocketChannel;
 import java.security.InvalidParameterException;
 import java.util.LinkedList;
 
-import com.v2soft.styxlib.library.core.Messenger.StyxMessengerListener;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.messages.base.structs.StyxQID;
 import com.v2soft.styxlib.library.server.ClientBalancer;
@@ -22,7 +21,7 @@ import com.v2soft.styxlib.library.server.vfs.IVirtualStyxFile;
  *
  */
 public class StyxServerManager 
-implements Closeable, StyxMessengerListener {
+implements Closeable {
     //---------------------------------------------------------------------------
     // Constants
     //---------------------------------------------------------------------------
@@ -174,15 +173,5 @@ implements Closeable, StyxMessengerListener {
     //-------------------------------------------------------------------------------------
     public void setTimeout(int mTimeout) {
         this.mTimeout = mTimeout;
-    }
-    //-------------------------------------------------------------------------------------
-    // Messenger listener
-    //-------------------------------------------------------------------------------------
-    @Override
-    public void onSocketDisconected() {
-    }
-
-    @Override
-    public void onTrashReceived() {
     }
 }

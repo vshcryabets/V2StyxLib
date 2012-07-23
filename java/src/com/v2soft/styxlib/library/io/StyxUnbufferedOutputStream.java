@@ -5,7 +5,7 @@ import java.io.OutputStream;
 
 import com.v2soft.styxlib.library.StyxClientConnection;
 import com.v2soft.styxlib.library.StyxFile;
-import com.v2soft.styxlib.library.core.Messenger;
+import com.v2soft.styxlib.library.core.StyxSessionHandler;
 import com.v2soft.styxlib.library.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.library.messages.StyxRWriteMessage;
 import com.v2soft.styxlib.library.messages.StyxTWriteMessage;
@@ -14,17 +14,17 @@ import com.v2soft.styxlib.library.types.ULong;
 
 /**
  * Unbuffered output styx output stream
- * @author mrco
+ * @author V.Shcryabets<vshcryabets@gmail.com>
  *
  */
 public class StyxUnbufferedOutputStream extends OutputStream {
     private long mTimeout = StyxClientConnection.DEFAULT_TIMEOUT;
     private byte[] mSingleByteArray = new byte[1];
     private StyxFile mFile;
-    private Messenger mMessenger;
+    private StyxSessionHandler mMessenger;
     private ULong mFileOffset = ULong.ZERO;
 
-    StyxUnbufferedOutputStream(StyxFile file, Messenger messnger) {
+    StyxUnbufferedOutputStream(StyxFile file, StyxSessionHandler messnger) {
         if ( file == null ) throw new NullPointerException("File is null");
         if ( messnger == null ) throw new NullPointerException("messnger is null");
 

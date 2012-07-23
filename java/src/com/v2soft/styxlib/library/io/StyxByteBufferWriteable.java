@@ -1,13 +1,13 @@
 package com.v2soft.styxlib.library.io;
 
-import java.nio.ByteBuffer;
+import org.apache.mina.core.buffer.IoBuffer;
 
 public class StyxByteBufferWriteable extends StyxDataWriter {
-	private ByteBuffer mBuffer;
+	private IoBuffer mBuffer;
 	
 	public StyxByteBufferWriteable(int capacity) {
 	    super();
-	    mBuffer = ByteBuffer.allocateDirect(capacity);
+	    mBuffer = IoBuffer.allocate(capacity);
 	}
 
 	/**
@@ -27,7 +27,7 @@ public class StyxByteBufferWriteable extends StyxDataWriter {
 	 * 
 	 * @return Byte buffer
 	 */
-	public ByteBuffer getBuffer() {
+	public IoBuffer getBuffer() {
 		return mBuffer;
 	}
 

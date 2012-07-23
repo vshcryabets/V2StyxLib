@@ -284,7 +284,8 @@ implements Closeable {
     private void sendMessage(StyxMessage answer) throws IOException {
         answer.writeToBuffer(mOutputBuffer);
         mOutputBuffer.getBuffer().position(0);
-        mChannel.write(mOutputBuffer.getBuffer());
+        // FIXME
+//        mChannel.write(mOutputBuffer.getBuffer());
     }
 
     @Override

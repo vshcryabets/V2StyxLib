@@ -4,21 +4,22 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.net.Socket;
-import java.net.SocketAddress;
-import java.nio.channels.SocketChannel;
+import java.nio.charset.Charset;
 import java.security.InvalidParameterException;
 import java.util.LinkedList;
 import java.util.concurrent.TimeoutException;
 
-import javax.net.ssl.SSLException;
-import javax.net.ssl.SSLSession;
-import javax.net.ssl.SSLSocket;
-import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.SSLContext;
 
-import com.v2soft.styxlib.Config;
-import com.v2soft.styxlib.library.core.Messenger;
-import com.v2soft.styxlib.library.core.Messenger.StyxMessengerListener;
+import org.apache.mina.core.future.ConnectFuture;
+import org.apache.mina.core.service.IoConnector;
+import org.apache.mina.core.session.IoSession;
+import org.apache.mina.filter.codec.ProtocolCodecFilter;
+import org.apache.mina.filter.codec.textline.TextLineCodecFactory;
+import org.apache.mina.transport.socket.nio.NioSocketConnector;
+
+import com.v2soft.styxlib.library.core.StyxCodecFactory;
+import com.v2soft.styxlib.library.core.StyxSessionHandler;
 import com.v2soft.styxlib.library.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.library.exceptions.StyxException;
 import com.v2soft.styxlib.library.messages.StyxRAttachMessage;
@@ -32,8 +33,13 @@ import com.v2soft.styxlib.library.messages.StyxTVersionMessage;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.messages.base.structs.StyxQID;
 
+/**
+ * 
+ * @author V.Shcryabets<vshcryabets@gmail.com>
+ *
+ */
 public class StyxClientConnection 
-implements Closeable, StyxMessengerListener {
+implements Closeable {
     //---------------------------------------------------------------------------
     // Constants
     //---------------------------------------------------------------------------
@@ -49,27 +55,29 @@ implements Closeable, StyxMessengerListener {
     private String mMountPoint;
     private int mPort;
     private int mTimeout = DEFAULT_TIMEOUT;
-    private boolean mSSL;
+    private SSLContext mSSL;
     private boolean mNeedAuth;
     private boolean isConnected, isAttached;
-    private Messenger mMessenger;
+    private StyxSessionHandler mMessenger;
     private int mIOBufSize = 8192;
     private long mAuthFID = StyxMessage.NOFID;
     private StyxQID mAuthQID;
     private StyxQID mQID;
     private long mFID = StyxMessage.NOFID;
     private ActiveFids mActiveFids = new ActiveFids();
+    private IoConnector mConnector;
+    private IoSession mSession;
 
     public StyxClientConnection() {
-        this(null, 0, false, null, null);
+        this(null, 0, null, null, null);
     }
 
-    public StyxClientConnection(InetAddress address, int port, boolean ssl) {
+    public StyxClientConnection(InetAddress address, int port, SSLContext ssl) {
         this(address, port, ssl, null, null);
     }
 
     public StyxClientConnection(InetAddress address, int port, 
-            boolean ssl, 
+            SSLContext ssl, 
             String username, String password) {
         mAddress = address;
         mPort = port;
@@ -90,81 +98,78 @@ implements Closeable, StyxMessengerListener {
             throws IOException, StyxException, InterruptedException, TimeoutException {
         mMountPoint = "/";
         mNeedAuth = (mUserName != null);
-        final SocketAddress sa = new InetSocketAddress(mAddress, mPort);
-        final SocketChannel channel = SocketChannel.open(sa);
-        channel.configureBlocking(true);
-        Socket socket = channel.socket();
-        socket.setSoTimeout(mTimeout);
-
-        if ( mSSL ) {
-            SSLSocketFactory factory = (SSLSocketFactory) SSLSocketFactory.getDefault();
-            SSLSocket sslSocket = (SSLSocket) factory.createSocket(socket, 
-                    mAddress.getHostAddress(), mPort, true);
-            printSocketInfo(sslSocket);
-
-            // Connect to the server
-            sslSocket.startHandshake();
-
-            // We need a timeout here for the case where the server is not using SSL,
-            // in which case both sides simply sit waiting for something from the
-            // other side.
-            sslSocket.setSoTimeout(500);
-            // Get the SSL session. This forces a handshake and is used
-            // to indicate that we've performed the handshake for this
-            // SSLSocket.
-            SSLSession session = sslSocket.getSession();
-            //        this.sslSessionMap.put(socket, session);
-
-            // Retrieve the server's certificate chain
-            java.security.cert.Certificate[] serverCerts =
-                    session.getPeerCertificates();
-
-            // Since we don't have isValid() in 1.4 this is the closest we can get to
-            // a validity check.
-            if (session.getId() != null && session.getId().length != 0) {
-                if ( Config.LOG_NETWORK ) {
-                    System.out.println("SSL session details: " + session);
-                }
-            } else {
-                if (sslSocket.getUseClientMode()) {
-                    throw new SSLException("SSL session handshake failed (is the server SSL enabled?)");
-                }
-                // For server's we'll leave it to JSSE to raise an exception
-                // when the client first tries to communicate with us.
-            }
-            // Set the read timeout to the smallest legal value so
-            // when data is available we can read it in blocking mode.
-            // This must be done only after the handshake has completed.
-            sslSocket.setSoTimeout(1);
-
-            SocketChannel channel2 = sslSocket.getChannel();
-            mMessenger = new Messenger(channel2, mIOBufSize, this);
-        } else {
-            mMessenger = new Messenger(socket.getChannel(), mIOBufSize, this);
+        mConnector = new NioSocketConnector();
+        mConnector.getSessionConfig().setReadBufferSize(mIOBufSize);
+        mConnector.getFilterChain().addLast("codec", new ProtocolCodecFilter(new StyxCodecFactory()));
+        mMessenger = new StyxSessionHandler();
+        mConnector.setHandler(mMessenger);
+        ConnectFuture future = mConnector.connect(new InetSocketAddress(mAddress, mPort));
+        future.awaitUninterruptibly();
+        if (!future.isConnected()) {
+            return false;
         }
+        mSession = future.getSession();
+        mSession.getConfig().setUseReadOperation(true);
+
+        
+//        final SocketAddress sa = new InetSocketAddress(mAddress, mPort);
+//        final SocketChannel channel = SocketChannel.open(sa);
+//        channel.configureBlocking(true);
+//        Socket socket = channel.socket();
+//        socket.setSoTimeout(mTimeout);
+//
+//        if ( mSSL != null ) {
+//            SSLSocketFactory factory = (SSLSocketFactory) SSLSocketFactory.getDefault();
+//            SSLSocket sslSocket = (SSLSocket) factory.createSocket(socket, 
+//                    mAddress.getHostAddress(), mPort, true);
+//            printSocketInfo(sslSocket);
+//
+//            // Connect to the server
+//            sslSocket.startHandshake();
+//
+//            // We need a timeout here for the case where the server is not using SSL,
+//            // in which case both sides simply sit waiting for something from the
+//            // other side.
+//            sslSocket.setSoTimeout(500);
+//            // Get the SSL session. This forces a handshake and is used
+//            // to indicate that we've performed the handshake for this
+//            // SSLSocket.
+//            SSLSession session = sslSocket.getSession();
+//            //        this.sslSessionMap.put(socket, session);
+//
+//            // Retrieve the server's certificate chain
+//            java.security.cert.Certificate[] serverCerts =
+//                    session.getPeerCertificates();
+//
+//            // Since we don't have isValid() in 1.4 this is the closest we can get to
+//            // a validity check.
+//            if (session.getId() != null && session.getId().length != 0) {
+//                if ( Config.LOG_NETWORK ) {
+//                    System.out.println("SSL session details: " + session);
+//                }
+//            } else {
+//                if (sslSocket.getUseClientMode()) {
+//                    throw new SSLException("SSL session handshake failed (is the server SSL enabled?)");
+//                }
+//                // For server's we'll leave it to JSSE to raise an exception
+//                // when the client first tries to communicate with us.
+//            }
+//            // Set the read timeout to the smallest legal value so
+//            // when data is available we can read it in blocking mode.
+//            // This must be done only after the handshake has completed.
+//            sslSocket.setSoTimeout(1);
+//
+//            SocketChannel channel2 = sslSocket.getChannel();
+//            mMessenger = new Messenger(channel2, mIOBufSize, this);
+//        } else {
+//            mMessenger = new Messenger(socket.getChannel(), mIOBufSize, this);
+//        }
 
         sendVersionMessage();
-        setConnected(socket.isConnected());
-        return socket.isConnected();
+        setConnected(true);
+        return true;
     }
-    
-    private static void printSocketInfo(SSLSocket s) {
-        System.out.println("Socket class: "+s.getClass());
-        System.out.println("   Remote address = "
-           +s.getInetAddress().toString());
-        System.out.println("   Remote port = "+s.getPort());
-        System.out.println("   Local socket address = "
-           +s.getLocalSocketAddress().toString());
-        System.out.println("   Local address = "
-           +s.getLocalAddress().toString());
-        System.out.println("   Local port = "+s.getLocalPort());
-        System.out.println("   Need client authentication = "
-           +s.getNeedClientAuth());
-        SSLSession ss = s.getSession();
-        System.out.println("   Cipher suite = "+ss.getCipherSuite());
-        System.out.println("   Protocol = "+ss.getProtocol());
-     }
-
+ 
     public StyxFile getRoot() throws StyxException, InterruptedException, 
     TimeoutException, IOException {
         if (mRoot == null)
@@ -172,7 +177,7 @@ implements Closeable, StyxMessengerListener {
         return mRoot;
     }
 
-    public Messenger getMessenger() {
+    public StyxSessionHandler getMessenger() {
         return mMessenger;
     }		
 
@@ -211,9 +216,12 @@ implements Closeable, StyxMessengerListener {
         return mPort;
     }
 
-    public boolean isSSL()
-    {
-        return mSSL;
+    /**
+     * 
+     * @return true if connection should use SSL
+     */
+    public boolean isSSL() {
+        return mSSL != null;
     }
 
     public boolean isNeedAuth()
@@ -288,7 +296,7 @@ implements Closeable, StyxMessengerListener {
     public void sendVersionMessage()
             throws InterruptedException, StyxException, IOException, TimeoutException {
         StyxTVersionMessage tVersion = new StyxTVersionMessage(mIOBufSize,PROTOCOL);
-        mMessenger.send(tVersion);
+        mSession.write(tVersion).awaitUninterruptibly();
 
         StyxMessage rMessage = tVersion.waitForAnswer(mTimeout);
         StyxErrorMessageException.doException(rMessage);
@@ -407,23 +415,5 @@ implements Closeable, StyxMessengerListener {
     public void setAddressPort(InetAddress address, int port) {
         mAddress = address;
         mPort = port;
-    }
-    //-------------------------------------------------------------------------------------
-    // Messenger listener
-    //-------------------------------------------------------------------------------------
-    @Override
-    public void onSocketDisconected() {
-        setConnected(false);
-    }
-
-    @Override
-    public void onTrashReceived() {
-        //something goes wrong, we should restart protocol
-        setAttached(false);
-        try {
-            sendVersionMessage();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 }
