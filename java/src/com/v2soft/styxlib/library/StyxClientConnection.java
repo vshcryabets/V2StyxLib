@@ -20,10 +20,10 @@ import com.v2soft.styxlib.library.messages.StyxRAuthMessage;
 import com.v2soft.styxlib.library.messages.StyxRVersionMessage;
 import com.v2soft.styxlib.library.messages.StyxTAttachMessage;
 import com.v2soft.styxlib.library.messages.StyxTAuthMessage;
-import com.v2soft.styxlib.library.messages.StyxTClunkMessage;
-import com.v2soft.styxlib.library.messages.StyxTRemoveMessage;
 import com.v2soft.styxlib.library.messages.StyxTVersionMessage;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
+import com.v2soft.styxlib.library.messages.base.StyxTMessageFID;
+import com.v2soft.styxlib.library.messages.base.enums.MessageType;
 import com.v2soft.styxlib.library.messages.base.structs.StyxQID;
 
 public class StyxClientConnection 
@@ -205,7 +205,7 @@ implements Closeable, StyxMessengerListener {
      */
     public void clunk(long fid) 
             throws InterruptedException, StyxException, TimeoutException, IOException {
-        final StyxTClunkMessage tClunk = new StyxTClunkMessage(fid);
+        final StyxTMessageFID tClunk = new StyxTMessageFID(MessageType.Tclunk, MessageType.Rclunk, fid);
         mMessenger.send(tClunk);
         StyxMessage rMessage = tClunk.waitForAnswer(mTimeout);
         StyxErrorMessageException.doException(rMessage);
@@ -221,8 +221,7 @@ implements Closeable, StyxMessengerListener {
      * @throws IOException 
      */
     public void remove(long fid) throws InterruptedException, TimeoutException, StyxErrorMessageException, IOException {
-        StyxTRemoveMessage tRemove = new StyxTRemoveMessage(fid);
-        
+        StyxTMessageFID tRemove = new StyxTMessageFID(MessageType.Tremove, MessageType.Rremove, fid);
         mMessenger.send(tRemove);
         StyxMessage rMessage = tRemove.waitForAnswer(mTimeout);
         getActiveFids().releaseFid(fid);

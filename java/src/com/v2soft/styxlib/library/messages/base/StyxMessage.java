@@ -8,27 +8,19 @@ import com.v2soft.styxlib.library.io.IStyxDataReader;
 import com.v2soft.styxlib.library.io.IStyxDataWriter;
 import com.v2soft.styxlib.library.messages.StyxRAttachMessage;
 import com.v2soft.styxlib.library.messages.StyxRAuthMessage;
-import com.v2soft.styxlib.library.messages.StyxRClunkMessage;
-import com.v2soft.styxlib.library.messages.StyxRCreateMessage;
 import com.v2soft.styxlib.library.messages.StyxRErrorMessage;
-import com.v2soft.styxlib.library.messages.StyxRFlushMessage;
 import com.v2soft.styxlib.library.messages.StyxROpenMessage;
 import com.v2soft.styxlib.library.messages.StyxRReadMessage;
-import com.v2soft.styxlib.library.messages.StyxRRemoveMessage;
 import com.v2soft.styxlib.library.messages.StyxRStatMessage;
 import com.v2soft.styxlib.library.messages.StyxRVersionMessage;
-import com.v2soft.styxlib.library.messages.StyxRWStatMessage;
 import com.v2soft.styxlib.library.messages.StyxRWalkMessage;
 import com.v2soft.styxlib.library.messages.StyxRWriteMessage;
 import com.v2soft.styxlib.library.messages.StyxTAttachMessage;
 import com.v2soft.styxlib.library.messages.StyxTAuthMessage;
-import com.v2soft.styxlib.library.messages.StyxTClunkMessage;
 import com.v2soft.styxlib.library.messages.StyxTCreateMessage;
 import com.v2soft.styxlib.library.messages.StyxTFlushMessage;
 import com.v2soft.styxlib.library.messages.StyxTOpenMessage;
 import com.v2soft.styxlib.library.messages.StyxTReadMessage;
-import com.v2soft.styxlib.library.messages.StyxTRemoveMessage;
-import com.v2soft.styxlib.library.messages.StyxTStatMessage;
 import com.v2soft.styxlib.library.messages.StyxTVersionMessage;
 import com.v2soft.styxlib.library.messages.StyxTWStatMessage;
 import com.v2soft.styxlib.library.messages.StyxTWalkMessage;
@@ -37,7 +29,7 @@ import com.v2soft.styxlib.library.messages.base.enums.MessageType;
 import com.v2soft.styxlib.library.messages.base.enums.ModeType;
 import com.v2soft.styxlib.library.messages.base.structs.StyxQID;
 
-public abstract class StyxMessage {
+public class StyxMessage {
     public static final Charset sUTFCharset = Charset.forName("utf-8"); 
     public static final int BASE_BINARY_SIZE = 7;
 
@@ -66,7 +58,7 @@ public abstract class StyxMessage {
         StyxMessage result = null;
         switch (type) {
         case Tversion:
-            result = new StyxTVersionMessage();
+            result = new StyxTVersionMessage(0, null);
             break;
         case Rversion:
             result = new StyxRVersionMessage(0, null);
@@ -90,7 +82,7 @@ public abstract class StyxMessage {
             result = new StyxRErrorMessage(tag, null);
             break;
         case Rflush:
-            result = new StyxRFlushMessage(tag);
+            result = new StyxMessage(MessageType.Rflush, tag);
             break;
         case Rattach:
             result = new StyxRAttachMessage(tag, StyxQID.EMPTY);
@@ -102,13 +94,13 @@ public abstract class StyxMessage {
             result = new StyxTOpenMessage(NOFID, ModeType.OREAD);
             break;
         case Ropen:
-            result = new StyxROpenMessage(tag, null, 0);
+            result = new StyxROpenMessage(tag, null, 0, false);
             break;
         case Tcreate:
             result = new StyxTCreateMessage(NOFID, null, 0, ModeType.OWRITE);
             break;
         case Rcreate:
-            result = new StyxRCreateMessage(tag);
+            result = new StyxROpenMessage(tag, null, 0, true);
             break;
         case Tread:
             result = new StyxTReadMessage(NOFID, null, 0);
@@ -123,19 +115,19 @@ public abstract class StyxMessage {
             result = new StyxRWriteMessage(tag, 0);
             break;
         case Tclunk:
-            result = new StyxTClunkMessage(tag);
+            result = new StyxTMessageFID(MessageType.Tclunk, MessageType.Rclunk, 0);
             break;
         case Rclunk:
-            result = new StyxRClunkMessage(tag);
+            result = new StyxMessage(MessageType.Rclunk, tag);
             break;
         case Tremove:
-            result = new StyxTRemoveMessage(tag);
+            result = new StyxTMessageFID(MessageType.Tremove, MessageType.Rremove, tag);
             break;
         case Rremove:
-            result = new StyxRRemoveMessage(tag);
+            result = new StyxMessage(MessageType.Rremove, tag);
             break;
         case Tstat:
-            result = new StyxTStatMessage(tag);
+            result = new StyxTMessageFID(MessageType.Tstat, MessageType.Rstat, tag);
             break;
         case Rstat:
             result = new StyxRStatMessage(tag);
@@ -144,7 +136,7 @@ public abstract class StyxMessage {
             result = new StyxTWStatMessage(NOFID, null);
             break;
         case Rwstat:
-            result = new StyxRWStatMessage(tag);
+            result = new StyxMessage(MessageType.Rwstat, tag);
             break;
         }
         result.setTag((short) tag);
@@ -152,8 +144,7 @@ public abstract class StyxMessage {
         return result;
     }	
 
-    public static String toString(byte[] bytes)
-    {
+    public static String toString(byte[] bytes) {
         if ( (bytes == null) || (bytes.length==0))
             return "-";
         StringBuilder result = new StringBuilder();
@@ -190,28 +181,24 @@ public abstract class StyxMessage {
         }
     }
 
-    protected StyxMessage(MessageType type, int tag) {
+    public StyxMessage(MessageType type, int tag) {
         mType = type;
         mTag = tag;
     }
 
-    public MessageType getType()
-    {
+    public MessageType getType(){
         return mType;
     }
 
-    public int getTag()
-    {
+    public int getTag(){
         return mTag;
     }
 
-    public void setTag(int tag)
-    {
+    public void setTag(int tag){
         mTag = (tag & 0xFFFF);
     }
 
-    public int getBinarySize()
-    {
+    public int getBinarySize(){
         return BASE_BINARY_SIZE;
     }
 
@@ -227,17 +214,9 @@ public abstract class StyxMessage {
         output.writeUInt16(getTag());
     }
 
-    protected abstract String internalToString();
-
     @Override
     public String toString() {
-        String stmp = String.format("Type: %s\nTag: %d", 
+        return String.format("Type: %s\nTag: %d", 
                 getType().toString(), getTag());
-
-        String internal = internalToString();
-        if (internal != null)
-            stmp = String.format("%s\n%s", stmp, internal);
-
-        return String.format("(\n%s\n)", stmp);
     }
 }

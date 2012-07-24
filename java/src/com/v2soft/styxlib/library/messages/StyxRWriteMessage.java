@@ -40,8 +40,8 @@ public class StyxRWriteMessage extends StyxMessage {
 	}
 
 	@Override
-	protected String internalToString() {
-		return String.format("Count: %d", mCount);
+    public String toString() {
+		return String.format("%s\nCount: %d", super.toString(), mCount);
 	}
 	
 }

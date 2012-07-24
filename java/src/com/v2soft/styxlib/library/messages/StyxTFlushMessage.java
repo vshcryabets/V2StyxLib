@@ -12,13 +12,14 @@ public class StyxTFlushMessage extends StyxTMessage {
 	private int mOldTag;
 
 	public StyxTFlushMessage(int tag){
-		super(MessageType.Tflush);
+		super(MessageType.Tflush, MessageType.Rflush);
 		mOldTag = tag;
 	}
 
     @Override
     public void load(IStyxDataReader input) 
         throws IOException  {
+        super.load(input);
         mOldTag = input.readUInt16();
     }
 
@@ -38,12 +39,7 @@ public class StyxTFlushMessage extends StyxTMessage {
 	}
 
 	@Override
-	protected String internalToString() {
-		return String.format("Tag: %d", getOldTag());
-	}
-
-	@Override
-	protected MessageType getRequiredAnswerType() {
-		return MessageType.Rflush;
+    public String toString() {
+		return String.format("%s\nTag: %d", super.toString(), getOldTag());
 	}
 }

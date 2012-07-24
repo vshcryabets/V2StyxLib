@@ -1,53 +1,11 @@
 package com.v2soft.styxlib.library.messages;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-
-import com.v2soft.styxlib.library.io.IStyxDataReader;
-import com.v2soft.styxlib.library.io.IStyxDataWriter;
-import com.v2soft.styxlib.library.messages.base.StyxMessage;
+import com.v2soft.styxlib.library.messages.base.StyxRSingleQIDMessage;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
 import com.v2soft.styxlib.library.messages.base.structs.StyxQID;
 
-public class StyxRAuthMessage extends StyxMessage {
-	private StyxQID mQID;
-
+public class StyxRAuthMessage extends StyxRSingleQIDMessage {
     public StyxRAuthMessage(int tag, StyxQID qid) {
-        super(MessageType.Rauth, tag);
-        mQID = qid;
+        super(MessageType.Rauth, tag, qid);
     }
-	
-	public StyxQID getQID()
-	{
-		if (mQID == null)
-			return StyxQID.EMPTY;
-		return mQID;
-	}
-	
-	public void setQID(StyxQID qid)
-	{
-		mQID = qid;
-	}
-	
-	@Override
-	public int getBinarySize() {
-		return super.getBinarySize() + StyxQID.CONTENT_SIZE;
-	}
-	
-	@Override
-	public void writeToBuffer(IStyxDataWriter output)
-	        throws UnsupportedEncodingException, IOException {
-	    super.writeToBuffer(output);
-		mQID.writeBinaryTo(output);
-	}
-
-	@Override
-	protected String internalToString() {
-		return String.format("QID: %s", mQID.toString());
-	}
-
-    @Override
-    protected void load(IStyxDataReader is) throws IOException {
-        mQID = new StyxQID(is);
-    }	
 }

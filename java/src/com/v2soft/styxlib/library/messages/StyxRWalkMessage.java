@@ -88,19 +88,18 @@ public class StyxRWalkMessage extends StyxMessage {
 	}
 
 	@Override
-	protected String internalToString() {
-		String result = "Number of walks: "+mQIDList.size()+"\n"; int num = 0;
-		
-		for (StyxQID qid : getQIDIterable())
-		{
-			num++;
-			if (!result.equals(""))
-				result += "\n";
-			result += String.format("QID #%d: %s", 
-					num, qid.toString());
-		}
-		
-		return result;
-	}
-	
+	public String toString() {
+        String result = super.toString()+"\nNumber of walks: "+mQIDList.size()+"\n"; int num = 0;
+        
+        for (StyxQID qid : getQIDIterable())
+        {
+            num++;
+            if (!result.equals(""))
+                result += "\n";
+            result += String.format("QID #%d: %s", 
+                    num, qid.toString());
+        }
+        
+        return result;
+	}	
 }

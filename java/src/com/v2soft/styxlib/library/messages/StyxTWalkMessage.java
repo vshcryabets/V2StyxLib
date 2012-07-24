@@ -10,7 +10,7 @@ import com.v2soft.styxlib.library.StyxFile;
 import com.v2soft.styxlib.library.io.IStyxDataReader;
 import com.v2soft.styxlib.library.io.IStyxDataWriter;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
-import com.v2soft.styxlib.library.messages.base.StyxTMessage;
+import com.v2soft.styxlib.library.messages.base.StyxTMessageFID;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
 
 /**
@@ -19,20 +19,19 @@ import com.v2soft.styxlib.library.messages.base.enums.MessageType;
  *
  */
 public class StyxTWalkMessage 
-extends StyxTMessage {
-    private long mFID, mNewFID;
+extends StyxTMessageFID {
+    private long mNewFID;
     private List<String> mPathElements;
 
     public StyxTWalkMessage(long fid, long new_fid, String path){
-        super(MessageType.Twalk);
-        mFID = fid;
+        super(MessageType.Twalk, MessageType.Rwalk, fid);
         mNewFID = new_fid;
         setPath(path);
     }
 
     @Override
     public void load(IStyxDataReader input) throws IOException  {
-        mFID = input.readUInt32();
+        super.load(input);
         mNewFID = input.readUInt32();
         int count = input.readUInt16();
         mPathElements = new LinkedList<String>();
@@ -44,7 +43,6 @@ extends StyxTMessage {
     public void writeToBuffer(IStyxDataWriter output)
             throws UnsupportedEncodingException, IOException {
         super.writeToBuffer(output);
-        output.writeUInt32(mFID);
         output.writeUInt32(mNewFID);
         if (mPathElements != null) {
             output.writeUInt16(mPathElements.size());
@@ -53,11 +51,6 @@ extends StyxTMessage {
         } else {
             output.writeUInt16(0);
         }
-    }
-
-    public long getFID()
-    {
-        return mFID;
     }
 
     public long getNewFID()
@@ -101,7 +94,7 @@ extends StyxTMessage {
 
     @Override
     public int getBinarySize() {
-        int size = super.getBinarySize() + 10;
+        int size = super.getBinarySize() + 4 + 2;
         if (mPathElements != null)
         {
             for (String pathElement : mPathElements)
@@ -112,14 +105,8 @@ extends StyxTMessage {
     }
 
     @Override
-    protected String internalToString() {
-        return String.format("FID: %d\nNewFID: %d\nNumber of walks:%d\nPath: %s",
-                mFID, mNewFID, mPathElements.size(), getPath());
+    public String toString() {
+        return String.format("%s\nNewFID: %d\nNumber of walks:%d\nPath: %s",
+                super.toString(), mNewFID, mPathElements.size(), getPath());
     }
-
-    @Override
-    protected MessageType getRequiredAnswerType() {
-        return MessageType.Rwalk;
-    }
-
 }

@@ -23,20 +23,18 @@ public class StyxRStatMessage extends StyxMessage {
 
     @Override
     public void load(IStyxDataReader input) throws IOException {
-        //        int size = 
+        super.load(input);
         input.readUInt16();
         mStat = new StyxStat(input);
     }
 
-    public StyxStat getStat()
-    {
+    public StyxStat getStat() {
         if (mStat == null)
             return StyxStat.EMPTY;
         return mStat;
     }
 
-    public void setStat(StyxStat stat)
-    {
+    public void setStat(StyxStat stat) {
         mStat = stat;
     }
 
@@ -55,8 +53,7 @@ public class StyxRStatMessage extends StyxMessage {
     }
 
     @Override
-    protected String internalToString() {
-        return String.format("Stat: %s", getStat().toString());
+    public String toString() {
+        return String.format("%s\nStat: %s", super.toString(), getStat().toString());
     }
-
 }

@@ -21,11 +21,12 @@ import com.v2soft.styxlib.library.messages.StyxRStatMessage;
 import com.v2soft.styxlib.library.messages.StyxRWalkMessage;
 import com.v2soft.styxlib.library.messages.StyxTCreateMessage;
 import com.v2soft.styxlib.library.messages.StyxTOpenMessage;
-import com.v2soft.styxlib.library.messages.StyxTStatMessage;
 import com.v2soft.styxlib.library.messages.StyxTWStatMessage;
 import com.v2soft.styxlib.library.messages.StyxTWalkMessage;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
+import com.v2soft.styxlib.library.messages.base.StyxTMessageFID;
 import com.v2soft.styxlib.library.messages.base.enums.FileMode;
+import com.v2soft.styxlib.library.messages.base.enums.MessageType;
 import com.v2soft.styxlib.library.messages.base.enums.ModeType;
 import com.v2soft.styxlib.library.messages.base.structs.StyxStat;
 import com.v2soft.styxlib.library.types.ULong;
@@ -480,11 +481,10 @@ public class StyxFile implements Closeable {
     private StyxStat getStat() throws StyxException, InterruptedException, TimeoutException, IOException
     {
         if (mStat == null) {
-            StyxTStatMessage tStat = new StyxTStatMessage(getFID());
+            StyxTMessageFID tStat = new StyxTMessageFID(MessageType.Tstat, MessageType.Rstat, getFID());
             mMessenger.send(tStat);
             StyxMessage rMessage = tStat.waitForAnswer(mTimeout);
             StyxErrorMessageException.doException(rMessage);
-
             mStat = ((StyxRStatMessage) rMessage).getStat();
         }
         return mStat;

@@ -14,18 +14,15 @@ public class StyxTVersionMessage extends StyxTMessage {
 	private String mProtocolVersion;
 	
 	public StyxTVersionMessage(long maxPacketSize, String protocolVersion) {
-		this();
+        super(MessageType.Tversion, MessageType.Rversion);
 		mMaxPacketSize = maxPacketSize;
 		mProtocolVersion = protocolVersion;
-	}
-	
-	public StyxTVersionMessage() {
-		super(MessageType.Tversion);
 	}
 	
     @Override
     public void load(IStyxDataReader input)
         throws IOException {
+        super.load(input);
         setMaxPacketSize(input.readUInt32());
         setProtocolVersion(input.readUTFString());
     }
@@ -67,13 +64,9 @@ public class StyxTVersionMessage extends StyxTMessage {
 	}
 
 	@Override
-	protected String internalToString() {
-		return String.format("MaxPocketSize: %d;\nProtocolVersion: %s", 
+    public String toString() {
+		return String.format("%s\nMaxPocketSize: %d;\nProtocolVersion: %s",
+		        super.toString(),
 				getMaxPacketSize(), getProtocolVersion());
-	}
-
-	@Override
-	protected MessageType getRequiredAnswerType() {
-		return MessageType.Rversion;
 	}
 }

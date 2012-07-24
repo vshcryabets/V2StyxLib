@@ -13,26 +13,23 @@ import com.v2soft.styxlib.library.io.StyxByteBufferReadable;
 import com.v2soft.styxlib.library.io.StyxByteBufferWriteable;
 import com.v2soft.styxlib.library.messages.StyxRAttachMessage;
 import com.v2soft.styxlib.library.messages.StyxRAuthMessage;
-import com.v2soft.styxlib.library.messages.StyxRClunkMessage;
 import com.v2soft.styxlib.library.messages.StyxRErrorMessage;
-import com.v2soft.styxlib.library.messages.StyxRFlushMessage;
 import com.v2soft.styxlib.library.messages.StyxROpenMessage;
 import com.v2soft.styxlib.library.messages.StyxRReadMessage;
 import com.v2soft.styxlib.library.messages.StyxRStatMessage;
 import com.v2soft.styxlib.library.messages.StyxRVersionMessage;
-import com.v2soft.styxlib.library.messages.StyxRWStatMessage;
 import com.v2soft.styxlib.library.messages.StyxRWalkMessage;
 import com.v2soft.styxlib.library.messages.StyxRWriteMessage;
 import com.v2soft.styxlib.library.messages.StyxTAttachMessage;
 import com.v2soft.styxlib.library.messages.StyxTAuthMessage;
-import com.v2soft.styxlib.library.messages.StyxTClunkMessage;
 import com.v2soft.styxlib.library.messages.StyxTOpenMessage;
 import com.v2soft.styxlib.library.messages.StyxTReadMessage;
-import com.v2soft.styxlib.library.messages.StyxTStatMessage;
 import com.v2soft.styxlib.library.messages.StyxTWStatMessage;
 import com.v2soft.styxlib.library.messages.StyxTWalkMessage;
 import com.v2soft.styxlib.library.messages.StyxTWriteMessage;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
+import com.v2soft.styxlib.library.messages.base.StyxTMessageFID;
+import com.v2soft.styxlib.library.messages.base.enums.MessageType;
 import com.v2soft.styxlib.library.messages.base.structs.StyxQID;
 import com.v2soft.styxlib.library.server.vfs.IVirtualStyxFile;
 
@@ -110,16 +107,16 @@ implements Closeable {
                 answer = processAuth((StyxTAuthMessage)msg);
                 break;
             case Tstat:
-                fid = ((StyxTStatMessage)msg).getFID();
+                fid = ((StyxTMessageFID)msg).getFID();
                 file = getAssignedFile(fid);
                 answer = new StyxRStatMessage(msg.getTag(), file.getStat());
                 break;
             case Tclunk:
-                answer = processClunk((StyxTClunkMessage)msg);
+                answer = processClunk((StyxTMessageFID)msg);
                 break;
             case Tflush:
                 // TODO do something there
-                answer = new StyxRFlushMessage(msg.getTag());
+                answer = new StyxMessage(MessageType.Rflush, msg.getTag());
                 break;
             case Twalk:
                 answer = processWalk((StyxTWalkMessage) msg);
@@ -155,11 +152,11 @@ implements Closeable {
      * @return
      * @throws StyxErrorMessageException
      */
-    private StyxMessage processClunk(StyxTClunkMessage msg) throws StyxErrorMessageException {
+    private StyxMessage processClunk(StyxTMessageFID msg) throws StyxErrorMessageException {
         IVirtualStyxFile file = getAssignedFile(msg.getFID());
         file.close(this);
         mAssignedFiles.remove(msg.getFID());
-        return new StyxRClunkMessage(msg.getTag());
+        return new StyxMessage(MessageType.Rclunk, msg.getTag());
     }
 
     private IVirtualStyxFile getAssignedFile(long fid) throws StyxErrorMessageException {
@@ -172,7 +169,7 @@ implements Closeable {
 
     private StyxMessage processWStat(StyxTWStatMessage msg) {
         // TODO Auto-generated method stub
-        return new StyxRWStatMessage(msg.getTag());
+        return new StyxMessage(MessageType.Rwstat, msg.getTag());
     }
 
     /**
@@ -230,7 +227,7 @@ implements Closeable {
         long fid = msg.getFID();
         IVirtualStyxFile file = getAssignedFile(fid);
         if ( file.open(this, msg.getMode()) ) {
-            return new StyxROpenMessage(msg.getTag(), file.getQID(), mIOUnit-24 ); // TODO magic number
+            return new StyxROpenMessage(msg.getTag(), file.getQID(), mIOUnit-24, false ); // TODO magic number
         } else {
             StyxErrorMessageException.doException("Incorrect mode for specified file");
             return null;

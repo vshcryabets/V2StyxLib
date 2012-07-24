@@ -5,19 +5,16 @@ import java.io.UnsupportedEncodingException;
 
 import com.v2soft.styxlib.library.io.IStyxDataReader;
 import com.v2soft.styxlib.library.io.IStyxDataWriter;
-import com.v2soft.styxlib.library.io.StyxDataReader;
-import com.v2soft.styxlib.library.messages.base.StyxTMessage;
+import com.v2soft.styxlib.library.messages.base.StyxTMessageFID;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
 import com.v2soft.styxlib.library.types.ULong;
 
-public class StyxTReadMessage extends StyxTMessage {
-	private long mFID;
+public class StyxTReadMessage extends StyxTMessageFID {
 	private ULong mOffset;
 	private long mCount;
 
 	public StyxTReadMessage(long fid, ULong offset, long count)	{
-		super(MessageType.Tread);
-		mFID = fid;
+		super(MessageType.Tread, MessageType.Rread, fid);
 		mOffset = offset;
 		mCount = count;
 	}
@@ -25,20 +22,10 @@ public class StyxTReadMessage extends StyxTMessage {
     @Override
     public void load(IStyxDataReader input) 
         throws IOException  {
-        mFID = input.readUInt32();
+        super.load(input);
         mOffset = input.readUInt64();
         mCount = input.readUInt32();
     }
-	
-	public long getFID()
-	{
-		return mFID;
-	}
-	
-	public void setFID(long fid)
-	{
-		mFID = fid;
-	}
 	
 	public ULong getOffset()
 	{
@@ -62,27 +49,20 @@ public class StyxTReadMessage extends StyxTMessage {
 	
 	@Override
 	public int getBinarySize() {
-		return super.getBinarySize() + 4 + 8 + 4;
+		return super.getBinarySize() + 8 + 4;
 	}
 	
 	@Override
 	public void writeToBuffer(IStyxDataWriter output)
 	        throws UnsupportedEncodingException, IOException {
 	    super.writeToBuffer(output);
-        output.writeUInt32(mFID);
         output.writeUInt64(mOffset);
         output.writeUInt32(mCount);
 	}
 
 	@Override
-	protected String internalToString() {
-		return String.format("FID: %d\nOffset: %s\nCount: %d",
-				getFID(), getOffset().toString(), getCount());
+    public String toString() {
+	    return String.format("%s\nOffset: %s\nCount: %d",
+				super.toString(), getOffset().toString(), getCount());
 	}
-
-	@Override
-	protected MessageType getRequiredAnswerType() {
-		return MessageType.Rread;
-	}
-	
 }
