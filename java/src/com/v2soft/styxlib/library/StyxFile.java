@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.concurrent.TimeoutException;
 
+import org.apache.mina.core.session.IoSession;
+
 import com.v2soft.styxlib.library.core.StyxSessionHandler;
 import com.v2soft.styxlib.library.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.library.exceptions.StyxException;
@@ -44,7 +46,7 @@ public class StyxFile implements Closeable {
     private long mParentFID = StyxMessage.NOFID;
     private StyxStat mStat;
     private String mPath;
-    private StyxSessionHandler mMessenger;
+    private IoSession mMessenger;
     private long mTimeout = StyxClientConnection.DEFAULT_TIMEOUT;
 
     public StyxFile(StyxClientConnection manager) throws StyxException, TimeoutException, IOException, InterruptedException {
@@ -60,7 +62,7 @@ public class StyxFile implements Closeable {
         if ( !manager.isConnected() )
             throw new IOException("Styx connection wasn't established");
         mManager = manager;
-        mMessenger = mManager.getMessenger();
+        mMessenger = mManager.getSession();
         mTimeout = mManager.getTimeout();
         if ( parent != null ) {
             mPath = combinePath(parent, path);
@@ -102,13 +104,12 @@ public class StyxFile implements Closeable {
 
     private int open(int mode) 
             throws StyxException, InterruptedException, TimeoutException, IOException {
-        StyxTOpenMessage tOpen = new StyxTOpenMessage(getFID(), mode);
-
-        mMessenger.send(tOpen);
-        StyxMessage rMessage = tOpen.waitForAnswer(mTimeout);
+        final StyxTOpenMessage tOpen = new StyxTOpenMessage(getFID(), mode);
+        mMessenger.write(tOpen);
+        final StyxMessage rMessage = tOpen.waitForAnswer(mTimeout);
         StyxErrorMessageException.doException(rMessage);
 
-        StyxROpenMessage rOpen = (StyxROpenMessage) rMessage;
+        final StyxROpenMessage rOpen = (StyxROpenMessage) rMessage;
         return (int)rOpen.getIOUnit();
     }
 
@@ -239,9 +240,10 @@ public class StyxFile implements Closeable {
         }
         // reserve FID
         long tempFID = sendWalkMessage("");
-        StyxTCreateMessage tCreate = new StyxTCreateMessage(tempFID, getName(), permissions, ModeType.OWRITE);
-        mMessenger.send(tCreate);
-        StyxMessage rMessage = tCreate.waitForAnswer(mTimeout);
+        final StyxTCreateMessage tCreate = new StyxTCreateMessage(tempFID, getName(),
+                permissions, ModeType.OWRITE);
+        mMessenger.write(tCreate);
+        final StyxMessage rMessage = tCreate.waitForAnswer(mTimeout);
         StyxErrorMessageException.doException(rMessage);
 
         // close temp FID
@@ -310,20 +312,20 @@ public class StyxFile implements Closeable {
         StyxStat stat = getStat();
         stat.setName(name);
         StyxTWStatMessage tWStat = new StyxTWStatMessage(getFID(), stat);
-        mMessenger.send(tWStat);
+        mMessenger.write(tWStat);
         StyxMessage rMessage = tWStat.waitForAnswer(mTimeout);
         StyxErrorMessageException.doException(rMessage);
     }
 
-    public void mkdir(long permissions) throws InterruptedException, StyxException, TimeoutException, IOException
-    {
+    public void mkdir(long permissions) throws InterruptedException, 
+        StyxException, TimeoutException, IOException {
         permissions = FileMode.getPermissionsByMode(permissions)
                 | FileMode.Directory.getMode();
 
-        StyxTCreateMessage tCreate = new StyxTCreateMessage(mParentFID, getName(), permissions, ModeType.OREAD);
-
-        mMessenger.send(tCreate);
-        StyxMessage rMessage = tCreate.waitForAnswer(mTimeout);
+        final StyxTCreateMessage tCreate = new StyxTCreateMessage(
+                mParentFID, getName(), permissions, ModeType.OREAD);
+        mMessenger.write(tCreate);
+        final StyxMessage rMessage = tCreate.waitForAnswer(mTimeout);
         StyxErrorMessageException.doException(rMessage);
     }
 
@@ -460,10 +462,10 @@ public class StyxFile implements Closeable {
     private long sendWalkMessage(String path) 
             throws StyxException, InterruptedException, TimeoutException, IOException {
         long newFID = mManager.getActiveFids().getFreeFid();
-        StyxTWalkMessage tWalk = new StyxTWalkMessage(mManager.getFID(),
+        final StyxTWalkMessage tWalk = new StyxTWalkMessage(mManager.getFID(),
                 newFID, path);
-        mMessenger.send(tWalk);
-        StyxMessage rWalk = tWalk.waitForAnswer(mTimeout);
+        mMessenger.write(tWalk);
+        final StyxMessage rWalk = tWalk.waitForAnswer(mTimeout);
         StyxErrorMessageException.doException(rWalk, mPath);
         if ( ((StyxRWalkMessage)rWalk).getQIDListLength() != tWalk.getPathLength())
             throw new FileNotFoundException("File not found "+mPath);
@@ -478,11 +480,12 @@ public class StyxFile implements Closeable {
      * @throws TimeoutException
      * @throws IOException 
      */
-    private StyxStat getStat() throws StyxException, InterruptedException, TimeoutException, IOException
-    {
+    private StyxStat getStat() throws StyxException, InterruptedException, 
+        TimeoutException, IOException {
         if (mStat == null) {
-            StyxTMessageFID tStat = new StyxTMessageFID(MessageType.Tstat, MessageType.Rstat, getFID());
-            mMessenger.send(tStat);
+            final StyxTMessageFID tStat = new StyxTMessageFID(MessageType.Tstat, 
+                    MessageType.Rstat, getFID());
+            mMessenger.write(tStat);
             StyxMessage rMessage = tStat.waitForAnswer(mTimeout);
             StyxErrorMessageException.doException(rMessage);
             mStat = ((StyxRStatMessage) rMessage).getStat();

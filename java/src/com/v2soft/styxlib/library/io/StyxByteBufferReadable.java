@@ -1,10 +1,6 @@
 package com.v2soft.styxlib.library.io;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.ByteBuffer;
-import java.nio.channels.SocketChannel;
-
+import org.apache.mina.core.buffer.IoBuffer;
 
 /**
  * 
@@ -12,107 +8,56 @@ import java.nio.channels.SocketChannel;
  *
  */
 public class StyxByteBufferReadable extends StyxDataReader {
-    private ByteBuffer mBuffer;
-    private int mWritePosition, mReadPosition, mCapacity, mStoredBytes;
+    private IoBuffer mBuffer;
 
-    public StyxByteBufferReadable(int capacity) {
-        mWritePosition = 0;
-        mReadPosition = 0;
-        mStoredBytes = 0;
-        mCapacity = capacity;
-        mBuffer = ByteBuffer.allocateDirect(mCapacity);
+    public StyxByteBufferReadable(IoBuffer buffer) {
+        mBuffer = buffer;
     }
     // ==========================================================
     // Public methods
     // ==========================================================
-    public int remainsToRead() {
-        return mStoredBytes;
-    }
-    public int readFromChannel(SocketChannel channel) throws IOException {
-        int free = mCapacity-mStoredBytes;
-        if ( free <= 0 ) return 0;
-        if ( mWritePosition >= mCapacity ) {
-            mWritePosition = 0;
-        }
-        mBuffer.limit( mWritePosition < mReadPosition ? mReadPosition : mCapacity );
-        mBuffer.position(mWritePosition);
-        int read = channel.read(mBuffer);
-        if ( read > 0 ) {
-            mStoredBytes+=read;
-            mWritePosition=mBuffer.position();
-        }
-        return read;
-    }
-    public int readFromStream(InputStream is) throws IOException {
-        int free = mCapacity-mStoredBytes;
-        if ( free <= 0 ) return 0;
-        if ( mWritePosition >= mCapacity ) {
-            mWritePosition = 0;
-        }
-        mBuffer.limit( mWritePosition < mReadPosition ? mReadPosition : mCapacity );
-        mBuffer.position(mWritePosition);
-        // FIXME
-        byte buffer[] = new byte[free];
-        int read = is.read(buffer);
-        mBuffer.put(buffer, 0, read);
-        if ( read > 0 ) {
-            mStoredBytes+=read;
-            mWritePosition=mBuffer.position();
-        }
-        return 0;
-    }    
     /**
      * Get byte array from buffer, this operation will not move read position pointer
      * @param out
-     * @param i
+     * @param offset
      * @param length
      */
-    public int get(byte[] out, int i, int length) {
-        if ( out == null ) throw new NullPointerException("Out buffer is null");
-        if ( mStoredBytes < length ) throw new ArrayIndexOutOfBoundsException("Too much bytes to read");
-        if ( mReadPosition >= mCapacity ) {
-            mReadPosition = 0;
+    public int get(byte[] out, int offset, int length) {
+        if ( out == null ) {
+            throw new NullPointerException("Out is null");
         }
-        mBuffer.position(mReadPosition);
-        int limit = mWritePosition <= mReadPosition ? mCapacity : mWritePosition;
-        mBuffer.limit( limit );
-        int avaiable = limit-mReadPosition;
-        if ( avaiable < length ) {
-            // splited block
-            // read first part
-            mBuffer.get(out, i, avaiable);
-            // read second part
-            mBuffer.position(0);
-            mBuffer.get(out, i+avaiable, length-avaiable);
-        } else {
-            // single block
-            mBuffer.get(out, i, length);
+        if ( mBuffer.remaining() < length ) {
+            throw new ArrayIndexOutOfBoundsException("Too much bytes to read");
         }
+        int position = mBuffer.position();
+        mBuffer.get(out, offset, length);
+        mBuffer.position(position);
         return length;
     }    
-    // ==========================================================
-    // StyxDataReader methods
-    // ==========================================================
     /**
      * Read byte array from buffer
      * @param out
-     * @param i
+     * @param offset
      * @param length
      */
     @Override
-    public int read(byte[] out, int i, int length) {
-        if ( out == null ) throw new NullPointerException("Out is null");
-        if ( mStoredBytes < length ) throw new ArrayIndexOutOfBoundsException("Too much bytes to read");
-        int res = get(out, i, length);
-        mReadPosition=mBuffer.position();
-        mStoredBytes-=res;
-        return res;
+    public int read(byte[] out, int offset, int length) {
+        if ( out == null ) {
+            throw new NullPointerException("Out is null");
+        }
+        if ( mBuffer.remaining() < length ) {
+            throw new ArrayIndexOutOfBoundsException("Too much bytes to read");
+        }
+        mBuffer.get(out, offset, length);
+        return length;
     }
 
     @Override
     protected long getInteger(int bytes) {
         // TODO this method will work wrong at the buffer end
-        if ( bytes > sDataBufferSize ) throw new ArrayIndexOutOfBoundsException("Too much bytes to read");
+        if ( bytes > sDataBufferSize ) {
+            throw new ArrayIndexOutOfBoundsException("Too much bytes to read");
+        }
         long result = 0L;
         int shift = 0;
         int readed = get(mDataBuffer, 0, bytes);

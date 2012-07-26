@@ -22,11 +22,6 @@ public class StyxSessionHandler extends IoHandlerAdapter {
         System.out.println(message.toString());
     }
 
-    public void send(StyxMessage tClunk) {
-        // TODO Auto-generated method stub
-        
-    }
-
     public void close() {
         // TODO Auto-generated method stub
         

@@ -58,7 +58,8 @@ implements Closeable {
         if ( root == null ) throw new NullPointerException("Root is null");
         if ( protocol == null ) throw new NullPointerException("Protocol is null");
         mIOUnit = iounit;
-        mBuffer = new StyxByteBufferReadable(iounit*2);
+        // FIXME
+//        mBuffer = new StyxByteBufferReadable(iounit*2);
         mOutputBuffer = new StyxByteBufferWriteable(iounit);
         mChannel = channel;
         mServerRoot = root;
@@ -73,15 +74,16 @@ implements Closeable {
      * @throws IOException
      */
     private boolean process() throws IOException {
-        int inBuffer = mBuffer.remainsToRead();
-        if ( inBuffer > 4 ) {
-            long packetSize = mBuffer.getUInt32();
-            if ( inBuffer >= packetSize ) {
-                final StyxMessage message = StyxMessage.factory(mBuffer, mIOUnit);
-                processMessage(message);
-                return true;
-            }
-        }
+        // FIXME
+//        int inBuffer = mBuffer.remainsToRead();
+//        if ( inBuffer > 4 ) {
+//            long packetSize = mBuffer.getUInt32();
+//            if ( inBuffer >= packetSize ) {
+//                final StyxMessage message = StyxMessage.factory(mBuffer, mIOUnit);
+//                processMessage(message);
+//                return true;
+//            }
+//        }
         return false;
     }
 
@@ -296,19 +298,20 @@ implements Closeable {
      * @throws IOException
      */
     public boolean readSocket() throws IOException {
-        int read = 0;
-        try {
-            read = mBuffer.readFromChannel(mChannel);
-        }
-        catch (IOException e) {
-            read = -1;
-        }
-        if ( read == -1 ) {
-            close();
-            return true;
-        } else {
-            while ( process() );
-        }
+        // FIXME
+//        int read = 0;
+//        try {
+//            read = mBuffer.readFromChannel(mChannel);
+//        }
+//        catch (IOException e) {
+//            read = -1;
+//        }
+//        if ( read == -1 ) {
+//            close();
+//            return true;
+//        } else {
+//            while ( process() );
+//        }
         return false;
     }
 }

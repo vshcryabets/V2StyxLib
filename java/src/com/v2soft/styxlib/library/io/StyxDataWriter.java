@@ -1,7 +1,6 @@
 package com.v2soft.styxlib.library.io;
 
 import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
 
 import com.v2soft.styxlib.library.types.ULong;
 

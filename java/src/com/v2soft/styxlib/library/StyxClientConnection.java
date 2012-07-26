@@ -98,7 +98,8 @@ implements Closeable {
         mNeedAuth = (mUserName != null);
         mConnector = new NioSocketConnector();
         mConnector.getSessionConfig().setReadBufferSize(mIOBufSize);
-        mConnector.getFilterChain().addLast("codec", new ProtocolCodecFilter(new StyxCodecFactory()));
+        mConnector.getFilterChain().addLast("codec", 
+                new ProtocolCodecFilter(new StyxCodecFactory(mIOBufSize)));
         mMessenger = new StyxSessionHandler();
         mConnector.setHandler(mMessenger);
         ConnectFuture future = mConnector.connect(new InetSocketAddress(mAddress, mPort));
@@ -108,61 +109,6 @@ implements Closeable {
         }
         mSession = future.getSession();
         mSession.getConfig().setUseReadOperation(true);
-
-        
-//        final SocketAddress sa = new InetSocketAddress(mAddress, mPort);
-//        final SocketChannel channel = SocketChannel.open(sa);
-//        channel.configureBlocking(true);
-//        Socket socket = channel.socket();
-//        socket.setSoTimeout(mTimeout);
-//
-//        if ( mSSL != null ) {
-//            SSLSocketFactory factory = (SSLSocketFactory) SSLSocketFactory.getDefault();
-//            SSLSocket sslSocket = (SSLSocket) factory.createSocket(socket, 
-//                    mAddress.getHostAddress(), mPort, true);
-//            printSocketInfo(sslSocket);
-//
-//            // Connect to the server
-//            sslSocket.startHandshake();
-//
-//            // We need a timeout here for the case where the server is not using SSL,
-//            // in which case both sides simply sit waiting for something from the
-//            // other side.
-//            sslSocket.setSoTimeout(500);
-//            // Get the SSL session. This forces a handshake and is used
-//            // to indicate that we've performed the handshake for this
-//            // SSLSocket.
-//            SSLSession session = sslSocket.getSession();
-//            //        this.sslSessionMap.put(socket, session);
-//
-//            // Retrieve the server's certificate chain
-//            java.security.cert.Certificate[] serverCerts =
-//                    session.getPeerCertificates();
-//
-//            // Since we don't have isValid() in 1.4 this is the closest we can get to
-//            // a validity check.
-//            if (session.getId() != null && session.getId().length != 0) {
-//                if ( Config.LOG_NETWORK ) {
-//                    System.out.println("SSL session details: " + session);
-//                }
-//            } else {
-//                if (sslSocket.getUseClientMode()) {
-//                    throw new SSLException("SSL session handshake failed (is the server SSL enabled?)");
-//                }
-//                // For server's we'll leave it to JSSE to raise an exception
-//                // when the client first tries to communicate with us.
-//            }
-//            // Set the read timeout to the smallest legal value so
-//            // when data is available we can read it in blocking mode.
-//            // This must be done only after the handshake has completed.
-//            sslSocket.setSoTimeout(1);
-//
-//            SocketChannel channel2 = sslSocket.getChannel();
-//            mMessenger = new Messenger(channel2, mIOBufSize, this);
-//        } else {
-//            mMessenger = new Messenger(socket.getChannel(), mIOBufSize, this);
-//        }
-
         sendVersionMessage();
         setConnected(true);
         return true;
@@ -262,7 +208,7 @@ implements Closeable {
     public void clunk(long fid) 
             throws InterruptedException, StyxException, TimeoutException, IOException {
         final StyxTMessageFID tClunk = new StyxTMessageFID(MessageType.Tclunk, MessageType.Rclunk, fid);
-        mMessenger.send(tClunk);
+        mSession.write(tClunk);
         StyxMessage rMessage = tClunk.waitForAnswer(mTimeout);
         StyxErrorMessageException.doException(rMessage);
         mActiveFids.releaseFid(fid);
@@ -278,8 +224,9 @@ implements Closeable {
      */
     public void remove(long fid) throws InterruptedException, TimeoutException, 
         StyxErrorMessageException, IOException {
-        StyxTMessageFID tRemove = new StyxTMessageFID(MessageType.Tremove, MessageType.Rremove, fid);
-        mMessenger.send(tRemove);
+        StyxTMessageFID tRemove = new StyxTMessageFID(MessageType.Tremove, 
+                MessageType.Rremove, fid);
+        mSession.write(tRemove);
         StyxMessage rMessage = tRemove.waitForAnswer(mTimeout);
         getActiveFids().releaseFid(fid);
         StyxErrorMessageException.doException(rMessage);
@@ -315,7 +262,7 @@ implements Closeable {
         StyxTAuthMessage tAuth = new StyxTAuthMessage(mAuthFID);
         tAuth.setUserName(getUserName());
         tAuth.setMountPoint(getMountPoint());
-        mMessenger.send(tAuth);
+        mSession.write(tAuth);
 
         StyxMessage rMessage = tAuth.waitForAnswer(mTimeout);
         StyxErrorMessageException.doException(rMessage);
@@ -337,7 +284,7 @@ implements Closeable {
         StyxTAttachMessage tAttach = new StyxTAttachMessage(getFID(), getAuthFID(),
                 getUserName(),
                 getMountPoint());
-        mMessenger.send(tAttach);
+        mSession.write(tAttach);
 
         StyxMessage rMessage = tAttach.waitForAnswer(mTimeout);
         StyxErrorMessageException.doException(rMessage);
@@ -413,5 +360,9 @@ implements Closeable {
     public void setAddressPort(InetAddress address, int port) {
         mAddress = address;
         mPort = port;
+    }
+
+    public IoSession getSession() {
+        return mSession;
     }
 }

@@ -3,9 +3,10 @@ package com.v2soft.styxlib.library.io;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.apache.mina.core.session.IoSession;
+
 import com.v2soft.styxlib.library.StyxClientConnection;
 import com.v2soft.styxlib.library.StyxFile;
-import com.v2soft.styxlib.library.core.StyxSessionHandler;
 import com.v2soft.styxlib.library.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.library.messages.StyxRReadMessage;
 import com.v2soft.styxlib.library.messages.StyxTReadMessage;
@@ -21,11 +22,11 @@ public class StyxUnbufferedInputStream extends InputStream {
     private long mTimeout = StyxClientConnection.DEFAULT_TIMEOUT;
     private byte[] mSingleByteArray = new byte[1];
     private StyxFile mFile;
-    private StyxSessionHandler mMessenger;
+    private IoSession mMessenger;
     private ULong mFileOffset = ULong.ZERO;
     private int mIOUnitSize;
 
-    StyxUnbufferedInputStream(StyxFile file, StyxSessionHandler messnger, int iounit) {
+    StyxUnbufferedInputStream(StyxFile file, IoSession messnger, int iounit) {
         if ( file == null ) throw new NullPointerException("File is null");
         if ( messnger == null ) throw new NullPointerException("messnger is null");
         mIOUnitSize = iounit;
@@ -50,7 +51,7 @@ public class StyxUnbufferedInputStream extends InputStream {
         try {
             // send Tread
             StyxTReadMessage tRead = new StyxTReadMessage(mFile.getFID(), mFileOffset, len);
-            mMessenger.send(tRead);
+            mMessenger.write(tRead);
             StyxMessage rMessage = tRead.waitForAnswer(mTimeout);
             StyxErrorMessageException.doException(rMessage);
 
