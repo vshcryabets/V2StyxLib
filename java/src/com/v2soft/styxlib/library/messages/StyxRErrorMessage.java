@@ -21,13 +21,9 @@ public class StyxRErrorMessage extends StyxMessage {
         throws IOException  {
         setError(input.readUTFString());
     }	
-	public String getError()
-	{
-		if (mError == null)
-			return "";
+	public String getError() {
 		return mError;
-	}
-	
+	}	
 	public void setError(String error) {
 		mError = error;
 	}
@@ -44,10 +40,8 @@ public class StyxRErrorMessage extends StyxMessage {
 	    super.writeToBuffer(output);
 		output.writeUTFString(getError());
 	}
-
 	@Override
-	protected String internalToString() {
-		return String.format("Error: %s", getError());
+	public String toString() {
+	    return String.format("%s\nError: %s", super.toString(), getError());
 	}
-
 }

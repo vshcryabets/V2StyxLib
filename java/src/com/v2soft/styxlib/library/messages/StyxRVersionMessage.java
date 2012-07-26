@@ -5,7 +5,6 @@ import java.io.UnsupportedEncodingException;
 
 import com.v2soft.styxlib.library.io.IStyxDataReader;
 import com.v2soft.styxlib.library.io.IStyxDataWriter;
-import com.v2soft.styxlib.library.io.StyxDataReader;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
 
@@ -59,10 +58,10 @@ public class StyxRVersionMessage extends StyxMessage {
 		output.writeUInt32(getMaxPacketSize());
 		output.writeUTFString(getProtocolVersion());		
 	}	
-
 	@Override
-	protected String internalToString() {
-		return String.format("MaxPocketSize: %d;\nProtocolVersion: %s", 
-				getMaxPacketSize(), getProtocolVersion());
+	public String toString() {
+        return String.format("%s\nMaxPocketSize: %d;\nProtocolVersion: %s",
+                super.toString(),
+                getMaxPacketSize(), getProtocolVersion());
 	}
 }

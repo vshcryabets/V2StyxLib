@@ -4,7 +4,6 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.nio.charset.Charset;
 import java.security.InvalidParameterException;
 import java.util.LinkedList;
 import java.util.concurrent.TimeoutException;
@@ -15,7 +14,6 @@ import org.apache.mina.core.future.ConnectFuture;
 import org.apache.mina.core.service.IoConnector;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
-import org.apache.mina.filter.codec.textline.TextLineCodecFactory;
 import org.apache.mina.transport.socket.nio.NioSocketConnector;
 
 import com.v2soft.styxlib.library.core.StyxCodecFactory;
@@ -27,10 +25,10 @@ import com.v2soft.styxlib.library.messages.StyxRAuthMessage;
 import com.v2soft.styxlib.library.messages.StyxRVersionMessage;
 import com.v2soft.styxlib.library.messages.StyxTAttachMessage;
 import com.v2soft.styxlib.library.messages.StyxTAuthMessage;
-import com.v2soft.styxlib.library.messages.StyxTClunkMessage;
-import com.v2soft.styxlib.library.messages.StyxTRemoveMessage;
 import com.v2soft.styxlib.library.messages.StyxTVersionMessage;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
+import com.v2soft.styxlib.library.messages.base.StyxTMessageFID;
+import com.v2soft.styxlib.library.messages.base.enums.MessageType;
 import com.v2soft.styxlib.library.messages.base.structs.StyxQID;
 
 /**
@@ -263,7 +261,7 @@ implements Closeable {
      */
     public void clunk(long fid) 
             throws InterruptedException, StyxException, TimeoutException, IOException {
-        final StyxTClunkMessage tClunk = new StyxTClunkMessage(fid);
+        final StyxTMessageFID tClunk = new StyxTMessageFID(MessageType.Tclunk, MessageType.Rclunk, fid);
         mMessenger.send(tClunk);
         StyxMessage rMessage = tClunk.waitForAnswer(mTimeout);
         StyxErrorMessageException.doException(rMessage);
@@ -278,9 +276,9 @@ implements Closeable {
      * @throws StyxErrorMessageException 
      * @throws IOException 
      */
-    public void remove(long fid) throws InterruptedException, TimeoutException, StyxErrorMessageException, IOException {
-        StyxTRemoveMessage tRemove = new StyxTRemoveMessage(fid);
-
+    public void remove(long fid) throws InterruptedException, TimeoutException, 
+        StyxErrorMessageException, IOException {
+        StyxTMessageFID tRemove = new StyxTMessageFID(MessageType.Tremove, MessageType.Rremove, fid);
         mMessenger.send(tRemove);
         StyxMessage rMessage = tRemove.waitForAnswer(mTimeout);
         getActiveFids().releaseFid(fid);

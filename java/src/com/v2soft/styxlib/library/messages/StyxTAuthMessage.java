@@ -6,52 +6,36 @@ import java.io.UnsupportedEncodingException;
 import com.v2soft.styxlib.library.io.IStyxDataReader;
 import com.v2soft.styxlib.library.io.IStyxDataWriter;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
-import com.v2soft.styxlib.library.messages.base.StyxTMessage;
+import com.v2soft.styxlib.library.messages.base.StyxTMessageFID;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
 
-public class StyxTAuthMessage extends StyxTMessage 
-{
-	private long mAuthFID;
+public class StyxTAuthMessage extends StyxTMessageFID {
 	private String mUserName;
 	private String mMountPoint;
 	
 	public StyxTAuthMessage(long fid) {
-		super(MessageType.Tauth);
-		mAuthFID = fid;
+		super(MessageType.Tauth, MessageType.Rauth, fid);
 	}
 
     @Override
     public void load(IStyxDataReader input) 
         throws IOException  {
-        setAuthFID(input.readUInt32());
+        super.load(input);
         setUserName(input.readUTFString());
         setMountPoint(input.readUTFString());
     }
 	
-	public long getAuthFID()
-	{
-		return mAuthFID;
-	}
-	
-	public void setAuthFID(long afid)
-	{
-		mAuthFID = afid;
-	}
-	
-	public String getUserName()
-	{
+	public String getUserName() {
 		if (mUserName == null)
 			return "";
 		return mUserName;
 	}
 	
-	public void setUserName(String user_name)
-	{
+	public void setUserName(String user_name) {
 		mUserName = user_name;
 	}
 	
-	public String getMountPoint()
-	{
+	public String getMountPoint() {
 		if (mMountPoint == null)
 			return "";
 		return mMountPoint;
@@ -64,7 +48,7 @@ public class StyxTAuthMessage extends StyxTMessage
 	
 	@Override
 	public int getBinarySize() {
-		return super.getBinarySize() + 4
+		return super.getBinarySize()
 			+ StyxMessage.getUTFSize(getUserName())
 			+ StyxMessage.getUTFSize(getMountPoint());
 	}
@@ -73,20 +57,13 @@ public class StyxTAuthMessage extends StyxTMessage
 	public void writeToBuffer(IStyxDataWriter output)
 	        throws UnsupportedEncodingException, IOException {
 	    super.writeToBuffer(output);
-		output.writeUInt32(getAuthFID());
 		output.writeUTFString(getUserName());
 		output.writeUTFString(getMountPoint());		
 	}
 
 	@Override
-	protected String internalToString() {
-		return String.format("AuthFID: %d\nUserName: %s\nMountPoint: %s",
-				getAuthFID(), getUserName(), getMountPoint());
+    public String toString() {
+		return String.format("%s\nUserName: %s\nMountPoint: %s",
+				super.toString(), getUserName(), getMountPoint());
 	}
-
-	@Override
-	protected MessageType getRequiredAnswerType() {
-		return MessageType.Rauth;
-	}
-	
 }

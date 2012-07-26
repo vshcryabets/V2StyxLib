@@ -22,6 +22,7 @@ public class StyxRReadMessage extends StyxMessage {
     @Override
     public void load(IStyxDataReader input) 
             throws IOException  {
+        super.load(input);
         mDataLength = (int)input.readUInt32();
         mData = new byte[mDataLength];
         input.read(mData, 0, mDataLength);
@@ -46,19 +47,19 @@ public class StyxRReadMessage extends StyxMessage {
     }
 
     @Override
-    protected String internalToString() {
+    public String toString() {
         if ( Config.LOG_DATA_FIELDS ) {
-            return String.format("Data Length:%d\nData: %s",
+            return String.format("%s\nData Length:%d\nData: %s",
+                    super.toString(),
                     mData.length,
                     StyxMessage.toString(mData));
         } else {
-            return String.format("Data Length:%d",
+            return String.format("%s\nData Length:%d",
+                    super.toString(),
                     mData.length);
         }
     }
-
     public byte[] getDataBuffer() {
         return mData;
     }
-
 }

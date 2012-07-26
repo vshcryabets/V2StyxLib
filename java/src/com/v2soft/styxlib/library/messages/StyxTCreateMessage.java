@@ -6,19 +6,16 @@ import java.io.UnsupportedEncodingException;
 import com.v2soft.styxlib.library.io.IStyxDataReader;
 import com.v2soft.styxlib.library.io.IStyxDataWriter;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
-import com.v2soft.styxlib.library.messages.base.StyxTMessage;
+import com.v2soft.styxlib.library.messages.base.StyxTMessageFID;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
 
-public class StyxTCreateMessage extends StyxTMessage {
-    private long mFID;
+public class StyxTCreateMessage extends StyxTMessageFID {
     private String mName;
     private long mPermissions;
     private int mMode;
 
-    public StyxTCreateMessage(long fid, String name, long permissions, int mode)
-    {
-        super(MessageType.Tcreate);
-        mFID = fid;
+    public StyxTCreateMessage(long fid, String name, long permissions, int mode) {
+        super(MessageType.Tcreate, MessageType.Rcreate, fid);
         mName = name;
         mPermissions = permissions;
         mMode = mode;
@@ -26,20 +23,10 @@ public class StyxTCreateMessage extends StyxTMessage {
 
     @Override
     public void load(IStyxDataReader input) throws IOException {
-        mFID = input.readUInt32();
+        super.load(input);
         mName = input.readUTFString();
         mPermissions = input.readUInt32();
         mMode = input.readUInt8();
-    }
-
-    public long getFID()
-    {
-        return mFID;
-    }
-
-    public void setFID(long fid)
-    {
-        mFID = fid;
     }
 
     public String getName()
@@ -70,7 +57,7 @@ public class StyxTCreateMessage extends StyxTMessage {
 
     @Override
     public int getBinarySize() {
-        return super.getBinarySize() + 9
+        return super.getBinarySize() + 5
                 + StyxMessage.getUTFSize(getName());
     }
 
@@ -78,21 +65,14 @@ public class StyxTCreateMessage extends StyxTMessage {
     public void writeToBuffer(IStyxDataWriter output)
             throws UnsupportedEncodingException, IOException {
         super.writeToBuffer(output);
-        output.writeUInt32(getFID());
         output.writeUTFString(getName());
         output.writeUInt32(getPermissions());
         output.writeUInt8((short) mMode);  
     }
 
     @Override
-    protected String internalToString() {
-        return String.format("FID: %d\nName: %s\nPermissions: %d\nMode: %d", 
-                getFID(), getName(), getPermissions(), mMode);
+    public String toString() {
+        return String.format("%s\nName: %s\nPermissions: %d\nMode: %d", 
+                super.toString(), getName(), getPermissions(), mMode);
     }
-
-    @Override
-    protected MessageType getRequiredAnswerType() {
-        return MessageType.Rcreate;
-    }
-
 }

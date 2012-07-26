@@ -7,12 +7,11 @@ import com.v2soft.styxlib.Config;
 import com.v2soft.styxlib.library.io.IStyxDataReader;
 import com.v2soft.styxlib.library.io.IStyxDataWriter;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
-import com.v2soft.styxlib.library.messages.base.StyxTMessage;
+import com.v2soft.styxlib.library.messages.base.StyxTMessageFID;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
 import com.v2soft.styxlib.library.types.ULong;
 
-public class StyxTWriteMessage extends StyxTMessage {
-    private long mFID;
+public class StyxTWriteMessage extends StyxTMessageFID {
     private ULong mOffset;
     private byte[] mData;
     private int mDataOffset;
@@ -20,8 +19,7 @@ public class StyxTWriteMessage extends StyxTMessage {
 
     public StyxTWriteMessage(long fid, ULong offset, byte [] data, int dataOffset, int dataLength) 
             throws IOException {
-        super(MessageType.Twrite);
-        mFID = fid;
+        super(MessageType.Twrite, MessageType.Rwrite, fid);
         mOffset = offset;
         mData = data;
         mDataLength = dataLength;
@@ -29,10 +27,9 @@ public class StyxTWriteMessage extends StyxTMessage {
     // ===========================================================================
     // Styx message methods
     // ===========================================================================
-
     @Override
     public void load(IStyxDataReader input) throws IOException {
-        mFID = input.readUInt32();
+        super.load(input);
         mOffset = input.readUInt64();
         mDataLength = (int)input.readUInt32();
         mDataOffset = 0;
@@ -43,26 +40,24 @@ public class StyxTWriteMessage extends StyxTMessage {
     public void writeToBuffer(IStyxDataWriter output)
             throws UnsupportedEncodingException, IOException {
         super.writeToBuffer(output);
-        output.writeUInt32(mFID);
         output.writeUInt64(mOffset);
         output.writeUInt32(mDataLength);
         output.write(mData, mDataOffset, mDataLength);        
     }
 
     @Override
-    protected String internalToString() {
+    public String toString() {
         if ( Config.LOG_DATA_FIELDS ) {
-            return String.format("FID: %d\nOffset: %s\nData: %s",
-                    getFID(), getOffset().toString(), StyxMessage.toString(getData()));
+            return String.format("%s\nOffset: %s\nData: %s",
+                    super.toString(), getOffset().toString(), StyxMessage.toString(getData()));
         } else {
-            return String.format("FID: %d\nOffset: %d",
-                    getFID(), getOffset().asLong());
+            return String.format("%s\nOffset: %d",
+                    super.toString(), getOffset().asLong());
         }
     }    
     // ===========================================================================
     // Getters
     // ===========================================================================
-    public long getFID(){return mFID;}
     public ULong getOffset(){return mOffset;}
     public byte[] getData() {
         if (mData == null)
@@ -71,17 +66,13 @@ public class StyxTWriteMessage extends StyxTMessage {
     }
     @Override
     public int getBinarySize() {
-        return super.getBinarySize() + 16
+        return super.getBinarySize() + 12
                 + mDataLength;
     }
     
     public int getDataLength() {
         return mDataLength;
     }
-    @Override
-    protected MessageType getRequiredAnswerType() {
-        return MessageType.Rwrite;
-    }    
     // ===========================================================================
     // Setters
     // ===========================================================================

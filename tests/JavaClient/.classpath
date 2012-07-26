@@ -23,5 +23,6 @@
 	<classpathentry kind="lib" path="libs/mina-integration-xbean-2.0.4.jar"/>
 	<classpathentry kind="lib" path="libs/mina-statemachine-2.0.4.jar"/>
 	<classpathentry kind="lib" path="libs/mina-transport-apr-2.0.4.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/V2StyxLib"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
