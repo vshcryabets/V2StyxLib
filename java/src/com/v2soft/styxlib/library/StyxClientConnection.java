@@ -98,7 +98,8 @@ implements Closeable {
         mNeedAuth = (mUserName != null);
         mConnector = new NioSocketConnector();
         mConnector.getSessionConfig().setReadBufferSize(mIOBufSize);
-        mConnector.getFilterChain().addLast("codec", new ProtocolCodecFilter(new StyxCodecFactory()));
+        mConnector.getFilterChain().addLast("codec", 
+                new ProtocolCodecFilter(new StyxCodecFactory(mIOBufSize)));
         mMessenger = new StyxSessionHandler();
         mConnector.setHandler(mMessenger);
         ConnectFuture future = mConnector.connect(new InetSocketAddress(mAddress, mPort));

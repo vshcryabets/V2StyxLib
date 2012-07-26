@@ -6,7 +6,7 @@ import org.apache.mina.filter.codec.ProtocolDecoder;
 import org.apache.mina.filter.codec.ProtocolEncoder;
 
 /**
- * 
+ * COdec factory for MINA
  * @author V.Shcryabets<vshcryabets@gmail.com>
  *
  */
@@ -14,9 +14,9 @@ public class StyxCodecFactory implements ProtocolCodecFactory {
     private StyxEncoder mEncoder;
     private StyxDecoder mDecoder;
     
-    public StyxCodecFactory() {
+    public StyxCodecFactory(int iounit) {
         mEncoder = new StyxEncoder();
-        mDecoder = new StyxDecoder();
+        mDecoder = new StyxDecoder(iounit);
     }
 
     @Override
