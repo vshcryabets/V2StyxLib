@@ -4,5 +4,5 @@ PROJECT(V2StyxLib)
 INCLUDE_DIRECTORIES(include) 
 ADD_DEFINITIONS(-g -O2 -fsigned-char -Wall)
 
-ADD_SUBDIRECTORY( lib binlib )
-ADD_SUBDIRECTORY( testserver bintestserver )
+ADD_SUBDIRECTORY( lib out/lib )
+ADD_SUBDIRECTORY( testserver out/testserver )
