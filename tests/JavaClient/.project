@@ -14,11 +14,4 @@
 	<natures>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 	</natures>
-	<linkedResources>
-		<link>
-			<name>libsrc</name>
-			<type>2</type>
-			<location>/home/mrco/git/V2StyxLib/java/src</location>
-		</link>
-	</linkedResources>
 </projectDescription>
