@@ -26,6 +26,11 @@ import com.v2soft.styxlib.library.messages.base.StyxTMessageFID;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
 import com.v2soft.styxlib.library.messages.base.structs.StyxQID;
 
+/**
+ * Styx client conection
+ * @author V.Shcryabets<vshcryabets@gmail.com>
+ *
+ */
 public class StyxClientConnection 
 implements Closeable, StyxMessengerListener {
     //---------------------------------------------------------------------------
@@ -207,9 +212,6 @@ implements Closeable, StyxMessengerListener {
             throws InterruptedException, StyxException, TimeoutException, IOException {
         final StyxTMessageFID tClunk = new StyxTMessageFID(MessageType.Tclunk, MessageType.Rclunk, fid);
         mMessenger.send(tClunk);
-        StyxMessage rMessage = tClunk.waitForAnswer(mTimeout);
-        StyxErrorMessageException.doException(rMessage);
-        mActiveFids.releaseFid(fid);
     }
 
     /**
@@ -236,6 +238,16 @@ implements Closeable, StyxMessengerListener {
      */
     public void sendVersionMessage()
             throws InterruptedException, StyxException, IOException, TimeoutException {
+        // release atached FID
+        if ( mFID != StyxMessage.NOFID ) {
+            try {
+                clunk(mFID);
+            } catch (Exception e) {
+                throw new IOException(e);
+            }
+            mFID = StyxMessage.NOFID;
+        }
+
         StyxTVersionMessage tVersion = new StyxTVersionMessage(mIOBufSize,PROTOCOL);
         mMessenger.send(tVersion);
 
@@ -266,10 +278,10 @@ implements Closeable, StyxMessengerListener {
         mAuthQID = rAuth.getQID();
 
         // TODO uncomment later
-//        StyxOutputStream output = new StyxOutputStream((new StyxFile(this, 
-//                ((StyxTAuthMessage)tMessage).getAuthFID())).openForWrite());
-//        output.writeString(getPassword());
-//        output.flush();
+        //        StyxOutputStream output = new StyxOutputStream((new StyxFile(this, 
+        //                ((StyxTAuthMessage)tMessage).getAuthFID())).openForWrite());
+        //        output.writeString(getPassword());
+        //        output.flush();
 
         sendAttachMessage();
     }
@@ -290,7 +302,7 @@ implements Closeable, StyxMessengerListener {
     }
 
     @Override
-    public void close() {
+    public void close() throws IOException {
         if ( mMessenger != null ) {
             mMessenger.close();
             mMessenger = null;
@@ -374,5 +386,10 @@ implements Closeable, StyxMessengerListener {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void onFIDReleased(long fid) {
+        mActiveFids.releaseFid(fid);
     }
 }

@@ -185,4 +185,10 @@ implements Closeable, StyxMessengerListener {
     @Override
     public void onTrashReceived() {
     }
+
+    @Override
+    public void onFIDReleased(long fid) {
+        // TODO Auto-generated method stub
+        
+    }
 }

@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetAddress;
+import java.util.UUID;
 import java.util.concurrent.TimeoutException;
 
 import org.junit.After;
@@ -47,26 +48,28 @@ public class ConnectionTest {
                 mConnection.getMessenger().getErrorsCount(),
                 diff/count
                 ));
+        mConnection.close();
     }
     
     @Test
     public void testFileCreation() throws IOException, StyxException, InterruptedException, TimeoutException {
         assertTrue(mConnection.connect());
-        StyxFile newFile = new StyxFile(mConnection, "testFile3925");
-        OutputStream out = newFile.create(0x6FF);
+        final StyxFile newFile = new StyxFile(mConnection, UUID.randomUUID().toString());
+        final OutputStream out = newFile.create(0x1FF);
         assertNotNull(out);
         byte [] testArray = new byte[]{1,3,5,7,11,13,17,19,23,29};
         out.write(testArray);
         out.close();
-        InputStream in = newFile.openForRead();
+        final InputStream in = newFile.openForRead();
         assertNotNull(in);
-        byte [] readArray = new byte[testArray.length];
+        final byte [] readArray = new byte[testArray.length];
         int read = in.read(readArray);
         assertEquals(testArray.length, read);
         in.close();
         assertArrayEquals(testArray, readArray);
         newFile.delete();
-        
+        newFile.close();
+        mConnection.close();
     }
 
 }

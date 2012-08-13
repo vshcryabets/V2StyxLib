@@ -18,6 +18,7 @@ import com.v2soft.styxlib.library.io.StyxByteBufferReadable;
 import com.v2soft.styxlib.library.io.StyxByteBufferWriteable;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.messages.base.StyxTMessage;
+import com.v2soft.styxlib.library.messages.base.StyxTMessageFID;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
 import com.v2soft.styxlib.library.types.ObjectsPoll;
 import com.v2soft.styxlib.library.types.ObjectsPoll.ObjectsPollFactory;
@@ -26,6 +27,7 @@ public class Messenger implements Runnable, Closeable, ObjectsPollFactory<StyxBy
     public interface StyxMessengerListener {
         void onSocketDisconected();
         void onTrashReceived();
+        void onFIDReleased(long fid);
     }
     private StyxMessengerListener mListener;
     private Map<Integer, StyxTMessage> mMessages = new HashMap<Integer, StyxTMessage>();
@@ -134,7 +136,10 @@ public class Messenger implements Runnable, Closeable, ObjectsPollFactory<StyxBy
         int tag = message.getTag();
         if (!mMessages.containsKey(tag)) // we didn't send T message with such tag, so ignore this R message
             return;
-        StyxTMessage tMessage = mMessages.get(tag);
+        final StyxTMessage tMessage = mMessages.get(tag);
+        if ( message.getType() == MessageType.Rclunk ) {
+            mListener.onFIDReleased(((StyxTMessageFID)tMessage).getFID());
+        }
         tMessage.setAnswer(message);
         if ( message.getType() == MessageType.Rerror ) {
             mErrorCount++;
