@@ -123,7 +123,7 @@ implements Closeable, StyxMessengerListener {
     public StyxFile getRoot() throws StyxException, InterruptedException, TimeoutException, IOException
     {
         if (mRoot == null)
-            mRoot = new StyxFile(this);
+            mRoot = new StyxFile(this,mFID);
         return mRoot;
     }
 

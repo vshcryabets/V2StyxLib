@@ -47,11 +47,8 @@ public class StyxFile implements Closeable {
     private Messenger mMessenger;
     private long mTimeout = StyxClientConnection.DEFAULT_TIMEOUT;
 
-    public StyxFile(StyxClientConnection manager) throws StyxException, TimeoutException, IOException, InterruptedException {
-        this(manager, null);
-    }
-
-    public StyxFile(StyxClientConnection manager, String path) throws StyxException, TimeoutException, IOException, InterruptedException {
+    public StyxFile(StyxClientConnection manager, String path) 
+            throws StyxException, TimeoutException, IOException, InterruptedException {
         this(manager, path, null);
     }
 
@@ -250,7 +247,7 @@ public class StyxFile implements Closeable {
         // reserve FID
         long tempFID = sendWalkMessage(mParentFID, "");
         final StyxTCreateMessage tCreate = 
-                new StyxTCreateMessage(tempFID, getName(), permissions, ModeType.OWRITE);
+                new StyxTCreateMessage(tempFID, getName(), permissions, ModeType.OREAD);
         mMessenger.send(tCreate);
         final StyxMessage rMessage = tCreate.waitForAnswer(mTimeout);
         StyxErrorMessageException.doException(rMessage);

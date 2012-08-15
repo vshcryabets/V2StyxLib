@@ -15,6 +15,7 @@ import org.junit.Test;
 import com.v2soft.styxlib.library.StyxClientConnection;
 import com.v2soft.styxlib.library.StyxFile;
 import com.v2soft.styxlib.library.exceptions.StyxException;
+import com.v2soft.styxlib.library.messages.base.enums.FileMode;
 
 
 public class ConnectionTest {
@@ -30,6 +31,7 @@ public class ConnectionTest {
         mConnection.close();
     }
 
+    // TVersion & TAttach
     @Test
     public void testConnection() throws IOException, StyxException, InterruptedException, TimeoutException {
         int count = 100;
@@ -51,11 +53,13 @@ public class ConnectionTest {
         mConnection.close();
     }
     
+    // TVersion, Tattach, Twalk, create, write, clunk, open, read, remove
     @Test
     public void testFileCreation() throws IOException, StyxException, InterruptedException, TimeoutException {
         assertTrue(mConnection.connect());
         final StyxFile newFile = new StyxFile(mConnection, UUID.randomUUID().toString());
-        final OutputStream out = newFile.create(0x1FF);
+        final OutputStream out = newFile.create(FileMode.ReadOthersPermission.getMode() |
+                FileMode.WriteOthersPermission.getMode());
         assertNotNull(out);
         byte [] testArray = new byte[]{1,3,5,7,11,13,17,19,23,29};
         out.write(testArray);
@@ -69,6 +73,18 @@ public class ConnectionTest {
         assertArrayEquals(testArray, readArray);
         newFile.delete();
         newFile.close();
+        mConnection.close();
+    }
+    
+    @Test
+    public void testFSTree() throws IOException, StyxException, InterruptedException, TimeoutException {
+        assertTrue(mConnection.connect());
+        StyxFile newDirectory = new StyxFile(mConnection, UUID.randomUUID().toString());
+        newDirectory.create(FileMode.ReadOthersPermission.getMode() |
+                FileMode.WriteOthersPermission.getMode() |
+                FileMode.Directory.getMode() );
+        newDirectory.delete();
+        newDirectory.close();
         mConnection.close();
     }
 
