@@ -1,13 +1,32 @@
 package com.v2soft.styxlib.library.messages.base.enums;
 
+/**
+ * File mode bits
+ * @author V.Shcryabets<vshcryabets@gmail.com>
+ *
+ */
 public enum FileMode {
-	Directory(0x80000000L), AppendOnly(0x40000000L), ExclusiveUse(0x20000000L),
-	MountedChannel(0x10000000L), AuthenticationFile(0x08000000L),
-	TemporaryFile(0x04000000L), ReadOwnerPermission(0x00000100L),
-	WriteOwnerPermission(0x00000080L), ExecuteOwnerPermission(0x00000040L),
-	ReadGroupPermission(0x00000020L), WriteGroupPermission(0x00000010L),
-	ExecuteGroupPermission(0x00000008L), ReadOthersPermission(0x00000004L),
-	WriteOthersPermission(0x00000002L), ExecuteOthersPermission(0x00000001L);
+	Directory(0x80000000L), 
+	AppendOnly(0x40000000L), 
+	ExclusiveUse(0x20000000L),
+	MountedChannel(0x10000000L),
+	AuthenticationFile(0x08000000L), 
+	TemporaryFile(0x04000000L),
+	SymLinkFile(0x02000000),
+	LinkFile(0x01000000),
+	DeviceFile(0x00800000),
+	NamedPipeFile(0x00200000),
+	SocketFile(0x00100000),
+	
+	ReadOwnerPermission(0x00000100L),
+	WriteOwnerPermission(0x00000080L),
+	ExecuteOwnerPermission(0x00000040L),
+	ReadGroupPermission(0x00000020L), 
+	WriteGroupPermission(0x00000010L),
+	ExecuteGroupPermission(0x00000008L), 
+	ReadOthersPermission(0x00000004L),
+	WriteOthersPermission(0x00000002L), 
+	ExecuteOthersPermission(0x00000001L);
 	
 	public static long PERMISSION_BITMASK = 0x000001FFL;
 	
