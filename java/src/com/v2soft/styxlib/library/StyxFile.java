@@ -59,11 +59,10 @@ public class StyxFile implements Closeable {
         mManager = manager;
         mMessenger = mManager.getMessenger();
         mTimeout = mManager.getTimeout();
+        mPath = path;
         if ( parent != null ) {
-            mPath = combinePath(parent, path);
             mParentFID = parent.getFID();
         } else {
-            mPath = path;
             mParentFID = manager.getFID();
         }
     }
@@ -239,7 +238,7 @@ public class StyxFile implements Closeable {
         return new StyxFileBufferedOutputStream(mMessenger, tempFID, iounit);
     }
 
-    public OutputStream create(long permissions)
+    public void create(long permissions)
             throws InterruptedException, StyxException, TimeoutException, IOException {
         if ( !mManager.isConnected()) {
             throw new IOException("Not connected to server");
@@ -247,14 +246,13 @@ public class StyxFile implements Closeable {
         // reserve FID
         long tempFID = sendWalkMessage(mParentFID, "");
         final StyxTCreateMessage tCreate = 
-                new StyxTCreateMessage(tempFID, getName(), permissions, ModeType.OREAD);
+                new StyxTCreateMessage(tempFID, mPath, permissions, ModeType.OREAD);
         mMessenger.send(tCreate);
         final StyxMessage rMessage = tCreate.waitForAnswer(mTimeout);
         StyxErrorMessageException.doException(rMessage);
 
         // close temp FID
         mManager.clunk(tempFID);
-        return openForWrite();
     }
 
     public static boolean exists(StyxClientConnection manager, String fileName) 
@@ -303,8 +301,8 @@ public class StyxFile implements Closeable {
             for (StyxFile file : files)
                 file.delete(recurse);
         }
-        mManager.remove(getFID());
         mFID = StyxMessage.NOFID;
+        mManager.remove(getFID());
     }
 
     public static void delete(StyxClientConnection manager, String fileName, boolean recurse)
