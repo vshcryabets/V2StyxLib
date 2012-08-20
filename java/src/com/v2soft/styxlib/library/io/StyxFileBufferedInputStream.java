@@ -1,11 +1,9 @@
 package com.v2soft.styxlib.library.io;
 
 import java.io.BufferedInputStream;
-import java.io.IOException;
 
 import org.apache.mina.core.session.IoSession;
 
-import com.v2soft.styxlib.library.StyxFile;
 
 /**
  * 
@@ -13,8 +11,6 @@ import com.v2soft.styxlib.library.StyxFile;
  *
  */
 public class StyxFileBufferedInputStream extends BufferedInputStream {
-    private StyxFile mFile;
-
     /**
      * 
      * @param messenger
@@ -23,20 +19,8 @@ public class StyxFileBufferedInputStream extends BufferedInputStream {
      * @param autocloseFile close StyxFile object with this stream
      */
     public StyxFileBufferedInputStream(IoSession messenger, 
-            StyxFile file, 
-            int iounit, 
-            boolean autocloseFile) {
+            long file, 
+            int iounit) {
         super(new StyxUnbufferedInputStream(file, messenger, iounit), iounit);
-        if ( autocloseFile ) {
-            mFile = file;
-        }
-    }
-
-    @Override
-    public void close() throws IOException {
-        if ( mFile != null ) {
-            mFile.close();
-        }
-        super.close();
     }
 }

@@ -17,7 +17,9 @@
   <target name="compile" depends="init"
         description="compile the source " >
     <!-- Compile the java code from ${src} into ${build} -->
-    <javac srcdir="${src}" destdir="${build}"/>
+    <javac destdir="${build}" srcdir="${src}">
+	<exclude name="com/v2soft/styxlib/junit/*.java" />
+    </javac>
   </target>
 
   <target name="dist" depends="compile"

@@ -4,7 +4,6 @@ import java.io.BufferedOutputStream;
 
 import org.apache.mina.core.session.IoSession;
 
-import com.v2soft.styxlib.library.StyxFile;
 
 /**
  * 
@@ -12,7 +11,7 @@ import com.v2soft.styxlib.library.StyxFile;
  *
  */
 public class StyxFileBufferedOutputStream extends BufferedOutputStream {
-    public StyxFileBufferedOutputStream(IoSession messenger, StyxFile file, int iounit) {
+    public StyxFileBufferedOutputStream(IoSession messenger, long file, int iounit) {
         super(new StyxUnbufferedOutputStream(file, messenger), iounit);
     }
 }

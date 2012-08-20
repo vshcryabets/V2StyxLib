@@ -32,7 +32,7 @@ import com.v2soft.styxlib.library.messages.base.enums.MessageType;
 import com.v2soft.styxlib.library.messages.base.structs.StyxQID;
 
 /**
- * 
+ * Styx client conection
  * @author V.Shcryabets<vshcryabets@gmail.com>
  *
  */
@@ -117,7 +117,7 @@ implements Closeable {
     public StyxFile getRoot() throws StyxException, InterruptedException, 
     TimeoutException, IOException {
         if (mRoot == null)
-            mRoot = new StyxFile(this);
+            mRoot = new StyxFile(this,mFID);
         return mRoot;
     }
 
@@ -240,6 +240,16 @@ implements Closeable {
      */
     public void sendVersionMessage()
             throws InterruptedException, StyxException, IOException, TimeoutException {
+        // release atached FID
+        if ( mFID != StyxMessage.NOFID ) {
+            try {
+                clunk(mFID);
+            } catch (Exception e) {
+                throw new IOException(e);
+            }
+            mFID = StyxMessage.NOFID;
+        }
+
         StyxTVersionMessage tVersion = new StyxTVersionMessage(mIOBufSize,PROTOCOL);
         mSession.write(tVersion).awaitUninterruptibly();
 
@@ -294,7 +304,7 @@ implements Closeable {
     }
 
     @Override
-    public void close() {
+    public void close() throws IOException {
         if ( mMessenger != null ) {
             mMessenger.close();
             mMessenger = null;
@@ -365,4 +375,9 @@ implements Closeable {
     public IoSession getSession() {
         return mSession;
     }
+
+//    @Override
+//    public void onFIDReleased(long fid) {
+//        mActiveFids.releaseFid(fid);
+//    }
 }

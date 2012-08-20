@@ -30,12 +30,17 @@ import com.v2soft.styxlib.library.messages.base.enums.ModeType;
 import com.v2soft.styxlib.library.messages.base.structs.StyxQID;
 
 public class StyxMessage {
+    // ========================================================
+    // Constants
+    // ========================================================
     public static final Charset sUTFCharset = Charset.forName("utf-8"); 
     public static final int BASE_BINARY_SIZE = 7;
 
     public static final int NOTAG  =      0xFFFF;
     public static final long NOFID = 0xFFFFFFFFL;
-
+    // ========================================================
+    // Class fields
+    // ========================================================
     private int mTag;
     private MessageType mType;
 
@@ -50,9 +55,13 @@ public class StyxMessage {
             throws IOException {
         // get common packet data
         long packet_size = buffer.readUInt32();
-        if ( packet_size > io_unit ) throw new IOException("Packet size to large");
+        if ( packet_size > io_unit ) {
+            throw new IOException("Packet size to large");
+        }
         MessageType type = MessageType.factory(buffer.readUInt8());
-        if ( type == null ) throw new NullPointerException("Type is null");
+        if ( type == null ) {
+            throw new NullPointerException("Type is null, can't decode message");
+        }
         int tag = buffer.readUInt16();
         // load other data
         StyxMessage result = null;
@@ -147,7 +156,7 @@ public class StyxMessage {
     public static String toString(byte[] bytes) {
         if ( (bytes == null) || (bytes.length==0))
             return "-";
-        StringBuilder result = new StringBuilder();
+        final StringBuilder result = new StringBuilder();
         result.append(Integer.toHexString(((int)bytes[0])&0xFF));
         result.append(",");
         int count = bytes.length;

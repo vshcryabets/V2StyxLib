@@ -5,7 +5,10 @@ public enum QIDType {
 	QTAPPEND(0x40), 
 	QTEXCL(0x20), 
 	QTMOUNT(0x10), 
-	QTAUTH(0x08), 
+	QTAUTH(0x08),
+	QTTMP(0x04),
+	QTSYMLINK(0x02),
+	QTLINK(0x01),
 	QTFILE(0x00);
 	
 	private int mByte;

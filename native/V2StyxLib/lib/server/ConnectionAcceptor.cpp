@@ -56,7 +56,7 @@ void ConnectionAcceptor::start() {
 
 		timeout.tv_sec = 1;
 		timeout.tv_usec = 0;
-		size_t readsocks = select(highsock+1,
+		int readsocks = select(highsock+1,
 				&socks,
 				(fd_set*) 0,
 				(fd_set*) 0,
