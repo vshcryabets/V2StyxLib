@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.session.IoSession;
+import org.apache.mina.filter.codec.CumulativeProtocolDecoder;
 import org.apache.mina.filter.codec.ProtocolDecoder;
 import org.apache.mina.filter.codec.ProtocolDecoderOutput;
 
@@ -21,13 +22,13 @@ import com.v2soft.styxlib.library.messages.base.enums.MessageType;
  * @author V.Shcryabets<vshcryabets@gmail.com>
  *
  */
-public class StyxDecoder implements ProtocolDecoder {
+public class StyxDecoder extends CumulativeProtocolDecoder {
     private int mIOUnit;
     private Map<Integer, StyxTMessage> mMessages;
     private int mReceivedCount, mErrorCount;
     private StyxCodecFactory.ActiveTags mActiveTags;
     private ActiveFids mActiveFIDs;
-    
+
     public StyxDecoder(int ioUnit, Map<Integer, StyxTMessage> messagesMap,
             StyxCodecFactory.ActiveTags activeTags,
             ActiveFids fids) {
@@ -37,25 +38,12 @@ public class StyxDecoder implements ProtocolDecoder {
         mActiveFIDs = fids;
     }
 
-    @Override
-    public void decode(IoSession arg0, IoBuffer arg1, ProtocolDecoderOutput arg2)
-            throws Exception {
-        if ( arg1.limit() < 4 ) {
-            return;
-        }
-        arg1.order(ByteOrder.LITTLE_ENDIAN);
-        int position = arg1.position();
-        int packetSize = arg1.getInt();
-        arg1.position(position);
-        if ( packetSize < arg1.limit() ) {
-            // not enough data to decode
-            return;
-        }
-        final StyxByteBufferReadable readable = new StyxByteBufferReadable(arg1);
-        final StyxMessage message = StyxMessage.factory(readable, mIOUnit);
-        processIncomingMessage(message);
-    }
-    
+    //    @Override
+    //    public void decode(IoSession arg0, IoBuffer arg1, ProtocolDecoderOutput arg2)
+    //            throws Exception {
+
+    //    }
+
     private synchronized void processIncomingMessage(StyxMessage message) 
             throws StyxException {
         int tag = message.getTag();
@@ -74,24 +62,37 @@ public class StyxDecoder implements ProtocolDecoder {
         mActiveTags.releaseTag(tag);
     }
 
-    @Override
-    public void dispose(IoSession arg0) throws Exception {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void finishDecode(IoSession arg0, ProtocolDecoderOutput arg1)
-            throws Exception {
-        // TODO Auto-generated method stub
-
-    }
-    
     public void setIOUnit(int value) {
         mIOUnit = value;
     }
-    
+
     public int getReceivedCount() {return mReceivedCount;}
     public int getErrorsCount() {return mErrorCount;}
+
+    @Override
+    protected boolean doDecode(IoSession arg0, IoBuffer arg1,
+            ProtocolDecoderOutput arg2) throws Exception {
+        if ( arg1.limit() < 4 ) {
+            return false;
+        }
+        arg1.order(ByteOrder.LITTLE_ENDIAN);
+        int position = arg1.position();
+        int packetSize = arg1.getInt();
+        arg1.position(position);
+        if ( packetSize > arg1.limit() ) {
+            // not enough data to decode
+            return false;
+        }
+        try {
+            final StyxByteBufferReadable readable = new StyxByteBufferReadable(arg1);
+            final StyxMessage message = StyxMessage.factory(readable, mIOUnit);
+            processIncomingMessage(message);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            // TODO: handle exception
+        }
+        return false;
+    }
 
 }
