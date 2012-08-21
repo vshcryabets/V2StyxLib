@@ -226,7 +226,6 @@ implements Closeable, StyxMessengerListener {
         StyxTMessageFID tRemove = new StyxTMessageFID(MessageType.Tremove, MessageType.Rremove, fid);
         mMessenger.send(tRemove);
         StyxMessage rMessage = tRemove.waitForAnswer(mTimeout);
-        getActiveFids().releaseFid(fid);
         StyxErrorMessageException.doException(rMessage);
     }    
     /**

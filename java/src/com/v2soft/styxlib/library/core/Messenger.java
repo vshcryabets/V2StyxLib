@@ -137,7 +137,8 @@ public class Messenger implements Runnable, Closeable, ObjectsPollFactory<StyxBy
         if (!mMessages.containsKey(tag)) // we didn't send T message with such tag, so ignore this R message
             return;
         final StyxTMessage tMessage = mMessages.get(tag);
-        if ( message.getType() == MessageType.Rclunk ) {
+        if ( tMessage.getType() == MessageType.Tclunk ||
+                tMessage.getType() == MessageType.Tremove ) {
             mListener.onFIDReleased(((StyxTMessageFID)tMessage).getFID());
         }
         tMessage.setAnswer(message);

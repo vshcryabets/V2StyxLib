@@ -301,8 +301,9 @@ public class StyxFile implements Closeable {
             for (StyxFile file : files)
                 file.delete(recurse);
         }
+        long fid = getFID();
         mFID = StyxMessage.NOFID;
-        mManager.remove(getFID());
+        mManager.remove(fid);
     }
 
     public static void delete(StyxClientConnection manager, String fileName, boolean recurse)
