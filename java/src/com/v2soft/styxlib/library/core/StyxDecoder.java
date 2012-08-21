@@ -8,10 +8,12 @@ import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.ProtocolDecoder;
 import org.apache.mina.filter.codec.ProtocolDecoderOutput;
 
+import com.v2soft.styxlib.library.StyxClientConnection.ActiveFids;
 import com.v2soft.styxlib.library.exceptions.StyxException;
 import com.v2soft.styxlib.library.io.StyxByteBufferReadable;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.messages.base.StyxTMessage;
+import com.v2soft.styxlib.library.messages.base.StyxTMessageFID;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
 
 /**
@@ -24,12 +26,15 @@ public class StyxDecoder implements ProtocolDecoder {
     private Map<Integer, StyxTMessage> mMessages;
     private int mReceivedCount, mErrorCount;
     private StyxCodecFactory.ActiveTags mActiveTags;
+    private ActiveFids mActiveFIDs;
     
     public StyxDecoder(int ioUnit, Map<Integer, StyxTMessage> messagesMap,
-            StyxCodecFactory.ActiveTags activeTags) {
+            StyxCodecFactory.ActiveTags activeTags,
+            ActiveFids fids) {
         mIOUnit = ioUnit;
         mMessages = messagesMap;
         mActiveTags = activeTags;
+        mActiveFIDs = fids;
     }
 
     @Override
@@ -57,6 +62,10 @@ public class StyxDecoder implements ProtocolDecoder {
         if (!mMessages.containsKey(tag)) // we didn't send T message with such tag, so ignore this R message
             return;
         final StyxTMessage tMessage = mMessages.get(tag);
+        if ( tMessage.getType() == MessageType.Tclunk || 
+                tMessage.getType() == MessageType.Tremove) {
+            mActiveFIDs.releaseFid(((StyxTMessageFID)tMessage).getFID());
+        }
         tMessage.setAnswer(message);
         if ( message.getType() == MessageType.Rerror ) {
             mErrorCount++;

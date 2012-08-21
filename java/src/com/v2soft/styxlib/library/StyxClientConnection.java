@@ -62,7 +62,7 @@ implements Closeable {
     private StyxQID mAuthQID;
     private StyxQID mQID;
     private long mFID = StyxMessage.NOFID;
-    private ActiveFids mActiveFids = new ActiveFids();
+    private ActiveFids mActiveFids;
     private IoConnector mConnector;
     private IoSession mSession;
 
@@ -83,6 +83,7 @@ implements Closeable {
         mUserName = username;
         mPassword = password;
         setConnected(false);
+        mActiveFids = new ActiveFids();
     }
 
     /**
@@ -99,7 +100,7 @@ implements Closeable {
         mConnector = new NioSocketConnector();
         mConnector.getSessionConfig().setReadBufferSize(mIOBufSize);
         mConnector.getFilterChain().addLast("codec", 
-                new ProtocolCodecFilter(new StyxCodecFactory(mIOBufSize)));
+                new ProtocolCodecFilter(new StyxCodecFactory(mIOBufSize, mActiveFids)));
         mMessenger = new StyxSessionHandler();
         mConnector.setHandler(mMessenger);
         ConnectFuture future = mConnector.connect(new InetSocketAddress(mAddress, mPort));
@@ -113,7 +114,7 @@ implements Closeable {
         setConnected(true);
         return true;
     }
- 
+
     public StyxFile getRoot() throws StyxException, InterruptedException, 
     TimeoutException, IOException {
         if (mRoot == null)
@@ -124,11 +125,6 @@ implements Closeable {
     public StyxSessionHandler getMessenger() {
         return mMessenger;
     }		
-
-    public ActiveFids getActiveFids()
-    {
-        return mActiveFids;
-    }
 
     public long getIOBufSize()
     {
@@ -211,11 +207,10 @@ implements Closeable {
         mSession.write(tClunk);
         StyxMessage rMessage = tClunk.waitForAnswer(mTimeout);
         StyxErrorMessageException.doException(rMessage);
-        mActiveFids.releaseFid(fid);
     }
 
     /**
-     * Send TRemove message for specefied FID, note that FID will be released even if remove failed.
+     * Send TRemove message for specified FID, note that FID will be released even if remove failed.
      * @param fid FID of the file that should be removed
      * @throws TimeoutException 
      * @throws InterruptedException 
@@ -223,12 +218,11 @@ implements Closeable {
      * @throws IOException 
      */
     public void remove(long fid) throws InterruptedException, TimeoutException, 
-        StyxErrorMessageException, IOException {
-        StyxTMessageFID tRemove = new StyxTMessageFID(MessageType.Tremove, 
+    StyxErrorMessageException, IOException {
+        final StyxTMessageFID tRemove = new StyxTMessageFID(MessageType.Tremove, 
                 MessageType.Rremove, fid);
         mSession.write(tRemove);
-        StyxMessage rMessage = tRemove.waitForAnswer(mTimeout);
-        getActiveFids().releaseFid(fid);
+        final StyxMessage rMessage = tRemove.waitForAnswer(mTimeout);
         StyxErrorMessageException.doException(rMessage);
     }    
     /**
@@ -242,11 +236,7 @@ implements Closeable {
             throws InterruptedException, StyxException, IOException, TimeoutException {
         // release atached FID
         if ( mFID != StyxMessage.NOFID ) {
-            try {
-                clunk(mFID);
-            } catch (Exception e) {
-                throw new IOException(e);
-            }
+            clunk(mFID);
             mFID = StyxMessage.NOFID;
         }
 
@@ -267,7 +257,7 @@ implements Closeable {
 
     private void sendAuthMessage()
             throws InterruptedException, StyxException, IOException, TimeoutException {
-        mAuthFID = getActiveFids().getFreeFid();
+        mAuthFID = mActiveFids.getFreeFid();
 
         StyxTAuthMessage tAuth = new StyxTAuthMessage(mAuthFID);
         tAuth.setUserName(getUserName());
@@ -290,7 +280,7 @@ implements Closeable {
 
     private void sendAttachMessage()
             throws InterruptedException, StyxException, TimeoutException, IOException {
-        mFID = getActiveFids().getFreeFid();
+        mFID = mActiveFids.getFreeFid();
         StyxTAttachMessage tAttach = new StyxTAttachMessage(getFID(), getAuthFID(),
                 getUserName(),
                 getMountPoint());
@@ -311,8 +301,7 @@ implements Closeable {
         }
     }
 
-    public class ActiveFids
-    {
+    public class ActiveFids {
         private LinkedList<Long> mAvailableFids = new LinkedList<Long>();
         private long mLastFid = 0L;
 
@@ -330,7 +319,7 @@ implements Closeable {
             }
         }
 
-        protected boolean releaseFid(long fid) {
+        public boolean releaseFid(long fid) {
             synchronized (mAvailableFids) {
                 if (fid == StyxMessage.NOFID)
                     return false;
@@ -351,6 +340,7 @@ implements Closeable {
     //-------------------------------------------------------------------------------------
     public int getTimeout() {return mTimeout;}
     public boolean isAttached() {return isAttached;}
+    public ActiveFids getActiveFids(){return mActiveFids;}
     //-------------------------------------------------------------------------------------
     // Setters
     //-------------------------------------------------------------------------------------
@@ -375,9 +365,4 @@ implements Closeable {
     public IoSession getSession() {
         return mSession;
     }
-
-//    @Override
-//    public void onFIDReleased(long fid) {
-//        mActiveFids.releaseFid(fid);
-//    }
 }

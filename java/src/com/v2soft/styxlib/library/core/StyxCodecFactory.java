@@ -10,6 +10,7 @@ import org.apache.mina.filter.codec.ProtocolDecoder;
 import org.apache.mina.filter.codec.ProtocolEncoder;
 
 import com.v2soft.styxlib.library.Consts;
+import com.v2soft.styxlib.library.StyxClientConnection.ActiveFids;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.messages.base.StyxTMessage;
 
@@ -24,11 +25,11 @@ public class StyxCodecFactory implements ProtocolCodecFactory {
     private StyxCodecFactory.ActiveTags mActiveTags;
     private Map<Integer, StyxTMessage> mMessages;    
     
-    public StyxCodecFactory(int iounit) {
+    public StyxCodecFactory(int iounit, ActiveFids fids) {
         mActiveTags = new ActiveTags();
         mMessages = new HashMap<Integer, StyxTMessage>();
         mEncoder = new StyxEncoder(iounit, mMessages, mActiveTags);
-        mDecoder = new StyxDecoder(iounit, mMessages, mActiveTags);
+        mDecoder = new StyxDecoder(iounit, mMessages, mActiveTags, fids);
     }
 
     @Override

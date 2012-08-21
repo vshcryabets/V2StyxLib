@@ -8,6 +8,7 @@ import org.apache.mina.filter.codec.ProtocolEncoder;
 import org.apache.mina.filter.codec.ProtocolEncoderOutput;
 
 import com.v2soft.styxlib.Config;
+import com.v2soft.styxlib.library.StyxClientConnection.ActiveFids;
 import com.v2soft.styxlib.library.io.StyxByteBufferWriteable;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.messages.base.StyxTMessage;
@@ -16,7 +17,7 @@ import com.v2soft.styxlib.library.types.ObjectsPoll;
 import com.v2soft.styxlib.library.types.ObjectsPoll.ObjectsPollFactory;
 
 /**
- * 
+ * Styx message encoder for Mina framework
  * @author V.Shcryabets<vshcryabets@gmail.com>
  *
  */
