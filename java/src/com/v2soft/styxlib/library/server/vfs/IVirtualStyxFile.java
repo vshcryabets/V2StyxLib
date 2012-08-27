@@ -70,5 +70,13 @@ public interface IVirtualStyxFile {
      * @param state
      */
     public void onConnectionClosed(ClientState state);
-
+    /**
+     * Create new child file
+     * @param name
+     * @param permissions
+     * @param mode
+     * @return QID of new file
+     */
+    public StyxQID create(String name, long permissions, int mode)
+            throws StyxErrorMessageException;
 }
