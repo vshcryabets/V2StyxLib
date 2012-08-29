@@ -74,20 +74,23 @@ public class DiskStyxFile extends MemoryStyxFile {
         String ramode = null;
         switch (mode) {
         case ModeType.OREAD:
-            canOpen = (mode == ModeType.OREAD) && mFile.canRead();
+            canOpen = mFile.canRead();
             ramode = "r";
             break;
         case ModeType.OWRITE:
-            canOpen = (mode == ModeType.OWRITE) && mFile.canWrite();
-            ramode = "w";
+            canOpen = mFile.canWrite();
+            ramode = "rw";
+            break;
         case ModeType.ORDWR:
-            canOpen = (mode == ModeType.ORDWR) && mFile.canWrite() && mFile.canRead();
+            canOpen = mFile.canWrite() && mFile.canRead();
             ramode = "rw";
         default:
             break;
         }
-        final RandomAccessFile rf = new RandomAccessFile(mFile, ramode);
-        mFilesMap.put(client, rf);
+        if ( canOpen ) {
+            final RandomAccessFile rf = new RandomAccessFile(mFile, ramode);
+            mFilesMap.put(client, rf);
+        }
         return canOpen;
     }
 
@@ -121,7 +124,7 @@ public class DiskStyxFile extends MemoryStyxFile {
         } else {
             throw StyxErrorMessageException.newInstance("File is not open");
         }
-   }
+    }
 
     @Override
     public void close(ClientState client) {
@@ -134,6 +137,12 @@ public class DiskStyxFile extends MemoryStyxFile {
                 e.printStackTrace();
             }
         }
+    }
+    
+    @Override
+    public boolean delete(ClientState client) {
+        super.delete(client);
+        return mFile.delete();
     }
 
     @Override

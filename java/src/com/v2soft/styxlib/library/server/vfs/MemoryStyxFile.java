@@ -100,7 +100,8 @@ public class MemoryStyxFile implements IVirtualStyxFile {
     }
 
     @Override
-    public IVirtualStyxFile walk(Iterator<String> pathElements, List<StyxQID> qids) {
+    public IVirtualStyxFile walk(Iterator<String> pathElements, List<StyxQID> qids) 
+            throws StyxErrorMessageException {
         return this;
     }
 
@@ -154,5 +155,11 @@ public class MemoryStyxFile implements IVirtualStyxFile {
         StyxErrorMessageException.doException(
                 "Can't create file, this is read-only file system.");
         return null;
-    }   
+    }
+
+    @Override
+    public boolean delete(ClientState client) {
+        close(client);
+        return false;
+    }
 }
