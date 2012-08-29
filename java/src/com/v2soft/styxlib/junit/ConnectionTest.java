@@ -5,8 +5,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetAddress;
+import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.TimeoutException;
+import java.util.zip.CRC32;
 
 import org.junit.After;
 import org.junit.Before;
@@ -110,7 +112,7 @@ public class ConnectionTest {
         final StyxFile dirB = new StyxFile(mConnection, nameB);
         final StyxFile dirAA = new StyxFile(mConnection, nameAA);
         final StyxFile dirAB = new StyxFile(mConnection, nameAB);
-        
+
 
         dirA.create(FileMode.PERMISSION_BITMASK | FileMode.Directory.getMode());
         dirB.create(FileMode.PERMISSION_BITMASK | FileMode.Directory.getMode());
@@ -139,12 +141,83 @@ public class ConnectionTest {
         dirAB.close();
         dirAA.delete();
         dirAA.close();
-        
+
         dirA.delete();
         dirA.close();
         dirB.delete();
         dirB.close();
         mConnection.close();
     }
+
+    @Test
+    public void testBigFileTransmition() 
+            throws IOException, StyxException, InterruptedException, TimeoutException {
+        assertTrue(mConnection.connect());
+        int filecount = 10;
+        byte [] buffer = new byte[156];
+        System.out.println("Generating pattern...");
+        Random random = new Random();
+        random.nextBytes(buffer);
+        System.out.println("Count CRC32...");
+        final CRC32 crcounter = new CRC32();
+        crcounter.update(buffer);
+        long crc32 = crcounter.getValue();
+        long startTime = System.currentTimeMillis();
+        long filessize=200*1024*1024;
+        System.out.println("Copy file to server...");
+
+        // create file
+        String filename = UUID.randomUUID().toString();
+        StyxFile file = new StyxFile(mConnection, filename);
+        file.create(FileMode.PERMISSION_BITMASK);
+
+        final OutputStream out = file.openForWrite();
+        assertNotNull(out);
+        // write it
+        long bufcount = filessize/buffer.length;
+        long last = filessize%buffer.length;
+        for ( int j = 0 ; j < bufcount; j++ ) {
+            out.write(buffer);
+        }
+        out.write(buffer, 0, (int)last);
+        // close it
+        out.close();
+        file.close();
+
+        long writeTime = System.currentTimeMillis();
+        System.out.println("Read from server...");
+
+        InputStream in = file.openForRead();
+        assertNotNull(in);
+        // read it
+        bufcount = filessize/buffer.length;
+        //            long last = filessize%buffer.length;
+        int readed = 0;
+        for ( int j = 0 ; j < bufcount; j++ ) {
+            readed = 0;
+            while ( readed < buffer.length ) {
+                readed += in.read(buffer, readed, buffer.length-readed);
+            }
+            crcounter.reset();
+            crcounter.update(buffer, 0, readed);
+            assertEquals(crc32, crcounter.getValue());
+        }
+
+        // close it
+        in.close();
+
+        // delete it
+        file.delete();
+
+        long diff = System.currentTimeMillis()-writeTime;
+        System.out.println(String.format("Write done in %d ms", (writeTime-startTime)));
+        System.out.println(String.format("Read done in %d ms", diff));
+        System.out.println(String.format("\tTransmited %d messages", mConnection.getMessenger().getTransmitedCount()));
+        System.out.println(String.format("\tReceived %d messages", mConnection.getMessenger().getReceivedCount()));
+        System.out.println(String.format("\tError %d messages", mConnection.getMessenger().getErrorsCount()));
+        //        System.out.println(String.format("\tAverage time for connection %d ms",diff/count));
+        mConnection.close();        
+    }
+
 
 }
