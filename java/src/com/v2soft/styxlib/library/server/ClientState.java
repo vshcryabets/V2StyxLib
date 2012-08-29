@@ -137,6 +137,9 @@ implements Closeable {
             case Tcreate:
                 answer = processCreate((StyxTCreateMessage)msg);
                 break;
+            case Tremove:
+                answer = processRemove((StyxTMessageFID)msg);
+                break;
             default:
                 System.out.println("Got message:");
                 System.out.println(msg.toString());
@@ -148,6 +151,22 @@ implements Closeable {
         }
         if ( answer != null ) {
             sendMessage(answer);
+        }
+    }
+
+    /**
+     * Handle Tremove
+     * @param msg
+     * @return
+     * @throws StyxErrorMessageException 
+     */
+    private StyxMessage processRemove(StyxTMessageFID msg) 
+            throws StyxErrorMessageException {
+        final IVirtualStyxFile file = getAssignedFile(msg.getFID());
+        if ( file.delete(this) ) {
+            return new StyxMessage(MessageType.Rremove, msg.getTag());
+        } else {
+            return new StyxRErrorMessage(msg.getTag(), "Can't delete file");
         }
     }
 
