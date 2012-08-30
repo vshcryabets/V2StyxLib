@@ -2,7 +2,6 @@ package com.v2soft.styxlib.library.server.vfs;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -26,26 +25,32 @@ public class MemoryStyxFile implements IVirtualStyxFile {
     protected StyxStat mStat;
 
     public MemoryStyxFile(String name) {
-        if ( name == null ) throw new NullPointerException("Filename is null");
+        if ( name == null ) {
+            throw new NullPointerException("Filename is null");
+        }
         mName = name;
-        mQID = new StyxQID(QIDType.QTFILE, 0, new ULong(this.hashCode()));
-        mStat = new StyxStat((short)0, 
-                1, 
-                mQID, 
-                getMode(),
-                getAccessTime(), 
-                getModificationTime(), 
-                getLength(), 
-                name, 
-                getOwnerName(), 
-                getGroupName(), 
-                getModificationUser());        
+        mQID = new StyxQID(QIDType.QTFILE, 0, new ULong(mName.hashCode()));
     }
 
     @Override
     public StyxQID getQID() {return mQID;}
     @Override
-    public StyxStat getStat() {return mStat;}
+    public StyxStat getStat() {
+        if ( mStat == null ) {
+            mStat = new StyxStat((short)0, 
+                    1, 
+                    mQID, 
+                    getMode(),
+                    getAccessTime(), 
+                    getModificationTime(), 
+                    getLength(), 
+                    mName, 
+                    getOwnerName(), 
+                    getGroupName(), 
+                    getModificationUser());
+        }
+        return mStat;
+    }
 
     @Override
     public int getMode() {
@@ -141,5 +146,13 @@ public class MemoryStyxFile implements IVirtualStyxFile {
     @Override
     public void onConnectionClosed(ClientState state) {
         // ok, nothing to do
+    }
+
+    @Override
+    public StyxQID create(String name, long permissions, int mode) 
+            throws StyxErrorMessageException {
+        StyxErrorMessageException.doException(
+                "Can't create file, this is read-only file system.");
+        return null;
     }   
 }

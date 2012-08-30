@@ -22,6 +22,7 @@ import com.v2soft.styxlib.library.messages.StyxRWalkMessage;
 import com.v2soft.styxlib.library.messages.StyxRWriteMessage;
 import com.v2soft.styxlib.library.messages.StyxTAttachMessage;
 import com.v2soft.styxlib.library.messages.StyxTAuthMessage;
+import com.v2soft.styxlib.library.messages.StyxTCreateMessage;
 import com.v2soft.styxlib.library.messages.StyxTOpenMessage;
 import com.v2soft.styxlib.library.messages.StyxTReadMessage;
 import com.v2soft.styxlib.library.messages.StyxTWStatMessage;
@@ -134,6 +135,10 @@ implements Closeable {
                 break;
             case Twstat:
                 answer = processWStat((StyxTWStatMessage)msg);
+                break;
+            case Tcreate:
+                answer = processCreate((StyxTCreateMessage)msg);
+                break;
             default:
                 System.out.println("Got message:");
                 System.out.println(msg.toString());
@@ -146,6 +151,19 @@ implements Closeable {
         if ( answer != null ) {
             sendMessage(answer);
         }
+    }
+
+    /**
+     * Handle Tcreate message
+     * @param msg
+     * @return
+     * @throws StyxErrorMessageException 
+     */
+    private StyxMessage processCreate(StyxTCreateMessage msg) 
+            throws StyxErrorMessageException {
+        final IVirtualStyxFile file = getAssignedFile(msg.getFID());
+        StyxQID qid = file.create(msg.getName(), msg.getPermissions(), msg.getMode());
+        return new StyxROpenMessage(msg.getTag(), qid, mIOUnit, true);
     }
 
     /**

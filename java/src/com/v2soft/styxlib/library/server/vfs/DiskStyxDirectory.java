@@ -34,8 +34,8 @@ extends DiskStyxFile {
     protected Vector<IVirtualStyxFile> mFiles;
     protected List<IVirtualStyxFile> mDirectoryFiles;
 
-    public DiskStyxDirectory(File parent, String name) {
-        super(parent, name);
+    public DiskStyxDirectory(File directory) throws IOException {
+        super(directory);
         mQID.setType(QIDType.QTDIR);
         mFiles = new Vector<IVirtualStyxFile>();
         mDirectoryFiles = new ArrayList<IVirtualStyxFile>();
@@ -153,5 +153,24 @@ extends DiskStyxFile {
         // FIXME
         return false;
 //        return mFiles.remove(file);
+    }
+    
+    @Override
+    public StyxQID create(String name, long permissions, int mode)
+            throws StyxErrorMessageException {
+        File newFile = new File(mFile, name);
+        if ( newFile.exists() ) {
+            StyxErrorMessageException.doException("Can't create file, already exists");
+        }
+        try {
+            if ( !newFile.createNewFile() ) {
+                StyxErrorMessageException.doException("Can't create file, unknown error.");
+            }
+            DiskStyxFile file = new DiskStyxFile(newFile);
+            return file.getQID();
+        } catch (IOException e) {
+            StyxErrorMessageException.doException("Can't create file, unknown error.");
+        }
+        return null;
     }
 }

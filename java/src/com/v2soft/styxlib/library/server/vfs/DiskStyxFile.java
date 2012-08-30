@@ -9,7 +9,6 @@ import java.util.Map;
 
 import com.v2soft.styxlib.library.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.library.messages.base.enums.ModeType;
-import com.v2soft.styxlib.library.messages.base.structs.StyxStat;
 import com.v2soft.styxlib.library.server.ClientState;
 import com.v2soft.styxlib.library.types.ULong;
 
@@ -22,25 +21,13 @@ public class DiskStyxFile extends MemoryStyxFile {
     protected File mFile;
     protected Map<ClientState, RandomAccessFile> mFilesMap;
 
-    public DiskStyxFile(File parent, String name) {
-        super(name);
+    public DiskStyxFile(File file) throws IOException {
+        super(file.getName());
+        if ( !file.exists() ) {
+            throw new IOException("File not exists");
+        }
+        mFile = file;
         mFilesMap = new HashMap<ClientState, RandomAccessFile>();
-        mFile = new File(parent, name);
-        mStat = new StyxStat((short)0, 
-                1, 
-                mQID,
-                getMode(),
-                getAccessTime(), 
-                getModificationTime(), 
-                getLength(), 
-                name, 
-                getOwnerName(), 
-                getGroupName(), 
-                getModificationUser());
-    }
-
-    public DiskStyxFile(File file) {
-        this(file.getParentFile(), file.getName());
     }
 
     @Override
@@ -152,9 +139,5 @@ public class DiskStyxFile extends MemoryStyxFile {
     @Override
     public void onConnectionClosed(ClientState state) {
         close(state);
-    }
-
-    private File getFile() {
-        return mFile;
     }
 }
