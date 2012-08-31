@@ -3,10 +3,11 @@ package com.v2soft.styxlib.library.server;
 import java.io.Closeable;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.channels.SocketChannel;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+
+import org.apache.mina.core.session.IoSession;
 
 import com.v2soft.styxlib.library.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.library.io.StyxByteBufferReadable;
@@ -45,24 +46,23 @@ implements Closeable {
     private String mProtocol;
     private StyxByteBufferReadable mBuffer;
     private int mIOUnit;
-    private SocketChannel mChannel;
     private StyxByteBufferWriteable mOutputBuffer;
     private IVirtualStyxFile mServerRoot;
     private IVirtualStyxFile mClientRoot;
     private HashMap<Long, IVirtualStyxFile> mAssignedFiles;
+    private IoSession mConnection;
 
     public ClientState(int iounit, 
-            SocketChannel channel, 
             IVirtualStyxFile root,
-            String protocol) throws FileNotFoundException {
-        if ( channel == null ) throw new NullPointerException("Client channel is null");
+            String protocol,
+            IoSession connection) throws FileNotFoundException {
         if ( root == null ) throw new NullPointerException("Root is null");
         if ( protocol == null ) throw new NullPointerException("Protocol is null");
+        if ( connection == null ) throw new NullPointerException("Connection is null");
         mIOUnit = iounit;
+        mConnection = connection;
         // FIXME
-//        mBuffer = new StyxByteBufferReadable(iounit*2);
         mOutputBuffer = new StyxByteBufferWriteable(iounit);
-        mChannel = channel;
         mServerRoot = root;
         mAssignedFiles = new HashMap<Long, IVirtualStyxFile>();
         mUserName = "nobody";
@@ -70,30 +70,11 @@ implements Closeable {
     }
 
     /**
-     * 
-     * @return true if message was processed
-     * @throws IOException
-     */
-    private boolean process() throws IOException {
-        // FIXME
-//        int inBuffer = mBuffer.remainsToRead();
-//        if ( inBuffer > 4 ) {
-//            long packetSize = mBuffer.getUInt32();
-//            if ( inBuffer >= packetSize ) {
-//                final StyxMessage message = StyxMessage.factory(mBuffer, mIOUnit);
-//                processMessage(message);
-//                return true;
-//            }
-//        }
-        return false;
-    }
-
-    /**
      * Processing incoming messages
-     * @param msg incomming message
+     * @param msg incoming message
      * @throws IOException 
      */
-    private void processMessage(StyxMessage msg) throws IOException {
+    public void processMessage(StyxMessage msg) throws IOException {
         //        System.out.print("Got message "+msg.toString());
         StyxMessage answer = null;
         IVirtualStyxFile file;
@@ -296,18 +277,6 @@ implements Closeable {
         }
     }
 
-    /**
-     * 
-     * @param tag message tag
-     * @param fid File ID
-     * @return new Rerror message
-     * @throws StyxErrorMessageException 
-     */
-    //    private StyxRErrorMessage getNoFIDError(StyxMessage message, long fid) throws StyxErrorMessageException {
-    //        
-    //        return null;
-    //    }
-
     private void registerOpenedFile(long fid, IVirtualStyxFile file) {
         mAssignedFiles.put(fid, file);
     }
@@ -318,37 +287,11 @@ implements Closeable {
      * @throws IOException
      */
     private void sendMessage(StyxMessage answer) throws IOException {
-        answer.writeToBuffer(mOutputBuffer);
-        mOutputBuffer.getBuffer().position(0);
-        // FIXME
-//        mChannel.write(mOutputBuffer.getBuffer());
+        mConnection.write(answer);
     }
 
     @Override
     public void close() throws IOException {
         mBuffer = null;
-    }
-
-    /**
-     * Read data from assigned SocketChannel
-     * @return
-     * @throws IOException
-     */
-    public boolean readSocket() throws IOException {
-        // FIXME
-//        int read = 0;
-//        try {
-//            read = mBuffer.readFromChannel(mChannel);
-//        }
-//        catch (IOException e) {
-//            read = -1;
-//        }
-//        if ( read == -1 ) {
-//            close();
-//            return true;
-//        } else {
-//            while ( process() );
-//        }
-        return false;
     }
 }
