@@ -55,7 +55,8 @@ public interface IVirtualStyxFile {
      * @return number of bytes that was readed into the buffer
      */
     public long read(ClientState client, byte[] buffer, ULong offset, long count) throws StyxErrorMessageException;
-    public IVirtualStyxFile walk(Iterator<String> pathElements, List<StyxQID> qids);
+    public IVirtualStyxFile walk(Iterator<String> pathElements, List<StyxQID> qids)
+            throws StyxErrorMessageException;
     /**
      * Write data to file
      * @param client
@@ -70,5 +71,17 @@ public interface IVirtualStyxFile {
      * @param state
      */
     public void onConnectionClosed(ClientState state);
-
+    /**
+     * Create new child file
+     * @param name
+     * @param permissions
+     * @param mode
+     * @return QID of new file
+     */
+    public StyxQID create(String name, long permissions, int mode)
+            throws StyxErrorMessageException;
+    /**
+     * Delete this file
+     */
+    public boolean delete(ClientState client);
 }

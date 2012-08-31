@@ -34,8 +34,8 @@ extends DiskStyxFile {
     protected Vector<IVirtualStyxFile> mFiles;
     protected List<IVirtualStyxFile> mDirectoryFiles;
 
-    public DiskStyxDirectory(File parent, String name) {
-        super(parent, name);
+    public DiskStyxDirectory(File directory) throws IOException {
+        super(directory);
         mQID.setType(QIDType.QTDIR);
         mFiles = new Vector<IVirtualStyxFile>();
         mDirectoryFiles = new ArrayList<IVirtualStyxFile>();
@@ -48,13 +48,32 @@ extends DiskStyxFile {
     }
 
     @Override
-    public IVirtualStyxFile walk(Iterator<String> pathElements, List<StyxQID> qids) {
+    public IVirtualStyxFile walk(Iterator<String> pathElements, List<StyxQID> qids) 
+            throws StyxErrorMessageException {
         if ( pathElements.hasNext() ) {
             String filename = pathElements.next();
             for (IVirtualStyxFile file : mFiles) {
                 if ( file.getName().equals(filename)) {
                     qids.add(file.getQID());
                     return file.walk(pathElements, qids);
+                }
+            }
+            // look at disk
+            final File[] files = mFile.listFiles();
+            for (File file : files) {
+                if ( file.getName().equals(filename)) {
+                    DiskStyxFile styxFile;
+                    try {
+                        if ( file.isDirectory() ) {
+                            styxFile = new DiskStyxDirectory(file);
+                        } else {
+                            styxFile = new DiskStyxFile(file);
+                        }
+                        qids.add(styxFile.getQID());
+                        return styxFile.walk(pathElements, qids);
+                    } catch (IOException e) {
+                        StyxErrorMessageException.doException(e.toString());
+                    } 
                 }
             }
             return null;
@@ -84,7 +103,7 @@ extends DiskStyxFile {
                 size += stat.getSize();
                 stats.add(stat);
             }
-            
+
             // allocate buffer
             final StyxByteBufferWriteable buffer = new StyxByteBufferWriteable(size);
             for (StyxStat state : stats) {
@@ -115,9 +134,9 @@ extends DiskStyxFile {
 
     @Override
     public void close(ClientState client) {
-//        if ( !mBuffersMap.containsKey(client)) {
-//            throw StyxErrorMessageException.newInstance("This file isn't open");
-//        }
+        //        if ( !mBuffersMap.containsKey(client)) {
+        //            throw StyxErrorMessageException.newInstance("This file isn't open");
+        //        }
         // remove buffer
         mBuffersMap.remove(client);
     }
@@ -145,13 +164,32 @@ extends DiskStyxFile {
         mBuffersMap.remove(state);
     }
 
-    /**
-     * Delete child file
-     * @param file file that should be removed from this directory
-     */
-    public boolean deleteFile(IVirtualStyxFile file) {
-        // FIXME
-        return false;
-//        return mFiles.remove(file);
+    @Override
+    public StyxQID create(String name, long permissions, int mode)
+            throws StyxErrorMessageException {
+        File newFile = new File(mFile, name);
+        if ( newFile.exists() ) {
+            StyxErrorMessageException.doException("Can't create file, already exists");
+        }
+        try {
+            if ( (permissions & FileMode.Directory.getMode()) != 0 ) {
+                // create directory
+                if ( !newFile.mkdir() ) {
+                    StyxErrorMessageException.doException("Can't create directory, unknown error.");
+                }
+                DiskStyxDirectory file = new DiskStyxDirectory(newFile);
+                return file.getQID();
+            } else {
+                // create file
+                if ( !newFile.createNewFile() ) {
+                    StyxErrorMessageException.doException("Can't create file, unknown error.");
+                }
+                DiskStyxFile file = new DiskStyxFile(newFile);
+                return file.getQID();
+            }
+        } catch (IOException e) {
+            StyxErrorMessageException.doException("Can't create file, unknown error.");
+        }
+        return null;
     }
 }

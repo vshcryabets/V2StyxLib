@@ -3,5 +3,8 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="libsrc"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="libs/junit-4.11-SNAPSHOT-20120805-1225-src.jar"/>
+	<classpathentry kind="lib" path="libs/junit-4.11-SNAPSHOT-20120805-1225.jar"/>
+	<classpathentry kind="lib" path="libs/junit-dep-4.11-SNAPSHOT-20120805-1225.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
