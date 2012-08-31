@@ -32,7 +32,8 @@ public class JavaServerTest {
             dir.addFile(new MemoryStyxFile("vfile2"));
             dir.addFile(new MemoryStyxFile("vfile3"));
             dir.addFile(new MemoryStyxFile("vfile4"));
-            StyxServerManager manager = new StyxServerManager(InetAddress.getByName("127.0.0.1"), 
+            StyxServerManager manager = new StyxServerManager(
+                    InetAddress.getByName("127.0.0.1"), 
                     8080, 
                     false,
                     root,

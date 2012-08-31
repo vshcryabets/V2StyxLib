@@ -43,7 +43,8 @@ extends MemoryStyxFile {
     }
 
     @Override
-    public IVirtualStyxFile walk(Iterator<String> pathElements, List<StyxQID> qids) {
+    public IVirtualStyxFile walk(Iterator<String> pathElements, List<StyxQID> qids) 
+            throws StyxErrorMessageException {
         if ( pathElements.hasNext() ) {
             String filename = pathElements.next();
             for (IVirtualStyxFile file : mFiles) {
