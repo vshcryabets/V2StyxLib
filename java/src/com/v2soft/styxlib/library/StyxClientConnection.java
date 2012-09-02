@@ -14,6 +14,7 @@ import org.apache.mina.core.future.ConnectFuture;
 import org.apache.mina.core.service.IoConnector;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
+import org.apache.mina.filter.ssl.SslFilter;
 import org.apache.mina.transport.socket.nio.NioSocketConnector;
 
 import com.v2soft.styxlib.library.core.StyxCodecFactory;
@@ -99,6 +100,12 @@ implements Closeable {
         mNeedAuth = (mUserName != null);
         mConnector = new NioSocketConnector();
         mConnector.getSessionConfig().setReadBufferSize(mIOBufSize);
+        if ( mSSL != null ) {
+            // enable SSL
+            final SslFilter sslFilter = new SslFilter(mSSL);
+            sslFilter.setUseClientMode(true);
+            mConnector.getFilterChain().addFirst("sslFilter", sslFilter);
+        }
         mConnector.getFilterChain().addLast("codec", 
                 new ProtocolCodecFilter(new StyxCodecFactory(mIOBufSize, mActiveFids)));
         mMessenger = new StyxSessionHandler();

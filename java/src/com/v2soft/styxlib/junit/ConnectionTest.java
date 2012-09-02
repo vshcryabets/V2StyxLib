@@ -1,14 +1,27 @@
 package com.v2soft.styxlib.junit;
 import static org.junit.Assert.*;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetAddress;
+import java.security.KeyManagementException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.CertificateException;
 import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.TimeoutException;
 import java.util.zip.CRC32;
+
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManagerFactory;
 
 import org.junit.After;
 import org.junit.Before;
@@ -30,8 +43,11 @@ public class ConnectionTest {
 
     @Before
     public void setUp() throws Exception {
+        String trustStorePath = "/Users/user/Dropbox/private/git/SSLServer/clientpkeys.jks";
+        String trustStorePassword = "654321";
+        final SSLContext ssl = getSSLContext(null, null, trustStorePath, trustStorePassword);
         mConnection = new StyxClientConnection(InetAddress.getByName("localhost"), 
-                8080, null);
+                8080, ssl);
     }
 
     @After
@@ -49,15 +65,6 @@ public class ConnectionTest {
             mConnection.sendVersionMessage();
         }
         long diff = System.currentTimeMillis()-startTime;
-//        System.out.println(String.format("\tTransmited %d messages\n\t" +
-//                "Received %d messages\n\t" +
-//                "Error %d messages\n\t" +
-//                "Average time for connection %d ms", 
-//                mConnection.getMessenger().getTransmitedCount(),
-//                mConnection.getMessenger().getReceivedCount(),
-//                mConnection.getMessenger().getErrorsCount(),
-//                diff/count
-//                ));
         mConnection.close();
     }
 
@@ -219,6 +226,37 @@ public class ConnectionTest {
         //        System.out.println(String.format("\tAverage time for connection %d ms",diff/count));
         mConnection.close();        
     }
+    
+    private static SSLContext getSSLContext(String keyStorePath, String keyStorePassword, String trustStorePath, String trustStorePassword )
+            throws NoSuchAlgorithmException, KeyStoreException, CertificateException, FileNotFoundException, 
+            IOException, UnrecoverableKeyException, KeyManagementException {
+        KeyStore ks = null;
+        KeyStore ts = null;
+        KeyManagerFactory keyManagerFactory = null;
+        TrustManagerFactory trustManagerFactory = null;
 
+        // load key store
+        if ( keyStorePath != null ) {
+            keyManagerFactory = 
+                    KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+            ks = KeyStore.getInstance(KeyStore.getDefaultType());
+            ks.load(new FileInputStream(keyStorePath), keyStorePassword.toCharArray());
+            keyManagerFactory.init(ks, keyStorePassword.toCharArray());
+        }
 
+        //      load trust keys store
+        if ( trustStorePath != null ) {
+            trustManagerFactory = 
+                    TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+            ts = KeyStore.getInstance(KeyStore.getDefaultType());
+            ts.load(new FileInputStream(trustStorePath), trustStorePassword.toCharArray());
+            trustManagerFactory.init(ts);
+        }
+
+        SSLContext sslContext = SSLContext.getInstance("TLS");
+        sslContext.init( (keyManagerFactory == null ? null : keyManagerFactory.getKeyManagers()), 
+                (trustManagerFactory == null ? null : trustManagerFactory.getTrustManagers()), 
+                new SecureRandom());
+        return sslContext;
+    }
 }
