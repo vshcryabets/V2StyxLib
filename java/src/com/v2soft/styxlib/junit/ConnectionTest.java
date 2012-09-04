@@ -219,5 +219,37 @@ public class ConnectionTest {
         mConnection.close();        
     }
 
-
+    // TVersion, Tattach, Twalk, create, write, clunk, open, read, remove
+    @Test
+    public void testFileSeek() throws IOException, StyxException, InterruptedException, TimeoutException {
+        assertTrue(mConnection.connect());
+        final StyxFile newFile = new StyxFile(mConnection, UUID.randomUUID().toString());
+        newFile.create(FileMode.ReadOthersPermission.getMode() |
+                FileMode.WriteOthersPermission.getMode());
+        final OutputStream out = newFile.openForWrite();
+        assertNotNull(out);
+        byte [] testArray1 = new byte[]{1,3,5,7,11,13,17,19,23,29};
+        byte [] testArray2 = new byte[]{31,37,41,43,47,49,53,61,71,73};
+        byte [] testArray = new byte[testArray1.length+testArray2.length];
+        System.arraycopy(testArray1, 0, testArray, 0, testArray1.length);
+        System.arraycopy(testArray2, 0, testArray, testArray1.length, testArray2.length);
+        out.write(testArray1);
+        out.write(testArray2);
+        out.close();
+        final InputStream in = newFile.openForRead();
+        assertNotNull(in);
+        final byte [] readArray = new byte[testArray.length];
+        int read = in.read(readArray);
+        assertEquals(testArray.length, read);
+        assertArrayEquals(testArray, readArray);
+        // in.seek(testArray1.length)
+        byte [] readArray2 = new byte[testArray2.length];
+        read = in.read(readArray2);
+        assertEquals(testArray2.length, read);
+        assertArrayEquals(testArray2, readArray2);
+        in.close();
+        newFile.delete();
+        newFile.close();
+        mConnection.close();
+    }
 }
