@@ -18,6 +18,7 @@ import com.v2soft.styxlib.library.StyxClientConnection;
 import com.v2soft.styxlib.library.StyxFile;
 import com.v2soft.styxlib.library.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.library.exceptions.StyxException;
+import com.v2soft.styxlib.library.io.StyxFileBufferedInputStream;
 import com.v2soft.styxlib.library.messages.base.enums.FileMode;
 
 /**
@@ -236,13 +237,13 @@ public class ConnectionTest {
         out.write(testArray1);
         out.write(testArray2);
         out.close();
-        final InputStream in = newFile.openForRead();
+        final StyxFileBufferedInputStream in = newFile.openForRead();
         assertNotNull(in);
         final byte [] readArray = new byte[testArray.length];
         int read = in.read(readArray);
         assertEquals(testArray.length, read);
         assertArrayEquals(testArray, readArray);
-        // in.seek(testArray1.length)
+        in.seek(testArray1.length);
         byte [] readArray2 = new byte[testArray2.length];
         read = in.read(readArray2);
         assertEquals(testArray2.length, read);

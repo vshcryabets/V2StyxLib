@@ -1,6 +1,8 @@
 package com.v2soft.styxlib.library.io;
 
 import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 import com.v2soft.styxlib.library.core.Messenger;
 
@@ -9,9 +11,10 @@ import com.v2soft.styxlib.library.core.Messenger;
  * @author V.Shcriyabets (vshcryabets@gmail.com)
  *
  */
-public class StyxFileBufferedInputStream extends BufferedInputStream {
+public class StyxFileBufferedInputStream extends InputStream {
+    private StyxUnbufferedInputStream mUnbufferedInput;
+    private BufferedInputStream mBufferedInput;
     /**
-     * 
      * @param messenger
      * @param file
      * @param iounit
@@ -20,6 +23,30 @@ public class StyxFileBufferedInputStream extends BufferedInputStream {
     public StyxFileBufferedInputStream(Messenger messenger, 
             long file, 
             int iounit) {
-        super(new StyxUnbufferedInputStream(file, messenger, iounit), iounit);
+        mUnbufferedInput = new StyxUnbufferedInputStream(file, messenger, iounit);
+        mBufferedInput = new BufferedInputStream(mUnbufferedInput, iounit);
+    }
+    
+    @Override
+    public int read() throws IOException {
+        return mBufferedInput.read();
+    }
+    
+    @Override
+    public int read(byte[] b, int off, int len) throws IOException {
+        return mBufferedInput.read(b, off, len);
+    }
+    @Override
+    public int read(byte[] b) throws IOException {
+        return mBufferedInput.read(b);
+    }
+    
+    @Override
+    public void close() throws IOException {
+        mBufferedInput.close();
+    }
+    
+    public void seek(long position) {
+        mUnbufferedInput.seek(position);
     }
 }

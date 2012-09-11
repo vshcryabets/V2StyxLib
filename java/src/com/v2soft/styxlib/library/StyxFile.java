@@ -218,7 +218,7 @@ public class StyxFile implements Closeable {
         return files.toArray(new StyxFile[0]);
             }
 
-    public InputStream openForRead() 
+    public StyxFileBufferedInputStream openForRead() 
             throws InterruptedException, StyxException, TimeoutException, IOException {
         if ( !mManager.isConnected()) {
             throw new IOException("Not connected to server");

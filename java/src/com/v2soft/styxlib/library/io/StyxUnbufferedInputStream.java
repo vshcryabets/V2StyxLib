@@ -93,4 +93,8 @@ public class StyxUnbufferedInputStream extends InputStream {
         }
         super.close();
     }
+
+    public void seek(long position) {
+        mFileOffset.setValue(position);
+    }
 }
