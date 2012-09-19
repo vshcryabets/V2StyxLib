@@ -229,25 +229,35 @@ public class ConnectionTest {
                 FileMode.WriteOthersPermission.getMode());
         final OutputStream out = newFile.openForWrite();
         assertNotNull(out);
-        byte [] testArray1 = new byte[]{1,3,5,7,11,13,17,19,23,29};
-        byte [] testArray2 = new byte[]{31,37,41,43,47,49,53,61,71,73};
-        byte [] testArray = new byte[testArray1.length+testArray2.length];
-        System.arraycopy(testArray1, 0, testArray, 0, testArray1.length);
-        System.arraycopy(testArray2, 0, testArray, testArray1.length, testArray2.length);
-        out.write(testArray1);
-        out.write(testArray2);
+        // prepare random block
+        int fullSize = 4096;
+        byte [] randomBlock = new byte[fullSize];
+        final Random rnd = new Random();
+        for ( int  i = 0 ; i < fullSize; i++ ) {
+            randomBlock[i] = (byte) (rnd.nextInt(256)-128);
+        }
+        // write it to file 
+        out.write(randomBlock);
         out.close();
         final StyxFileBufferedInputStream in = newFile.openForRead();
         assertNotNull(in);
-        final byte [] readArray = new byte[testArray.length];
-        int read = in.read(readArray);
-        assertEquals(testArray.length, read);
-        assertArrayEquals(testArray, readArray);
-        in.seek(testArray1.length);
-        byte [] readArray2 = new byte[testArray2.length];
-        read = in.read(readArray2);
-        assertEquals(testArray2.length, read);
-        assertArrayEquals(testArray2, readArray2);
+        // test partial reads
+        int testCount = 10;
+        for ( int i = 0; i < testCount; i++ ) {
+            int position = rnd.nextInt(fullSize*8/10);
+            int maxRead = fullSize - position;
+            int wantRead = rnd.nextInt(maxRead);
+            final byte [] readArray = new byte[wantRead];
+            in.seek(position);
+            int read = 0;
+            while ( read  < wantRead ) {
+                read += in.read(readArray, read, wantRead-read);
+            }
+            assertEquals(wantRead, read);
+            final byte[] sampleArray = new byte[wantRead];
+            System.arraycopy(randomBlock, position, sampleArray, 0, wantRead);
+            assertArrayEquals(sampleArray, readArray);
+        }
         in.close();
         newFile.delete();
         newFile.close();

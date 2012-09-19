@@ -13,12 +13,12 @@ import com.v2soft.styxlib.library.server.vfs.IVirtualStyxFile;
  *
  */
 public class ClientsHandler 
-    implements Closeable {
+implements Closeable {
     private String mProtocol;
     private int mIOUnit;
     private Map<SocketChannel, ClientState> mClientStatesMap;
     private IVirtualStyxFile mRoot;
-    
+
     public ClientsHandler(int iounit, IVirtualStyxFile root, String protocol) throws IOException {
         mIOUnit = iounit;
         mClientStatesMap = new HashMap<SocketChannel, ClientState>();
@@ -35,22 +35,22 @@ public class ClientsHandler
     public void close() throws IOException {
     }
 
-	protected boolean readClient(SocketChannel channel) throws IOException {
-		final ClientState state = mClientStatesMap.get(channel);
-		boolean result = state.readSocket();
-		if ( result ) {
-		    removeClient(channel);
-		}
-		return result;
-	}
+    protected boolean readClient(SocketChannel channel) throws IOException {
+        final ClientState state = mClientStatesMap.get(channel);
+        boolean result = state.readSocket();
+        if ( result ) {
+            removeClient(channel);
+        }
+        return result;
+    }
 
-	
-	private void removeClient(SocketChannel channel) throws IOException {
-	    final ClientState state = mClientStatesMap.get(channel);
-	    mRoot.onConnectionClosed(state);
-    	mClientStatesMap.remove(channel);
-    	channel.close();
-	}
-    
-    
+
+    private void removeClient(SocketChannel channel) throws IOException {
+        final ClientState state = mClientStatesMap.get(channel);
+        mRoot.onConnectionClosed(state);
+        mClientStatesMap.remove(channel);
+        channel.close();
+    }
+
+
 }
