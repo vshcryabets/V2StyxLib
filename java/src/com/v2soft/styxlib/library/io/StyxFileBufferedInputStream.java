@@ -13,7 +13,7 @@ import com.v2soft.styxlib.library.core.Messenger;
  */
 public class StyxFileBufferedInputStream extends InputStream {
     private StyxUnbufferedInputStream mUnbufferedInput;
-    private BufferedInputStream mBufferedInput;
+    private CBufferedInputStream mBufferedInput;
     /**
      * @param messenger
      * @param file
@@ -24,7 +24,7 @@ public class StyxFileBufferedInputStream extends InputStream {
             long file, 
             int iounit) {
         mUnbufferedInput = new StyxUnbufferedInputStream(file, messenger, iounit);
-        mBufferedInput = new BufferedInputStream(mUnbufferedInput, iounit);
+        mBufferedInput = new CBufferedInputStream(mUnbufferedInput, iounit);
     }
     
     @Override
@@ -46,7 +46,21 @@ public class StyxFileBufferedInputStream extends InputStream {
         mBufferedInput.close();
     }
     
-    public void seek(long position) {
+    public void seek(long position) throws IOException {
+        mBufferedInput.clearBuffer();
         mUnbufferedInput.seek(position);
+    }
+    
+    private class CBufferedInputStream extends BufferedInputStream {
+
+        public CBufferedInputStream(InputStream in, int size) {
+            super(in, size);
+        }
+        
+        public void clearBuffer() {
+            count = 0;
+            pos = 0;
+        }
+        
     }
 }
