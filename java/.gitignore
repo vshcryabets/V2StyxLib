@@ -1,0 +1,11 @@
+bin
+gen
+target
+.settings
+local.properties
+libs
+build
+target/
+.idea/
+.gradle/
+*.iml
