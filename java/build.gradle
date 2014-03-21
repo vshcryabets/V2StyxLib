@@ -1,38 +1,18 @@
-apply plugin: 'java'
-
-sourceCompatibility = 1.6
-version = '1.0.0'
-jar {
-    manifest {
-        attributes 'Implementation-Title': 'V2StyxLib', 'Implementation-Version': version
-    }
-}
-
-repositories {
+buildscript {
+  repositories {
     mavenCentral()
+  }
 }
 
+allprojects {
+  group = 'com.v2soft.styxlib'
+  version = '1.0.0'
 
-dependencies {
-    testCompile 'junit:junit:4.11'
-}
+  repositories {
+    mavenCentral()
+  }
 
-sourceSets {
-    main {
-        java {
-            srcDir 'src'
-        }
-    }
-    test {
-        java {
-            srcDir 'tests'
-        }
-    }
-}
-
-test {
-    testLogging {
-        // Show that tests are run in the command-line output
-        events 'passed'
-    }
+  tasks.withType(Compile) {
+    options.encoding = "UTF-8"
+  }
 }

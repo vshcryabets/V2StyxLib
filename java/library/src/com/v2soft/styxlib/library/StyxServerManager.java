@@ -67,9 +67,10 @@ implements Closeable, StyxMessengerListener {
         mAcceptor = new ConnectionAcceptor(channel, mBalancer);
     }
 
-    public void start() {
+    public Thread start() {
         mAcceptorThread = new Thread(mAcceptor, "Acceptor");
         mAcceptorThread.start();
+        return mAcceptorThread;
     }
 
     public ActiveFids getActiveFids()

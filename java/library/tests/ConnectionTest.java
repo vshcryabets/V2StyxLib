@@ -1,4 +1,3 @@
-package com.v2soft.styxlib.junit;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
@@ -27,11 +26,12 @@ import com.v2soft.styxlib.library.messages.base.enums.FileMode;
  *
  */
 public class ConnectionTest {
+    private static final int PORT = 10234;
     private StyxClientConnection mConnection;
 
     @Before
     public void setUp() throws Exception {
-        mConnection = new StyxClientConnection(InetAddress.getByName("localhost"), 8080, false);
+        mConnection = new StyxClientConnection(InetAddress.getByName("localhost"), PORT, false);
     }
 
     @After

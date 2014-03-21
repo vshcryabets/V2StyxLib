@@ -1,13 +1,19 @@
-V2StyxLib
-=========
+import java.io.File;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.util.concurrent.TimeoutException;
 
-Java/C#/C++ implementation of Styx (9P2000) protocol
+import com.v2soft.styxlib.library.StyxServerManager;
+import com.v2soft.styxlib.library.exceptions.StyxException;
+import com.v2soft.styxlib.library.server.vfs.DiskStyxDirectory;
+import com.v2soft.styxlib.library.server.vfs.MemoryStyxDirectory;
+import com.v2soft.styxlib.library.server.vfs.MemoryStyxFile;
 
-
-How to use it in Java
-
-Java server:
-
+/**
+ * 
+ * @author V.Shcriyabets (vshcryabets@gmail.com)
+ *
+ */
 public class JavaServerTest {
 
     public static void main(String[] args) throws IOException, StyxException, InterruptedException, TimeoutException {
@@ -37,5 +43,3 @@ public class JavaServerTest {
         }
     }
 }
-
-Java client:
