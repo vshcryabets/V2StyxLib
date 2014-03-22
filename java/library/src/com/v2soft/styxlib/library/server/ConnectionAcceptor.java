@@ -9,7 +9,7 @@ import java.nio.channels.SocketChannel;
 import java.util.Iterator;
 
 /**
- * 
+ * Income connection handler class.
  * @author V.Shcriyabets (vshcryabets@gmail.com)
  *
  */

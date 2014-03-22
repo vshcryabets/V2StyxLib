@@ -41,16 +41,15 @@ implements Closeable, StyxMessengerListener {
     private StyxQID mQID;
     private long mFID = StyxMessage.NOFID;
     private ActiveFids mActiveFids = new ActiveFids();
-//    private ServerSocket mSocket;
     private ConnectionAcceptor mAcceptor;
     private ClientBalancer mBalancer;
     private Thread mAcceptorThread;
 
-    public StyxServerManager(InetAddress address, int port, boolean ssl, 
-            IVirtualStyxFile root, String protocol) throws IOException {
+    public StyxServerManager(InetAddress address, int port, boolean ssl,
+                             IVirtualStyxFile root) throws IOException {
         mPort = port;
         ServerSocketChannel channel = null;
-        if ( ssl ) {
+        if (ssl) {
             throw new RuntimeException("Not implemented");
         } else {
             channel = ServerSocketChannel.open();
@@ -62,8 +61,8 @@ implements Closeable, StyxMessengerListener {
         socket.bind(isa);
         socket.setReuseAddress(true);
         socket.setSoTimeout(mTimeout);
-        
-        mBalancer = new ClientBalancer(mIOBufSize, root, protocol);
+
+        mBalancer = new ClientBalancer(mIOBufSize, root, getProtocol());
         mAcceptor = new ConnectionAcceptor(channel, mBalancer);
     }
 
@@ -129,6 +128,10 @@ implements Closeable, StyxMessengerListener {
             mAcceptor.close();
             mAcceptorThread = null;
         }
+    }
+
+    public String getProtocol() {
+        return PROTOCOL;
     }
 
     public class ActiveFids

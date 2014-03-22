@@ -39,6 +39,10 @@ implements Closeable, StyxMessengerListener {
     public static final String PROTOCOL = "9P2000";
     public static final int DEFAULT_TIMEOUT = 10000;
     //---------------------------------------------------------------------------
+    // Interface
+    //---------------------------------------------------------------------------
+
+    //---------------------------------------------------------------------------
     // Class fields
     //---------------------------------------------------------------------------
     private StyxFile mRoot;
@@ -63,8 +67,7 @@ implements Closeable, StyxMessengerListener {
         this(null, 0, false, null, null);
     }
 
-    public StyxClientConnection(InetAddress address, int port, boolean ssl)
-    {
+    public StyxClientConnection(InetAddress address, int port, boolean ssl) {
         this(address, port, ssl, null, null);
         setConnected(false);
     }

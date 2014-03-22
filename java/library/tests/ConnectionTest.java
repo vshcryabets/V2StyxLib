@@ -1,5 +1,6 @@
 import static org.junit.Assert.*;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -15,10 +16,14 @@ import org.junit.Test;
 
 import com.v2soft.styxlib.library.StyxClientConnection;
 import com.v2soft.styxlib.library.StyxFile;
+import com.v2soft.styxlib.library.StyxServerManager;
 import com.v2soft.styxlib.library.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.library.exceptions.StyxException;
 import com.v2soft.styxlib.library.io.StyxFileBufferedInputStream;
 import com.v2soft.styxlib.library.messages.base.enums.FileMode;
+import com.v2soft.styxlib.library.server.vfs.DiskStyxDirectory;
+import com.v2soft.styxlib.library.server.vfs.MemoryStyxDirectory;
+import com.v2soft.styxlib.library.server.vfs.MemoryStyxFile;
 
 /**
  * Client JUnit tests
@@ -28,10 +33,31 @@ import com.v2soft.styxlib.library.messages.base.enums.FileMode;
 public class ConnectionTest {
     private static final int PORT = 10234;
     private StyxClientConnection mConnection;
+    private StyxServerManager mServer;
+    private Thread mServerThread;
 
     @Before
     public void setUp() throws Exception {
+        startServer();
         mConnection = new StyxClientConnection(InetAddress.getByName("localhost"), PORT, false);
+    }
+
+    @After
+    public void shutDown() throws InterruptedException {
+        mServer.close();
+        mServerThread.join();
+    }
+
+    private void startServer() throws IOException {
+        File testDirectory = new File("./test");
+        if ( !testDirectory.exists() ) {
+            testDirectory.mkdirs();
+        }
+        mServer = new StyxServerManager(InetAddress.getByName("127.0.0.1"),
+                PORT,
+                false,
+                new DiskStyxDirectory(testDirectory));
+        mServerThread = mServer.start();
     }
 
     @After
@@ -262,5 +288,10 @@ public class ConnectionTest {
         newFile.delete();
         newFile.close();
         mConnection.close();
+    }
+
+    @Test
+    public void testConnectAsync() {
+        // TODO write test
     }
 }
