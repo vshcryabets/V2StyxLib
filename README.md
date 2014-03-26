@@ -8,7 +8,7 @@ How to use it in Java
 
 Java server:
 
-‘’’
+```java
 /**
  * Java server that calculate MD5 digest.
  * @author V.Shcriyabets (vshcryabets@gmail.com)
@@ -69,10 +69,10 @@ public class JavaServerSample {
         mServer.start().join();
     }
 }
-'''
+```
 
 Java client sample:
-‘’’
+```java
         StyxClientConnection mConnection = new StyxClientConnection(InetAddress.getByName("127.0.0.1"), PORT, false);
         mConnection.connect();
         final StyxFile newFile = new StyxFile(mConnection, FILE_NAME);
@@ -85,4 +85,4 @@ Java client sample:
         output.close();
         input.close();
         mConnection.close();
-‘’’
+```
