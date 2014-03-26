@@ -97,22 +97,8 @@ public abstract class UDPAbstractDiscoveryClient extends DiscoveryClient {
         @Override
         public void run() {
             isWorking = true;
-            // start receiver thread
-            mReceiverThread = new Thread(mBackgroundReceiver,
-                    UDPAbstractDiscoveryClient.class.getSimpleName()+"R");
-            mReceiverThread.start();
-
             startDiscoverySync();
-            isWorking = false;
-            if ( mReceiverThread.isAlive() ) {
-                try {
-                    mReceiverThread.join();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
             mSenderThread = null;
-            mReceiverThread = null;
             if ( mListener != null ) {
                 mListener.onDiscoveryFinished();
             }
@@ -142,6 +128,11 @@ public abstract class UDPAbstractDiscoveryClient extends DiscoveryClient {
 
     public void startDiscoverySync() {
         isWorking = true;
+        // start receiver thread
+        mReceiverThread = new Thread(mBackgroundReceiver,
+                UDPAbstractDiscoveryClient.class.getSimpleName()+"R");
+        mReceiverThread.start();
+
         int count = getRetryCount();
         try {
             mSocket = new DatagramSocket();
@@ -170,5 +161,14 @@ public abstract class UDPAbstractDiscoveryClient extends DiscoveryClient {
         } finally {
             mSocket.close();
         }
+        isWorking = false;
+        if ( mReceiverThread.isAlive() ) {
+            try {
+                mReceiverThread.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        mReceiverThread = null;
     }
 }

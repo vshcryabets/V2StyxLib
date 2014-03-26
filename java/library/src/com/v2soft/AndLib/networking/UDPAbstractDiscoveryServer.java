@@ -66,8 +66,9 @@ public abstract class UDPAbstractDiscoveryServer extends DiscoveryServer impleme
                     handleIncomePacket(mSocket, packet);
                     Thread.sleep(100);
                 } catch (IOException e) {
-                    e.printStackTrace();
+//                    e.printStackTrace();
                     if ( mSocket.isClosed() ) {
+                        mSocket = null;
                         break;
                     }
                 } catch (InterruptedException e) {

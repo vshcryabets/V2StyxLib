@@ -93,7 +93,7 @@ public class DiscoveryServiceTests {
             }
             @Override
             protected void handleAnswer(DatagramPacket income) {
-                String answer = new String(income.getData());
+                String answer = new String(income.getData(), 0, income.getLength());
                 assertEquals("Wrong answer", answerStr, answer);
                 discoveredServicersCount[0]++;
             }
@@ -104,7 +104,7 @@ public class DiscoveryServiceTests {
 
             @Override
             public int getDelayBetweenRetry() {
-                return 500;
+                return 1500;
             }
         };
         explorer.startDiscoverySync();
