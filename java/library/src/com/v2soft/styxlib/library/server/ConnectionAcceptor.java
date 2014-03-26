@@ -46,7 +46,13 @@ public class ConnectionAcceptor implements Runnable, Closeable {
 
             while ( isWorking ) {
                 try {
+                    if ( !mSelector.isOpen() ) {
+                        break;
+                    }
                     mSelector.select();
+                    if ( !mSelector.isOpen() ) {
+                        break;
+                    }
                     Iterator<SelectionKey> iterator = mSelector.selectedKeys().iterator();
                     while ( iterator.hasNext() ) {
                         SelectionKey key = iterator.next();

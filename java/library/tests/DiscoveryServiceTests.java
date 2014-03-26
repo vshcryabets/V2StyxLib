@@ -108,9 +108,7 @@ public class DiscoveryServiceTests {
             }
         };
         explorer.startDiscoverySync();
-        assertTrue("Can't discover server", discoveredServicersCount[0] > 0 );
-
-        // check answer from server
+        assertEquals("Wrong number of discovered servers", 1, discoveredServicersCount[0] );
 
         server.close();
     }

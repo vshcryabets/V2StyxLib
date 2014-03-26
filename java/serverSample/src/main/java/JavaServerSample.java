@@ -1,14 +1,18 @@
-V2StyxLib
-=========
+import com.v2soft.styxlib.library.StyxServerManager;
+import com.v2soft.styxlib.library.exceptions.StyxErrorMessageException;
+import com.v2soft.styxlib.library.exceptions.StyxException;
+import com.v2soft.styxlib.library.server.ClientState;
+import com.v2soft.styxlib.library.server.vfs.MemoryStyxDirectory;
+import com.v2soft.styxlib.library.server.vfs.MemoryStyxFile;
+import com.v2soft.styxlib.library.types.ULong;
 
-Java/C#/C++ implementation of Styx (9P2000) protocol
+import java.io.IOException;
+import java.net.InetAddress;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.HashMap;
+import java.util.concurrent.TimeoutException;
 
-
-How to use it in Java
-
-Java server:
-
-‘’’java
 /**
  * Java server that calculate MD5 digest.
  * @author V.Shcriyabets (vshcryabets@gmail.com)
@@ -62,27 +66,10 @@ public class JavaServerSample {
         };
         MemoryStyxDirectory root = new MemoryStyxDirectory("root");
         root.addFile(md5);
-        StyxServerManager mServer = new StyxServerManager(InetAddress.getByName(“localhost”),
+        StyxServerManager mServer = new StyxServerManager(InetAddress.getByName("127.0.0.1"),
                 PORT,
                 false,
                 root);
         mServer.start().join();
     }
 }
-'''
-
-Java client sample:
-‘’’java
-        StyxClientConnection mConnection = new StyxClientConnection(InetAddress.getByName("127.0.0.1"), PORT, false);
-        mConnection.connect();
-        final StyxFile newFile = new StyxFile(mConnection, FILE_NAME);
-        OutputStream output = newFile.openForWrite();
-        InputStream input = newFile.openForRead();
-        output.write(someData);
-        output.flush();
-        byte [] remoteHash = new byte[16];
-        int read = input.read(remoteHash);
-        output.close();
-        input.close();
-        mConnection.close();
-‘’’
