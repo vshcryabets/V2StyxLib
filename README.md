@@ -8,6 +8,8 @@ How to use it in Java
 
 Java server:
 
+'''
+java
 public class JavaServerTest {
 
     public static void main(String[] args) throws IOException, StyxException, InterruptedException, TimeoutException {
@@ -37,5 +39,6 @@ public class JavaServerTest {
         }
     }
 }
+'''
 
-Java client:
+Java client sample:
