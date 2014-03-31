@@ -3,6 +3,7 @@ import com.v2soft.styxlib.library.StyxFile;
 import com.v2soft.styxlib.library.StyxServerManager;
 import com.v2soft.styxlib.library.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.library.exceptions.StyxException;
+import com.v2soft.styxlib.library.io.DualStreams;
 import com.v2soft.styxlib.library.io.StyxFileBufferedInputStream;
 import com.v2soft.styxlib.library.messages.base.enums.FileMode;
 import com.v2soft.styxlib.library.server.ClientState;
@@ -124,14 +125,11 @@ public class ClientServerTest {
 
         assertTrue(mConnection.connect()); // mConnection.connect();
         final StyxFile newFile = new StyxFile(mConnection, FILE_NAME);
-        // newFile.openForReadAndWrite()
-        OutputStream output = newFile.openForWrite();
-        InputStream input = newFile.openForRead();
-        output.write(someData);
-        output.flush();
-        int read = input.read(remoteHash);
-        output.close();
-        input.close();
+        DualStreams streams = newFile.openForReadAndWrite();
+        streams.output.write(someData);
+        streams.output.flush();
+        int read = streams.input.read(remoteHash);
+        streams.close();
         mConnection.close();
 
         assertEquals("Wrong remote hash size", 16, read);

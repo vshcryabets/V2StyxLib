@@ -13,6 +13,7 @@ import java.util.concurrent.TimeoutException;
 import com.v2soft.styxlib.library.core.Messenger;
 import com.v2soft.styxlib.library.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.library.exceptions.StyxException;
+import com.v2soft.styxlib.library.io.DualStreams;
 import com.v2soft.styxlib.library.io.StyxDataInputStream;
 import com.v2soft.styxlib.library.io.StyxFileBufferedInputStream;
 import com.v2soft.styxlib.library.io.StyxFileBufferedOutputStream;
@@ -218,6 +219,14 @@ public class StyxFile implements Closeable {
         return files.toArray(new StyxFile[0]);
             }
 
+    /**
+     * Open input stream to this file.
+     * @return
+     * @throws InterruptedException
+     * @throws StyxException
+     * @throws TimeoutException
+     * @throws IOException
+     */
     public StyxFileBufferedInputStream openForRead() 
             throws InterruptedException, StyxException, TimeoutException, IOException {
         if ( !mManager.isConnected()) {
@@ -227,6 +236,15 @@ public class StyxFile implements Closeable {
         int iounit = open(ModeType.OREAD, tempFID);
         return new StyxFileBufferedInputStream(mMessenger, tempFID, iounit);
     }
+
+    /**
+     * Open both streams - input and output.
+     * @return
+     */
+    public DualStreams openForReadAndWrite() throws InterruptedException, StyxException, TimeoutException, IOException {
+        return new DualStreams(openForRead(), openForWrite());
+    }
+
 
     public OutputStream openForWrite() 
             throws InterruptedException, StyxException, TimeoutException, IOException {
@@ -502,5 +520,4 @@ public class StyxFile implements Closeable {
     public void setTimeout(long mTimeout) {
         this.mTimeout = mTimeout;
     }
-
 }

@@ -16,9 +16,8 @@ public class StyxFileBufferedInputStream extends InputStream {
     private CBufferedInputStream mBufferedInput;
     /**
      * @param messenger
-     * @param file
-     * @param iounit
-     * @param autocloseFile close StyxFile object with this stream
+     * @param file styx file id.
+     * @param iounit maximal block size.
      */
     public StyxFileBufferedInputStream(Messenger messenger, 
             long file, 
