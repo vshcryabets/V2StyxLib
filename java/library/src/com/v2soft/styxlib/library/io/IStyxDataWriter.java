@@ -14,4 +14,5 @@ public interface IStyxDataWriter {
     int write(byte[] data, int offset, int count);
     void clear();
     void limit(int limit);
+    java.nio.ByteBuffer getBuffer();
 }

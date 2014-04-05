@@ -1,5 +1,20 @@
 package com.v2soft.styxlib.library.core;
 
+import com.v2soft.styxlib.ILogListener;
+import com.v2soft.styxlib.library.Consts;
+import com.v2soft.styxlib.library.exceptions.StyxException;
+import com.v2soft.styxlib.library.io.IStyxBuffer;
+import com.v2soft.styxlib.library.io.IStyxDataWriter;
+import com.v2soft.styxlib.library.io.StyxByteBufferReadable;
+import com.v2soft.styxlib.library.io.StyxDataReader;
+import com.v2soft.styxlib.library.io.StyxDataWriter;
+import com.v2soft.styxlib.library.messages.base.StyxMessage;
+import com.v2soft.styxlib.library.messages.base.StyxTMessage;
+import com.v2soft.styxlib.library.messages.base.StyxTMessageFID;
+import com.v2soft.styxlib.library.messages.base.enums.MessageType;
+import com.v2soft.styxlib.library.types.ObjectsPoll;
+import com.v2soft.styxlib.library.types.ObjectsPoll.ObjectsPollFactory;
+
 import java.io.Closeable;
 import java.io.IOException;
 import java.net.SocketException;
@@ -11,19 +26,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
-import com.v2soft.styxlib.Config;
-import com.v2soft.styxlib.library.Consts;
-import com.v2soft.styxlib.library.exceptions.StyxException;
-import com.v2soft.styxlib.library.io.StyxByteBufferReadable;
-import com.v2soft.styxlib.library.io.StyxByteBufferWriteable;
-import com.v2soft.styxlib.library.messages.base.StyxMessage;
-import com.v2soft.styxlib.library.messages.base.StyxTMessage;
-import com.v2soft.styxlib.library.messages.base.StyxTMessageFID;
-import com.v2soft.styxlib.library.messages.base.enums.MessageType;
-import com.v2soft.styxlib.library.types.ObjectsPoll;
-import com.v2soft.styxlib.library.types.ObjectsPoll.ObjectsPollFactory;
-
-public class Messenger implements Runnable, Closeable, ObjectsPollFactory<StyxByteBufferWriteable> {
+public class Messenger implements Runnable, Closeable, ObjectsPollFactory<IStyxDataWriter> {
     public interface StyxMessengerListener {
         void onSocketDisconected();
         void onTrashReceived();
@@ -37,15 +40,18 @@ public class Messenger implements Runnable, Closeable, ObjectsPollFactory<StyxBy
     private boolean isWorking;
     private int mIOBufferSize;
     private int mTransmitedCount, mReceivedCount, mErrorCount, mBuffersAllocated;
-    private ObjectsPoll<StyxByteBufferWriteable> mBufferPoll;
+    private ObjectsPoll<IStyxDataWriter> mBufferPoll;
+    protected ILogListener mLogListener;
 
-    public Messenger(SocketChannel socket, int io_unit, StyxMessengerListener listener) 
+    public Messenger(SocketChannel socket, int io_unit, StyxMessengerListener listener,
+                     ILogListener logListener)
             throws IOException {
+        mLogListener = logListener;
         resetStatistics();
         mIOBufferSize = io_unit;
         mSocketChannel = socket;
         mListener = listener;
-        mBufferPoll = new ObjectsPoll<StyxByteBufferWriteable>(this);
+        mBufferPoll = new ObjectsPoll<IStyxDataWriter>(this);
         mThread = new Thread(this);
         mThread.start();        
     }
@@ -64,8 +70,8 @@ public class Messenger implements Runnable, Closeable, ObjectsPollFactory<StyxBy
      */
     public boolean send(StyxTMessage message) throws IOException {
         try {
-            if ( Config.LOG_TMESSAGES) {
-                System.out.println("Send message "+message.toString());
+            if ( mLogListener != null ) {
+                mLogListener.onSendMessage(message);
             }
             if ( !mSocketChannel.isConnected()) throw new IOException("Not connected to server");
 
@@ -76,7 +82,7 @@ public class Messenger implements Runnable, Closeable, ObjectsPollFactory<StyxBy
             message.setTag((short) tag);
             mMessages.put(tag, message);
 
-            StyxByteBufferWriteable buffer = mBufferPoll.get();
+            IStyxDataWriter buffer = mBufferPoll.get();
             message.writeToBuffer(buffer);
             final ByteBuffer inbuf = buffer.getBuffer();
             inbuf.flip();
@@ -93,6 +99,7 @@ public class Messenger implements Runnable, Closeable, ObjectsPollFactory<StyxBy
     public void run() {
         try {
             final StyxByteBufferReadable buffer = new StyxByteBufferReadable(mIOBufferSize*2);
+            final StyxDataReader reader = new StyxDataReader(buffer);
             isWorking = true;
             while (isWorking) {
                 if (Thread.interrupted()) break;
@@ -103,11 +110,11 @@ public class Messenger implements Runnable, Closeable, ObjectsPollFactory<StyxBy
                         // try to decode
                         final int inBuffer = buffer.remainsToRead();
                         if ( inBuffer > 4 ) {
-                            final long packetSize = buffer.getUInt32();
+                            final long packetSize = reader.getUInt32();
                             if ( inBuffer >= packetSize ) {
-                                final StyxMessage message = StyxMessage.factory(buffer, mIOBufferSize);
-                                if ( Config.LOG_RMESSAGES) {
-                                    System.out.println("Got message "+message.toString());
+                                final StyxMessage message = StyxMessage.factory(reader, mIOBufferSize);
+                                if ( mLogListener != null ) {
+                                    mLogListener.onMessageReceived(message);
                                 }
                                 mReceivedCount++;
                                 processIncomingMessage(message);
@@ -188,7 +195,6 @@ public class Messenger implements Runnable, Closeable, ObjectsPollFactory<StyxBy
     public StyxMessengerListener getListener() {
         return mListener;
     }
-
     public void setListener(StyxMessengerListener mListener) {
         this.mListener = mListener;
     }
@@ -199,9 +205,9 @@ public class Messenger implements Runnable, Closeable, ObjectsPollFactory<StyxBy
     public int getAllocationCount() {return mBuffersAllocated;}
 
     @Override
-    public StyxByteBufferWriteable create() {
+    public IStyxDataWriter create() {
         mBuffersAllocated++;
-        return new StyxByteBufferWriteable(mIOBufferSize);
+        return new StyxDataWriter(ByteBuffer.allocateDirect(mIOBufferSize));
     }
 
 }

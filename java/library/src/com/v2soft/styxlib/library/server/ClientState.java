@@ -3,14 +3,17 @@ package com.v2soft.styxlib.library.server;
 import java.io.Closeable;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
 import com.v2soft.styxlib.library.exceptions.StyxErrorMessageException;
+import com.v2soft.styxlib.library.io.IStyxBuffer;
 import com.v2soft.styxlib.library.io.StyxByteBufferReadable;
-import com.v2soft.styxlib.library.io.StyxByteBufferWriteable;
+import com.v2soft.styxlib.library.io.StyxDataReader;
+import com.v2soft.styxlib.library.io.StyxDataWriter;
 import com.v2soft.styxlib.library.messages.StyxRAttachMessage;
 import com.v2soft.styxlib.library.messages.StyxRAuthMessage;
 import com.v2soft.styxlib.library.messages.StyxRErrorMessage;
@@ -44,9 +47,10 @@ implements Closeable {
     private String mUserName;
     private String mProtocol;
     private StyxByteBufferReadable mBuffer;
+    protected StyxDataReader mReader;
     private int mIOUnit;
     private SocketChannel mChannel;
-    private StyxByteBufferWriteable mOutputBuffer;
+    private ByteBuffer mOutputBuffer;
     private IVirtualStyxFile mServerRoot;
     private IVirtualStyxFile mClientRoot;
     private HashMap<Long, IVirtualStyxFile> mAssignedFiles;
@@ -60,7 +64,8 @@ implements Closeable {
         if ( protocol == null ) throw new NullPointerException("Protocol is null");
         mIOUnit = iounit;
         mBuffer = new StyxByteBufferReadable(iounit*2);
-        mOutputBuffer = new StyxByteBufferWriteable(iounit);
+        mReader = new StyxDataReader(mBuffer);
+        mOutputBuffer = ByteBuffer.allocate(iounit);
         mChannel = channel;
         mServerRoot = root;
         mAssignedFiles = new HashMap<Long, IVirtualStyxFile>();
@@ -76,9 +81,9 @@ implements Closeable {
     private boolean process() throws IOException {
         int inBuffer = mBuffer.remainsToRead();
         if ( inBuffer > 4 ) {
-            long packetSize = mBuffer.getUInt32();
+            long packetSize = mReader.getUInt32();
             if ( inBuffer >= packetSize ) {
-                final StyxMessage message = StyxMessage.factory(mBuffer, mIOUnit);
+                final StyxMessage message = StyxMessage.factory(mReader, mIOUnit);
                 processMessage(message);
                 return true;
             }
@@ -266,7 +271,7 @@ implements Closeable {
         if ( file.open(this, msg.getMode()) ) {
             return new StyxROpenMessage(msg.getTag(), file.getQID(), mIOUnit-24, false ); // TODO magic number
         } else {
-            StyxErrorMessageException.doException("Incorrect mode for specified file");
+            StyxErrorMessageException.doException("Not supported mode for specified file");
             return null;
         }
     }
@@ -294,18 +299,6 @@ implements Closeable {
         }
     }
 
-    /**
-     * 
-     * @param tag message tag
-     * @param fid File ID
-     * @return new Rerror message
-     * @throws StyxErrorMessageException 
-     */
-    //    private StyxRErrorMessage getNoFIDError(StyxMessage message, long fid) throws StyxErrorMessageException {
-    //        
-    //        return null;
-    //    }
-
     private void registerOpenedFile(long fid, IVirtualStyxFile file) {
         mAssignedFiles.put(fid, file);
     }
@@ -316,9 +309,9 @@ implements Closeable {
      * @throws IOException
      */
     private void sendMessage(StyxMessage answer) throws IOException {
-        answer.writeToBuffer(mOutputBuffer);
-        mOutputBuffer.getBuffer().position(0);
-        mChannel.write(mOutputBuffer.getBuffer());
+        answer.writeToBuffer(new StyxDataWriter(mOutputBuffer));
+        mOutputBuffer.position(0);
+        mChannel.write(mOutputBuffer);
     }
 
     @Override

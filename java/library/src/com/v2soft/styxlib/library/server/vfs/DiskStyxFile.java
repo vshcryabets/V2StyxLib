@@ -1,16 +1,16 @@
 package com.v2soft.styxlib.library.server.vfs;
 
+import com.v2soft.styxlib.library.exceptions.StyxErrorMessageException;
+import com.v2soft.styxlib.library.messages.base.enums.ModeType;
+import com.v2soft.styxlib.library.server.ClientState;
+import com.v2soft.styxlib.library.types.ULong;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-
-import com.v2soft.styxlib.library.exceptions.StyxErrorMessageException;
-import com.v2soft.styxlib.library.messages.base.enums.ModeType;
-import com.v2soft.styxlib.library.server.ClientState;
-import com.v2soft.styxlib.library.types.ULong;
 
 /**
  * Disk file representation

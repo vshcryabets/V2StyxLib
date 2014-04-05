@@ -11,6 +11,7 @@ import java.security.InvalidParameterException;
 import java.util.LinkedList;
 import java.util.concurrent.TimeoutException;
 
+import com.v2soft.styxlib.ILogListener;
 import com.v2soft.styxlib.library.core.Messenger;
 import com.v2soft.styxlib.library.core.Messenger.StyxMessengerListener;
 import com.v2soft.styxlib.library.exceptions.StyxErrorMessageException;
@@ -116,7 +117,7 @@ implements Closeable, StyxMessengerListener {
         channel.configureBlocking(true);
         Socket socket = channel.socket();
         socket.setSoTimeout(mTimeout);
-        mMessenger = new Messenger(channel, mIOBufSize, this);
+        mMessenger = new Messenger(channel, mIOBufSize, this, getLogListener());
 
         sendVersionMessage();
         setConnected(socket.isConnected());
@@ -230,9 +231,11 @@ implements Closeable, StyxMessengerListener {
         mMessenger.send(tRemove);
         StyxMessage rMessage = tRemove.waitForAnswer(mTimeout);
         StyxErrorMessageException.doException(rMessage);
-    }    
+    }
+
     /**
      * Restart session with server
+     *
      * @throws InterruptedException
      * @throws StyxException
      * @throws IOException
@@ -241,7 +244,7 @@ implements Closeable, StyxMessengerListener {
     public void sendVersionMessage()
             throws InterruptedException, StyxException, IOException, TimeoutException {
         // release atached FID
-        if ( mFID != StyxMessage.NOFID ) {
+        if (mFID != StyxMessage.NOFID) {
             try {
                 clunk(mFID);
             } catch (Exception e) {
@@ -250,14 +253,14 @@ implements Closeable, StyxMessengerListener {
             mFID = StyxMessage.NOFID;
         }
 
-        StyxTVersionMessage tVersion = new StyxTVersionMessage(mIOBufSize,PROTOCOL);
+        StyxTVersionMessage tVersion = new StyxTVersionMessage(mIOBufSize, getProtocol());
         mMessenger.send(tVersion);
 
         StyxMessage rMessage = tVersion.waitForAnswer(mTimeout);
         StyxErrorMessageException.doException(rMessage);
-        StyxRVersionMessage rVersion = (StyxRVersionMessage)rMessage;
+        StyxRVersionMessage rVersion = (StyxRVersionMessage) rMessage;
         if (rVersion.getMaxPacketSize() < mIOBufSize)
-            mIOBufSize = (int)rVersion.getMaxPacketSize();
+            mIOBufSize = (int) rVersion.getMaxPacketSize();
         mActiveFids.clean();
         if (isNeedAuth())
             sendAuthMessage();
@@ -309,6 +312,14 @@ implements Closeable, StyxMessengerListener {
             mMessenger.close();
             mMessenger = null;
         }
+    }
+
+    public ILogListener getLogListener() {
+        return null;
+    }
+
+    public String getProtocol() {
+        return PROTOCOL;
     }
 
     public class ActiveFids

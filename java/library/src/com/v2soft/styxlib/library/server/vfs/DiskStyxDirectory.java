@@ -1,5 +1,15 @@
 package com.v2soft.styxlib.library.server.vfs;
 
+import com.v2soft.styxlib.library.exceptions.StyxErrorMessageException;
+import com.v2soft.styxlib.library.io.StyxDataWriter;
+import com.v2soft.styxlib.library.messages.base.enums.FileMode;
+import com.v2soft.styxlib.library.messages.base.enums.ModeType;
+import com.v2soft.styxlib.library.messages.base.enums.QIDType;
+import com.v2soft.styxlib.library.messages.base.structs.StyxQID;
+import com.v2soft.styxlib.library.messages.base.structs.StyxStat;
+import com.v2soft.styxlib.library.server.ClientState;
+import com.v2soft.styxlib.library.types.ULong;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -11,16 +21,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
-import com.v2soft.styxlib.library.exceptions.StyxErrorMessageException;
-import com.v2soft.styxlib.library.io.StyxByteBufferWriteable;
-import com.v2soft.styxlib.library.messages.base.enums.FileMode;
-import com.v2soft.styxlib.library.messages.base.enums.ModeType;
-import com.v2soft.styxlib.library.messages.base.enums.QIDType;
-import com.v2soft.styxlib.library.messages.base.structs.StyxQID;
-import com.v2soft.styxlib.library.messages.base.structs.StyxStat;
-import com.v2soft.styxlib.library.server.ClientState;
-import com.v2soft.styxlib.library.types.ULong;
-
 /**
  * Disk directory
  * @author vshcryabets@gmail.com
@@ -28,7 +28,7 @@ import com.v2soft.styxlib.library.types.ULong;
  */
 public class DiskStyxDirectory
 extends DiskStyxFile {
-    private Map<ClientState, StyxByteBufferWriteable> mBuffersMap;
+    private Map<ClientState, ByteBuffer> mBuffersMap;
     protected Vector<IVirtualStyxFile> mFiles;
     protected List<IVirtualStyxFile> mDirectoryFiles;
 
@@ -37,7 +37,7 @@ extends DiskStyxFile {
         mQID.setType(QIDType.QTDIR);
         mFiles = new Vector<IVirtualStyxFile>();
         mDirectoryFiles = new ArrayList<IVirtualStyxFile>();
-        mBuffersMap = new HashMap<ClientState, StyxByteBufferWriteable>();
+        mBuffersMap = new HashMap<ClientState, ByteBuffer>();
     }
 
     @Override
@@ -103,9 +103,9 @@ extends DiskStyxFile {
             }
 
             // allocate buffer
-            final StyxByteBufferWriteable buffer = new StyxByteBufferWriteable(size);
+            final ByteBuffer buffer = ByteBuffer.allocate(size);
             for (StyxStat state : stats) {
-                state.writeBinaryTo(buffer);
+                state.writeBinaryTo(new StyxDataWriter(buffer));
             }
             mBuffersMap.put(client, buffer);
             return true;
@@ -118,7 +118,7 @@ extends DiskStyxFile {
         if ( !mBuffersMap.containsKey(client)) {
             throw StyxErrorMessageException.newInstance("This file isn't open");
         }
-        final ByteBuffer buffer = mBuffersMap.get(client).getBuffer();
+        final ByteBuffer buffer = mBuffersMap.get(client);
         int boffset = buffer.limit();
         if ( offset.asLong() > boffset ) return 0;
         buffer.position((int) offset.asLong());

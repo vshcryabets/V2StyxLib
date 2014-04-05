@@ -1,3 +1,5 @@
+package com.v2soft.styxlib.tests;
+
 import com.v2soft.AndLib.networking.DiscoveryClient;
 import com.v2soft.AndLib.networking.DiscoveryServer;
 import com.v2soft.AndLib.networking.UDPAbstractDiscoveryClient;

@@ -1,11 +1,5 @@
 package com.v2soft.styxlib.library.server.vfs;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-
 import com.v2soft.styxlib.library.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.library.messages.base.enums.ModeType;
 import com.v2soft.styxlib.library.messages.base.enums.QIDType;
@@ -13,6 +7,12 @@ import com.v2soft.styxlib.library.messages.base.structs.StyxQID;
 import com.v2soft.styxlib.library.messages.base.structs.StyxStat;
 import com.v2soft.styxlib.library.server.ClientState;
 import com.v2soft.styxlib.library.types.ULong;
+
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * In-Memory file

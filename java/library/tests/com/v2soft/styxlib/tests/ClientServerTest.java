@@ -1,3 +1,5 @@
+package com.v2soft.styxlib.tests;
+
 import com.v2soft.styxlib.library.StyxClientConnection;
 import com.v2soft.styxlib.library.StyxFile;
 import com.v2soft.styxlib.library.StyxServerManager;
