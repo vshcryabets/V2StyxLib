@@ -18,7 +18,9 @@ import java.net.NetworkInterface;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 import java.util.UUID;
 
 import static org.junit.Assert.assertArrayEquals;
@@ -88,6 +90,8 @@ public class DiscoveryServiceTests {
         DiscoveryClient explorer = new UDPAbstractDiscoveryClient(PORT,
                 listOfBroadcasts.toArray(new InetAddress[listOfBroadcasts.size()])
                 ) {
+            private Set<String> mCodes = new HashSet<String>();
+
             @Override
             protected DatagramPacket prepareRequest() {
                 DatagramPacket requestPacket = new DatagramPacket(request, request.length);
@@ -97,7 +101,10 @@ public class DiscoveryServiceTests {
             protected void handleAnswer(DatagramPacket income) {
                 String answer = new String(income.getData(), 0, income.getLength());
                 assertEquals("Wrong answer", answerStr, answer);
-                discoveredServicersCount[0]++;
+                if ( !mCodes.contains(answer )) {
+                    discoveredServicersCount[0]++;
+                    mCodes.add(answer);
+                }
             }
             @Override
             public int getRetryCount() {

@@ -322,6 +322,12 @@ implements Closeable, StyxMessengerListener {
         return PROTOCOL;
     }
 
+    public void checkConnection() throws IOException {
+        if ( !isConnected()) {
+            throw new IOException("Not connected to server");
+        }
+    }
+
     public class ActiveFids
     {
         private LinkedList<Long> mAvailableFids = new LinkedList<Long>();

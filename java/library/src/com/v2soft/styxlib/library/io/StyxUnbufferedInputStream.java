@@ -26,13 +26,13 @@ public class StyxUnbufferedInputStream extends InputStream {
     private ULong mFileOffset = ULong.ZERO;
     private int mIOUnitSize;
 
-    StyxUnbufferedInputStream(long file, Messenger messnger, int iounit) {
-        if ( messnger == null ) {
-            throw new NullPointerException("messnger is null");
+    public StyxUnbufferedInputStream(long file, Messenger messenger, int iounit) {
+        if ( messenger == null ) {
+            throw new NullPointerException("messenger is null");
         }
         mIOUnitSize = iounit;
         mFile = file;
-        mMessenger = messnger;
+        mMessenger = messenger;
     }
 
     public long getTimeout() {
@@ -48,7 +48,7 @@ public class StyxUnbufferedInputStream extends InputStream {
         if ( len > mIOUnitSize ) {
             len = mIOUnitSize;
         }
-        int readed = 0;
+        int read = 0;
         try {
             // send Tread
             final StyxTReadMessage tRead = new StyxTReadMessage(mFile, mFileOffset, len);
@@ -57,17 +57,17 @@ public class StyxUnbufferedInputStream extends InputStream {
             StyxErrorMessageException.doException(rMessage);
 
             final StyxRReadMessage rRead = (StyxRReadMessage) rMessage;
-            readed = rRead.getDataLength();
-            if ( readed > 0 ) {
-                System.arraycopy(rRead.getDataBuffer(), 0, b, 0, readed);
-                mFileOffset = mFileOffset.add(readed);
+            read = rRead.getDataLength();
+            if ( read > 0 ) {
+                System.arraycopy(rRead.getDataBuffer(), 0, b, 0, read);
+                mFileOffset = mFileOffset.add(read);
             } else {
-                readed = -1;
+                read = -1;
             }
         } catch (Exception e) {
             throw new IOException(e);
         }
-        return readed;
+        return read;
     }
     @Override
     public int read(byte[] b) throws IOException {

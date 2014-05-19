@@ -25,7 +25,7 @@ public class StyxUnbufferedOutputStream extends OutputStream {
     private Messenger mMessenger;
     private ULong mFileOffset = ULong.ZERO;
 
-    StyxUnbufferedOutputStream(long fid, Messenger messnger) {
+    public StyxUnbufferedOutputStream(long fid, Messenger messnger) {
         if ( messnger == null ) throw new NullPointerException("messnger is null");
 
         mFID = fid;
@@ -44,7 +44,6 @@ public class StyxUnbufferedOutputStream extends OutputStream {
             mMessenger.send(tWrite);
             final StyxMessage rMessage = tWrite.waitForAnswer(mTimeout);
             StyxErrorMessageException.doException(rMessage);
-
             final StyxRWriteMessage rWrite = (StyxRWriteMessage) rMessage;
             mFileOffset = mFileOffset.add(rWrite.getCount());
         } catch (Exception e) {

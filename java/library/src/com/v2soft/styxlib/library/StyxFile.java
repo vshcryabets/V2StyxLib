@@ -1,5 +1,6 @@
 package com.v2soft.styxlib.library;
 
+import java.io.BufferedOutputStream;
 import java.io.Closeable;
 import java.io.EOFException;
 import java.io.FileNotFoundException;
@@ -16,7 +17,8 @@ import com.v2soft.styxlib.library.exceptions.StyxException;
 import com.v2soft.styxlib.library.io.DualStreams;
 import com.v2soft.styxlib.library.io.StyxDataInputStream;
 import com.v2soft.styxlib.library.io.StyxFileBufferedInputStream;
-import com.v2soft.styxlib.library.io.StyxFileBufferedOutputStream;
+import com.v2soft.styxlib.library.io.StyxUnbufferedInputStream;
+import com.v2soft.styxlib.library.io.StyxUnbufferedOutputStream;
 import com.v2soft.styxlib.library.messages.StyxROpenMessage;
 import com.v2soft.styxlib.library.messages.StyxRStatMessage;
 import com.v2soft.styxlib.library.messages.StyxRWalkMessage;
@@ -229,13 +231,23 @@ public class StyxFile implements Closeable {
      */
     public StyxFileBufferedInputStream openForRead() 
             throws InterruptedException, StyxException, TimeoutException, IOException {
-        if ( !mManager.isConnected()) {
-            throw new IOException("Not connected to server");
-        }
+        mManager.checkConnection();
         long tempFID = sendWalkMessage(getFID(), "");
         int iounit = open(ModeType.OREAD, tempFID);
         return new StyxFileBufferedInputStream(mMessenger, tempFID, iounit);
     }
+
+    /**
+     * Get unbuffered input stream to this file.
+     * @return
+     */
+    public InputStream openForReadUnbuffered() throws IOException, InterruptedException, TimeoutException, StyxException {
+        mManager.checkConnection();
+        long tempFID = sendWalkMessage(getFID(), "");
+        int iounit = open(ModeType.OREAD, tempFID);
+        return new StyxUnbufferedInputStream(tempFID, mMessenger, iounit);
+    }
+
 
     /**
      * Open both streams - input and output.
@@ -245,22 +257,27 @@ public class StyxFile implements Closeable {
         return new DualStreams(openForRead(), openForWrite());
     }
 
+    public OutputStream openForWrite()
 
-    public OutputStream openForWrite() 
             throws InterruptedException, StyxException, TimeoutException, IOException {
-        if ( !mManager.isConnected()) {
-            throw new IOException("Not connected to server");
-        }
+        mManager.checkConnection();
         long tempFID = sendWalkMessage(getFID(), "");
         int iounit = open(ModeType.OWRITE, tempFID);
-        return new StyxFileBufferedOutputStream(mMessenger, tempFID, iounit);
+        return new BufferedOutputStream(new StyxUnbufferedOutputStream(tempFID, mMessenger), iounit);
     }
+
+    public OutputStream openForWriteUnbeffered()
+            throws InterruptedException, StyxException, TimeoutException, IOException {
+        mManager.checkConnection();
+        long tempFID = sendWalkMessage(getFID(), "");
+        int iounit = open(ModeType.OWRITE, tempFID);
+        return new StyxUnbufferedOutputStream(tempFID, mMessenger);
+    }
+
 
     public void create(long permissions)
             throws InterruptedException, StyxException, TimeoutException, IOException {
-        if ( !mManager.isConnected()) {
-            throw new IOException("Not connected to server");
-        }
+        mManager.checkConnection();
         // reserve FID
         long tempFID = sendWalkMessage(mParentFID, "");
         final StyxTCreateMessage tCreate = 

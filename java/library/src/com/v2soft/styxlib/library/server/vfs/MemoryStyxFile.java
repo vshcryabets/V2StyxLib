@@ -10,6 +10,7 @@ import com.v2soft.styxlib.library.types.ULong;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -121,14 +122,13 @@ public class MemoryStyxFile implements IVirtualStyxFile {
     // ==============================================================
     // Abstract methods
     // ==============================================================
-    protected int stringReply(String value, byte[] buffer, String charset) 
-            throws UnsupportedEncodingException {
+    protected int stringReply(String value, byte[] buffer, Charset charset) {
         byte[] bytes = value.getBytes(charset);
         System.arraycopy(bytes, 0, buffer, 0, bytes.length);
         return bytes.length;
     }
-    protected int stringReplyWithOffset(String value, byte[] buffer, String charset, 
-            long offset, int count) throws UnsupportedEncodingException {
+    protected int stringReplyWithOffset(String value, byte[] buffer, Charset charset,
+            long offset, int count) {
         return byteReplyWithOffset(value.getBytes(charset), buffer, offset, count);
     }
     protected int byteReplyWithOffset(byte[] reply, byte[] buffer, long offset, int count) {
