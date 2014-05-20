@@ -46,7 +46,6 @@ import static org.junit.Assert.assertTrue;
  */
 public class ClientServerTest {
     private static final int PORT = 10234;
-    private static final String FILE_NAME = "md5file";
     private StyxServerManager mServer;
     private Thread mServerThread;
 
@@ -62,47 +61,7 @@ public class ClientServerTest {
     }
 
     private void startServer() throws IOException {
-        MemoryStyxFile md5 = new MemoryStyxFile(FILE_NAME){
-            protected HashMap<ClientState, MessageDigest> mClientsMap = new HashMap<ClientState, MessageDigest>();
-            @Override
-            public boolean open(ClientState client, int mode)
-                    throws IOException {
-                try {
-                    MessageDigest md = MessageDigest.getInstance("MD5");
-                    mClientsMap.put(client, md);
-                } catch (NoSuchAlgorithmException e) {
-                    return false;
-                }
-                return super.open(client, mode);
-            }
-            @Override
-            public void close(ClientState client) {
-                mClientsMap.remove(client);
-                super.close(client);
-            }
-            @Override
-            public int write(ClientState client, byte[] data, ULong offset)
-                    throws StyxErrorMessageException {
-                if ( mClientsMap.containsKey(client) ) {
-                    mClientsMap.get(client).update(data, 0, data.length);
-                }
-                return super.write(client, data, offset);
-            }
-            @Override
-            public long read(ClientState client, byte[] outbuffer, ULong offset, long count)
-                    throws StyxErrorMessageException {
-                if ( mClientsMap.containsKey(client) ) {
-                    byte[] digest = mClientsMap.get(client).digest();
-                    if (count < digest.length) {
-                        return 0;
-                    } else {
-                        System.arraycopy(digest, 0, outbuffer, 0, digest.length);
-                        return digest.length;
-                    }
-                }
-                return super.read(client, outbuffer, offset, count);
-            }
-        };
+        MemoryStyxFile md5 = new MD5StyxFile();
         MemoryStyxDirectory root = new MemoryStyxDirectory("root");
         root.addFile(md5);
         mServer = new StyxServerManager(InetAddress.getByName("127.0.0.1"),
@@ -125,7 +84,7 @@ public class ClientServerTest {
         byte [] remoteHash = new byte[16];
 
         assertTrue(mConnection.connect()); // mConnection.connect();
-        final StyxFile newFile = new StyxFile(mConnection, FILE_NAME);
+        final StyxFile newFile = new StyxFile(mConnection, MD5StyxFile.FILE_NAME);
         DualStreams streams = newFile.openForReadAndWrite();
         streams.output.write(someData);
         streams.output.flush();

@@ -1,45 +1,32 @@
 package com.v2soft.styxlib.library.server;
 
 import java.io.IOException;
-import java.nio.channels.SocketChannel;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
+import com.v2soft.styxlib.library.messages.base.StyxMessage;
+import com.v2soft.styxlib.library.messages.base.StyxTMessage;
 import com.v2soft.styxlib.library.server.vfs.IVirtualStyxFile;
 
 
 public class ClientBalancer {
-//    private String mProtocol;
-    private ClientsHandler mHandler;
-    private Thread mThread;
-    private List<SocketChannel> mNewConnetions, mReadable;
-    
+    private MessagesProcessor mHandler;
+//    protected Set<ClientState> mClients;
+
     public ClientBalancer(int iounit, IVirtualStyxFile root, String protocol) throws IOException {
-    	mNewConnetions = new ArrayList<SocketChannel>();
-    	mReadable = new ArrayList<SocketChannel>();
-        mHandler = new ClientsHandler(iounit, root, protocol);
-//        mThread = new Thread(mHandler, "ClientsHandler");
-//        mThread.start();
-    }
-    
-    public void pushNewConnection(SocketChannel client) throws IOException {
-    	mNewConnetions.add(client);
+        mHandler = new MessagesProcessor(iounit, root, protocol);
+//        mClients = new HashSet<ClientState>();
     }
 
-	public void process() throws IOException {
-		// new connections
-		for (SocketChannel channel : mNewConnetions) {
-			mHandler.addClient(channel);
-		}
-		mNewConnetions.clear();
-		// new readables
-		for (SocketChannel channel : mReadable) {
-			boolean closed = mHandler.readClient(channel);
-		}
-		mReadable.clear();
-	}
-
-	public void pushReadable(SocketChannel clientChannel) {
-		mReadable.add(clientChannel);
-	}
+    public void addClient(ClientState state) {
+//        mClients.add(state);
+        mHandler.addClient(state);
+    }
+    public void removeClient(ClientState state) {
+//        mClients.remove(state);
+        mHandler.removeClient(state);
+    }
+    public void processPacket(ClientState client, StyxMessage message) throws IOException {
+        mHandler.processPacket(client, message);
+    }
 }
