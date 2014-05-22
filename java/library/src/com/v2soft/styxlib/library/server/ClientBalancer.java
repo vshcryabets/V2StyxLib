@@ -9,21 +9,22 @@ import com.v2soft.styxlib.library.messages.base.StyxTMessage;
 import com.v2soft.styxlib.library.server.vfs.IVirtualStyxFile;
 
 
+/**
+ *
+ * @author V.Shcriyabets (vshcryabets@gmail.com)
+ *
+ */
 public class ClientBalancer {
     private MessagesProcessor mHandler;
-//    protected Set<ClientState> mClients;
 
-    public ClientBalancer(int iounit, IVirtualStyxFile root, String protocol) throws IOException {
+    public ClientBalancer(int iounit, IVirtualStyxFile root, String protocol) {
         mHandler = new MessagesProcessor(iounit, root, protocol);
-//        mClients = new HashSet<ClientState>();
     }
 
     public void addClient(ClientState state) {
-//        mClients.add(state);
         mHandler.addClient(state);
     }
     public void removeClient(ClientState state) {
-//        mClients.remove(state);
         mHandler.removeClient(state);
     }
     public void processPacket(ClientState client, StyxMessage message) throws IOException {

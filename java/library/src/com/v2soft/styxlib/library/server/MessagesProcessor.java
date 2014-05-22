@@ -37,28 +37,29 @@ import com.v2soft.styxlib.library.messages.base.structs.StyxQID;
 import com.v2soft.styxlib.library.server.vfs.IVirtualStyxFile;
 
 /**
- * 
+ * Income Styx messages processor.
  * @author V.Shcriyabets (vshcryabets@gmail.com)
  *
  */
 public class MessagesProcessor implements Closeable {
     private String mProtocol;
     private int mIOUnit;
-//    private Set<ClientState> mClients;
     private IVirtualStyxFile mRoot;
+    protected int mHandledPackets, mErrorPackets, mAnswerPackets;
 
-    public MessagesProcessor(int iounit, IVirtualStyxFile root, String protocol) throws IOException {
+    public MessagesProcessor(int iounit, IVirtualStyxFile root, String protocol) {
         mIOUnit = iounit;
-//        mClients = new HashSet<ClientState>();
         mRoot = root;
         mProtocol = protocol;
+        mHandledPackets = 0;
+        mErrorPackets = 0;
+        mAnswerPackets = 0;
     }
 
     public void addClient(ClientState client) {
         client.setIOUnit(mIOUnit);
         client.setRoot(mRoot);
         client.setProtocol(mProtocol);
-//        mClients.add(client);
     }
 
     @Override
@@ -67,7 +68,6 @@ public class MessagesProcessor implements Closeable {
 
     protected void removeClient(ClientState client) {
         mRoot.onConnectionClosed(client);
-//        mClients.remove(client);
     }
 
     /**
@@ -76,7 +76,7 @@ public class MessagesProcessor implements Closeable {
      * @throws IOException
      */
     public void processPacket(ClientState client, StyxMessage message) throws IOException {
-        //        System.out.print("Got message "+msg.toString());
+        mHandledPackets++;
         StyxMessage answer = null;
         IVirtualStyxFile file;
         long fid;
@@ -132,8 +132,10 @@ public class MessagesProcessor implements Closeable {
         } catch (StyxErrorMessageException e) {
             answer = e.getErrorMessage();
             answer.setTag(message.getTag());
+            mErrorPackets++;
         }
         if ( answer != null ) {
+            mAnswerPackets++;
             client.getDriver().sendMessage(client, answer);
         }
     }

@@ -10,6 +10,7 @@ import java.io.Closeable;
  * @author V.Shcryabets (vshcryabets@gmail.com)
  */
 public interface IChannelDriver extends Closeable {
-    void listen();
     void sendMessage(ClientState client, StyxMessage answer);
+    void setBalancer(ClientBalancer mBalancer);
+    Thread start();
 }

@@ -31,7 +31,6 @@ public class TCPChannelDriver implements IChannelDriver, Runnable {
     private int mPort;
     private boolean mSSL;
     private boolean mNeedAuth;
-    private int mIOBufSize = 8192;
     private Thread mAcceptorThread;
     private boolean isWorking;
     private ServerSocketChannel mChannel;
@@ -41,7 +40,7 @@ public class TCPChannelDriver implements IChannelDriver, Runnable {
     private Map<SocketChannel, TCPClientState> mClientStatesMap;
     protected int mIOUnit;
 
-    public TCPChannelDriver(InetAddress address, int port, boolean ssl, ClientBalancer balancer, int IOUnit) throws IOException {
+    public TCPChannelDriver(InetAddress address, int port, boolean ssl, int IOUnit) throws IOException {
         mPort = port;
         ServerSocketChannel channel = null;
         if (ssl) {
@@ -50,7 +49,7 @@ public class TCPChannelDriver implements IChannelDriver, Runnable {
             channel = ServerSocketChannel.open();
         }
 
-        mIOUnit = mIOUnit;
+        mIOUnit = IOUnit;
 
         // Bind the server socket to the local host and port
         InetSocketAddress isa = new InetSocketAddress(address, port);
@@ -59,9 +58,7 @@ public class TCPChannelDriver implements IChannelDriver, Runnable {
         socket.setReuseAddress(true);
         socket.setSoTimeout(getTimeout());
 
-        mBalancer = balancer;
         mChannel = channel;
-        mBalancer = balancer;
         mSelector = Selector.open();
         channel.configureBlocking(false);
 
@@ -74,15 +71,14 @@ public class TCPChannelDriver implements IChannelDriver, Runnable {
         return StyxServerManager.DEFAULT_TIMEOUT;
     }
 
+    @Override
     public Thread start() {
+        if ( mBalancer == null ) {
+            throw new IllegalStateException("Balancer is null");
+        }
         mAcceptorThread = new Thread(this, TAG);
         mAcceptorThread.start();
         return mAcceptorThread;
-    }
-
-    @Override
-    public void listen() {
-        start();
     }
 
     @Override
@@ -95,6 +91,11 @@ public class TCPChannelDriver implements IChannelDriver, Runnable {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void setBalancer(ClientBalancer balancer) {
+        mBalancer = balancer;
     }
 
     @Override
@@ -157,7 +158,9 @@ public class TCPChannelDriver implements IChannelDriver, Runnable {
         // new connections
         for (SocketChannel channel : mNewConnetions) {
             channel.configureBlocking(false);
-            mBalancer.addClient(new TCPClientState(channel, this, mIOUnit));
+            TCPClientState client = new TCPClientState(channel, this, mIOUnit);
+            mBalancer.addClient(client);
+            mClientStatesMap.put(channel, client);
         }
         mNewConnetions.clear();
         // new readables

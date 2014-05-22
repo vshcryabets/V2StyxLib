@@ -1,19 +1,15 @@
 package com.v2soft.styxlib.library;
 
-import java.io.Closeable;
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.ServerSocket;
-import java.nio.channels.ServerSocketChannel;
-import java.security.InvalidParameterException;
-import java.util.LinkedList;
-
 import com.v2soft.styxlib.library.core.Messenger.StyxMessengerListener;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
-import com.v2soft.styxlib.library.messages.base.structs.StyxQID;
 import com.v2soft.styxlib.library.server.ClientBalancer;
+import com.v2soft.styxlib.library.server.IChannelDriver;
 import com.v2soft.styxlib.library.server.vfs.IVirtualStyxFile;
+
+import java.io.Closeable;
+import java.io.IOException;
+import java.security.InvalidParameterException;
+import java.util.LinkedList;
 
 /**
  * 
@@ -27,146 +23,42 @@ implements Closeable, StyxMessengerListener {
     //---------------------------------------------------------------------------
     public static final String PROTOCOL = "9P2000";
     public static final int DEFAULT_TIMEOUT = 5000;
+    public static final int DEFAULT_IOUNIT = 8192;
     //---------------------------------------------------------------------------
     // Class fields
     //---------------------------------------------------------------------------
-    private int mPort;
+    protected IChannelDriver mDriver;
     private int mTimeout = DEFAULT_TIMEOUT;
-    private boolean mSSL;
-    private boolean mNeedAuth;
-    private int mIOBufSize = 8192;
-    private long mAuthFID = StyxMessage.NOFID;
-    private StyxQID mAuthQID;
-    private StyxQID mQID;
-    private long mFID = StyxMessage.NOFID;
-    private ActiveFids mActiveFids = new ActiveFids();
-    private ConnectionAcceptor mAcceptor;
     private ClientBalancer mBalancer;
-    private Thread mAcceptorThread;
 
-    public StyxServerManager(InetAddress address, int port, boolean ssl,
-                             IVirtualStyxFile root) throws IOException {
-        mPort = port;
-        ServerSocketChannel channel = null;
-        if (ssl) {
-            throw new RuntimeException("Not implemented");
-        } else {
-            channel = ServerSocketChannel.open();
+    public StyxServerManager(IVirtualStyxFile root) {
+        mBalancer = new ClientBalancer(getIOUnit(), root, getProtocol());
+    }
+
+    public void setDriver(IChannelDriver driver) {
+        if ( driver == null ) {
+            throw new NullPointerException("Driver is null");
         }
-
-        // Bind the server socket to the local host and port
-        InetSocketAddress isa = new InetSocketAddress(address, port);
-        ServerSocket socket = channel.socket();
-        socket.bind(isa);
-        socket.setReuseAddress(true);
-        socket.setSoTimeout(mTimeout);
-
-        mBalancer = new ClientBalancer(mIOBufSize, root, getProtocol());
-        mAcceptor = new ConnectionAcceptor(channel, mBalancer);
+        mDriver = driver;
+        mDriver.setBalancer(mBalancer);
     }
 
     public Thread start() {
-        mAcceptorThread = new Thread(mAcceptor, "Acceptor");
-        mAcceptorThread.start();
-        return mAcceptorThread;
+        return mDriver.start();
     }
 
-    public ActiveFids getActiveFids()
+    public int getIOUnit()
     {
-        return mActiveFids;
+        return DEFAULT_IOUNIT;
     }
-
-    public long getIOBufSize()
-    {
-        return mIOBufSize;
-    }
-
-    public int getPort()
-    {
-        return mPort;
-    }
-
-    public boolean isSSL()
-    {
-        return mSSL;
-    }
-
-    public boolean isNeedAuth()
-    {
-        return mNeedAuth;
-    }
-
-    /**
-     * 
-     * @return FID of root folder
-     */
-    public long getFID()
-    {
-        return mFID;
-    }
-
-    public StyxQID getQID()
-    {
-        return mQID;
-    }
-
-    public long getAuthFID()
-    {
-        return mAuthFID;
-    }
-
-    public StyxQID getAuthQID()
-    {
-        return mAuthQID;
-    }
-
 
     @Override
-    public void close() {
-        if ( mAcceptorThread != null ) {
-            mAcceptor.close();
-            mAcceptorThread = null;
-        }
+    public void close() throws IOException {
+        mDriver.close();
     }
 
     public String getProtocol() {
         return PROTOCOL;
-    }
-
-    public class ActiveFids
-    {
-        private LinkedList<Long> mAvailableFids = new LinkedList<Long>();
-        private long mLastFid = 0L;
-
-        /**
-         * @return Return free FID
-         */
-        protected long getFreeFid() {
-            synchronized (mAvailableFids) {
-                if (!mAvailableFids.isEmpty())
-                    return mAvailableFids.poll();
-                mLastFid++;
-                if(mLastFid > Consts.MAXUNINT)
-                    mLastFid = 0;
-                return mLastFid;
-            }
-        }
-
-        protected boolean releaseFid(long fid) {
-            synchronized (mAvailableFids) {
-                if (fid == StyxMessage.NOFID)
-                    return false;
-                if ( mAvailableFids.contains(fid)) {
-                    throw new InvalidParameterException(
-                            String.format("Something goes wrong, this FID(%d) already has been released", fid));
-                }
-                return mAvailableFids.add(fid);
-            }
-        }
-        protected void clean() {
-            mAvailableFids.clear();
-            mLastFid = 0;
-        }
     }
     //-------------------------------------------------------------------------------------
     // Getters

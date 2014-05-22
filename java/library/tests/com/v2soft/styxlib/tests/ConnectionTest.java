@@ -1,6 +1,18 @@
 package com.v2soft.styxlib.tests;
 
-import static org.junit.Assert.*;
+import com.v2soft.styxlib.library.StyxClientConnection;
+import com.v2soft.styxlib.library.StyxFile;
+import com.v2soft.styxlib.library.StyxServerManager;
+import com.v2soft.styxlib.library.exceptions.StyxErrorMessageException;
+import com.v2soft.styxlib.library.exceptions.StyxException;
+import com.v2soft.styxlib.library.io.StyxFileBufferedInputStream;
+import com.v2soft.styxlib.library.messages.base.enums.FileMode;
+import com.v2soft.styxlib.library.server.tcp.TCPServerManager;
+import com.v2soft.styxlib.library.server.vfs.DiskStyxDirectory;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,20 +24,11 @@ import java.util.UUID;
 import java.util.concurrent.TimeoutException;
 import java.util.zip.CRC32;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-
-import com.v2soft.styxlib.library.StyxClientConnection;
-import com.v2soft.styxlib.library.StyxFile;
-import com.v2soft.styxlib.library.StyxServerManager;
-import com.v2soft.styxlib.library.exceptions.StyxErrorMessageException;
-import com.v2soft.styxlib.library.exceptions.StyxException;
-import com.v2soft.styxlib.library.io.StyxFileBufferedInputStream;
-import com.v2soft.styxlib.library.messages.base.enums.FileMode;
-import com.v2soft.styxlib.library.server.vfs.DiskStyxDirectory;
-import com.v2soft.styxlib.library.server.vfs.MemoryStyxDirectory;
-import com.v2soft.styxlib.library.server.vfs.MemoryStyxFile;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Client JUnit tests
@@ -45,7 +48,7 @@ public class ConnectionTest {
     }
 
     @After
-    public void shutDown() throws InterruptedException {
+    public void shutDown() throws InterruptedException, IOException {
         mServer.close();
         mServerThread.join();
     }
@@ -55,7 +58,7 @@ public class ConnectionTest {
         if ( !testDirectory.exists() ) {
             testDirectory.mkdirs();
         }
-        mServer = new StyxServerManager(InetAddress.getByName("127.0.0.1"),
+        mServer = new TCPServerManager(InetAddress.getByName("127.0.0.1"),
                 PORT,
                 false,
                 new DiskStyxDirectory(testDirectory));

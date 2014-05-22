@@ -2,6 +2,7 @@ import com.v2soft.styxlib.library.StyxServerManager;
 import com.v2soft.styxlib.library.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.library.exceptions.StyxException;
 import com.v2soft.styxlib.library.server.ClientState;
+import com.v2soft.styxlib.library.server.tcp.TCPServerManager;
 import com.v2soft.styxlib.library.server.vfs.MemoryStyxDirectory;
 import com.v2soft.styxlib.library.server.vfs.MemoryStyxFile;
 import com.v2soft.styxlib.library.types.ULong;
@@ -66,7 +67,7 @@ public class JavaServerSample {
         };
         MemoryStyxDirectory root = new MemoryStyxDirectory("root");
         root.addFile(md5);
-        StyxServerManager mServer = new StyxServerManager(InetAddress.getByName("127.0.0.1"),
+        StyxServerManager mServer = new TCPServerManager(InetAddress.getByName("127.0.0.1"),
                 PORT,
                 false,
                 root);
