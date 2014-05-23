@@ -3,7 +3,6 @@ package com.v2soft.styxlib.library.server.tcp;
 import com.v2soft.styxlib.library.StyxServerManager;
 import com.v2soft.styxlib.library.server.IChannelDriver;
 import com.v2soft.styxlib.library.server.vfs.IVirtualStyxFile;
-import com.v2soft.styxlib.library.server.vfs.MemoryStyxDirectory;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -21,7 +20,7 @@ public class TCPServerManager extends StyxServerManager {
     }
 
     private IChannelDriver prepareDriver(InetAddress address, int port, boolean ssl) throws IOException {
-        TCPChannelDriver driver = new TCPChannelDriver(address, port, ssl, getIOUnit());
+        TCPChannelDriver driver = new TCPServerChannelDriver(address, port, ssl, getIOUnit());
         return driver;
     }
 }

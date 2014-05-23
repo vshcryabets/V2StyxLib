@@ -40,7 +40,7 @@ implements Closeable, StyxMessengerListener {
             throw new NullPointerException("Driver is null");
         }
         mDriver = driver;
-        mDriver.setBalancer(mBalancer);
+        mDriver.setMessageHandler(mBalancer);
     }
 
     public Thread start() {

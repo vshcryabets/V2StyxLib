@@ -1,11 +1,14 @@
 package com.v2soft.styxlib.tests;
 
+import com.v2soft.styxlib.ILogListener;
 import com.v2soft.styxlib.library.StyxClientConnection;
 import com.v2soft.styxlib.library.StyxFile;
 import com.v2soft.styxlib.library.StyxServerManager;
 import com.v2soft.styxlib.library.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.library.exceptions.StyxException;
 import com.v2soft.styxlib.library.io.StyxFileBufferedInputStream;
+import com.v2soft.styxlib.library.messages.base.StyxMessage;
+import com.v2soft.styxlib.library.messages.base.StyxTMessage;
 import com.v2soft.styxlib.library.messages.base.enums.FileMode;
 import com.v2soft.styxlib.library.server.tcp.TCPServerManager;
 import com.v2soft.styxlib.library.server.vfs.DiskStyxDirectory;
@@ -44,11 +47,28 @@ public class ConnectionTest {
     @Before
     public void setUp() throws Exception {
         startServer();
-        mConnection = new StyxClientConnection(InetAddress.getByName("localhost"), PORT, false);
+        mConnection = new StyxClientConnection(InetAddress.getByName("localhost"), PORT, false){
+            @Override
+            public ILogListener getLogListener() {
+                return null;
+                        /*new ILogListener() {
+                    @Override
+                    public void onMessageReceived(StyxMessage message) {
+                        System.out.println("Got message "+message.getType());
+                    }
+
+                    @Override
+                    public void onSendMessage(StyxTMessage message) {
+
+                    }
+                };*/
+            }
+        };
     }
 
     @After
     public void shutDown() throws InterruptedException, IOException {
+        mConnection.close();
         mServer.close();
         mServerThread.join();
     }
@@ -65,19 +85,15 @@ public class ConnectionTest {
         mServerThread = mServer.start();
     }
 
-    @After
-    public void tearDown() throws Exception {
-        mConnection.close();
-    }
-
     // TVersion & TAttach
     @Test
     public void testConnection() throws IOException, StyxException, InterruptedException, TimeoutException {
-        int count = 100;
+        int count = 1000;
         assertTrue(mConnection.connect());
         long startTime = System.currentTimeMillis();
         for ( int i = 0; i < count; i++ ) {
             mConnection.sendVersionMessage();
+//            System.out.println(String.valueOf(i));
         }
         long diff = System.currentTimeMillis()-startTime;
         System.out.println(String.format("\tTransmited %d messages\n\t" +

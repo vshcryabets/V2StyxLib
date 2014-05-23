@@ -12,6 +12,9 @@ import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.messages.base.StyxTMessage;
 import com.v2soft.styxlib.library.messages.base.StyxTMessageFID;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
+import com.v2soft.styxlib.library.server.ClientState;
+import com.v2soft.styxlib.library.server.IChannelDriver;
+import com.v2soft.styxlib.library.server.IClientChannelDriver;
 import com.v2soft.styxlib.library.types.ObjectsPoll;
 import com.v2soft.styxlib.library.types.ObjectsPoll.ObjectsPollFactory;
 
@@ -26,7 +29,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
-public class Messenger implements Runnable, Closeable, ObjectsPollFactory<IStyxDataWriter> {
+public class Messenger implements Closeable, ObjectsPollFactory<IStyxDataWriter> {
     public interface StyxMessengerListener {
         void onSocketDisconected();
         void onTrashReceived();
@@ -34,26 +37,22 @@ public class Messenger implements Runnable, Closeable, ObjectsPollFactory<IStyxD
     }
     private StyxMessengerListener mListener;
     private Map<Integer, StyxTMessage> mMessages = new HashMap<Integer, StyxTMessage>();
-    private Thread mThread;
-    private SocketChannel mSocketChannel;
     private ActiveTags mActiveTags = new ActiveTags();
-    private boolean isWorking;
     private int mIOBufferSize;
     private int mTransmitedCount, mReceivedCount, mErrorCount, mBuffersAllocated;
-    private ObjectsPoll<IStyxDataWriter> mBufferPoll;
     protected ILogListener mLogListener;
+    protected IClientChannelDriver mDriver;
 
-    public Messenger(SocketChannel socket, int io_unit, StyxMessengerListener listener,
+    public Messenger(IClientChannelDriver driver, int io_unit, StyxMessengerListener listener,
                      ILogListener logListener)
             throws IOException {
         mLogListener = logListener;
         resetStatistics();
         mIOBufferSize = io_unit;
-        mSocketChannel = socket;
+        mDriver = driver;
         mListener = listener;
-        mBufferPoll = new ObjectsPoll<IStyxDataWriter>(this);
-        mThread = new Thread(this);
-        mThread.start();        
+        mDriver.setMessageHandler(mMessageHandler);
+        mDriver.start();
     }
 
     private void resetStatistics() {
@@ -73,7 +72,7 @@ public class Messenger implements Runnable, Closeable, ObjectsPollFactory<IStyxD
             if ( mLogListener != null ) {
                 mLogListener.onSendMessage(message);
             }
-            if ( !mSocketChannel.isConnected()) throw new IOException("Not connected to server");
+            if ( !mDriver.isConnected()) throw new IOException("Not connected to server");
 
             int tag = StyxMessage.NOTAG;
             if ( message.getType() != MessageType.Tversion ) {
@@ -82,11 +81,7 @@ public class Messenger implements Runnable, Closeable, ObjectsPollFactory<IStyxD
             message.setTag((short) tag);
             mMessages.put(tag, message);
 
-            IStyxDataWriter buffer = mBufferPoll.get();
-            message.writeToBuffer(buffer);
-            final ByteBuffer inbuf = buffer.getBuffer();
-            inbuf.flip();
-            mSocketChannel.write(inbuf);
+            mDriver.sendMessage( message);
             mTransmitedCount++;
             return true;
         } catch (SocketException e) {
@@ -95,66 +90,43 @@ public class Messenger implements Runnable, Closeable, ObjectsPollFactory<IStyxD
         return false;
     }
 
-    @Override
-    public void run() {
-        try {
-            final StyxByteBufferReadable buffer = new StyxByteBufferReadable(mIOBufferSize*2);
-            final StyxDataReader reader = new StyxDataReader(buffer);
-            isWorking = true;
-            while (isWorking) {
-                if (Thread.interrupted()) break;
-                // read from socket
-                try {
-                    int readed = buffer.readFromChannel(mSocketChannel);
-                    if ( readed > 0 ) {
-                        // try to decode
-                        final int inBuffer = buffer.remainsToRead();
-                        if ( inBuffer > 4 ) {
-                            final long packetSize = reader.getUInt32();
-                            if ( inBuffer >= packetSize ) {
-                                final StyxMessage message = StyxMessage.factory(reader, mIOBufferSize);
-                                if ( mLogListener != null ) {
-                                    mLogListener.onMessageReceived(message);
-                                }
-                                mReceivedCount++;
-                                processIncomingMessage(message);
-                            }
-                        }
-                    }
-                }
-                catch (SocketTimeoutException e) {
-                    // Nothing to read
-                    //                    e.printStackTrace();
-                } catch (ClosedByInterruptException e) {
-                    // finish
-                    break;
-                }
-                catch (StyxException e)	{ 
-                    e.printStackTrace();
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        } 
-    }
+    private final IMessageProcessor mMessageHandler = new IMessageProcessor() {
+        @Override
+        public void addClient(ClientState state) {
 
-    private synchronized void processIncomingMessage(StyxMessage message) 
-            throws StyxException {
-        int tag = message.getTag();
-        if (!mMessages.containsKey(tag)) // we didn't send T message with such tag, so ignore this R message
-            return;
-        final StyxTMessage tMessage = mMessages.get(tag);
-        if ( tMessage.getType() == MessageType.Tclunk ||
-                tMessage.getType() == MessageType.Tremove ) {
-            mListener.onFIDReleased(((StyxTMessageFID)tMessage).getFID());
         }
-        tMessage.setAnswer(message);
-        if ( message.getType() == MessageType.Rerror ) {
-            mErrorCount++;
+
+        @Override
+        public void removeClient(ClientState state) {
+
         }
-        mMessages.remove(tag);
-        mActiveTags.releaseTag(tag);
-    }
+
+        @Override
+        public void processPacket(ClientState client, StyxMessage message) {
+            if ( mLogListener != null ) {
+                mLogListener.onMessageReceived(message);
+            }
+            mReceivedCount++;
+            int tag = message.getTag();
+            if (!mMessages.containsKey(tag)) // we didn't send T message with such tag, so ignore this R message
+                return;
+            final StyxTMessage tMessage = mMessages.get(tag);
+            if ( tMessage.getType() == MessageType.Tclunk ||
+                    tMessage.getType() == MessageType.Tremove ) {
+                mListener.onFIDReleased(((StyxTMessageFID)tMessage).getFID());
+            }
+            try {
+                tMessage.setAnswer(message);
+            } catch (StyxException e) {
+                e.printStackTrace();
+            }
+            if ( message.getType() == MessageType.Rerror ) {
+                mErrorCount++;
+            }
+            mMessages.remove(tag);
+            mActiveTags.releaseTag(tag);
+        }
+    };
 
     public class ActiveTags {
         private LinkedList<Integer> mAvailableTags = new LinkedList<Integer>();
@@ -187,9 +159,8 @@ public class Messenger implements Runnable, Closeable, ObjectsPollFactory<IStyxD
     }
 
     @Override
-    public void close() {
-        isWorking = false;
-        mThread.interrupt();		
+    public void close() throws IOException {
+        mDriver.close();
     }
 
     public StyxMessengerListener getListener() {

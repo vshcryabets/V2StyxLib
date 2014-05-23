@@ -26,6 +26,7 @@ import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.messages.base.StyxTMessageFID;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
 import com.v2soft.styxlib.library.messages.base.structs.StyxQID;
+import com.v2soft.styxlib.library.server.tcp.TCPClientChannelDriver;
 
 /**
  * Styx client conection
@@ -112,16 +113,14 @@ implements Closeable, StyxMessengerListener {
         mPassword = password;
         mMountPoint = "/";
         mNeedAuth = (username != null);
-        SocketAddress sa = new InetSocketAddress(address, port);
-        SocketChannel channel = SocketChannel.open(sa);
-        channel.configureBlocking(true);
-        Socket socket = channel.socket();
-        socket.setSoTimeout(mTimeout);
-        mMessenger = new Messenger(channel, mIOBufSize, this, getLogListener());
+
+        TCPClientChannelDriver driver = new TCPClientChannelDriver(address, port, ssl, mIOBufSize);
+        mMessenger = new Messenger(driver, mIOBufSize, this, getLogListener());
 
         sendVersionMessage();
-        setConnected(socket.isConnected());
-        return socket.isConnected();
+
+        setConnected(driver.getSocket().isConnected());
+        return driver.getSocket().isConnected();
     }
 
     public StyxFile getRoot() throws StyxException, InterruptedException, TimeoutException, IOException

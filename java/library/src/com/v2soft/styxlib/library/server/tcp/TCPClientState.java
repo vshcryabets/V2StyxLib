@@ -1,12 +1,10 @@
 package com.v2soft.styxlib.library.server.tcp;
 
-import com.v2soft.styxlib.library.io.IStyxBuffer;
 import com.v2soft.styxlib.library.io.IStyxDataReader;
 import com.v2soft.styxlib.library.io.StyxByteBufferReadable;
 import com.v2soft.styxlib.library.io.StyxDataReader;
 import com.v2soft.styxlib.library.server.ClientState;
 import com.v2soft.styxlib.library.server.IChannelDriver;
-import com.v2soft.styxlib.library.server.vfs.IVirtualStyxFile;
 
 import java.io.FileNotFoundException;
 import java.nio.ByteBuffer;

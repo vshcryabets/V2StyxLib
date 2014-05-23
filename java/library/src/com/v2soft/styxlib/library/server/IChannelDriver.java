@@ -1,5 +1,6 @@
 package com.v2soft.styxlib.library.server;
 
+import com.v2soft.styxlib.library.core.IMessageProcessor;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
 
 import java.io.Closeable;
@@ -11,6 +12,6 @@ import java.io.Closeable;
  */
 public interface IChannelDriver extends Closeable {
     void sendMessage(ClientState client, StyxMessage answer);
-    void setBalancer(ClientBalancer mBalancer);
     Thread start();
+    void setMessageHandler(IMessageProcessor handler);
 }
