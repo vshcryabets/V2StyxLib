@@ -62,10 +62,10 @@ public class JavaServerSample {
         };
         MemoryStyxDirectory root = new MemoryStyxDirectory("root");
         root.addFile(md5);
-        StyxServerManager mServer = new StyxServerManager(InetAddress.getByName(“localhost”),
+        StyxServerManager mServer = new TCPServerManager(InetAddress.getByName("127.0.0.1"),
                 PORT,
                 false,
-                root);
+                root);        
         mServer.start().join();
     }
 }
