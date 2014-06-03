@@ -1,7 +1,5 @@
 package com.v2soft.styxlib.library.server.tcp;
 
-import com.v2soft.styxlib.library.StyxClientConnection;
-import com.v2soft.styxlib.library.exceptions.StyxException;
 import com.v2soft.styxlib.library.io.StyxByteBufferReadable;
 import com.v2soft.styxlib.library.io.StyxDataReader;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
@@ -12,7 +10,6 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.net.SocketAddress;
 import java.net.SocketTimeoutException;
 import java.nio.channels.ClosedByInterruptException;
 import java.nio.channels.SocketChannel;
@@ -45,8 +42,9 @@ public class TCPClientChannelDriver extends TCPChannelDriver implements IClientC
     }
 
     @Override
-    public void sendMessage(StyxMessage message) {
+    public boolean sendMessage(StyxMessage message) {
         super.sendMessage(mPseudoClient, message);
+        return true;
     }
 
     @Override

@@ -74,7 +74,7 @@ implements Closeable, StyxMessengerListener {
     // Messenger listener
     //-------------------------------------------------------------------------------------
     @Override
-    public void onSocketDisconected() {
+    public void onSocketDisconnected() {
     }
 
     @Override

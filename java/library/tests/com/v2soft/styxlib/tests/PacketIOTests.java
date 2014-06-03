@@ -6,6 +6,7 @@ import com.v2soft.styxlib.library.StyxServerManager;
 import com.v2soft.styxlib.library.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.library.exceptions.StyxException;
 import com.v2soft.styxlib.library.server.ClientState;
+import com.v2soft.styxlib.library.server.tcp.TCPClientChannelDriver;
 import com.v2soft.styxlib.library.server.tcp.TCPServerManager;
 import com.v2soft.styxlib.library.server.vfs.MemoryStyxDirectory;
 import com.v2soft.styxlib.library.server.vfs.MemoryStyxFile;
@@ -110,13 +111,17 @@ public class PacketIOTests {
         MessageDigest digest = MessageDigest.getInstance("MD5");
 
 
-        StyxClientConnection mConnection = new StyxClientConnection(InetAddress.getByName("127.0.0.1"), PORT, false);
+        StyxClientConnection mConnection = new StyxClientConnection();
         byte[] someData = new byte[1024];
         byte [] remoteHash = new byte[16];
 
-        assertTrue(mConnection.connect()); // mConnection.connect();
+        assertTrue(mConnection.connect(
+                new TCPClientChannelDriver(
+                        InetAddress.getByName("localhost"), PORT, false, mConnection.getIOBufSize()),
+                null, null));
+
         final StyxFile newFile = new StyxFile(mConnection, FILE_NAME);
-        OutputStream output = newFile.openForWriteUnbeffered();
+        OutputStream output = newFile.openForWriteUnbuffered();
         InputStream input = newFile.openForReadUnbuffered();
 
         int count = random.nextInt(20)+20;

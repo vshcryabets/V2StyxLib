@@ -3,35 +3,29 @@ package com.v2soft.styxlib.library.core;
 import com.v2soft.styxlib.ILogListener;
 import com.v2soft.styxlib.library.Consts;
 import com.v2soft.styxlib.library.exceptions.StyxException;
-import com.v2soft.styxlib.library.io.IStyxBuffer;
 import com.v2soft.styxlib.library.io.IStyxDataWriter;
-import com.v2soft.styxlib.library.io.StyxByteBufferReadable;
-import com.v2soft.styxlib.library.io.StyxDataReader;
 import com.v2soft.styxlib.library.io.StyxDataWriter;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.messages.base.StyxTMessage;
 import com.v2soft.styxlib.library.messages.base.StyxTMessageFID;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
 import com.v2soft.styxlib.library.server.ClientState;
-import com.v2soft.styxlib.library.server.IChannelDriver;
 import com.v2soft.styxlib.library.server.IClientChannelDriver;
-import com.v2soft.styxlib.library.types.ObjectsPoll;
+import com.v2soft.styxlib.library.server.IMessageTransmitter;
+import com.v2soft.styxlib.library.server.MessagesProcessor;
+import com.v2soft.styxlib.library.server.vfs.IVirtualStyxFile;
 import com.v2soft.styxlib.library.types.ObjectsPoll.ObjectsPollFactory;
 
-import java.io.Closeable;
 import java.io.IOException;
 import java.net.SocketException;
-import java.net.SocketTimeoutException;
 import java.nio.ByteBuffer;
-import java.nio.channels.ClosedByInterruptException;
-import java.nio.channels.SocketChannel;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
-public class Messenger implements Closeable, ObjectsPollFactory<IStyxDataWriter> {
+public class Messenger implements IMessageTransmitter, ObjectsPollFactory<IStyxDataWriter> {
     public interface StyxMessengerListener {
-        void onSocketDisconected();
+        void onSocketDisconnected();
         void onTrashReceived();
         void onFIDReleased(long fid);
     }
@@ -42,6 +36,7 @@ public class Messenger implements Closeable, ObjectsPollFactory<IStyxDataWriter>
     private int mTransmitedCount, mReceivedCount, mErrorCount, mBuffersAllocated;
     protected ILogListener mLogListener;
     protected IClientChannelDriver mDriver;
+    protected IMessageProcessor mTMessageProcessor;
 
     public Messenger(IClientChannelDriver driver, int io_unit, StyxMessengerListener listener,
                      ILogListener logListener)
@@ -53,6 +48,21 @@ public class Messenger implements Closeable, ObjectsPollFactory<IStyxDataWriter>
         mListener = listener;
         mDriver.setMessageHandler(mMessageHandler);
         mDriver.start();
+    }
+
+    public void export(IVirtualStyxFile root, String protocol) {
+        if ( root != null ) {
+            mTMessageProcessor = new MessagesProcessor(mIOBufferSize, root, protocol);
+        } else {
+            if ( mTMessageProcessor != null ) {
+                try {
+                    mTMessageProcessor.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                mTMessageProcessor = null;
+            }
+        }
     }
 
     private void resetStatistics() {
@@ -67,25 +77,28 @@ public class Messenger implements Closeable, ObjectsPollFactory<IStyxDataWriter>
      * @param message
      * @return true if success
      */
-    public boolean send(StyxTMessage message) throws IOException {
+    public boolean sendMessage(StyxMessage message) throws IOException {
         try {
             if ( mLogListener != null ) {
                 mLogListener.onSendMessage(message);
             }
             if ( !mDriver.isConnected()) throw new IOException("Not connected to server");
 
-            int tag = StyxMessage.NOTAG;
-            if ( message.getType() != MessageType.Tversion ) {
-                tag = mActiveTags.getTag();
+            if ( message.getType().isTMessage() ) {
+                // set message tag
+                int tag = StyxMessage.NOTAG;
+                if (message.getType() != MessageType.Tversion) {
+                    tag = mActiveTags.getTag();
+                }
+                message.setTag((short) tag);
+                mMessages.put(tag, (StyxTMessage)message);
             }
-            message.setTag((short) tag);
-            mMessages.put(tag, message);
 
             mDriver.sendMessage( message);
             mTransmitedCount++;
             return true;
         } catch (SocketException e) {
-            mListener.onSocketDisconected();
+            mListener.onSocketDisconnected();
         }
         return false;
     }
@@ -93,12 +106,16 @@ public class Messenger implements Closeable, ObjectsPollFactory<IStyxDataWriter>
     private final IMessageProcessor mMessageHandler = new IMessageProcessor() {
         @Override
         public void addClient(ClientState state) {
-
+            if ( mTMessageProcessor != null ) {
+                mTMessageProcessor.addClient(state);
+            }
         }
 
         @Override
         public void removeClient(ClientState state) {
-
+            if ( mTMessageProcessor != null ) {
+                mTMessageProcessor.removeClient(state);
+            }
         }
 
         @Override
@@ -107,24 +124,41 @@ public class Messenger implements Closeable, ObjectsPollFactory<IStyxDataWriter>
                 mLogListener.onMessageReceived(message);
             }
             mReceivedCount++;
-            int tag = message.getTag();
-            if (!mMessages.containsKey(tag)) // we didn't send T message with such tag, so ignore this R message
-                return;
-            final StyxTMessage tMessage = mMessages.get(tag);
-            if ( tMessage.getType() == MessageType.Tclunk ||
-                    tMessage.getType() == MessageType.Tremove ) {
-                mListener.onFIDReleased(((StyxTMessageFID)tMessage).getFID());
+            if ( message.getType().isTMessage() ) {
+                if ( mTMessageProcessor != null ) {
+                    try {
+                        mTMessageProcessor.processPacket(client, message);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            } else {
+                int tag = message.getTag();
+                if (!mMessages.containsKey(tag)) // we didn't send T message with such tag, so ignore this R message
+                    return;
+                final StyxTMessage tMessage = mMessages.get(tag);
+                if (tMessage.getType() == MessageType.Tclunk ||
+                        tMessage.getType() == MessageType.Tremove) {
+                    mListener.onFIDReleased(((StyxTMessageFID) tMessage).getFID());
+                }
+                try {
+                    tMessage.setAnswer(message);
+                } catch (StyxException e) {
+                    e.printStackTrace();
+                }
+                if (message.getType() == MessageType.Rerror) {
+                    mErrorCount++;
+                }
+                mMessages.remove(tag);
+                mActiveTags.releaseTag(tag);
             }
-            try {
-                tMessage.setAnswer(message);
-            } catch (StyxException e) {
-                e.printStackTrace();
+        }
+
+        @Override
+        public void close() throws IOException {
+            if ( mTMessageProcessor != null ) {
+                mTMessageProcessor.close();
             }
-            if ( message.getType() == MessageType.Rerror ) {
-                mErrorCount++;
-            }
-            mMessages.remove(tag);
-            mActiveTags.releaseTag(tag);
         }
     };
 

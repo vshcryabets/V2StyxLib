@@ -29,5 +29,8 @@ public enum MessageType {
 	{
 		return mByte;
 	}
-	
+
+    public boolean isTMessage() {
+        return mByte % 2 == 0;
+    }
 }

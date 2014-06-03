@@ -4,13 +4,13 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import com.v2soft.styxlib.library.StyxClientConnection;
-import com.v2soft.styxlib.library.core.Messenger;
 import com.v2soft.styxlib.library.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.library.messages.StyxRReadMessage;
 import com.v2soft.styxlib.library.messages.StyxTReadMessage;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.messages.base.StyxTMessageFID;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
+import com.v2soft.styxlib.library.server.IMessageTransmitter;
 import com.v2soft.styxlib.library.types.ULong;
 
 /**
@@ -22,11 +22,11 @@ public class StyxUnbufferedInputStream extends InputStream {
     private long mTimeout = StyxClientConnection.DEFAULT_TIMEOUT;
     private byte[] mSingleByteArray = new byte[1];
     private long mFile;
-    private Messenger mMessenger;
+    private IMessageTransmitter mMessenger;
     private ULong mFileOffset = ULong.ZERO;
     private int mIOUnitSize;
 
-    public StyxUnbufferedInputStream(long file, Messenger messenger, int iounit) {
+    public StyxUnbufferedInputStream(long file, IMessageTransmitter messenger, int iounit) {
         if ( messenger == null ) {
             throw new NullPointerException("messenger is null");
         }
@@ -52,7 +52,7 @@ public class StyxUnbufferedInputStream extends InputStream {
         try {
             // send Tread
             final StyxTReadMessage tRead = new StyxTReadMessage(mFile, mFileOffset, len);
-            mMessenger.send(tRead);
+            mMessenger.sendMessage(tRead);
             final StyxMessage rMessage = tRead.waitForAnswer(mTimeout);
             StyxErrorMessageException.doException(rMessage);
 
@@ -83,7 +83,7 @@ public class StyxUnbufferedInputStream extends InputStream {
     public void close() throws IOException {
         // send Tclunk
         final StyxTMessageFID tClunk = new StyxTMessageFID(MessageType.Tclunk, MessageType.Rclunk, mFile);
-        mMessenger.send(tClunk);
+        mMessenger.sendMessage(tClunk);
         StyxMessage rMessage;
         try {
             rMessage = tClunk.waitForAnswer(mTimeout);

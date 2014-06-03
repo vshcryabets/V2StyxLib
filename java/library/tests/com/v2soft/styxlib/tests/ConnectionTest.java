@@ -1,6 +1,7 @@
 package com.v2soft.styxlib.tests;
 
 import com.v2soft.styxlib.ILogListener;
+import com.v2soft.styxlib.library.IClient;
 import com.v2soft.styxlib.library.StyxClientConnection;
 import com.v2soft.styxlib.library.StyxFile;
 import com.v2soft.styxlib.library.StyxServerManager;
@@ -10,6 +11,7 @@ import com.v2soft.styxlib.library.io.StyxFileBufferedInputStream;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.messages.base.StyxTMessage;
 import com.v2soft.styxlib.library.messages.base.enums.FileMode;
+import com.v2soft.styxlib.library.server.tcp.TCPClientChannelDriver;
 import com.v2soft.styxlib.library.server.tcp.TCPServerManager;
 import com.v2soft.styxlib.library.server.vfs.DiskStyxDirectory;
 
@@ -40,14 +42,14 @@ import static org.junit.Assert.assertTrue;
  */
 public class ConnectionTest {
     private static final int PORT = 10234;
-    private StyxClientConnection mConnection;
+    private IClient mConnection;
     private StyxServerManager mServer;
     private Thread mServerThread;
 
     @Before
     public void setUp() throws Exception {
         startServer();
-        mConnection = new StyxClientConnection(InetAddress.getByName("localhost"), PORT, false){
+        mConnection = new StyxClientConnection(){
             @Override
             public ILogListener getLogListener() {
                 return null;
@@ -64,6 +66,10 @@ public class ConnectionTest {
                 };*/
             }
         };
+        assertTrue(mConnection.connect(
+                new TCPClientChannelDriver(
+                        InetAddress.getByName("localhost"), PORT, false, mConnection.getIOBufSize()),
+                null, null));
     }
 
     @After
@@ -89,7 +95,6 @@ public class ConnectionTest {
     @Test
     public void testConnection() throws IOException, StyxException, InterruptedException, TimeoutException {
         int count = 1000;
-        assertTrue(mConnection.connect());
         long startTime = System.currentTimeMillis();
         for ( int i = 0; i < count; i++ ) {
             mConnection.sendVersionMessage();
@@ -108,10 +113,9 @@ public class ConnectionTest {
         mConnection.close();
     }
 
-    // TVersion, Tattach, Twalk, create, write, clunk, open, read, remove
+    // TVersion, Tattach, Twalk, create, write, Tclunk, open, read, remove
     @Test
     public void testFileCreation() throws IOException, StyxException, InterruptedException, TimeoutException {
-        assertTrue(mConnection.connect());
         final StyxFile newFile = new StyxFile(mConnection, UUID.randomUUID().toString());
         newFile.create(FileMode.ReadOthersPermission.getMode() |
                 FileMode.WriteOthersPermission.getMode());
@@ -134,7 +138,6 @@ public class ConnectionTest {
 
     @Test
     public void testFSTree() throws IOException, StyxException, InterruptedException, TimeoutException {
-        assertTrue(mConnection.connect());
         // create 2 directory and 4 sub-directories
         String nameA = UUID.randomUUID().toString();
         String nameB = UUID.randomUUID().toString();
@@ -200,7 +203,6 @@ public class ConnectionTest {
     @Test
     public void testBigFileTransmition() 
             throws IOException, StyxException, InterruptedException, TimeoutException {
-        assertTrue(mConnection.connect());
         int filecount = 10;
         byte [] buffer = new byte[156];
         System.out.println("Generating pattern...");
@@ -267,10 +269,9 @@ public class ConnectionTest {
         mConnection.close();        
     }
 
-    // TVersion, Tattach, Twalk, create, write, clunk, open, read, remove
+    // TVersion, Tattach, Twalk, create, write, Tclunk, open, read, remove
     @Test
     public void testFileSeek() throws IOException, StyxException, InterruptedException, TimeoutException {
-        assertTrue(mConnection.connect());
         final StyxFile newFile = new StyxFile(mConnection, UUID.randomUUID().toString());
         newFile.create(FileMode.ReadOthersPermission.getMode() |
                 FileMode.WriteOthersPermission.getMode());

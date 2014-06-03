@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.v2soft.styxlib.library.core.IMessageProcessor;
 import com.v2soft.styxlib.library.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.library.io.StyxDataWriter;
 import com.v2soft.styxlib.library.messages.StyxRAttachMessage;
@@ -41,7 +42,7 @@ import com.v2soft.styxlib.library.server.vfs.IVirtualStyxFile;
  * @author V.Shcriyabets (vshcryabets@gmail.com)
  *
  */
-public class MessagesProcessor implements Closeable {
+public class MessagesProcessor implements IMessageProcessor {
     private String mProtocol;
     private int mIOUnit;
     private IVirtualStyxFile mRoot;
@@ -63,10 +64,11 @@ public class MessagesProcessor implements Closeable {
     }
 
     @Override
-    public void close() throws IOException {
+    public void close() {
+
     }
 
-    protected void removeClient(ClientState client) {
+    public void removeClient(ClientState client) {
         mRoot.onConnectionClosed(client);
     }
 

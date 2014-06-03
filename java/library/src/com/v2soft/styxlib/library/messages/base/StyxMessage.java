@@ -46,7 +46,7 @@ public class StyxMessage {
 
     /**
      * Construct message from DoubleStateBuffer
-     * @param is intput stream
+     * @param buffer input buffer
      * @param io_unit packet size
      * @return constructed Message object
      * @throws IOException

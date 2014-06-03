@@ -36,4 +36,9 @@ public class ClientBalancer implements IMessageProcessor {
             e.printStackTrace();
         }
     }
+
+    @Override
+    public void close() throws IOException {
+        mHandler.close();
+    }
 }

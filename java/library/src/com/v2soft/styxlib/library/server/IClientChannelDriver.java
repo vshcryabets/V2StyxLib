@@ -7,7 +7,6 @@ import com.v2soft.styxlib.library.messages.base.StyxMessage;
  *
  * @author V.Shcryabets (vshcryabets@gmail.com)
  */
-public interface IClientChannelDriver extends IChannelDriver {
+public interface IClientChannelDriver extends IChannelDriver, IMessageTransmitter {
     boolean isConnected();
-    void sendMessage(StyxMessage answer);
 }
