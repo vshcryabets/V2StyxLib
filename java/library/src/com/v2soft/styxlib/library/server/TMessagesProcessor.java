@@ -1,18 +1,7 @@
 package com.v2soft.styxlib.library.server;
 
-import java.io.Closeable;
-import java.io.IOException;
-import java.nio.channels.SocketChannel;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import com.v2soft.styxlib.library.core.IMessageProcessor;
 import com.v2soft.styxlib.library.exceptions.StyxErrorMessageException;
-import com.v2soft.styxlib.library.io.StyxDataWriter;
 import com.v2soft.styxlib.library.messages.StyxRAttachMessage;
 import com.v2soft.styxlib.library.messages.StyxRAuthMessage;
 import com.v2soft.styxlib.library.messages.StyxRErrorMessage;
@@ -31,24 +20,27 @@ import com.v2soft.styxlib.library.messages.StyxTWStatMessage;
 import com.v2soft.styxlib.library.messages.StyxTWalkMessage;
 import com.v2soft.styxlib.library.messages.StyxTWriteMessage;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
-import com.v2soft.styxlib.library.messages.base.StyxTMessage;
 import com.v2soft.styxlib.library.messages.base.StyxTMessageFID;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
 import com.v2soft.styxlib.library.messages.base.structs.StyxQID;
 import com.v2soft.styxlib.library.server.vfs.IVirtualStyxFile;
+
+import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Income Styx messages processor.
  * @author V.Shcriyabets (vshcryabets@gmail.com)
  *
  */
-public class MessagesProcessor implements IMessageProcessor {
+public class TMessagesProcessor implements IMessageProcessor {
     private String mProtocol;
     private int mIOUnit;
     private IVirtualStyxFile mRoot;
     protected int mHandledPackets, mErrorPackets, mAnswerPackets;
 
-    public MessagesProcessor(int iounit, IVirtualStyxFile root, String protocol) {
+    public TMessagesProcessor(int iounit, IVirtualStyxFile root, String protocol) {
         mIOUnit = iounit;
         mRoot = root;
         mProtocol = protocol;
@@ -57,17 +49,17 @@ public class MessagesProcessor implements IMessageProcessor {
         mAnswerPackets = 0;
     }
 
+    @Override
     public void addClient(ClientState client) {
         client.setIOUnit(mIOUnit);
         client.setRoot(mRoot);
         client.setProtocol(mProtocol);
     }
-
     @Override
     public void close() {
 
     }
-
+    @Override
     public void removeClient(ClientState client) {
         mRoot.onConnectionClosed(client);
     }
@@ -77,7 +69,9 @@ public class MessagesProcessor implements IMessageProcessor {
      * @param message incomming message
      * @throws IOException
      */
-    public void processPacket(ClientState client, StyxMessage message) throws IOException {
+    @Override
+    public void processPacket(StyxMessage message) throws IOException {
+        ClientState client = (ClientState) message.getRouteInfo();
         mHandledPackets++;
         StyxMessage answer = null;
         IVirtualStyxFile file;
@@ -138,8 +132,19 @@ public class MessagesProcessor implements IMessageProcessor {
         }
         if ( answer != null ) {
             mAnswerPackets++;
-            client.getDriver().sendMessage(client, answer);
+            answer.setRouteInfo(client);
+            client.getDriver().sendMessage(answer);
         }
+    }
+
+    @Override
+    public int getReceivedPacketsCount() {
+        return mHandledPackets;
+    }
+
+    @Override
+    public int getReceivedErrorPacketsCount() {
+        return mErrorPackets;
     }
 
     private StyxRAttachMessage processAttach(ClientState client, StyxTAttachMessage msg) {

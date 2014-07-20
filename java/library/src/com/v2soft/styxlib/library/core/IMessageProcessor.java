@@ -13,8 +13,8 @@ import java.io.IOException;
  */
 public interface IMessageProcessor extends Closeable {
     public void addClient(ClientState state);
-
     public void removeClient(ClientState state);
-
-    public void processPacket(ClientState client, StyxMessage message) throws IOException;
+    public void processPacket(StyxMessage message) throws IOException;
+    public int getReceivedPacketsCount();
+    public int getReceivedErrorPacketsCount();
 }

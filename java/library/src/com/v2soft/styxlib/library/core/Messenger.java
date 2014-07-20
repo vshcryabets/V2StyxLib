@@ -2,17 +2,14 @@ package com.v2soft.styxlib.library.core;
 
 import com.v2soft.styxlib.ILogListener;
 import com.v2soft.styxlib.library.Consts;
-import com.v2soft.styxlib.library.exceptions.StyxException;
 import com.v2soft.styxlib.library.io.IStyxDataWriter;
 import com.v2soft.styxlib.library.io.StyxDataWriter;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.messages.base.StyxTMessage;
-import com.v2soft.styxlib.library.messages.base.StyxTMessageFID;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
-import com.v2soft.styxlib.library.server.ClientState;
 import com.v2soft.styxlib.library.server.IClientChannelDriver;
 import com.v2soft.styxlib.library.server.IMessageTransmitter;
-import com.v2soft.styxlib.library.server.MessagesProcessor;
+import com.v2soft.styxlib.library.server.TMessagesProcessor;
 import com.v2soft.styxlib.library.server.vfs.IVirtualStyxFile;
 import com.v2soft.styxlib.library.types.ObjectsPoll.ObjectsPollFactory;
 
@@ -33,10 +30,10 @@ public class Messenger implements IMessageTransmitter, ObjectsPollFactory<IStyxD
     private Map<Integer, StyxTMessage> mMessages = new HashMap<Integer, StyxTMessage>();
     private ActiveTags mActiveTags = new ActiveTags();
     private int mIOBufferSize;
-    private int mTransmitedCount, mReceivedCount, mErrorCount, mBuffersAllocated;
+    private int mTransmitedCount, mErrorCount, mBuffersAllocated;
     protected ILogListener mLogListener;
     protected IClientChannelDriver mDriver;
-    protected IMessageProcessor mTMessageProcessor;
+    protected MessagesFilter mFilterProcessor;
 
     public Messenger(IClientChannelDriver driver, int io_unit, StyxMessengerListener listener,
                      ILogListener logListener)
@@ -46,13 +43,22 @@ public class Messenger implements IMessageTransmitter, ObjectsPollFactory<IStyxD
         mIOBufferSize = io_unit;
         mDriver = driver;
         mListener = listener;
-        mDriver.setMessageHandler(mMessageHandler);
+        RMessagesProcessor rProcessor = new RMessagesProcessor();
+        rProcessor.setmActiveTags(mActiveTags);
+        rProcessor.setmListener(mListener);
+        rProcessor.setmLogListener(mLogListener);
+        rProcessor.setmMessagesMap(mMessages);
+        mFilterProcessor = new MessagesFilter(null, rProcessor);
+        mDriver.setMessageHandler(mFilterProcessor);
         mDriver.start();
     }
 
     public void export(IVirtualStyxFile root, String protocol) {
+        IMessageProcessor mTMessageProcessor = mFilterProcessor.getTProcessor();
+
         if ( root != null ) {
-            mTMessageProcessor = new MessagesProcessor(mIOBufferSize, root, protocol);
+            // if root was changed we should close previous TProcessor
+            mTMessageProcessor = new TMessagesProcessor(mIOBufferSize, root, protocol);
         } else {
             if ( mTMessageProcessor != null ) {
                 try {
@@ -63,11 +69,11 @@ public class Messenger implements IMessageTransmitter, ObjectsPollFactory<IStyxD
                 mTMessageProcessor = null;
             }
         }
+        mFilterProcessor.setTProcessor(mTMessageProcessor);
     }
 
     private void resetStatistics() {
         mTransmitedCount = 0;
-        mReceivedCount = 0;
         mErrorCount = 0;
         mBuffersAllocated = 0;
     }
@@ -103,65 +109,6 @@ public class Messenger implements IMessageTransmitter, ObjectsPollFactory<IStyxD
         return false;
     }
 
-    private final IMessageProcessor mMessageHandler = new IMessageProcessor() {
-        @Override
-        public void addClient(ClientState state) {
-            if ( mTMessageProcessor != null ) {
-                mTMessageProcessor.addClient(state);
-            }
-        }
-
-        @Override
-        public void removeClient(ClientState state) {
-            if ( mTMessageProcessor != null ) {
-                mTMessageProcessor.removeClient(state);
-            }
-        }
-
-        @Override
-        public void processPacket(ClientState client, StyxMessage message) {
-            if ( mLogListener != null ) {
-                mLogListener.onMessageReceived(message);
-            }
-            mReceivedCount++;
-            if ( message.getType().isTMessage() ) {
-                if ( mTMessageProcessor != null ) {
-                    try {
-                        mTMessageProcessor.processPacket(client, message);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            } else {
-                int tag = message.getTag();
-                if (!mMessages.containsKey(tag)) // we didn't send T message with such tag, so ignore this R message
-                    return;
-                final StyxTMessage tMessage = mMessages.get(tag);
-                if (tMessage.getType() == MessageType.Tclunk ||
-                        tMessage.getType() == MessageType.Tremove) {
-                    mListener.onFIDReleased(((StyxTMessageFID) tMessage).getFID());
-                }
-                try {
-                    tMessage.setAnswer(message);
-                } catch (StyxException e) {
-                    e.printStackTrace();
-                }
-                if (message.getType() == MessageType.Rerror) {
-                    mErrorCount++;
-                }
-                mMessages.remove(tag);
-                mActiveTags.releaseTag(tag);
-            }
-        }
-
-        @Override
-        public void close() throws IOException {
-            if ( mTMessageProcessor != null ) {
-                mTMessageProcessor.close();
-            }
-        }
-    };
-
     public class ActiveTags {
         private LinkedList<Integer> mAvailableTags = new LinkedList<Integer>();
         private int mLastTag = 0;
@@ -196,16 +143,9 @@ public class Messenger implements IMessageTransmitter, ObjectsPollFactory<IStyxD
     public void close() throws IOException {
         mDriver.close();
     }
-
-    public StyxMessengerListener getListener() {
-        return mListener;
-    }
-    public void setListener(StyxMessengerListener mListener) {
-        this.mListener = mListener;
-    }
-
+    @Override
     public int getTransmitedCount() {return mTransmitedCount;}
-    public int getReceivedCount() {return mReceivedCount;}
+    @Override
     public int getErrorsCount() {return mErrorCount;}
     public int getAllocationCount() {return mBuffersAllocated;}
 

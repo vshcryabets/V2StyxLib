@@ -43,8 +43,8 @@ public class TCPClientChannelDriver extends TCPChannelDriver implements IClientC
 
     @Override
     public boolean sendMessage(StyxMessage message) {
-        super.sendMessage(mPseudoClient, message);
-        return true;
+        message.setRouteInfo(mPseudoClient);
+        return super.sendMessage(message);
     }
 
     @Override
@@ -65,7 +65,8 @@ public class TCPClientChannelDriver extends TCPChannelDriver implements IClientC
                             final long packetSize = reader.getUInt32();
                             if ( buffer.remainsToRead() >= packetSize ) {
                                 final StyxMessage message = StyxMessage.factory(reader, mIOUnit);
-                                mMessageHandler.processPacket(mPseudoClient, message);
+                                message.setRouteInfo(mPseudoClient);
+                                mMessageHandler.processPacket(message);
                             } else {
                                 break;
                             }

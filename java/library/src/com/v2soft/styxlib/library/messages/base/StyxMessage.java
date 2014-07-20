@@ -43,6 +43,7 @@ public class StyxMessage {
     // ========================================================
     private int mTag;
     private MessageType mType;
+    protected Object mRouteInfo;
 
     /**
      * Construct message from DoubleStateBuffer
@@ -227,5 +228,12 @@ public class StyxMessage {
     public String toString() {
         return String.format("Type: %s\nTag: %d", 
                 getType().toString(), getTag());
+    }
+
+    public Object getRouteInfo() {
+        return mRouteInfo;
+    }
+    public void setRouteInfo(Object info) {
+        mRouteInfo = info;
     }
 }

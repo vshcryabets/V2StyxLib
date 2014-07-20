@@ -26,6 +26,8 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
     protected boolean isWorking;
     protected IMessageProcessor mMessageHandler;
     protected int mIOUnit;
+    protected int mTransmitedPacketsCount;
+    protected int mTransmissionErrorsCount;
 
     public TCPChannelDriver(InetAddress address, int port, boolean ssl, int IOUnit) throws IOException {
         mPort = port;
@@ -35,6 +37,8 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
         InetSocketAddress socketAddress = new InetSocketAddress(address, port);
 
         prepareSocket(socketAddress, ssl);
+        mTransmitedPacketsCount = 0;
+        mTransmissionErrorsCount = 0;
     }
 
     protected abstract void prepareSocket(InetSocketAddress socketAddress, boolean ssl) throws IOException;
@@ -54,18 +58,23 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
     }
 
     @Override
-    public void sendMessage(ClientState client, StyxMessage answer) {
+    public boolean sendMessage(StyxMessage message) {
+        ClientState client = (ClientState) message.getRouteInfo();
         if ( client == null ) {
             throw new NullPointerException("Client can't be null");
         }
         ByteBuffer buffer = ((TCPClientState)client).getOutputBuffer();
         try {
-            answer.writeToBuffer(new StyxDataWriter(buffer));
+            message.writeToBuffer(new StyxDataWriter(buffer));
             buffer.position(0);
             ((TCPClientState)client).getChannel().write(buffer);
+            mTransmitedPacketsCount++;
+            return true;
         } catch (IOException e) {
             e.printStackTrace();
+            mTransmissionErrorsCount++;
         }
+        return false;
     }
 
     public void setMessageHandler(IMessageProcessor handler) {
@@ -110,10 +119,20 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
             long packetSize = client.getInputReader().getUInt32();
             if ( inBuffer >= packetSize ) {
                 final StyxMessage message = StyxMessage.factory(client.getInputReader(), mIOUnit);
-                mMessageHandler.processPacket(client, message);
+                message.setRouteInfo(client);
+                mMessageHandler.processPacket(message);
                 return true;
             }
         }
         return false;
+    }
+
+    @Override
+    public int getTransmitedCount() {
+        return mTransmitedPacketsCount;
+    }
+    @Override
+    public int getErrorsCount() {
+        return mTransmissionErrorsCount;
     }
 }

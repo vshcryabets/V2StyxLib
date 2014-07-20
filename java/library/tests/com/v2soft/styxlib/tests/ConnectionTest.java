@@ -102,11 +102,11 @@ public class ConnectionTest {
         }
         long diff = System.currentTimeMillis()-startTime;
         System.out.println(String.format("\tTransmited %d messages\n\t" +
-                "Received %d messages\n\t" +
+                //"Received %d messages\n\t" +
                 "Error %d messages\n\t" +
                 "Average time for connection %d ms", 
                 mConnection.getMessenger().getTransmitedCount(),
-                mConnection.getMessenger().getReceivedCount(),
+//                mConnection.getMessenger().getReceivedCount(),
                 mConnection.getMessenger().getErrorsCount(),
                 diff/count
                 ));
@@ -263,7 +263,7 @@ public class ConnectionTest {
         System.out.println(String.format("Write done in %d ms", (writeTime-startTime)));
         System.out.println(String.format("Read done in %d ms", diff));
         System.out.println(String.format("\tTransmited %d messages", mConnection.getMessenger().getTransmitedCount()));
-        System.out.println(String.format("\tReceived %d messages", mConnection.getMessenger().getReceivedCount()));
+//        System.out.println(String.format("\tReceived %d messages", mConnection.getMessenger().getReceivedCount()));
         System.out.println(String.format("\tError %d messages", mConnection.getMessenger().getErrorsCount()));
         //        System.out.println(String.format("\tAverage time for connection %d ms",diff/count));
         mConnection.close();        
