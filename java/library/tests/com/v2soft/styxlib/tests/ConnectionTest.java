@@ -8,8 +8,6 @@ import com.v2soft.styxlib.library.StyxServerManager;
 import com.v2soft.styxlib.library.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.library.exceptions.StyxException;
 import com.v2soft.styxlib.library.io.StyxFileBufferedInputStream;
-import com.v2soft.styxlib.library.messages.base.StyxMessage;
-import com.v2soft.styxlib.library.messages.base.StyxTMessage;
 import com.v2soft.styxlib.library.messages.base.enums.FileMode;
 import com.v2soft.styxlib.library.server.tcp.TCPClientChannelDriver;
 import com.v2soft.styxlib.library.server.tcp.TCPServerManager;
@@ -105,7 +103,7 @@ public class ConnectionTest {
                 //"Received %d messages\n\t" +
                 "Error %d messages\n\t" +
                 "Average time for connection %d ms", 
-                mConnection.getMessenger().getTransmitedCount(),
+                mConnection.getMessenger().getTransmittedCount(),
 //                mConnection.getMessenger().getReceivedCount(),
                 mConnection.getMessenger().getErrorsCount(),
                 diff/count
@@ -262,7 +260,7 @@ public class ConnectionTest {
         long diff = System.currentTimeMillis()-writeTime;
         System.out.println(String.format("Write done in %d ms", (writeTime-startTime)));
         System.out.println(String.format("Read done in %d ms", diff));
-        System.out.println(String.format("\tTransmited %d messages", mConnection.getMessenger().getTransmitedCount()));
+        System.out.println(String.format("\tTransmited %d messages", mConnection.getMessenger().getTransmittedCount()));
 //        System.out.println(String.format("\tReceived %d messages", mConnection.getMessenger().getReceivedCount()));
         System.out.println(String.format("\tError %d messages", mConnection.getMessenger().getErrorsCount()));
         //        System.out.println(String.format("\tAverage time for connection %d ms",diff/count));

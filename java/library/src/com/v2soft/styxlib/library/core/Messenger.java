@@ -1,9 +1,6 @@
 package com.v2soft.styxlib.library.core;
 
 import com.v2soft.styxlib.ILogListener;
-import com.v2soft.styxlib.library.Consts;
-import com.v2soft.styxlib.library.io.IStyxDataWriter;
-import com.v2soft.styxlib.library.io.StyxDataWriter;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.messages.base.StyxTMessage;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
@@ -11,16 +8,17 @@ import com.v2soft.styxlib.library.server.IClientChannelDriver;
 import com.v2soft.styxlib.library.server.IMessageTransmitter;
 import com.v2soft.styxlib.library.server.TMessagesProcessor;
 import com.v2soft.styxlib.library.server.vfs.IVirtualStyxFile;
-import com.v2soft.styxlib.library.types.ObjectsPoll.ObjectsPollFactory;
+import com.v2soft.styxlib.library.utils.MessageTagPoll;
 
 import java.io.IOException;
 import java.net.SocketException;
-import java.nio.ByteBuffer;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.Map;
 
-public class Messenger implements IMessageTransmitter, ObjectsPollFactory<IStyxDataWriter> {
+/**
+ * @author V.Shcryabets<vshcryabets@gmail.com>
+ */
+public class Messenger implements IMessageTransmitter {
     public interface StyxMessengerListener {
         void onSocketDisconnected();
         void onTrashReceived();
@@ -28,9 +26,9 @@ public class Messenger implements IMessageTransmitter, ObjectsPollFactory<IStyxD
     }
     private StyxMessengerListener mListener;
     private Map<Integer, StyxTMessage> mMessages = new HashMap<Integer, StyxTMessage>();
-    private ActiveTags mActiveTags = new ActiveTags();
+    private MessageTagPoll mActiveTags = new MessageTagPoll();
     private int mIOBufferSize;
-    private int mTransmitedCount, mErrorCount, mBuffersAllocated;
+    private int mTransmittedCount, mErrorCount, mBuffersAllocated;
     protected ILogListener mLogListener;
     protected IClientChannelDriver mDriver;
     protected MessagesFilter mFilterProcessor;
@@ -44,10 +42,10 @@ public class Messenger implements IMessageTransmitter, ObjectsPollFactory<IStyxD
         mDriver = driver;
         mListener = listener;
         RMessagesProcessor rProcessor = new RMessagesProcessor();
-        rProcessor.setmActiveTags(mActiveTags);
-        rProcessor.setmListener(mListener);
-        rProcessor.setmLogListener(mLogListener);
-        rProcessor.setmMessagesMap(mMessages);
+        rProcessor.setActiveTags(mActiveTags);
+        rProcessor.setListener(mListener);
+        rProcessor.setLogListener(mLogListener);
+        rProcessor.setMessagesMap(mMessages);
         mFilterProcessor = new MessagesFilter(null, rProcessor);
         mDriver.setMessageHandler(mFilterProcessor);
         mDriver.start();
@@ -73,7 +71,7 @@ public class Messenger implements IMessageTransmitter, ObjectsPollFactory<IStyxD
     }
 
     private void resetStatistics() {
-        mTransmitedCount = 0;
+        mTransmittedCount = 0;
         mErrorCount = 0;
         mBuffersAllocated = 0;
     }
@@ -94,14 +92,14 @@ public class Messenger implements IMessageTransmitter, ObjectsPollFactory<IStyxD
                 // set message tag
                 int tag = StyxMessage.NOTAG;
                 if (message.getType() != MessageType.Tversion) {
-                    tag = mActiveTags.getTag();
+                    tag = mActiveTags.getFreeItem();
                 }
                 message.setTag((short) tag);
                 mMessages.put(tag, (StyxTMessage)message);
             }
 
             mDriver.sendMessage( message);
-            mTransmitedCount++;
+            mTransmittedCount++;
             return true;
         } catch (SocketException e) {
             mListener.onSocketDisconnected();
@@ -109,50 +107,13 @@ public class Messenger implements IMessageTransmitter, ObjectsPollFactory<IStyxD
         return false;
     }
 
-    public class ActiveTags {
-        private LinkedList<Integer> mAvailableTags = new LinkedList<Integer>();
-        private int mLastTag = 0;
-        private Object mSync = new Object();
-
-        public int getTag()
-        {
-            synchronized (mSync)
-            {
-                if (!mAvailableTags.isEmpty())
-                    return mAvailableTags.poll();
-
-                mLastTag++;
-                if (mLastTag > Consts.MAXUSHORT)
-                    mLastTag = 0;
-                return mLastTag;
-            }
-        }
-
-        public boolean releaseTag(int tag)
-        {
-            synchronized (mSync)
-            {
-                if (tag == StyxMessage.NOTAG)
-                    return false;
-                return mAvailableTags.add(tag);
-            }
-        }
-    }
-
     @Override
     public void close() throws IOException {
         mDriver.close();
     }
     @Override
-    public int getTransmitedCount() {return mTransmitedCount;}
+    public int getTransmittedCount() {return mTransmittedCount;}
     @Override
     public int getErrorsCount() {return mErrorCount;}
     public int getAllocationCount() {return mBuffersAllocated;}
-
-    @Override
-    public IStyxDataWriter create() {
-        mBuffersAllocated++;
-        return new StyxDataWriter(ByteBuffer.allocateDirect(mIOBufferSize));
-    }
-
 }

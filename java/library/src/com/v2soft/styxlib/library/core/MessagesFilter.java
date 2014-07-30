@@ -2,7 +2,6 @@ package com.v2soft.styxlib.library.core;
 
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.server.ClientState;
-import com.v2soft.styxlib.library.server.TMessagesProcessor;
 
 import java.io.IOException;
 

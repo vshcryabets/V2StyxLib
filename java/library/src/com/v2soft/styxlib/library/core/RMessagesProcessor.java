@@ -7,19 +7,20 @@ import com.v2soft.styxlib.library.messages.base.StyxTMessage;
 import com.v2soft.styxlib.library.messages.base.StyxTMessageFID;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
 import com.v2soft.styxlib.library.server.ClientState;
+import com.v2soft.styxlib.library.utils.MessageTagPoll;
 
 import java.io.IOException;
 import java.util.Map;
 
 /**
- * Created by mrco on 7/20/14.
+ * @author V.Shcryabets<vshcryabets@gmail.com>
  */
 public class RMessagesProcessor implements IMessageProcessor {
     protected ILogListener mLogListener;
     protected int mReceivedCount, mErrorCount;
     protected Map<Integer, StyxTMessage> mMessagesMap;
     protected Messenger.StyxMessengerListener mListener;
-    protected Messenger.ActiveTags mActiveTags;
+    protected MessageTagPoll mActiveTags;
 
     @Override
     public void addClient(ClientState state) {
@@ -54,7 +55,7 @@ public class RMessagesProcessor implements IMessageProcessor {
             mErrorCount++;
         }
         mMessagesMap.remove(tag);
-        mActiveTags.releaseTag(tag);
+        mActiveTags.release(tag);
     }
 
     @Override
@@ -72,19 +73,19 @@ public class RMessagesProcessor implements IMessageProcessor {
 
     }
 
-    public void setmLogListener(ILogListener mLogListener) {
+    public void setLogListener(ILogListener mLogListener) {
         this.mLogListener = mLogListener;
     }
 
-    public void setmMessagesMap(Map<Integer, StyxTMessage> mMessagesMap) {
+    public void setMessagesMap(Map<Integer, StyxTMessage> mMessagesMap) {
         this.mMessagesMap = mMessagesMap;
     }
 
-    public void setmListener(Messenger.StyxMessengerListener mListener) {
+    public void setListener(Messenger.StyxMessengerListener mListener) {
         this.mListener = mListener;
     }
 
-    public void setmActiveTags(Messenger.ActiveTags mActiveTags) {
+    public void setActiveTags(MessageTagPoll mActiveTags) {
         this.mActiveTags = mActiveTags;
     }
 

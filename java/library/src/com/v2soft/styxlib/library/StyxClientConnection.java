@@ -2,11 +2,10 @@ package com.v2soft.styxlib.library;
 
 import java.io.Closeable;
 import java.io.IOException;
-import java.security.InvalidParameterException;
-import java.util.LinkedList;
 import java.util.concurrent.TimeoutException;
 
 import com.v2soft.styxlib.ILogListener;
+import com.v2soft.styxlib.library.utils.FIDPoll;
 import com.v2soft.styxlib.library.core.Messenger;
 import com.v2soft.styxlib.library.core.Messenger.StyxMessengerListener;
 import com.v2soft.styxlib.library.exceptions.StyxErrorMessageException;
@@ -53,7 +52,7 @@ implements Closeable, StyxMessengerListener, IClient {
     private StyxQID mAuthQID;
     private StyxQID mQID;
     private long mFID = StyxMessage.NOFID;
-    private ActiveFids mActiveFids = new ActiveFids();
+    private FIDPoll mActiveFids = new FIDPoll();
     protected IVirtualStyxFile mExportedRoot = null;
 
     public StyxClientConnection() {
@@ -98,8 +97,7 @@ implements Closeable, StyxMessengerListener, IClient {
         return mMessenger;
     }		
 
-    public ActiveFids getActiveFids()
-    {
+    protected FIDPoll getActiveFids() {
         return mActiveFids;
     }
 
@@ -156,7 +154,7 @@ implements Closeable, StyxMessengerListener, IClient {
 
     @Override
     public long allocateFID() {
-        return mActiveFids.getFreeFid();
+        return mActiveFids.getFreeItem();
     }
 
     public void sendVersionMessage()
@@ -188,7 +186,7 @@ implements Closeable, StyxMessengerListener, IClient {
 
     private void sendAuthMessage()
             throws InterruptedException, StyxException, IOException, TimeoutException {
-        mAuthFID = getActiveFids().getFreeFid();
+        mAuthFID = getActiveFids().getFreeItem();
 
         StyxTAuthMessage tAuth = new StyxTAuthMessage(mAuthFID);
         tAuth.setUserName(getUserName());
@@ -211,7 +209,7 @@ implements Closeable, StyxMessengerListener, IClient {
 
     private void sendAttachMessage()
             throws InterruptedException, StyxException, TimeoutException, IOException {
-        mFID = getActiveFids().getFreeFid();
+        mFID = getActiveFids().getFreeItem();
         StyxTAttachMessage tAttach = new StyxTAttachMessage(getFID(), getAuthFID(),
                 getUserName(),
                 getMountPoint());
@@ -242,42 +240,6 @@ implements Closeable, StyxMessengerListener, IClient {
 
     public void export(IVirtualStyxFile root) {
         mExportedRoot = root;
-    }
-
-    public class ActiveFids
-    {
-        private LinkedList<Long> mAvailableFids = new LinkedList<Long>();
-        private long mLastFid = 0L;
-
-        /**
-         * @return Return free FID
-         */
-        protected long getFreeFid() {
-            synchronized (mAvailableFids) {
-                if (!mAvailableFids.isEmpty())
-                    return mAvailableFids.poll();
-                mLastFid++;
-                if(mLastFid > Consts.MAXUNINT)
-                    mLastFid = 0;
-                return mLastFid;
-            }
-        }
-
-        protected boolean releaseFid(long fid) {
-            synchronized (mAvailableFids) {
-                if (fid == StyxMessage.NOFID)
-                    return false;
-                if ( mAvailableFids.contains(fid)) {
-                    throw new InvalidParameterException(
-                            String.format("Something goes wrong, this FID(%d) already has been released", fid));
-                }
-                return mAvailableFids.add(fid);
-            }
-        }
-        protected void clean() {
-            mAvailableFids.clear();
-            mLastFid = 0;
-        }
     }
     //-------------------------------------------------------------------------------------
     // Getters
@@ -318,6 +280,6 @@ implements Closeable, StyxMessengerListener, IClient {
 
     @Override
     public void onFIDReleased(long fid) {
-        mActiveFids.releaseFid(fid);
+        mActiveFids.release(fid);
     }
 }

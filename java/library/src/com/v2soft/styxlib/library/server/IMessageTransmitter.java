@@ -12,6 +12,6 @@ import java.io.IOException;
  */
 public interface IMessageTransmitter extends Closeable {
     boolean sendMessage(StyxMessage answer) throws IOException;
-    int getTransmitedCount();
+    int getTransmittedCount();
     int getErrorsCount();
 }
