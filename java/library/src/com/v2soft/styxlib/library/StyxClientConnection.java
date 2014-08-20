@@ -1,11 +1,6 @@
 package com.v2soft.styxlib.library;
 
-import java.io.Closeable;
-import java.io.IOException;
-import java.util.concurrent.TimeoutException;
-
 import com.v2soft.styxlib.ILogListener;
-import com.v2soft.styxlib.library.utils.FIDPoll;
 import com.v2soft.styxlib.library.core.Messenger;
 import com.v2soft.styxlib.library.core.Messenger.StyxMessengerListener;
 import com.v2soft.styxlib.library.exceptions.StyxErrorMessageException;
@@ -20,9 +15,14 @@ import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.messages.base.StyxTMessageFID;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
 import com.v2soft.styxlib.library.messages.base.structs.StyxQID;
+import com.v2soft.styxlib.library.server.ClientState;
 import com.v2soft.styxlib.library.server.IClientChannelDriver;
 import com.v2soft.styxlib.library.server.IMessageTransmitter;
-import com.v2soft.styxlib.library.server.vfs.IVirtualStyxFile;
+import com.v2soft.styxlib.library.utils.FIDPoll;
+
+import java.io.Closeable;
+import java.io.IOException;
+import java.util.concurrent.TimeoutException;
 
 /**
  * Styx client conection
@@ -53,7 +53,7 @@ implements Closeable, StyxMessengerListener, IClient {
     private StyxQID mQID;
     private long mFID = StyxMessage.NOFID;
     private FIDPoll mActiveFids = new FIDPoll();
-    protected IVirtualStyxFile mExportedRoot = null;
+    protected ClientState mRecepient;
 
     public StyxClientConnection() {
         this(null, null);
@@ -67,6 +67,7 @@ implements Closeable, StyxMessengerListener, IClient {
 
     /**
      * Connect to server with specified parameters
+     * @param driver channel driver
      * @param username user name
      * @param password password 
      * @return true if connected
@@ -76,15 +77,36 @@ implements Closeable, StyxMessengerListener, IClient {
      */
     public boolean connect(IClientChannelDriver driver, String username, String password)
             throws IOException, StyxException, InterruptedException, TimeoutException {
+        if (driver == null ) {
+            throw new NullPointerException("Channel driver can't be null");
+        }
         mUserName = username;
         mPassword = password;
         mMountPoint = "/";
         mNeedAuth = (username != null);
-        mMessenger = new Messenger(driver, mIOBufSize, this, getLogListener());
-        ((Messenger)mMessenger).export(mExportedRoot, getProtocol());
+        mMessenger = initMessenger(driver);
+        mRecepient = driver.getClients().iterator().next();
         sendVersionMessage();
         isConnected = driver.isConnected();
+
         return driver.isConnected();
+    }
+    /**
+     * Connect to server with specified parameters
+     * @param driver channel driver
+     * @return true if connected
+     * @throws IOException
+     * @throws StyxException
+     * @throws TimeoutException
+     */
+    public boolean connect(IClientChannelDriver driver)
+            throws IOException, StyxException, InterruptedException, TimeoutException {
+        return connect(driver, null, null);
+    }
+
+    protected IMessageTransmitter initMessenger(IClientChannelDriver driver) throws IOException {
+        IMessageTransmitter result = new Messenger(driver, mIOBufSize, this, getLogListener());
+        return result;
     }
 
     public StyxFile getRoot() throws StyxException, InterruptedException, TimeoutException, IOException {
@@ -149,7 +171,7 @@ implements Closeable, StyxMessengerListener, IClient {
     public void releaseFID(long fid)
             throws InterruptedException, StyxException, TimeoutException, IOException {
         final StyxTMessageFID tClunk = new StyxTMessageFID(MessageType.Tclunk, MessageType.Rclunk, fid);
-        mMessenger.sendMessage(tClunk);
+        mMessenger.sendMessage(tClunk, mRecepient);
     }
 
     @Override
@@ -170,7 +192,7 @@ implements Closeable, StyxMessengerListener, IClient {
         }
 
         StyxTVersionMessage tVersion = new StyxTVersionMessage(mIOBufSize, getProtocol());
-        mMessenger.sendMessage(tVersion);
+        mMessenger.sendMessage(tVersion, mRecepient);
 
         StyxMessage rMessage = tVersion.waitForAnswer(mTimeout);
         StyxErrorMessageException.doException(rMessage);
@@ -191,7 +213,7 @@ implements Closeable, StyxMessengerListener, IClient {
         StyxTAuthMessage tAuth = new StyxTAuthMessage(mAuthFID);
         tAuth.setUserName(getUserName());
         tAuth.setMountPoint(getMountPoint());
-        mMessenger.sendMessage(tAuth);
+        mMessenger.sendMessage(tAuth, mRecepient);
 
         StyxMessage rMessage = tAuth.waitForAnswer(mTimeout);
         StyxErrorMessageException.doException(rMessage);
@@ -213,7 +235,7 @@ implements Closeable, StyxMessengerListener, IClient {
         StyxTAttachMessage tAttach = new StyxTAttachMessage(getFID(), getAuthFID(),
                 getUserName(),
                 getMountPoint());
-        mMessenger.sendMessage(tAttach);
+        mMessenger.sendMessage(tAttach, mRecepient);
 
         StyxMessage rMessage = tAttach.waitForAnswer(mTimeout);
         StyxErrorMessageException.doException(rMessage);
@@ -236,10 +258,6 @@ implements Closeable, StyxMessengerListener, IClient {
 
     public String getProtocol() {
         return PROTOCOL;
-    }
-
-    public void export(IVirtualStyxFile root) {
-        mExportedRoot = root;
     }
     //-------------------------------------------------------------------------------------
     // Getters
@@ -281,5 +299,10 @@ implements Closeable, StyxMessengerListener, IClient {
     @Override
     public void onFIDReleased(long fid) {
         mActiveFids.release(fid);
+    }
+
+    @Override
+    public ClientState getRecepient() {
+        return mRecepient;
     }
 }

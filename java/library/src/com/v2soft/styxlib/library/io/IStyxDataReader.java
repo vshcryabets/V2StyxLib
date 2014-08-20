@@ -1,8 +1,8 @@
 package com.v2soft.styxlib.library.io;
 
-import java.io.IOException;
-
 import com.v2soft.styxlib.library.types.ULong;
+
+import java.io.IOException;
 
 public interface IStyxDataReader {
     short readUInt8() throws IOException;

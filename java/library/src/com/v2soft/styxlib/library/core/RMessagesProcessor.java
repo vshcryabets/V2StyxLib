@@ -33,7 +33,7 @@ public class RMessagesProcessor implements IMessageProcessor {
     }
 
     @Override
-    public void processPacket(StyxMessage message) throws IOException {
+    public void processPacket(StyxMessage message, ClientState transmitter) throws IOException {
         if ( mLogListener != null ) {
             mLogListener.onMessageReceived(message);
         }

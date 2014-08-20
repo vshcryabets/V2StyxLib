@@ -1,9 +1,5 @@
 package com.v2soft.styxlib.library.messages.base;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
-
 import com.v2soft.styxlib.library.io.IStyxDataReader;
 import com.v2soft.styxlib.library.io.IStyxDataWriter;
 import com.v2soft.styxlib.library.messages.StyxRAttachMessage;
@@ -28,6 +24,10 @@ import com.v2soft.styxlib.library.messages.StyxTWriteMessage;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
 import com.v2soft.styxlib.library.messages.base.enums.ModeType;
 import com.v2soft.styxlib.library.messages.base.structs.StyxQID;
+
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 
 public class StyxMessage {
     // ========================================================
@@ -230,10 +230,10 @@ public class StyxMessage {
                 getType().toString(), getTag());
     }
 
-    public Object getRouteInfo() {
-        return mRouteInfo;
-    }
-    public void setRouteInfo(Object info) {
-        mRouteInfo = info;
-    }
+//    public Object getRouteInfo() {
+//        return mRouteInfo;
+//    }
+//    public void setRouteInfo(Object info) {
+//        mRouteInfo = info;
+//    }
 }

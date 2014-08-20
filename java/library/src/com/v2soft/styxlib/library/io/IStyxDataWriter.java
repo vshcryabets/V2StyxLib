@@ -1,9 +1,9 @@
 package com.v2soft.styxlib.library.io;
 
+import com.v2soft.styxlib.library.types.ULong;
+
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-
-import com.v2soft.styxlib.library.types.ULong;
 
 public interface IStyxDataWriter {
     void writeUInt8(short val) throws IOException;

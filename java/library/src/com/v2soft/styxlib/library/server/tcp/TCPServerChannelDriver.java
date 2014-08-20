@@ -11,8 +11,12 @@ import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Stack;
 
 /**
@@ -26,10 +30,12 @@ public class TCPServerChannelDriver extends TCPChannelDriver {
     private ServerSocketChannel mChannel;
     private Selector mSelector;
     private Stack<SocketChannel> mNewConnetions, mReadable;
+    protected HashSet<ClientState> mClients;
     private Map<SocketChannel, TCPClientState> mClientStatesMap;
 
     public TCPServerChannelDriver(InetAddress address, int port, boolean ssl, int IOUnit) throws IOException {
         super(address, port, ssl, IOUnit);
+        mClients = new HashSet<ClientState>();
         mNewConnetions = new Stack<SocketChannel>();
         mReadable = new Stack<SocketChannel>();
         mClientStatesMap = new HashMap<SocketChannel, TCPClientState>();
@@ -111,6 +117,7 @@ public class TCPServerChannelDriver extends TCPChannelDriver {
             TCPClientState client = new TCPClientState(channel, this, mIOUnit);
             mMessageHandler.addClient(client);
             mClientStatesMap.put(channel, client);
+            mClients.add(client);
         }
         mNewConnetions.clear();
         // new readables
@@ -127,7 +134,13 @@ public class TCPServerChannelDriver extends TCPChannelDriver {
     private void removeClient(SocketChannel channel) throws IOException {
         final ClientState client = mClientStatesMap.get(channel);
         mMessageHandler.removeClient(client);
+        mClients.remove(client);
         mClientStatesMap.remove(channel);
         channel.close();
+    }
+
+    @Override
+    public Set<ClientState> getClients() {
+        return mClients;
     }
 }

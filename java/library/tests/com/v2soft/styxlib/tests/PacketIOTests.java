@@ -40,7 +40,7 @@ public class PacketIOTests {
     private static final int PORT = 10234;
     private static final String FILE_NAME = "md5file";
     private StyxServerManager mServer;
-    private Thread mServerThread;
+    private Thread[] mServerThreads;
 
     @Before
     public void setUp() throws Exception {
@@ -50,7 +50,9 @@ public class PacketIOTests {
     @After
     public void shutDown() throws InterruptedException, IOException {
         mServer.close();
-        mServerThread.join();
+        for ( Thread thread : mServerThreads ) {
+            thread.join();
+        }
     }
 
     private void startServer() throws IOException {
@@ -102,7 +104,7 @@ public class PacketIOTests {
                 PORT,
                 false,
                 root);
-        mServerThread = mServer.start();
+        mServerThreads = mServer.start();
     }
 
     @Test

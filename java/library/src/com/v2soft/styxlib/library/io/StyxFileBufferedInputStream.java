@@ -1,11 +1,11 @@
 package com.v2soft.styxlib.library.io;
 
+import com.v2soft.styxlib.library.server.ClientState;
+import com.v2soft.styxlib.library.server.IMessageTransmitter;
+
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-
-import com.v2soft.styxlib.library.core.Messenger;
-import com.v2soft.styxlib.library.server.IMessageTransmitter;
 
 /**
  * 
@@ -22,8 +22,9 @@ public class StyxFileBufferedInputStream extends InputStream {
      */
     public StyxFileBufferedInputStream(IMessageTransmitter messenger,
             long file, 
-            int iounit) {
-        mUnbufferedInput = new StyxUnbufferedInputStream(file, messenger, iounit);
+            int iounit,
+            ClientState recepient) {
+        mUnbufferedInput = new StyxUnbufferedInputStream(file, messenger, iounit, recepient);
         mBufferedInput = new CBufferedInputStream(mUnbufferedInput, iounit);
     }
     

@@ -38,14 +38,14 @@ public class MessagesFilter implements IMessageProcessor {
     }
 
     @Override
-    public void processPacket(StyxMessage message) throws IOException {
+    public void processPacket(StyxMessage message, ClientState transmitter) throws IOException {
         if ( message.getType().isTMessage() ) {
             if ( mTProcessor != null ) {
-                mTProcessor.processPacket(message);
+                mTProcessor.processPacket(message, transmitter);
             }
         } else {
             if ( mRProcessor != null ) {
-                mRProcessor.processPacket(message);
+                mRProcessor.processPacket(message, transmitter);
             }
         }
     }

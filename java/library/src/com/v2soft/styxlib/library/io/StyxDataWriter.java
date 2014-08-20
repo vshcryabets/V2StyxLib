@@ -1,10 +1,10 @@
 package com.v2soft.styxlib.library.io;
 
+import com.v2soft.styxlib.library.types.ULong;
+
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
-
-import com.v2soft.styxlib.library.types.ULong;
 
 public class StyxDataWriter implements IStyxDataWriter {
     private static final int sDataBufferSize = 16;

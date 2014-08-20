@@ -57,7 +57,6 @@ public class TMessagesProcessor implements IMessageProcessor {
     }
     @Override
     public void close() {
-
     }
     @Override
     public void removeClient(ClientState client) {
@@ -70,8 +69,7 @@ public class TMessagesProcessor implements IMessageProcessor {
      * @throws IOException
      */
     @Override
-    public void processPacket(StyxMessage message) throws IOException {
-        ClientState client = (ClientState) message.getRouteInfo();
+    public void processPacket(StyxMessage message, ClientState client) throws IOException {
         mHandledPackets++;
         StyxMessage answer = null;
         IVirtualStyxFile file;
@@ -132,8 +130,7 @@ public class TMessagesProcessor implements IMessageProcessor {
         }
         if ( answer != null ) {
             mAnswerPackets++;
-            answer.setRouteInfo(client);
-            client.getDriver().sendMessage(answer);
+            client.getDriver().sendMessage(answer, client);
         }
     }
 
@@ -277,5 +274,9 @@ public class TMessagesProcessor implements IMessageProcessor {
         byte [] buffer = new byte[(int) msg.getCount()];
         long readed = file.read(client, buffer, msg.getOffset(), msg.getCount());
         return new StyxRReadMessage(msg.getTag(), buffer, (int) readed);
+    }
+
+    public IVirtualStyxFile getRoot() {
+        return mRoot;
     }
 }

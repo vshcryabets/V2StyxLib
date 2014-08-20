@@ -1,12 +1,12 @@
 package com.v2soft.styxlib.library.messages;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-
 import com.v2soft.styxlib.library.io.IStyxDataReader;
 import com.v2soft.styxlib.library.io.IStyxDataWriter;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
+
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 
 public class StyxRWriteMessage extends StyxMessage {
 	private long mCount;

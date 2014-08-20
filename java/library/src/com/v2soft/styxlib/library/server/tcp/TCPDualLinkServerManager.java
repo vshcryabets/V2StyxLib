@@ -12,16 +12,16 @@ import java.net.InetAddress;
  *
  * @author V.Shcryabets (vshcryabets@gmail.com)
  */
-public class TCPTwoWayServerManager extends TCPServerManager {
+public class TCPDualLinkServerManager extends TCPServerManager {
 
-    public TCPTwoWayServerManager(InetAddress address, int port, boolean ssl, IVirtualStyxFile root) throws IOException {
+    private static final String DUAL_LINK_PROTO = "9P2000_2VDL";
+
+    public TCPDualLinkServerManager(InetAddress address, int port, boolean ssl, IVirtualStyxFile root) throws IOException {
         super(address, port, ssl, root);
     }
 
-    public IClient getClient(ClientState client) {
-        // 1. construct IClientChannelDriver
-
-        // 2. create new instance of StyxClientConnection
-        return null;
+    @Override
+    public String getProtocol() {
+        return DUAL_LINK_PROTO;
     }
 }

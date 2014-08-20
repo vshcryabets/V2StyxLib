@@ -13,6 +13,8 @@ import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.nio.channels.ClosedByInterruptException;
 import java.nio.channels.SocketChannel;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created by V.Shcryabets on 5/22/14.
@@ -42,9 +44,11 @@ public class TCPClientChannelDriver extends TCPChannelDriver implements IClientC
     }
 
     @Override
-    public boolean sendMessage(StyxMessage message) {
-        message.setRouteInfo(mPseudoClient);
-        return super.sendMessage(message);
+    public boolean sendMessage(StyxMessage message, ClientState recepient) {
+        if ( !recepient.equals(mPseudoClient)) {
+            throw new IllegalArgumentException("Wrong recepient");
+        }
+        return super.sendMessage(message, recepient);
     }
 
     @Override
@@ -65,8 +69,7 @@ public class TCPClientChannelDriver extends TCPChannelDriver implements IClientC
                             final long packetSize = reader.getUInt32();
                             if ( buffer.remainsToRead() >= packetSize ) {
                                 final StyxMessage message = StyxMessage.factory(reader, mIOUnit);
-                                message.setRouteInfo(mPseudoClient);
-                                mMessageHandler.processPacket(message);
+                                mMessageHandler.processPacket(message, mPseudoClient);
                             } else {
                                 break;
                             }
@@ -88,5 +91,12 @@ public class TCPClientChannelDriver extends TCPChannelDriver implements IClientC
 
     public Socket getSocket() {
         return mChanel.socket();
+    }
+
+    @Override
+    public Set<ClientState> getClients() {
+        Set<ClientState> result = new HashSet<ClientState>();
+        result.add(mPseudoClient);
+        return result;
     }
 }

@@ -1,13 +1,13 @@
 package com.v2soft.styxlib.library.messages;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-
 import com.v2soft.styxlib.library.io.IStyxDataReader;
 import com.v2soft.styxlib.library.io.IStyxDataWriter;
 import com.v2soft.styxlib.library.messages.base.StyxTMessageFID;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
 import com.v2soft.styxlib.library.types.ULong;
+
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 
 public class StyxTReadMessage extends StyxTMessageFID {
 	private ULong mOffset;

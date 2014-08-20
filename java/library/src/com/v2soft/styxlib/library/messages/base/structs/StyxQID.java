@@ -1,11 +1,11 @@
 package com.v2soft.styxlib.library.messages.base.structs;
 
-import java.io.IOException;
-
 import com.v2soft.styxlib.library.io.IStyxDataReader;
 import com.v2soft.styxlib.library.io.IStyxDataWriter;
 import com.v2soft.styxlib.library.messages.base.enums.QIDType;
 import com.v2soft.styxlib.library.types.ULong;
+
+import java.io.IOException;
 
 /**
  * Styx QID structure

@@ -42,7 +42,7 @@ public class ConnectionTest {
     private static final int PORT = 10234;
     private IClient mConnection;
     private StyxServerManager mServer;
-    private Thread mServerThread;
+    private Thread[] mServerThreads;
 
     @Before
     public void setUp() throws Exception {
@@ -51,17 +51,6 @@ public class ConnectionTest {
             @Override
             public ILogListener getLogListener() {
                 return null;
-                        /*new ILogListener() {
-                    @Override
-                    public void onMessageReceived(StyxMessage message) {
-                        System.out.println("Got message "+message.getType());
-                    }
-
-                    @Override
-                    public void onSendMessage(StyxTMessage message) {
-
-                    }
-                };*/
             }
         };
         assertTrue(mConnection.connect(
@@ -74,7 +63,9 @@ public class ConnectionTest {
     public void shutDown() throws InterruptedException, IOException {
         mConnection.close();
         mServer.close();
-        mServerThread.join();
+        for ( Thread thread : mServerThreads ) {
+            thread.join();
+        }
     }
 
     private void startServer() throws IOException {
@@ -86,7 +77,7 @@ public class ConnectionTest {
                 PORT,
                 false,
                 new DiskStyxDirectory(testDirectory));
-        mServerThread = mServer.start();
+        mServerThreads = mServer.start();
     }
 
     // TVersion & TAttach

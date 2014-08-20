@@ -11,4 +11,5 @@ import com.v2soft.styxlib.library.messages.base.StyxTMessage;
 public interface ILogListener {
     public void onMessageReceived(StyxMessage message);
     public void onSendMessage(StyxMessage message);
+    public void onException(Throwable err);
 }

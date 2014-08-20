@@ -1,5 +1,11 @@
 package com.v2soft.styxlib.library.messages;
 
+import com.v2soft.styxlib.library.io.IStyxDataReader;
+import com.v2soft.styxlib.library.io.IStyxDataWriter;
+import com.v2soft.styxlib.library.messages.base.StyxMessage;
+import com.v2soft.styxlib.library.messages.base.enums.MessageType;
+import com.v2soft.styxlib.library.messages.base.structs.StyxQID;
+
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
@@ -7,12 +13,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-
-import com.v2soft.styxlib.library.io.IStyxDataReader;
-import com.v2soft.styxlib.library.io.IStyxDataWriter;
-import com.v2soft.styxlib.library.messages.base.StyxMessage;
-import com.v2soft.styxlib.library.messages.base.enums.MessageType;
-import com.v2soft.styxlib.library.messages.base.structs.StyxQID;
 
 public class StyxRWalkMessage extends StyxMessage {
 	private List<StyxQID> mQIDList;

@@ -1,5 +1,6 @@
 package com.v2soft.styxlib.library.server.tcp;
 
+import com.v2soft.styxlib.ILogListener;
 import com.v2soft.styxlib.library.StyxServerManager;
 import com.v2soft.styxlib.library.core.IMessageProcessor;
 import com.v2soft.styxlib.library.io.StyxDataWriter;
@@ -19,25 +20,22 @@ import java.nio.ByteBuffer;
  */
 public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
     private static final String TAG = TCPChannelDriver.class.getSimpleName();
-    private int mPort;
-    private boolean mSSL;
-    private boolean mNeedAuth;
     private Thread mAcceptorThread;
     protected boolean isWorking;
     protected IMessageProcessor mMessageHandler;
     protected int mIOUnit;
-    protected int mTransmitedPacketsCount;
+    protected int mTransmittedPacketsCount;
     protected int mTransmissionErrorsCount;
+    protected ILogListener mLogListener;
 
     public TCPChannelDriver(InetAddress address, int port, boolean ssl, int IOUnit) throws IOException {
-        mPort = port;
         mIOUnit = IOUnit;
 
         // Bind the server socket to the local host and port
         InetSocketAddress socketAddress = new InetSocketAddress(address, port);
 
         prepareSocket(socketAddress, ssl);
-        mTransmitedPacketsCount = 0;
+        mTransmittedPacketsCount = 0;
         mTransmissionErrorsCount = 0;
     }
 
@@ -58,20 +56,21 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
     }
 
     @Override
-    public boolean sendMessage(StyxMessage message) {
-        ClientState client = (ClientState) message.getRouteInfo();
-        if ( client == null ) {
+    public boolean sendMessage(StyxMessage message, ClientState recepient) {
+        if ( recepient == null ) {
             throw new NullPointerException("Client can't be null");
         }
-        ByteBuffer buffer = ((TCPClientState)client).getOutputBuffer();
+        ByteBuffer buffer = ((TCPClientState)recepient).getOutputBuffer();
         try {
             message.writeToBuffer(new StyxDataWriter(buffer));
             buffer.position(0);
-            ((TCPClientState)client).getChannel().write(buffer);
-            mTransmitedPacketsCount++;
+            ((TCPClientState)recepient).getChannel().write(buffer);
+            mTransmittedPacketsCount++;
             return true;
         } catch (IOException e) {
-            e.printStackTrace();
+            if ( mLogListener != null ) {
+                mLogListener.onException(e);
+            }
             mTransmissionErrorsCount++;
         }
         return false;
@@ -100,7 +99,7 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
             read = -1;
         }
         if ( read == -1 ) {
-            close();
+            close(); // TODO WTF?? WHY close?
             return true;
         } else {
             while ( process(client) );
@@ -109,7 +108,7 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
     }
 
     /**
-     *
+     * Read income message from specified client.
      * @return true if message was processed
      * @throws IOException
      */
@@ -119,8 +118,7 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
             long packetSize = client.getInputReader().getUInt32();
             if ( inBuffer >= packetSize ) {
                 final StyxMessage message = StyxMessage.factory(client.getInputReader(), mIOUnit);
-                message.setRouteInfo(client);
-                mMessageHandler.processPacket(message);
+                mMessageHandler.processPacket(message, client);
                 return true;
             }
         }
@@ -129,7 +127,7 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
 
     @Override
     public int getTransmittedCount() {
-        return mTransmitedPacketsCount;
+        return mTransmittedPacketsCount;
     }
     @Override
     public int getErrorsCount() {

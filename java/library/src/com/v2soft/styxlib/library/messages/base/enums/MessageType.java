@@ -1,7 +1,5 @@
 package com.v2soft.styxlib.library.messages.base.enums;
 
-import java.util.HashMap;
-
 public enum MessageType {
 	Tversion(100), Rversion(101), Tauth(102), Rauth(103), Tattach(104), Rattach(105),
 	Rerror(107), Tflush(108), Rflush(109), Twalk(110), Rwalk(111), Topen(112), Ropen(113),
@@ -9,7 +7,6 @@ public enum MessageType {
 	Rclunk(121), Tremove(122), Rremove(123), Tstat(124), Rstat(125), Twstat(126), Rwstat(127);
 	
 	private int mByte;
-//    private HashMap<Integer, MessageType> mMap;
 	
 	public static MessageType factory(int b) {
 		MessageType[] messages = MessageType.values();

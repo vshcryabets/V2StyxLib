@@ -71,6 +71,9 @@ public class JavaServerSample {
                 PORT,
                 false,
                 root);
-        mServer.start().join();
+        Thread[] threads = mServer.start();
+        for(Thread thread : threads) {
+            thread.join();
+        }
     }
 }

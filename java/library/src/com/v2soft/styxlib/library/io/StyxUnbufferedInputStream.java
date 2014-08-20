@@ -1,8 +1,5 @@
 package com.v2soft.styxlib.library.io;
 
-import java.io.IOException;
-import java.io.InputStream;
-
 import com.v2soft.styxlib.library.StyxClientConnection;
 import com.v2soft.styxlib.library.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.library.messages.StyxRReadMessage;
@@ -10,8 +7,12 @@ import com.v2soft.styxlib.library.messages.StyxTReadMessage;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.messages.base.StyxTMessageFID;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
+import com.v2soft.styxlib.library.server.ClientState;
 import com.v2soft.styxlib.library.server.IMessageTransmitter;
 import com.v2soft.styxlib.library.types.ULong;
+
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * Unbuffered input styx output stream
@@ -25,11 +26,16 @@ public class StyxUnbufferedInputStream extends InputStream {
     private IMessageTransmitter mMessenger;
     private ULong mFileOffset = ULong.ZERO;
     private int mIOUnitSize;
+    protected ClientState mRecepient;
 
-    public StyxUnbufferedInputStream(long file, IMessageTransmitter messenger, int iounit) {
+    public StyxUnbufferedInputStream(long file, IMessageTransmitter messenger, int iounit, ClientState recepient) {
+        if ( recepient == null ) {
+            throw new NullPointerException("recepient is null");
+        }
         if ( messenger == null ) {
             throw new NullPointerException("messenger is null");
         }
+        mRecepient = recepient;
         mIOUnitSize = iounit;
         mFile = file;
         mMessenger = messenger;
@@ -52,7 +58,7 @@ public class StyxUnbufferedInputStream extends InputStream {
         try {
             // send Tread
             final StyxTReadMessage tRead = new StyxTReadMessage(mFile, mFileOffset, len);
-            mMessenger.sendMessage(tRead);
+            mMessenger.sendMessage(tRead, mRecepient);
             final StyxMessage rMessage = tRead.waitForAnswer(mTimeout);
             StyxErrorMessageException.doException(rMessage);
 
@@ -83,7 +89,7 @@ public class StyxUnbufferedInputStream extends InputStream {
     public void close() throws IOException {
         // send Tclunk
         final StyxTMessageFID tClunk = new StyxTMessageFID(MessageType.Tclunk, MessageType.Rclunk, mFile);
-        mMessenger.sendMessage(tClunk);
+        mMessenger.sendMessage(tClunk, mRecepient);
         StyxMessage rMessage;
         try {
             rMessage = tClunk.waitForAnswer(mTimeout);

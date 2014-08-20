@@ -1,12 +1,12 @@
 package com.v2soft.styxlib.library.messages;
 
-import java.io.IOException;
-
 import com.v2soft.styxlib.library.io.IStyxDataReader;
 import com.v2soft.styxlib.library.io.IStyxDataWriter;
 import com.v2soft.styxlib.library.messages.base.StyxTMessageFID;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
 import com.v2soft.styxlib.library.messages.base.structs.StyxStat;
+
+import java.io.IOException;
 
 public class StyxTWStatMessage extends StyxTMessageFID {
 	private StyxStat mStat;

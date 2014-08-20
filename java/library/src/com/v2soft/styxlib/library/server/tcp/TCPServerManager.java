@@ -16,7 +16,7 @@ public class TCPServerManager extends StyxServerManager {
 
     public TCPServerManager(InetAddress address, int port, boolean ssl, IVirtualStyxFile root) throws IOException {
         super(root);
-        setDriver(prepareDriver(address, port, ssl));
+        addDriver(prepareDriver(address, port, ssl));
     }
 
     private IChannelDriver prepareDriver(InetAddress address, int port, boolean ssl) throws IOException {

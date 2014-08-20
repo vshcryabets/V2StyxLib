@@ -1,8 +1,8 @@
 package com.v2soft.styxlib.library.io;
 
-import java.io.UnsupportedEncodingException;
-
 import com.v2soft.styxlib.library.types.ULong;
+
+import java.io.UnsupportedEncodingException;
 
 public class StyxDataReader implements IStyxDataReader {
     protected static final int sDataBufferSize = 16;

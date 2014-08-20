@@ -27,8 +27,8 @@ public class ClientBalancer implements IMessageProcessor {
         mHandler.removeClient(state);
     }
     @Override
-    public void processPacket(StyxMessage message) throws IOException {
-        mHandler.processPacket(message);
+    public void processPacket(StyxMessage message, ClientState transmitter) throws IOException {
+        mHandler.processPacket(message, transmitter);
     }
 
     @Override

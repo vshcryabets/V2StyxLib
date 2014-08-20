@@ -1,11 +1,11 @@
 package com.v2soft.styxlib.library.io;
 
+import com.v2soft.styxlib.library.types.ULong;
+
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
-
-import com.v2soft.styxlib.library.types.ULong;
 
 public class StyxDataInputStream 
     extends FilterInputStream 

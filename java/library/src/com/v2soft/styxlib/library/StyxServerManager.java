@@ -1,15 +1,14 @@
 package com.v2soft.styxlib.library;
 
 import com.v2soft.styxlib.library.core.Messenger.StyxMessengerListener;
-import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.server.ClientBalancer;
 import com.v2soft.styxlib.library.server.IChannelDriver;
 import com.v2soft.styxlib.library.server.vfs.IVirtualStyxFile;
 
 import java.io.Closeable;
 import java.io.IOException;
-import java.security.InvalidParameterException;
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  * 
@@ -27,24 +26,30 @@ implements Closeable, StyxMessengerListener {
     //---------------------------------------------------------------------------
     // Class fields
     //---------------------------------------------------------------------------
-    protected IChannelDriver mDriver;
+    protected List<IChannelDriver> mDrivers;
     private int mTimeout = DEFAULT_TIMEOUT;
     private ClientBalancer mBalancer;
 
     public StyxServerManager(IVirtualStyxFile root) {
         mBalancer = new ClientBalancer(getIOUnit(), root, getProtocol());
+        mDrivers = new LinkedList<IChannelDriver>();
     }
 
-    public void setDriver(IChannelDriver driver) {
+    public void addDriver(IChannelDriver driver) {
         if ( driver == null ) {
             throw new NullPointerException("Driver is null");
         }
-        mDriver = driver;
-        mDriver.setMessageHandler(mBalancer);
+        mDrivers.add(driver);
+        driver.setMessageHandler(mBalancer);
     }
 
-    public Thread start() {
-        return mDriver.start();
+    public Thread[] start() {
+        int count = mDrivers.size();
+        Thread[] result = new Thread[count];
+        for ( int i = 0 ; i < count; i++ ) {
+            result[i] = mDrivers.get(i).start();
+        }
+        return result;
     }
 
     public int getIOUnit()
@@ -54,7 +59,10 @@ implements Closeable, StyxMessengerListener {
 
     @Override
     public void close() throws IOException {
-        mDriver.close();
+        int count = mDrivers.size();
+        for ( int i = 0 ; i < count; i++ ) {
+            mDrivers.get(i).close();
+        }
     }
 
     public String getProtocol() {
@@ -85,5 +93,9 @@ implements Closeable, StyxMessengerListener {
     public void onFIDReleased(long fid) {
         // TODO Auto-generated method stub
         
+    }
+
+    public List<IChannelDriver> getDrivers() {
+        return mDrivers;
     }
 }

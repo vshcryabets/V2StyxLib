@@ -1,7 +1,7 @@
 package com.v2soft.styxlib.library;
 
-import com.v2soft.styxlib.library.core.Messenger;
 import com.v2soft.styxlib.library.exceptions.StyxException;
+import com.v2soft.styxlib.library.server.ClientState;
 import com.v2soft.styxlib.library.server.IClientChannelDriver;
 import com.v2soft.styxlib.library.server.IMessageTransmitter;
 
@@ -61,4 +61,10 @@ public interface IClient extends Closeable {
     long allocateFID();
 
     int getIOBufSize();
+
+    /**
+     *
+     * @return message recepient information
+     */
+    ClientState getRecepient();
 }

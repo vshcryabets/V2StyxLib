@@ -1,10 +1,10 @@
 package com.v2soft.styxlib.library.messages.base;
 
-import java.util.concurrent.TimeoutException;
-
 import com.v2soft.styxlib.library.exceptions.StyxException;
 import com.v2soft.styxlib.library.exceptions.StyxWrongMessageException;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
+
+import java.util.concurrent.TimeoutException;
 
 public class StyxTMessage extends StyxMessage {
     private StyxMessage mAnswer;

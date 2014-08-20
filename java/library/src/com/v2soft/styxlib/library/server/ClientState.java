@@ -23,7 +23,6 @@ implements Closeable {
     protected IVirtualStyxFile mClientRoot;
     protected HashMap<Long, IVirtualStyxFile> mAssignedFiles;
     protected IChannelDriver mDriver;
-    private ByteBuffer mB;
 
     public ClientState(IChannelDriver driver) throws FileNotFoundException {
         if ( driver == null ) throw new NullPointerException("Driver is null");
