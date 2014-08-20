@@ -20,7 +20,7 @@ import java.nio.ByteBuffer;
  */
 public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
     private static final String TAG = TCPChannelDriver.class.getSimpleName();
-    private Thread mAcceptorThread;
+    protected Thread mAcceptorThread;
     protected boolean isWorking;
     protected IMessageProcessor mMessageHandler;
     protected int mIOUnit;
@@ -50,7 +50,7 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
         if ( mMessageHandler == null ) {
             throw new IllegalStateException("Message handler is null");
         }
-        mAcceptorThread = new Thread(this, TAG);
+        mAcceptorThread = new Thread(this, toString());
         mAcceptorThread.start();
         return mAcceptorThread;
     }
@@ -82,7 +82,7 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
 
     @Override
     public void close() {
-        isWorking= false;
+        isWorking = false;
     }
 
     /**
@@ -99,7 +99,6 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
             read = -1;
         }
         if ( read == -1 ) {
-            close(); // TODO WTF?? WHY close?
             return true;
         } else {
             while ( process(client) );

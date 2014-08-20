@@ -22,12 +22,13 @@ import java.util.Set;
  * @author V.Shcryabets (vshcryabets@gmail.com)
  */
 public class TCPClientChannelDriver extends TCPChannelDriver implements IClientChannelDriver {
+    public static final int PSEUDO_CLIENT_ID = 1;
     protected SocketChannel mChanel;
     protected ClientState mPseudoClient;
 
     public TCPClientChannelDriver(InetAddress address, int port, boolean ssl, int IOUnit) throws IOException {
         super(address, port, ssl, IOUnit);
-        mPseudoClient = new TCPClientState(mChanel, this, IOUnit);
+        mPseudoClient = new TCPClientState(mChanel, this, IOUnit, PSEUDO_CLIENT_ID);
     }
 
     @Override
@@ -86,7 +87,19 @@ public class TCPClientChannelDriver extends TCPChannelDriver implements IClientC
             }
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            try {
+                mChanel.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
+    }
+
+    @Override
+    public void close() {
+        super.close();
+        mAcceptorThread.interrupt();
     }
 
     public Socket getSocket() {

@@ -21,9 +21,9 @@ public class TCPClientState extends ClientState {
     protected StyxByteBufferReadable mBuffer;
     protected StyxDataReader mReader;
 
-    public TCPClientState(SocketChannel channel, IChannelDriver driver, int iounit) throws FileNotFoundException {
-        super(driver);
-        if ( channel == null ) throw new NullPointerException("Client channel is null");
+    public TCPClientState(SocketChannel channel, IChannelDriver driver, int iounit, int id) throws FileNotFoundException {
+        super(driver, id);
+        if ( channel == null ) throw new NullPointerException("Client channel can't be null");
         mChannel = channel;
         setIOUnit(iounit);
     }

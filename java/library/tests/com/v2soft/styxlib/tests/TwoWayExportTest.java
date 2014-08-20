@@ -127,6 +127,9 @@ public class TwoWayExportTest {
         assertEquals(1, clients.size());
         ClientState pseudoClient = clients.iterator().next();
         assertNotNull(pseudoClient);
+        assertNotNull(pseudoClient.getDriver());
+        assertEquals(driver, pseudoClient.getDriver());
+        assertEquals(TCPClientChannelDriver.PSEUDO_CLIENT_ID, pseudoClient.getId());
         connection.close();
     }
 
@@ -142,7 +145,7 @@ public class TwoWayExportTest {
         IClientChannelDriver driver2 = new TCPClientChannelDriver(
                 InetAddress.getByName("127.0.0.1"), PORT,
                 false, connection2.getIOBufSize());
-        assertTrue(connection2.connect(driver));
+        assertTrue(connection2.connect(driver2));
 
         List<IChannelDriver> drivers = mServer.getDrivers();
         assertNotNull(drivers);
@@ -151,8 +154,19 @@ public class TwoWayExportTest {
         assertNotNull(clients);
         assertEquals(2, clients.size());
 
+        String tag1 = driver.toString();
+        String tag2 = driver2.toString();
         connection2.close();
+        Thread.sleep(500);
+        clients = drivers.get(0).getClients();
+        assertNotNull(clients);
+        assertEquals(1, clients.size());
+
         connection.close();
+        Thread.sleep(500);
+        clients = drivers.get(0).getClients();
+        assertNotNull(clients);
+        assertEquals(0, clients.size());
     }
 
 }

@@ -27,11 +27,12 @@ import java.util.Stack;
 public class TCPServerChannelDriver extends TCPChannelDriver {
     private static final String TAG = TCPServerChannelDriver.class.getSimpleName();
 
-    private ServerSocketChannel mChannel;
-    private Selector mSelector;
-    private Stack<SocketChannel> mNewConnetions, mReadable;
+    protected ServerSocketChannel mChannel;
+    protected Selector mSelector;
+    protected Stack<SocketChannel> mNewConnetions, mReadable;
     protected HashSet<ClientState> mClients;
-    private Map<SocketChannel, TCPClientState> mClientStatesMap;
+    protected Map<SocketChannel, TCPClientState> mClientStatesMap;
+    protected int mLastClientId = 1;
 
     public TCPServerChannelDriver(InetAddress address, int port, boolean ssl, int IOUnit) throws IOException {
         super(address, port, ssl, IOUnit);
@@ -114,7 +115,7 @@ public class TCPServerChannelDriver extends TCPChannelDriver {
         // new connections
         for (SocketChannel channel : mNewConnetions) {
             channel.configureBlocking(false);
-            TCPClientState client = new TCPClientState(channel, this, mIOUnit);
+            TCPClientState client = new TCPClientState(channel, this, mIOUnit, mLastClientId++);
             mMessageHandler.addClient(client);
             mClientStatesMap.put(channel, client);
             mClients.add(client);

@@ -23,12 +23,14 @@ implements Closeable {
     protected IVirtualStyxFile mClientRoot;
     protected HashMap<Long, IVirtualStyxFile> mAssignedFiles;
     protected IChannelDriver mDriver;
+    protected int mId;
 
-    public ClientState(IChannelDriver driver) throws FileNotFoundException {
+    public ClientState(IChannelDriver driver, int id) throws FileNotFoundException {
         if ( driver == null ) throw new NullPointerException("Driver is null");
         mAssignedFiles = new HashMap<Long, IVirtualStyxFile>();
         mUserName = "nobody";
         mDriver = driver;
+        mId = id;
     }
 
     protected IVirtualStyxFile getAssignedFile(long fid) throws StyxErrorMessageException {
@@ -83,4 +85,7 @@ implements Closeable {
         return mDriver;
     }
 
+    public int getId() {
+        return mId;
+    }
 }
