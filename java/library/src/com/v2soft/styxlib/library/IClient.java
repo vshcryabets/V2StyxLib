@@ -2,8 +2,9 @@ package com.v2soft.styxlib.library;
 
 import com.v2soft.styxlib.library.exceptions.StyxException;
 import com.v2soft.styxlib.library.server.ClientState;
-import com.v2soft.styxlib.library.server.IClientChannelDriver;
+import com.v2soft.styxlib.library.server.IChannelDriver;
 import com.v2soft.styxlib.library.server.IMessageTransmitter;
+import com.v2soft.styxlib.library.types.Credentials;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -27,14 +28,31 @@ public interface IClient extends Closeable {
             throws InterruptedException, StyxException, IOException, TimeoutException;
     /**
      * Connect to server with specified parameters
-     * @param username user name
-     * @param password password
      * @return true if connected
      * @throws java.io.IOException
      * @throws com.v2soft.styxlib.library.exceptions.StyxException
      * @throws java.util.concurrent.TimeoutException
      */
-    public boolean connect(IClientChannelDriver driver, String username, String password)
+    public boolean connect(IChannelDriver driver)
+            throws IOException, StyxException, InterruptedException, TimeoutException;
+    /**
+     * Connect to server with specified parameters
+     * @param credentials user credentials
+     * @return true if connected
+     * @throws java.io.IOException
+     * @throws com.v2soft.styxlib.library.exceptions.StyxException
+     * @throws java.util.concurrent.TimeoutException
+     */
+    public boolean connect(IChannelDriver driver, Credentials credentials)
+            throws IOException, StyxException, InterruptedException, TimeoutException;
+    /**
+     * Connect to server.
+     * @return true if connected
+     * @throws java.io.IOException
+     * @throws com.v2soft.styxlib.library.exceptions.StyxException
+     * @throws java.util.concurrent.TimeoutException
+     */
+    public boolean connect()
             throws IOException, StyxException, InterruptedException, TimeoutException;
 
     boolean isConnected();

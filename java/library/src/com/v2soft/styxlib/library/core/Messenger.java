@@ -5,7 +5,7 @@ import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.messages.base.StyxTMessage;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
 import com.v2soft.styxlib.library.server.ClientState;
-import com.v2soft.styxlib.library.server.IClientChannelDriver;
+import com.v2soft.styxlib.library.server.IChannelDriver;
 import com.v2soft.styxlib.library.server.IMessageTransmitter;
 import com.v2soft.styxlib.library.utils.MessageTagPoll;
 
@@ -29,10 +29,10 @@ public class Messenger implements IMessageTransmitter {
     protected int mIOBufferSize;
     protected int mTransmittedCount, mErrorCount;
     protected ILogListener mLogListener;
-    protected IClientChannelDriver mDriver;
+    protected IChannelDriver mDriver;
     protected IMessageProcessor mMessageProcessor;
 
-    public Messenger(IClientChannelDriver driver, int io_unit, StyxMessengerListener listener,
+    public Messenger(IChannelDriver driver, int io_unit, StyxMessengerListener listener,
                      ILogListener logListener)
             throws IOException {
         mLogListener = logListener;

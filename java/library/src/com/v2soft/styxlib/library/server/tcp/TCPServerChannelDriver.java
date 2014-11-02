@@ -144,4 +144,9 @@ public class TCPServerChannelDriver extends TCPChannelDriver {
     public Set<ClientState> getClients() {
         return mClients;
     }
+
+    @Override
+    public boolean isConnected() {
+        return true;
+    }
 }

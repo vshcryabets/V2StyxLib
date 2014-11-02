@@ -2,7 +2,7 @@ package com.v2soft.styxlib.library;
 
 import com.v2soft.styxlib.library.core.Messenger;
 import com.v2soft.styxlib.library.core.MessengerWithExport;
-import com.v2soft.styxlib.library.server.IClientChannelDriver;
+import com.v2soft.styxlib.library.server.IChannelDriver;
 import com.v2soft.styxlib.library.server.IMessageTransmitter;
 import com.v2soft.styxlib.library.server.tcp.TCPDualLinkServerManager;
 import com.v2soft.styxlib.library.server.vfs.IVirtualStyxFile;
@@ -29,7 +29,7 @@ public class DualLinkClientConnection extends StyxClientConnection {
     }
 
     @Override
-    protected IMessageTransmitter initMessenger(IClientChannelDriver driver) throws IOException {
+    protected IMessageTransmitter initMessenger(IChannelDriver driver) throws IOException {
         MessengerWithExport result = new MessengerWithExport(driver, getIOBufSize(), this, getLogListener());
         if ( mExportedRoot != null ) {
             result.export(mExportedRoot, getProtocol());

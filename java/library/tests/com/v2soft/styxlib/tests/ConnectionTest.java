@@ -56,7 +56,7 @@ public class ConnectionTest {
         assertTrue(mConnection.connect(
                 new TCPClientChannelDriver(
                         InetAddress.getByName("localhost"), PORT, false, mConnection.getIOBufSize()),
-                null, null));
+                null));
     }
 
     @After

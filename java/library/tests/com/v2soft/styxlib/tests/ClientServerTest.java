@@ -1,10 +1,12 @@
 package com.v2soft.styxlib.tests;
 
+import com.v2soft.styxlib.library.IClient;
 import com.v2soft.styxlib.library.StyxClientConnection;
 import com.v2soft.styxlib.library.StyxFile;
 import com.v2soft.styxlib.library.StyxServerManager;
 import com.v2soft.styxlib.library.exceptions.StyxException;
 import com.v2soft.styxlib.library.io.DualStreams;
+import com.v2soft.styxlib.library.server.IChannelDriver;
 import com.v2soft.styxlib.library.server.tcp.TCPClientChannelDriver;
 import com.v2soft.styxlib.library.server.tcp.TCPServerManager;
 import com.v2soft.styxlib.library.server.vfs.MemoryStyxDirectory;
@@ -62,26 +64,27 @@ public class ClientServerTest {
     // TVersion & TAttach
     @Test
     public void testMD5() throws IOException, StyxException, InterruptedException, TimeoutException, NoSuchAlgorithmException {
+        IClient connection = new StyxClientConnection();
+        IChannelDriver driver = new TCPClientChannelDriver(
+                InetAddress.getByName("127.0.0.1"), PORT, false, connection.getIOBufSize());
+        assertTrue(connection.connect(driver, null));
+        checkMD5Hash(connection);
+        connection.close();
+    }
+
+    protected static void checkMD5Hash(IClient connection) throws NoSuchAlgorithmException, InterruptedException, StyxException, TimeoutException, IOException {
         Random random = new Random();
         byte[] someData = new byte[1024];
         random.nextBytes(someData);
         MessageDigest digest = MessageDigest.getInstance("MD5");
         byte [] localHash = digest.digest(someData);
-
-
-        StyxClientConnection mConnection = new StyxClientConnection();
         byte [] remoteHash = new byte[16];
-
-        assertTrue(mConnection.connect(new TCPClientChannelDriver(
-                InetAddress.getByName("127.0.0.1"), PORT, false, mConnection.getIOBufSize()), null, null));
-        final StyxFile newFile = new StyxFile(mConnection, MD5StyxFile.FILE_NAME);
+        final StyxFile newFile = new StyxFile(connection, MD5StyxFile.FILE_NAME);
         DualStreams streams = newFile.openForReadAndWrite();
         streams.output.write(someData);
         streams.output.flush();
         int read = streams.input.read(remoteHash);
         streams.close();
-        mConnection.close();
-
         assertEquals("Wrong remote hash size", 16, read);
         assertArrayEquals("Wrong remote hash", localHash, remoteHash);
     }

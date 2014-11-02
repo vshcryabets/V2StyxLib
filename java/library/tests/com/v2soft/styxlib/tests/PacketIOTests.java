@@ -120,7 +120,7 @@ public class PacketIOTests {
         assertTrue(mConnection.connect(
                 new TCPClientChannelDriver(
                         InetAddress.getByName("localhost"), PORT, false, mConnection.getIOBufSize()),
-                null, null));
+                null));
 
         final StyxFile newFile = new StyxFile(mConnection, FILE_NAME);
         OutputStream output = newFile.openForWriteUnbuffered();

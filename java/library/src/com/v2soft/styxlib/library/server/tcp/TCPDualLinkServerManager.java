@@ -1,8 +1,11 @@
 package com.v2soft.styxlib.library.server.tcp;
 
 import com.v2soft.styxlib.library.IClient;
+import com.v2soft.styxlib.library.StyxClientConnection;
 import com.v2soft.styxlib.library.server.ClientState;
+import com.v2soft.styxlib.library.server.IChannelDriver;
 import com.v2soft.styxlib.library.server.vfs.IVirtualStyxFile;
+import com.v2soft.styxlib.library.types.Credentials;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -23,5 +26,13 @@ public class TCPDualLinkServerManager extends TCPServerManager {
     @Override
     public String getProtocol() {
         return DUAL_LINK_PROTO;
+    }
+
+    public IClient getReverseConnectionForClient(ClientState client, Credentials credentials) {
+        StyxClientConnection connection = new StyxClientConnection(credentials);
+        IChannelDriver driver = client.getDriver();
+        connection.setDriver(driver);
+//        connection.connect(mDrivers);
+        return connection;
     }
 }

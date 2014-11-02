@@ -50,6 +50,9 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
         if ( mMessageHandler == null ) {
             throw new IllegalStateException("Message handler is null");
         }
+        if ( mAcceptorThread != null ) {
+            throw new IllegalStateException("Already started");
+        }
         mAcceptorThread = new Thread(this, toString());
         mAcceptorThread.start();
         return mAcceptorThread;

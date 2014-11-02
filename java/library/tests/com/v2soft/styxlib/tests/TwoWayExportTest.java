@@ -2,19 +2,14 @@ package com.v2soft.styxlib.tests;
 
 import com.v2soft.styxlib.library.DualLinkClientConnection;
 import com.v2soft.styxlib.library.IClient;
-import com.v2soft.styxlib.library.StyxClientConnection;
-import com.v2soft.styxlib.library.StyxFile;
 import com.v2soft.styxlib.library.exceptions.StyxException;
-import com.v2soft.styxlib.library.io.DualStreams;
 import com.v2soft.styxlib.library.server.ClientState;
 import com.v2soft.styxlib.library.server.IChannelDriver;
-import com.v2soft.styxlib.library.server.IClientChannelDriver;
 import com.v2soft.styxlib.library.server.tcp.TCPClientChannelDriver;
 import com.v2soft.styxlib.library.server.tcp.TCPDualLinkServerManager;
 import com.v2soft.styxlib.library.server.vfs.MemoryStyxDirectory;
 import com.v2soft.styxlib.library.server.vfs.MemoryStyxFile;
-
-import junit.framework.Assert;
+import com.v2soft.styxlib.library.types.Credentials;
 
 import org.junit.After;
 import org.junit.Before;
@@ -22,16 +17,12 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
-import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.TimeoutException;
 
 import static junit.framework.TestCase.assertNotNull;
-import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -77,40 +68,25 @@ public class TwoWayExportTest {
         root.addFile(md5);
         DualLinkClientConnection connection = new DualLinkClientConnection();
         connection.export(root);
+        IChannelDriver driver = new TCPClientChannelDriver(
+                InetAddress.getByName("127.0.0.1"), PORT,
+                false, connection.getIOBufSize());
 
-        Random random = new Random();
-        byte[] someData = new byte[1024];
-        random.nextBytes(someData);
-        MessageDigest digest = MessageDigest.getInstance("MD5");
-        byte [] localHash = digest.digest(someData);
-
-        byte [] remoteHash = new byte[16];
-
-        assertTrue(connection.connect(new TCPClientChannelDriver(
-                InetAddress.getByName("127.0.0.1"), PORT, false, connection.getIOBufSize()), null, null));
-        final StyxFile newFile = new StyxFile(connection, MD5StyxFile.FILE_NAME);
-        DualStreams streams = newFile.openForReadAndWrite();
-        streams.output.write(someData);
-        streams.output.flush();
-        int read = streams.input.read(remoteHash);
-        streams.close();
-        assertEquals("Wrong remote hash size", 16, read);
-        assertArrayEquals("Wrong remote hash", localHash, remoteHash);
+        assertTrue(connection.connect(driver));
+//        ClientServerTest.checkMD5Hash(connection);
 
         // reverse test
         List<IChannelDriver> drivers = mServer.getDrivers();
-//        List<ClientState> clients = drivers.get(0).getClients();
-//        IClient client = mServer.getClient(clients.get(0));
-//        final StyxFile clientFile = new StyxFile(client, MD5StyxFile.FILE_NAME);
-//        streams = newFile.openForReadAndWrite();
-//        streams.output.write(someData);
-//        streams.output.flush();
-//        read = streams.input.read(remoteHash);
-//        streams.close();
-//        assertEquals("Wrong remote hash size", 16, read);
-//        assertArrayEquals("Wrong remote hash", localHash, remoteHash);
+        Set<ClientState> clients = drivers.get(0).getClients();
+        ClientState client
+                = clients.iterator().next();
+        IClient reverseConnection = mServer.getReverseConnectionForClient(client,
+                new Credentials(null, null));
+        assertNotNull("Can't retrieve reverse connection to client",reverseConnection);
+        reverseConnection.connect();
+        ClientServerTest.checkMD5Hash(reverseConnection);
 
-
+        reverseConnection.close();
         connection.close();
 
     }
@@ -118,7 +94,7 @@ public class TwoWayExportTest {
     @Test
     public void testGetClientsFromClient() throws IOException, InterruptedException, TimeoutException, StyxException {
         DualLinkClientConnection connection = new DualLinkClientConnection();
-        IClientChannelDriver driver = new TCPClientChannelDriver(
+        IChannelDriver driver = new TCPClientChannelDriver(
                 InetAddress.getByName("127.0.0.1"), PORT,
                 false, connection.getIOBufSize());
         assertTrue(connection.connect(driver));
@@ -136,13 +112,13 @@ public class TwoWayExportTest {
     @Test
     public void testGetClientsFromServer() throws IOException, InterruptedException, TimeoutException, StyxException {
         DualLinkClientConnection connection = new DualLinkClientConnection();
-        IClientChannelDriver driver = new TCPClientChannelDriver(
+        IChannelDriver driver = new TCPClientChannelDriver(
                 InetAddress.getByName("127.0.0.1"), PORT,
                 false, connection.getIOBufSize());
         assertTrue(connection.connect(driver));
 
         DualLinkClientConnection connection2 = new DualLinkClientConnection();
-        IClientChannelDriver driver2 = new TCPClientChannelDriver(
+        IChannelDriver driver2 = new TCPClientChannelDriver(
                 InetAddress.getByName("127.0.0.1"), PORT,
                 false, connection2.getIOBufSize());
         assertTrue(connection2.connect(driver2));
@@ -154,8 +130,6 @@ public class TwoWayExportTest {
         assertNotNull(clients);
         assertEquals(2, clients.size());
 
-        String tag1 = driver.toString();
-        String tag2 = driver2.toString();
         connection2.close();
         Thread.sleep(500);
         clients = drivers.get(0).getClients();

@@ -20,4 +20,6 @@ public interface IChannelDriver extends Closeable, IMessageTransmitter {
      * @return all active clients.
      */
     Set<ClientState> getClients();
+
+    boolean isConnected();
 }

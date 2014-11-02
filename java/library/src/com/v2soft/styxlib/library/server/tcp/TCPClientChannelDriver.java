@@ -4,7 +4,6 @@ import com.v2soft.styxlib.library.io.StyxByteBufferReadable;
 import com.v2soft.styxlib.library.io.StyxDataReader;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.server.ClientState;
-import com.v2soft.styxlib.library.server.IClientChannelDriver;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -21,7 +20,7 @@ import java.util.Set;
  *
  * @author V.Shcryabets (vshcryabets@gmail.com)
  */
-public class TCPClientChannelDriver extends TCPChannelDriver implements IClientChannelDriver {
+public class TCPClientChannelDriver extends TCPChannelDriver {
     public static final int PSEUDO_CLIENT_ID = 1;
     protected SocketChannel mChanel;
     protected ClientState mPseudoClient;
@@ -85,9 +84,9 @@ public class TCPClientChannelDriver extends TCPChannelDriver implements IClientC
                     break;
                 }
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
             try {
                 mChanel.close();
             } catch (IOException e) {
@@ -102,9 +101,9 @@ public class TCPClientChannelDriver extends TCPChannelDriver implements IClientC
         mAcceptorThread.interrupt();
     }
 
-    public Socket getSocket() {
-        return mChanel.socket();
-    }
+//    public Socket getSocket() {
+//        return mChanel.socket();
+//    }
 
     @Override
     public Set<ClientState> getClients() {

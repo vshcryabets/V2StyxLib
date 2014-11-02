@@ -16,8 +16,9 @@ import com.v2soft.styxlib.library.messages.base.StyxTMessageFID;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
 import com.v2soft.styxlib.library.messages.base.structs.StyxQID;
 import com.v2soft.styxlib.library.server.ClientState;
-import com.v2soft.styxlib.library.server.IClientChannelDriver;
+import com.v2soft.styxlib.library.server.IChannelDriver;
 import com.v2soft.styxlib.library.server.IMessageTransmitter;
+import com.v2soft.styxlib.library.types.Credentials;
 import com.v2soft.styxlib.library.utils.FIDPoll;
 
 import java.io.Closeable;
@@ -40,8 +41,7 @@ implements Closeable, StyxMessengerListener, IClient {
     // Class fields
     //---------------------------------------------------------------------------
     private StyxFile mRoot;
-    private String mUserName;
-    private String mPassword;
+    protected Credentials mCredentials;
     private String mMountPoint;
     private int mTimeout = DEFAULT_TIMEOUT;
     private boolean mNeedAuth;
@@ -54,36 +54,38 @@ implements Closeable, StyxMessengerListener, IClient {
     private long mFID = StyxMessage.NOFID;
     private FIDPoll mActiveFids = new FIDPoll();
     protected ClientState mRecepient;
+    private IChannelDriver mDriver;
 
     public StyxClientConnection() {
-        this(null, null);
+        this(null);
         isConnected = false;
+        mCredentials = new Credentials(null, null);
     }
 
-    public StyxClientConnection(String username, String password) {
-        mUserName = username;
-        mPassword = password;
+    public StyxClientConnection(Credentials credentials) {
+        mCredentials = credentials;
     }
 
     /**
      * Connect to server with specified parameters
      * @param driver channel driver
-     * @param username user name
-     * @param password password 
+     * @param credentials user credentials
      * @return true if connected
      * @throws IOException
      * @throws StyxException
      * @throws TimeoutException 
      */
-    public boolean connect(IClientChannelDriver driver, String username, String password)
+    public boolean connect(IChannelDriver driver, Credentials credentials)
             throws IOException, StyxException, InterruptedException, TimeoutException {
         if (driver == null ) {
             throw new NullPointerException("Channel driver can't be null");
         }
-        mUserName = username;
-        mPassword = password;
+        if (credentials == null) {
+            throw new NullPointerException("Credentials can't be null");
+        }
+        mCredentials = credentials;
         mMountPoint = "/";
-        mNeedAuth = (username != null);
+        mNeedAuth = (mCredentials != null);
         mMessenger = initMessenger(driver);
         mRecepient = driver.getClients().iterator().next();
         sendVersionMessage();
@@ -99,12 +101,25 @@ implements Closeable, StyxMessengerListener, IClient {
      * @throws StyxException
      * @throws TimeoutException
      */
-    public boolean connect(IClientChannelDriver driver)
+    public boolean connect(IChannelDriver driver)
             throws IOException, StyxException, InterruptedException, TimeoutException {
-        return connect(driver, null, null);
+        return connect(driver, mCredentials);
     }
 
-    protected IMessageTransmitter initMessenger(IClientChannelDriver driver) throws IOException {
+    /**
+     * Connect to server with specified parameters
+     * @return
+     * @throws IOException
+     * @throws StyxException
+     * @throws InterruptedException
+     * @throws TimeoutException
+     */
+    public boolean connect()
+            throws IOException, StyxException, InterruptedException, TimeoutException {
+        return connect(mDriver, mCredentials);
+    }
+
+    protected IMessageTransmitter initMessenger(IChannelDriver driver) throws IOException {
         IMessageTransmitter result = new Messenger(driver, mIOBufSize, this, getLogListener());
         return result;
     }
@@ -128,14 +143,9 @@ implements Closeable, StyxMessengerListener, IClient {
         return mIOBufSize;
     }
 
-    public String getUserName()
+    public Credentials getCredentials()
     {
-        return mUserName;
-    }
-
-    public String getPassword()
-    {
-        return mPassword;
+        return mCredentials;
     }
 
     public String getMountPoint()
@@ -211,7 +221,7 @@ implements Closeable, StyxMessengerListener, IClient {
         mAuthFID = getActiveFids().getFreeItem();
 
         StyxTAuthMessage tAuth = new StyxTAuthMessage(mAuthFID);
-        tAuth.setUserName(getUserName());
+        tAuth.setUserName(getCredentials().getUserName());
         tAuth.setMountPoint(getMountPoint());
         mMessenger.sendMessage(tAuth, mRecepient);
 
@@ -233,7 +243,7 @@ implements Closeable, StyxMessengerListener, IClient {
             throws InterruptedException, StyxException, TimeoutException, IOException {
         mFID = getActiveFids().getFreeItem();
         StyxTAttachMessage tAttach = new StyxTAttachMessage(getFID(), getAuthFID(),
-                getUserName(),
+                getCredentials().getUserName(),
                 getMountPoint());
         mMessenger.sendMessage(tAttach, mRecepient);
 
@@ -304,5 +314,9 @@ implements Closeable, StyxMessengerListener, IClient {
     @Override
     public ClientState getRecepient() {
         return mRecepient;
+    }
+
+    public void setDriver(IChannelDriver driver) {
+        mDriver = driver;
     }
 }
