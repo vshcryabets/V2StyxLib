@@ -1,0 +1,29 @@
+Thu Nov  6 09:27:24 2014
+Added ability to export VFS from client (connection initiator) to the server (connection acceptor).
+At the client:
+```
+    MemoryStyxFile md5 = new MD5StyxFile();
+    MemoryStyxDirectory root = new MemoryStyxDirectory("clientroot");
+    root.addFile(md5);
+    DualLinkClientConnection connection = new DualLinkClientConnection();
+    connection.export(root);
+    IChannelDriver driver = new TCPClientChannelDriver(
+            InetAddress.getByName("127.0.0.1"), PORT,
+            false, connection.getIOBufSize());
+    connection.connect(driver);
+```
+At the server:
+```
+   mServer = new TCPDualLinkServerManager(InetAddress.getByName("127.0.0.1"),
+        PORT,
+        false,
+        root);
+   mServerThreads = mServer.start();
+   ... // waiting for the client connection
+   Set<ClientState> clients = drivers.get(0).getClients();
+   ClientState client = clients.iterator().next();
+   IClient reverseConnection = mServer.getReverseConnectionForClient(client,
+                   new Credentials(null, null));
+   reverseConnection.connect();
+   // do something with reverseConnection
+```

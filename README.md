@@ -73,8 +73,10 @@ public class JavaServerSample {
 
 Java client sample:
 ```java
-        StyxClientConnection mConnection = new StyxClientConnection(InetAddress.getByName("127.0.0.1"), PORT, false);
-        mConnection.connect();
+        StyxClientConnection mConnection = new StyxClientConnection();
+        IChannelDriver driver = new TCPClientChannelDriver(
+            InetAddress.getByName("localhost"), PORT, false, mConnection.getIOBufSize());
+        mConnection.connect(driver);
         final StyxFile newFile = new StyxFile(mConnection, FILE_NAME);
         OutputStream output = newFile.openForWrite();
         InputStream input = newFile.openForRead();
