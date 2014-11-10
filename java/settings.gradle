@@ -1,2 +1,4 @@
-include ':library'
+include ':styxlib'
 include ':serverSample'
+
+project(":styxlib").projectDir = new File(settingsDir as String, "library/")
