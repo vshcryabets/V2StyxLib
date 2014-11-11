@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 V.Shcryabets (vshcryabets@gmail.com)
+ * Copyright (C) 2012-2014 V.Shcryabets (vshcryabets@gmail.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,7 @@ public abstract class UDPAbstractDiscoveryClient extends DiscoveryClient {
         void onDiscoveryStarted();
         void onDiscoveryFinished();
         void onNewServer(Object item);
+        void onException(Throwable error);
     }
 
     protected static final String LOG_TAG = UDPAbstractDiscoveryClient.class.getSimpleName();
@@ -111,7 +112,7 @@ public abstract class UDPAbstractDiscoveryClient extends DiscoveryClient {
                     handleAnswer(packet);
                     Thread.sleep(100);
                 } catch (IOException e) {
-                    // ignore it
+                    onError(e);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                     break;
@@ -144,8 +145,7 @@ public abstract class UDPAbstractDiscoveryClient extends DiscoveryClient {
                     try {
                         mSocket.send(packet);
                     } catch (Exception e) {
-                        e.printStackTrace();
-                        //                    Log.e(LOG_TAG, e.toString(), e);
+                        onError(e);
                     }
                 }
                 // delay
@@ -154,7 +154,7 @@ public abstract class UDPAbstractDiscoveryClient extends DiscoveryClient {
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (SocketException e) {
-            e.printStackTrace();
+            onError(e);
         } finally {
             mSocket.close();
         }
@@ -163,12 +163,18 @@ public abstract class UDPAbstractDiscoveryClient extends DiscoveryClient {
             try {
                 mReceiverThread.join();
             } catch (InterruptedException e) {
-                e.printStackTrace();
             }
         }
         mReceiverThread = null;
         if (mListener != null) {
             mListener.onDiscoveryFinished();
+        }
+    }
+
+    public void onError(Exception e) {
+        e.printStackTrace();
+        if ( mListener != null ) {
+            mListener.onException(e);
         }
     }
 }

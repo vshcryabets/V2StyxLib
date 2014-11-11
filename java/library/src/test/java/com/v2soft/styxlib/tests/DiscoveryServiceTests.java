@@ -130,6 +130,11 @@ public class DiscoveryServiceTests {
             public void onNewServer(Object item) {
                 flags[2]++;
             }
+
+            @Override
+            public void onException(Throwable error) {
+                
+            }
         });
         explorer.startDiscoverySync();
         assertEquals("Wrong number of discovery start count", 1, flags[0]);
