@@ -26,8 +26,8 @@ import static org.junit.Assert.assertEquals;
 
 /**
  * UDP broadcast discovery service tests.
- * @author V.Shcriyabets (vshcryabets@gmail.com)
  *
+ * @author V.Shcriyabets (vshcryabets@gmail.com)
  */
 public class DiscoveryServiceTests {
 
@@ -38,7 +38,7 @@ public class DiscoveryServiceTests {
     }
 
     @After
-    public void shutDown(){
+    public void shutDown() {
 
     }
 
@@ -52,11 +52,11 @@ public class DiscoveryServiceTests {
         final ArrayList<InetAddress> listOfBroadcasts = new ArrayList<InetAddress>();
         final ArrayList<InetAddress> listOfAddresses = new ArrayList<InetAddress>();
         for (Enumeration<NetworkInterface> en =
-                     NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();) {
+                     NetworkInterface.getNetworkInterfaces(); en.hasMoreElements(); ) {
             NetworkInterface intf = en.nextElement();
             System.out.println("Found up interface:" + intf);
             for (InterfaceAddress interfaceAddress : intf.getInterfaceAddresses()) {
-                if ( interfaceAddress.getBroadcast() == null ) continue;
+                if (interfaceAddress.getBroadcast() == null) continue;
                 listOfBroadcasts.add(interfaceAddress.getBroadcast());
                 listOfAddresses.add(interfaceAddress.getAddress());
             }
@@ -67,7 +67,7 @@ public class DiscoveryServiceTests {
             protected void handleIncomePacket(DatagramSocket socket, DatagramPacket packet) {
                 InetAddress sourceAddress = packet.getAddress();
                 int sourcePort = packet.getPort();
-                byte [] data = packet.getData();
+                byte[] data = packet.getData();
                 String received = new String(data, 0, packet.getLength());
                 try {
                     socket.send(new DatagramPacket(answer, answer.length,
@@ -80,11 +80,11 @@ public class DiscoveryServiceTests {
             }
         };
         server.listen();
-        final int [] discoveredServicersCount = new int[1];
+        final int[] flags = new int[]{0, 0, 0};
         // start discovery
-        DiscoveryClient explorer = new UDPAbstractDiscoveryClient(PORT,
+        UDPAbstractDiscoveryClient explorer = new UDPAbstractDiscoveryClient(PORT,
                 listOfBroadcasts.toArray(new InetAddress[listOfBroadcasts.size()])
-                ) {
+        ) {
             private Set<String> mCodes = new HashSet<String>();
 
             @Override
@@ -92,15 +92,19 @@ public class DiscoveryServiceTests {
                 DatagramPacket requestPacket = new DatagramPacket(request, request.length);
                 return requestPacket;
             }
+
             @Override
             protected void handleAnswer(DatagramPacket income) {
                 String answer = new String(income.getData(), 0, income.getLength());
                 assertEquals("Wrong answer", answerStr, answer);
-                if ( !mCodes.contains(answer )) {
-                    discoveredServicersCount[0]++;
+                if (!mCodes.contains(answer)) {
                     mCodes.add(answer);
+                    if (mListener != null) {
+                        mListener.onNewServer(answer);
+                    }
                 }
             }
+
             @Override
             public int getRetryCount() {
                 return 3;
@@ -111,8 +115,26 @@ public class DiscoveryServiceTests {
                 return 1500;
             }
         };
+        explorer.setListener(new UDPAbstractDiscoveryClient.UDPBroadcastListener() {
+            @Override
+            public void onDiscoveryStarted() {
+                flags[0]++;
+            }
+
+            @Override
+            public void onDiscoveryFinished() {
+                flags[1]++;
+            }
+
+            @Override
+            public void onNewServer(Object item) {
+                flags[2]++;
+            }
+        });
         explorer.startDiscoverySync();
-        assertEquals("Wrong number of discovered servers", 1, discoveredServicersCount[0] );
+        assertEquals("Wrong number of discovery start count", 1, flags[0]);
+        assertEquals("Wrong number of discovery end count", 1, flags[1]);
+        assertEquals("Wrong number of discovered servers " + flags[2], 1, flags[2]);
 
         server.close();
     }

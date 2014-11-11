@@ -22,7 +22,7 @@ import java.net.InetAddress;
 import java.net.SocketException;
 
 /**
- * 
+ *
  * @author V.Shcriyabets (vshcryabets@gmail.com)
  *
  */
@@ -45,7 +45,7 @@ public abstract class UDPAbstractDiscoveryClient extends DiscoveryClient {
     protected boolean isWorking;
 
     /**
-     * 
+     *
      */
     public UDPAbstractDiscoveryClient(int targetPort,
                                       InetAddress targetAddress[]) {
@@ -66,9 +66,6 @@ public abstract class UDPAbstractDiscoveryClient extends DiscoveryClient {
         mSenderThread = new Thread(mBackgroundSender,
                 UDPAbstractDiscoveryClient.class.getSimpleName());
         mSenderThread.start();
-        if ( mListener != null ) {
-            mListener.onDiscoveryStarted();
-        }
     }
 
     /**
@@ -99,9 +96,6 @@ public abstract class UDPAbstractDiscoveryClient extends DiscoveryClient {
             isWorking = true;
             startDiscoverySync();
             mSenderThread = null;
-            if ( mListener != null ) {
-                mListener.onDiscoveryFinished();
-            }
         }
     };
 
@@ -132,6 +126,9 @@ public abstract class UDPAbstractDiscoveryClient extends DiscoveryClient {
         mReceiverThread = new Thread(mBackgroundReceiver,
                 UDPAbstractDiscoveryClient.class.getSimpleName()+"R");
         mReceiverThread.start();
+        if (mListener != null) {
+            mListener.onDiscoveryStarted();
+        }
 
         int count = getRetryCount();
         try {
@@ -170,5 +167,8 @@ public abstract class UDPAbstractDiscoveryClient extends DiscoveryClient {
             }
         }
         mReceiverThread = null;
+        if (mListener != null) {
+            mListener.onDiscoveryFinished();
+        }
     }
 }
