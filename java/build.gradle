@@ -6,7 +6,7 @@ buildscript {
 
 allprojects {
   group = 'com.v2soft'
-  version = '1.1.0'
+  version = '1.1.1'
 
   repositories {
     mavenCentral()

@@ -133,7 +133,7 @@ public class DiscoveryServiceTests {
 
             @Override
             public void onException(Throwable error) {
-                
+
             }
         });
         explorer.startDiscoverySync();
