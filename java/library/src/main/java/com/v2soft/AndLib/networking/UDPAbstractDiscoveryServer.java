@@ -23,27 +23,28 @@ import java.net.InetAddress;
 import java.net.SocketException;
 
 /**
- * 
+ *
  * @author V.Shcriyabets (vshcryabets@gmail.com)
  *
  */
 public abstract class UDPAbstractDiscoveryServer extends DiscoveryServer implements Closeable{
-    private Thread mReceiverThread = null;
-    private DatagramSocket mSocket;
-    protected InetAddress mAddress;
-    private int mPort;
+    protected Thread mReceiverThread = null;
+    protected DatagramSocket mSocket;
+    protected final InetAddress mAddress;
+    protected final int mPort;
 
     public UDPAbstractDiscoveryServer(int port, InetAddress listenOnInterface) throws SocketException {
         mAddress = listenOnInterface;
         mPort = port;
+
     }
 
     public void listen() throws SocketException {
-        mSocket = new DatagramSocket(mPort);
         if ( mReceiverThread != null ) {
             throw new IllegalStateException("Broadcast receiving process already started");
         }
         mReceiverThread = new Thread(mBackgroundReceiver, UDPAbstractDiscoveryServer.class.getSimpleName());
+        mSocket = new DatagramSocket(mPort, mAddress);
         mReceiverThread.start();
     }
 
@@ -58,7 +59,7 @@ public abstract class UDPAbstractDiscoveryServer extends DiscoveryServer impleme
         @Override
         public void run() {
             final byte[] buf = new byte[256];
-            
+
             while ( true ) {
                 try {
                     final DatagramPacket packet = new DatagramPacket(buf, buf.length);
@@ -66,9 +67,7 @@ public abstract class UDPAbstractDiscoveryServer extends DiscoveryServer impleme
                     handleIncomePacket(mSocket, packet);
                     Thread.sleep(100);
                 } catch (IOException e) {
-//                    e.printStackTrace();
                     if ( mSocket.isClosed() ) {
-                        mSocket = null;
                         break;
                     }
                 } catch (InterruptedException e) {
@@ -76,6 +75,7 @@ public abstract class UDPAbstractDiscoveryServer extends DiscoveryServer impleme
                 }
             }
             mReceiverThread = null;
+            mSocket = null;
         }
     };
 }

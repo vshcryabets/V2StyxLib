@@ -48,21 +48,8 @@ public class DiscoveryServiceTests {
         final String answerStr = UUID.randomUUID().toString();
         final byte[] answer = answerStr.getBytes("utf-8");
         final byte[] request = UUID.randomUUID().toString().getBytes("utf-8");
-        // load addresses
-        final ArrayList<InetAddress> listOfBroadcasts = new ArrayList<InetAddress>();
-        final ArrayList<InetAddress> listOfAddresses = new ArrayList<InetAddress>();
-        for (Enumeration<NetworkInterface> en =
-                     NetworkInterface.getNetworkInterfaces(); en.hasMoreElements(); ) {
-            NetworkInterface intf = en.nextElement();
-            System.out.println("Found up interface:" + intf);
-            for (InterfaceAddress interfaceAddress : intf.getInterfaceAddresses()) {
-                if (interfaceAddress.getBroadcast() == null) continue;
-                listOfBroadcasts.add(interfaceAddress.getBroadcast());
-                listOfAddresses.add(interfaceAddress.getAddress());
-            }
-        }
         // start server
-        DiscoveryServer server = new UDPAbstractDiscoveryServer(PORT, listOfAddresses.get(0)) {
+        DiscoveryServer server = new UDPAbstractDiscoveryServer(PORT, InetAddress.getLoopbackAddress()) {
             @Override
             protected void handleIncomePacket(DatagramSocket socket, DatagramPacket packet) {
                 InetAddress sourceAddress = packet.getAddress();
@@ -83,8 +70,7 @@ public class DiscoveryServiceTests {
         final int[] flags = new int[]{0, 0, 0};
         // start discovery
         UDPAbstractDiscoveryClient explorer = new UDPAbstractDiscoveryClient(PORT,
-                listOfBroadcasts.toArray(new InetAddress[listOfBroadcasts.size()])
-        ) {
+                new InetAddress[]{InetAddress.getLoopbackAddress()}) {
             private Set<String> mCodes = new HashSet<String>();
 
             @Override
