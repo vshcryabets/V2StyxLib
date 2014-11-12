@@ -56,16 +56,14 @@ public abstract class UDPAbstractDiscoveryClient extends DiscoveryClient {
     }
 
     /**
-     * Start searching of other hosts
-     * @throws SocketException
+     * Start searching for a other hosts
      */
-    public void startDiscovery() throws SocketException {
+    public void startDiscovery() {
         if ( mSenderThread != null ) {
             throw new IllegalStateException("Broadcast discovery process already started");
         }
         // start
-        mSenderThread = new Thread(mBackgroundSender,
-                UDPAbstractDiscoveryClient.class.getSimpleName());
+        mSenderThread = new Thread(mBackgroundSender, LOG_TAG);
         mSenderThread.start();
     }
 
