@@ -39,13 +39,22 @@ public interface IVirtualStyxFile {
     public String getModificationUser();
     /**
      * Open file
-     * @param mode
-     * @throws IOException 
+     * @param mode The mode argument specifies the access mode in which the file is to be opened.
+     *  OREAD   = 0  // open read-only
+     *  OWRITE  = 1  // open write-only
+     *  ORDWR   = 2  // open read-write
+     *  OEXEC   = 3  // execute (== read but check execute permission)
+     *  OTRUNC  = 16 // or'ed in (except for exec), truncate file first
+     *  OCEXEC  = 32 // or'ed in, close on exec
+     *  ORCLOSE = 64 // or'ed in, remove on close
+     *  Flags for the mode field in Topen and Tcreate messages
+     * @throws IOException
+     * @return true if file was successfully opened
      */
     public boolean open(ClientState client, int mode) throws IOException;
     /**
      * Close file
-     * @param mode
+     * @param client
      */
     public void close(ClientState client);
     /**
@@ -58,11 +67,11 @@ public interface IVirtualStyxFile {
     public IVirtualStyxFile walk(Iterator<String> pathElements, List<StyxQID> qids)
             throws StyxErrorMessageException;
     /**
-     * Write data to file
+     * Writes data to file at the position offset.
      * @param client
-     * @param data
-     * @param offset
-     * @return
+     * @param data the data
+     * @param offset offset from begining of the file
+     * @return return the number of bytes written
      * @throws StyxErrorMessageException
      */
     public int write(ClientState client, byte[] data, ULong offset) throws StyxErrorMessageException;
@@ -73,7 +82,7 @@ public interface IVirtualStyxFile {
     public void onConnectionClosed(ClientState state);
     /**
      * Create new child file
-     * @param name
+     * @param name new file name
      * @param permissions
      * @param mode
      * @return QID of new file
