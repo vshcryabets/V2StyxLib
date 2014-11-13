@@ -1,8 +1,8 @@
 package com.v2soft.styxlib.tests;
 
 import com.v2soft.styxlib.library.exceptions.StyxErrorMessageException;
-import com.v2soft.styxlib.library.server.ClientState;
-import com.v2soft.styxlib.library.server.vfs.MemoryStyxFile;
+import com.v2soft.styxlib.server.ClientDetails;
+import com.v2soft.styxlib.vfs.MemoryStyxFile;
 import com.v2soft.styxlib.library.types.ULong;
 
 import java.io.IOException;
@@ -18,41 +18,41 @@ import java.util.HashMap;
 public class MD5StyxFile extends MemoryStyxFile {
     public static final String FILE_NAME = "md5file";
 
-    protected HashMap<ClientState, MessageDigest> mClientsMap = new HashMap<ClientState, MessageDigest>();
+    protected HashMap<ClientDetails, MessageDigest> mClientsMap = new HashMap<ClientDetails, MessageDigest>();
 
     public MD5StyxFile() {
         super(FILE_NAME);
     }
 
     @Override
-    public boolean open(ClientState client, int mode)
+    public boolean open(ClientDetails clientDetails, int mode)
             throws IOException {
         try {
             MessageDigest md = MessageDigest.getInstance("MD5");
-            mClientsMap.put(client, md);
+            mClientsMap.put(clientDetails, md);
         } catch (NoSuchAlgorithmException e) {
             return false;
         }
-        return super.open(client, mode);
+        return super.open(clientDetails, mode);
     }
     @Override
-    public void close(ClientState client) {
-        mClientsMap.remove(client);
-        super.close(client);
+    public void close(ClientDetails clientDetails) {
+        mClientsMap.remove(clientDetails);
+        super.close(clientDetails);
     }
     @Override
-    public int write(ClientState client, byte[] data, ULong offset)
+    public int write(ClientDetails clientDetails, byte[] data, ULong offset)
             throws StyxErrorMessageException {
-        if ( mClientsMap.containsKey(client) ) {
-            mClientsMap.get(client).update(data, 0, data.length);
+        if ( mClientsMap.containsKey(clientDetails) ) {
+            mClientsMap.get(clientDetails).update(data, 0, data.length);
         }
-        return super.write(client, data, offset);
+        return super.write(clientDetails, data, offset);
     }
     @Override
-    public long read(ClientState client, byte[] outbuffer, ULong offset, long count)
+    public long read(ClientDetails clientDetails, byte[] outbuffer, ULong offset, long count)
             throws StyxErrorMessageException {
-        if ( mClientsMap.containsKey(client) ) {
-            byte[] digest = mClientsMap.get(client).digest();
+        if ( mClientsMap.containsKey(clientDetails) ) {
+            byte[] digest = mClientsMap.get(clientDetails).digest();
             if (count < digest.length) {
                 return 0;
             } else {
@@ -60,6 +60,6 @@ public class MD5StyxFile extends MemoryStyxFile {
                 return digest.length;
             }
         }
-        return super.read(client, outbuffer, offset, count);
+        return super.read(clientDetails, outbuffer, offset, count);
     }
 }

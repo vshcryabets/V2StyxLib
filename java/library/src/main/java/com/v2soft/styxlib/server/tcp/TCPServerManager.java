@@ -1,8 +1,8 @@
-package com.v2soft.styxlib.library.server.tcp;
+package com.v2soft.styxlib.server.tcp;
 
 import com.v2soft.styxlib.library.StyxServerManager;
-import com.v2soft.styxlib.library.server.IChannelDriver;
-import com.v2soft.styxlib.library.server.vfs.IVirtualStyxFile;
+import com.v2soft.styxlib.server.IChannelDriver;
+import com.v2soft.styxlib.vfs.IVirtualStyxFile;
 
 import java.io.IOException;
 import java.net.InetAddress;

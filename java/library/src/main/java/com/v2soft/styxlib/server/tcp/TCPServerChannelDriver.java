@@ -1,6 +1,6 @@
-package com.v2soft.styxlib.library.server.tcp;
+package com.v2soft.styxlib.server.tcp;
 
-import com.v2soft.styxlib.library.server.ClientState;
+import com.v2soft.styxlib.server.ClientDetails;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -13,8 +13,6 @@ import java.nio.channels.SocketChannel;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
@@ -30,16 +28,16 @@ public class TCPServerChannelDriver extends TCPChannelDriver {
     protected ServerSocketChannel mChannel;
     protected Selector mSelector;
     protected Stack<SocketChannel> mNewConnetions, mReadable;
-    protected HashSet<ClientState> mClients;
-    protected Map<SocketChannel, TCPClientState> mClientStatesMap;
+    protected HashSet<ClientDetails> mClientDetailses;
+    protected Map<SocketChannel, TCPClientDetails> mClientStatesMap;
     protected int mLastClientId = 1;
 
     public TCPServerChannelDriver(InetAddress address, int port, boolean ssl, int IOUnit) throws IOException {
         super(address, port, ssl, IOUnit);
-        mClients = new HashSet<ClientState>();
+        mClientDetailses = new HashSet<ClientDetails>();
         mNewConnetions = new Stack<SocketChannel>();
         mReadable = new Stack<SocketChannel>();
-        mClientStatesMap = new HashMap<SocketChannel, TCPClientState>();
+        mClientStatesMap = new HashMap<SocketChannel, TCPClientDetails>();
     }
 
     protected void prepareSocket(InetSocketAddress isa, boolean useSSL) throws IOException {
@@ -122,15 +120,15 @@ public class TCPServerChannelDriver extends TCPChannelDriver {
         // new connections
         for (SocketChannel channel : mNewConnetions) {
             channel.configureBlocking(false);
-            TCPClientState client = new TCPClientState(channel, this, mIOUnit, mLastClientId++);
+            TCPClientDetails client = new TCPClientDetails(channel, this, mIOUnit, mLastClientId++);
             mMessageHandler.addClient(client);
             mClientStatesMap.put(channel, client);
-            mClients.add(client);
+            mClientDetailses.add(client);
         }
         mNewConnetions.clear();
         // new readables
         for (SocketChannel channel : mReadable) {
-            final TCPClientState state = mClientStatesMap.get(channel);
+            final TCPClientDetails state = mClientStatesMap.get(channel);
             boolean result = readSocket(state);
             if ( result ) {
                 removeClient(channel);
@@ -140,16 +138,16 @@ public class TCPServerChannelDriver extends TCPChannelDriver {
     }
 
     private void removeClient(SocketChannel channel) throws IOException {
-        final ClientState client = mClientStatesMap.get(channel);
-        mMessageHandler.removeClient(client);
-        mClients.remove(client);
+        final ClientDetails clientDetails = mClientStatesMap.get(channel);
+        mMessageHandler.removeClient(clientDetails);
+        mClientDetailses.remove(clientDetails);
         mClientStatesMap.remove(channel);
         channel.close();
     }
 
     @Override
-    public Set<ClientState> getClients() {
-        return mClients;
+    public Set<ClientDetails> getClients() {
+        return mClientDetailses;
     }
 
     @Override

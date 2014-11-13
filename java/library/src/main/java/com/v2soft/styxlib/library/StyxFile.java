@@ -20,7 +20,7 @@ import com.v2soft.styxlib.library.messages.base.enums.FileMode;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
 import com.v2soft.styxlib.library.messages.base.enums.ModeType;
 import com.v2soft.styxlib.library.messages.base.structs.StyxStat;
-import com.v2soft.styxlib.library.server.IMessageTransmitter;
+import com.v2soft.styxlib.server.IMessageTransmitter;
 import com.v2soft.styxlib.library.types.ULong;
 
 import java.io.BufferedOutputStream;
@@ -35,7 +35,7 @@ import java.util.Date;
 import java.util.concurrent.TimeoutException;
 
 /**
- * 
+ *
  * @author V.Shcriyabets (vshcryabets@gmail.com)
  *
  */
@@ -107,7 +107,7 @@ public class StyxFile implements Closeable {
         return mFID;
     }
 
-    private int open(int mode, long fid) 
+    private int open(int mode, long fid)
             throws StyxException, InterruptedException, TimeoutException, IOException {
         final StyxTOpenMessage tOpen = new StyxTOpenMessage(fid, mode);
 
@@ -205,9 +205,8 @@ public class StyxFile implements Closeable {
         return files.toArray(new StyxFile[0]);
             }
 
-    public StyxFile[] listFiles(StyxFileFilter filter)
-            throws StyxException, InterruptedException, TimeoutException, IOException
-            {
+    public StyxFile[] listFiles(StyxFileFilter filter) throws StyxException, InterruptedException, TimeoutException,
+            IOException {
         StyxStat[] stats = listStat();
 
         ArrayList<StyxFile> files = new ArrayList<StyxFile>();
@@ -229,7 +228,7 @@ public class StyxFile implements Closeable {
      * @throws TimeoutException
      * @throws IOException
      */
-    public StyxFileBufferedInputStream openForRead() 
+    public StyxFileBufferedInputStream openForRead()
             throws InterruptedException, StyxException, TimeoutException, IOException {
         checkConnection();
         long tempFID = sendWalkMessage(getFID(), "");
@@ -257,7 +256,6 @@ public class StyxFile implements Closeable {
 
     /**
      * Open both streams - input and output.
-     * @return
      */
     public DualStreams openForReadAndWrite() throws InterruptedException, StyxException, TimeoutException, IOException {
         return new DualStreams(openForRead(), openForWrite());
@@ -285,7 +283,7 @@ public class StyxFile implements Closeable {
         checkConnection();
         // reserve FID
         long tempFID = sendWalkMessage(mParentFID, "");
-        final StyxTCreateMessage tCreate = 
+        final StyxTCreateMessage tCreate =
                 new StyxTCreateMessage(tempFID, mPath, permissions, ModeType.OREAD);
         mMessenger.sendMessage(tCreate, mClient.getRecepient());
         final StyxMessage rMessage = tCreate.waitForAnswer(mTimeout);
@@ -321,7 +319,7 @@ public class StyxFile implements Closeable {
      * @throws TimeoutException
      * @throws IOException
      */
-    public void delete() 
+    public void delete()
             throws InterruptedException, StyxException, TimeoutException, IOException {
         delete(false);
     }
@@ -334,12 +332,12 @@ public class StyxFile implements Closeable {
      * @throws TimeoutException
      * @throws IOException
      */
-    public void delete(boolean recurse) 
+    public void delete(boolean recurse)
             throws InterruptedException, StyxException, TimeoutException, IOException {
         if (recurse && this.isDirectory()) {
             StyxFile[] files = listFiles();
             for (StyxFile file : files)
-                file.delete(recurse);
+                file.delete(true);
         }
         long fid = getFID();
         mFID = StyxMessage.NOFID;
@@ -355,7 +353,7 @@ public class StyxFile implements Closeable {
         file.delete(recurse);
     }
 
-    public void renameTo(String name) 
+    public void renameTo(String name)
             throws InterruptedException, StyxException, TimeoutException, IOException {
         StyxStat stat = getStat();
         stat.setName(name);
@@ -493,7 +491,7 @@ public class StyxFile implements Closeable {
         return builder.toString();
     }
 
-    public String getUserName() throws StyxException, InterruptedException, TimeoutException, IOException 
+    public String getUserName() throws StyxException, InterruptedException, TimeoutException, IOException
     {
         StyxStat stat = getStat();
         return stat.getUserName();
@@ -506,7 +504,7 @@ public class StyxFile implements Closeable {
     }
 
     // TODO this method is wrong, it should process parent fid and file name separately
-    private long sendWalkMessage(long parentFID, String path) 
+    private long sendWalkMessage(long parentFID, String path)
             throws StyxException, InterruptedException, TimeoutException, IOException {
         long newFID = mClient.allocateFID();
         final StyxTWalkMessage tWalk = new StyxTWalkMessage(parentFID,
@@ -525,7 +523,7 @@ public class StyxFile implements Closeable {
      * @throws StyxException
      * @throws InterruptedException
      * @throws TimeoutException
-     * @throws IOException 
+     * @throws IOException
      */
     private StyxStat getStat() throws StyxException, InterruptedException, TimeoutException, IOException
     {

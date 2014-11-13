@@ -7,8 +7,8 @@ import com.v2soft.styxlib.library.messages.StyxTReadMessage;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.messages.base.StyxTMessageFID;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
-import com.v2soft.styxlib.library.server.ClientState;
-import com.v2soft.styxlib.library.server.IMessageTransmitter;
+import com.v2soft.styxlib.server.ClientDetails;
+import com.v2soft.styxlib.server.IMessageTransmitter;
 import com.v2soft.styxlib.library.types.ULong;
 
 import java.io.IOException;
@@ -26,9 +26,9 @@ public class StyxUnbufferedInputStream extends InputStream {
     private IMessageTransmitter mMessenger;
     private ULong mFileOffset = ULong.ZERO;
     private int mIOUnitSize;
-    protected ClientState mRecepient;
+    protected ClientDetails mRecepient;
 
-    public StyxUnbufferedInputStream(long file, IMessageTransmitter messenger, int iounit, ClientState recepient) {
+    public StyxUnbufferedInputStream(long file, IMessageTransmitter messenger, int iounit, ClientDetails recepient) {
         if ( recepient == null ) {
             throw new NullPointerException("recepient is null");
         }
@@ -84,7 +84,7 @@ public class StyxUnbufferedInputStream extends InputStream {
         read(mSingleByteArray);
         return mSingleByteArray[0];
     }
-    
+
     @Override
     public void close() throws IOException {
         // send Tclunk

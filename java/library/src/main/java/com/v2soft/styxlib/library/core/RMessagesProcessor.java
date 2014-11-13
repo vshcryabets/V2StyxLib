@@ -5,7 +5,7 @@ import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.messages.base.StyxTMessage;
 import com.v2soft.styxlib.library.messages.base.StyxTMessageFID;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
-import com.v2soft.styxlib.library.server.ClientState;
+import com.v2soft.styxlib.server.ClientDetails;
 import com.v2soft.styxlib.library.utils.MessageTagPoll;
 
 import java.io.IOException;
@@ -21,17 +21,17 @@ public class RMessagesProcessor implements IMessageProcessor {
     protected MessageTagPoll mActiveTags;
 
     @Override
-    public void addClient(ClientState state) {
+    public void addClient(ClientDetails state) {
 
     }
 
     @Override
-    public void removeClient(ClientState state) {
+    public void removeClient(ClientDetails state) {
 
     }
 
     @Override
-    public void processPacket(StyxMessage message, ClientState transmitter) throws IOException {
+    public void processPacket(StyxMessage message, ClientDetails transmitter) throws IOException {
         mReceivedCount++;
         int tag = message.getTag();
         if (!mMessagesMap.containsKey(tag)) // we didn't send T message with such tag, so ignore this R message

@@ -5,11 +5,11 @@ import com.v2soft.styxlib.library.StyxFile;
 import com.v2soft.styxlib.library.StyxServerManager;
 import com.v2soft.styxlib.library.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.library.exceptions.StyxException;
-import com.v2soft.styxlib.library.server.ClientState;
-import com.v2soft.styxlib.library.server.tcp.TCPClientChannelDriver;
-import com.v2soft.styxlib.library.server.tcp.TCPServerManager;
-import com.v2soft.styxlib.library.server.vfs.MemoryStyxDirectory;
-import com.v2soft.styxlib.library.server.vfs.MemoryStyxFile;
+import com.v2soft.styxlib.server.ClientDetails;
+import com.v2soft.styxlib.server.tcp.TCPClientChannelDriver;
+import com.v2soft.styxlib.server.tcp.TCPServerManager;
+import com.v2soft.styxlib.vfs.MemoryStyxDirectory;
+import com.v2soft.styxlib.vfs.MemoryStyxFile;
 import com.v2soft.styxlib.library.types.ULong;
 
 import org.junit.After;
@@ -57,9 +57,9 @@ public class PacketIOTests {
 
     private void startServer() throws IOException {
         MemoryStyxFile md5 = new MemoryStyxFile(FILE_NAME){
-            protected HashMap<ClientState, MessageDigest> mClientsMap = new HashMap<ClientState, MessageDigest>();
+            protected HashMap<ClientDetails, MessageDigest> mClientsMap = new HashMap<ClientDetails, MessageDigest>();
             @Override
-            public boolean open(ClientState client, int mode)
+            public boolean open(ClientDetails client, int mode)
                     throws IOException {
                 try {
                     MessageDigest md = MessageDigest.getInstance("MD5");
@@ -70,12 +70,12 @@ public class PacketIOTests {
                 return super.open(client, mode);
             }
             @Override
-            public void close(ClientState client) {
+            public void close(ClientDetails client) {
                 mClientsMap.remove(client);
                 super.close(client);
             }
             @Override
-            public int write(ClientState client, byte[] data, ULong offset)
+            public int write(ClientDetails client, byte[] data, ULong offset)
                     throws StyxErrorMessageException {
                 if ( mClientsMap.containsKey(client) ) {
                     mClientsMap.get(client).reset();
@@ -84,7 +84,7 @@ public class PacketIOTests {
                 return super.write(client, data, offset);
             }
             @Override
-            public long read(ClientState client, byte[] outbuffer, ULong offset, long count)
+            public long read(ClientDetails client, byte[] outbuffer, ULong offset, long count)
                     throws StyxErrorMessageException {
                 if ( mClientsMap.containsKey(client) ) {
                     byte[] digest = mClientsMap.get(client).digest();
@@ -119,7 +119,7 @@ public class PacketIOTests {
 
         assertTrue(mConnection.connect(
                 new TCPClientChannelDriver(
-                        InetAddress.getByName("localhost"), PORT, false, mConnection.getIOBufSize())));
+                        InetAddress.getByName("localhost"), PORT, false, mConnection.getConnectionDetails().getIOUnit())));
 
         final StyxFile newFile = new StyxFile(mConnection, FILE_NAME);
         OutputStream output = newFile.openForWriteUnbuffered();

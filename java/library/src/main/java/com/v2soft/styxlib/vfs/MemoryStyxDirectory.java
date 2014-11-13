@@ -1,4 +1,4 @@
-package com.v2soft.styxlib.library.server.vfs;
+package com.v2soft.styxlib.vfs;
 
 import com.v2soft.styxlib.library.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.library.io.IStyxDataWriter;
@@ -8,7 +8,7 @@ import com.v2soft.styxlib.library.messages.base.enums.ModeType;
 import com.v2soft.styxlib.library.messages.base.enums.QIDType;
 import com.v2soft.styxlib.library.messages.base.structs.StyxQID;
 import com.v2soft.styxlib.library.messages.base.structs.StyxStat;
-import com.v2soft.styxlib.library.server.ClientState;
+import com.v2soft.styxlib.server.ClientDetails;
 import com.v2soft.styxlib.library.types.ULong;
 
 import java.io.IOException;
@@ -26,14 +26,14 @@ import java.util.Map;
  */
 public class MemoryStyxDirectory
 extends MemoryStyxFile {
-    private Map<ClientState, ByteBuffer> mBuffersMap;
+    private Map<ClientDetails, ByteBuffer> mBuffersMap;
     private List<IVirtualStyxFile> mFiles;
 
     public MemoryStyxDirectory(String name) {
         super(name);
         mQID.setType(QIDType.QTDIR);
         mFiles = new LinkedList<IVirtualStyxFile>();
-        mBuffersMap = new HashMap<ClientState, ByteBuffer>();
+        mBuffersMap = new HashMap<ClientDetails, ByteBuffer>();
     }
 
     @Override
@@ -42,7 +42,7 @@ extends MemoryStyxFile {
     }
 
     @Override
-    public IVirtualStyxFile walk(Iterator<String> pathElements, List<StyxQID> qids) 
+    public IVirtualStyxFile walk(Iterator<String> pathElements, List<StyxQID> qids)
             throws StyxErrorMessageException {
         if ( pathElements.hasNext() ) {
             String filename = pathElements.next();
@@ -58,7 +58,7 @@ extends MemoryStyxFile {
     }
 
     @Override
-    public boolean open(ClientState client, int mode) throws IOException {
+    public boolean open(ClientDetails clientDetails, int mode) throws IOException {
         boolean result = ((mode&0x0F) == ModeType.OREAD);
         if ( result ) {
             // prepare binary structure of the directory
@@ -75,15 +75,15 @@ extends MemoryStyxFile {
             for (StyxStat state : stats) {
                 state.writeBinaryTo(writer);
             }
-            mBuffersMap.put(client, buffer);
+            mBuffersMap.put(clientDetails, buffer);
         }
         return result;
     }
 
     @Override
-    public long read(ClientState client, byte[] outbuffer, ULong offset, long count) throws StyxErrorMessageException {
-        if ( !mBuffersMap.containsKey(client)) StyxErrorMessageException.doException("This file isn't open");
-        final ByteBuffer buffer = mBuffersMap.get(client);
+    public long read(ClientDetails clientDetails, byte[] outbuffer, ULong offset, long count) throws StyxErrorMessageException {
+        if ( !mBuffersMap.containsKey(clientDetails)) StyxErrorMessageException.doException("This file isn't open");
+        final ByteBuffer buffer = mBuffersMap.get(clientDetails);
         int boffset = buffer.limit();
         if ( offset.asLong() > boffset ) return 0;
         buffer.position((int) offset.asLong());
@@ -96,9 +96,9 @@ extends MemoryStyxFile {
     }
 
     @Override
-    public void close(ClientState client) {
+    public void close(ClientDetails clientDetails) {
         // remove buffer
-        mBuffersMap.remove(client);
+        mBuffersMap.remove(clientDetails);
     }
 
     /**
@@ -107,20 +107,20 @@ extends MemoryStyxFile {
      */
     public IVirtualStyxFile addFile(IVirtualStyxFile file) {
 //        String fileName = file.getName();
-        // TODO check! may be this folder already contains file with same name 
+        // TODO check! may be this folder already contains file with same name
         mFiles.add(file);
         return this;
     }
 
     @Override
-    public int write(ClientState client, byte[] data, ULong offset)
+    public int write(ClientDetails clientDetails, byte[] data, ULong offset)
             throws StyxErrorMessageException {
         StyxErrorMessageException.doException("Can't write to directory");
         return 0;
     }
 
     @Override
-    public void onConnectionClosed(ClientState state) {
+    public void onConnectionClosed(ClientDetails state) {
         for (IVirtualStyxFile file : mFiles) {
             file.onConnectionClosed(state);
         }

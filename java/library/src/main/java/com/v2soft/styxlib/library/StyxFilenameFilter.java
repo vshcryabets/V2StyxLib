@@ -2,6 +2,6 @@ package com.v2soft.styxlib.library;
 
 public interface StyxFilenameFilter {
 
-	boolean accept(StyxFile parent, String name);
-	
+    boolean accept(StyxFile parent, String name);
+
 }

@@ -1,9 +1,9 @@
-package com.v2soft.styxlib.library.server.tcp;
+package com.v2soft.styxlib.server.tcp;
 
 import com.v2soft.styxlib.library.io.StyxByteBufferReadable;
 import com.v2soft.styxlib.library.io.StyxDataReader;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
-import com.v2soft.styxlib.library.server.ClientState;
+import com.v2soft.styxlib.server.ClientDetails;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -23,11 +23,11 @@ import java.util.Set;
 public class TCPClientChannelDriver extends TCPChannelDriver {
     public static final int PSEUDO_CLIENT_ID = 1;
     protected SocketChannel mChanel;
-    protected ClientState mPseudoClient;
+    protected ClientDetails mPseudoClientDetails;
 
     public TCPClientChannelDriver(InetAddress address, int port, boolean ssl, int IOUnit) throws IOException {
         super(address, port, ssl, IOUnit);
-        mPseudoClient = new TCPClientState(mChanel, this, IOUnit, PSEUDO_CLIENT_ID);
+        mPseudoClientDetails = new TCPClientDetails(mChanel, this, IOUnit, PSEUDO_CLIENT_ID);
     }
 
     @Override
@@ -49,8 +49,8 @@ public class TCPClientChannelDriver extends TCPChannelDriver {
     }
 
     @Override
-    public boolean sendMessage(StyxMessage message, ClientState recepient) {
-        if ( !recepient.equals(mPseudoClient)) {
+    public boolean sendMessage(StyxMessage message, ClientDetails recepient) {
+        if ( !recepient.equals(mPseudoClientDetails)) {
             throw new IllegalArgumentException("Wrong recepient");
         }
         return super.sendMessage(message, recepient);
@@ -75,9 +75,9 @@ public class TCPClientChannelDriver extends TCPChannelDriver {
                             if ( buffer.remainsToRead() >= packetSize ) {
                                 final StyxMessage message = StyxMessage.factory(reader, mIOUnit);
                                 if (mLogListener != null) {
-                                    mLogListener.onMessageReceived(this, mPseudoClient, message);
+                                    mLogListener.onMessageReceived(this, mPseudoClientDetails, message);
                                 }
-                                mMessageHandler.processPacket(message, mPseudoClient);
+                                mMessageHandler.processPacket(message, mPseudoClientDetails);
                             } else {
                                 break;
                             }
@@ -111,9 +111,9 @@ public class TCPClientChannelDriver extends TCPChannelDriver {
     }
 
     @Override
-    public Set<ClientState> getClients() {
-        Set<ClientState> result = new HashSet<ClientState>();
-        result.add(mPseudoClient);
+    public Set<ClientDetails> getClients() {
+        Set<ClientDetails> result = new HashSet<ClientDetails>();
+        result.add(mPseudoClientDetails);
         return result;
     }
 

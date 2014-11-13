@@ -1,8 +1,10 @@
-package com.v2soft.styxlib.library.server;
+package com.v2soft.styxlib.server;
 
 import com.v2soft.styxlib.library.core.IMessageProcessor;
+import com.v2soft.styxlib.library.core.TMessagesProcessor;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
-import com.v2soft.styxlib.library.server.vfs.IVirtualStyxFile;
+import com.v2soft.styxlib.library.types.ConnectionDetails;
+import com.v2soft.styxlib.vfs.IVirtualStyxFile;
 
 import java.io.IOException;
 
@@ -15,19 +17,19 @@ import java.io.IOException;
 public class ClientBalancer implements IMessageProcessor {
     private IMessageProcessor mHandler;
 
-    public ClientBalancer(int iounit, IVirtualStyxFile root, String protocol) {
-        mHandler = new TMessagesProcessor(iounit, root, protocol);
+    public ClientBalancer(ConnectionDetails details, IVirtualStyxFile root) {
+        mHandler = new TMessagesProcessor(details, root);
     }
     @Override
-    public void addClient(ClientState state) {
+    public void addClient(ClientDetails state) {
         mHandler.addClient(state);
     }
     @Override
-    public void removeClient(ClientState state) {
+    public void removeClient(ClientDetails state) {
         mHandler.removeClient(state);
     }
     @Override
-    public void processPacket(StyxMessage message, ClientState transmitter) throws IOException {
+    public void processPacket(StyxMessage message, ClientDetails transmitter) throws IOException {
         mHandler.processPacket(message, transmitter);
     }
 

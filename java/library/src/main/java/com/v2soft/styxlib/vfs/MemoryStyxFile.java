@@ -1,11 +1,11 @@
-package com.v2soft.styxlib.library.server.vfs;
+package com.v2soft.styxlib.vfs;
 
 import com.v2soft.styxlib.library.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.library.messages.base.enums.ModeType;
 import com.v2soft.styxlib.library.messages.base.enums.QIDType;
 import com.v2soft.styxlib.library.messages.base.structs.StyxQID;
 import com.v2soft.styxlib.library.messages.base.structs.StyxStat;
-import com.v2soft.styxlib.library.server.ClientState;
+import com.v2soft.styxlib.server.ClientDetails;
 import com.v2soft.styxlib.library.types.ULong;
 
 import java.io.IOException;
@@ -16,8 +16,8 @@ import java.util.List;
 
 /**
  * In-Memory file
- * @author vshcryabets@gmail.com
  *
+ * @author vshcryabets@gmail.com
  */
 public class MemoryStyxFile implements IVirtualStyxFile {
     protected String mName;
@@ -25,7 +25,7 @@ public class MemoryStyxFile implements IVirtualStyxFile {
     protected StyxStat mStat;
 
     public MemoryStyxFile(String name) {
-        if ( name == null ) {
+        if (name == null) {
             throw new NullPointerException("Filename is null");
         }
         mName = name;
@@ -33,20 +33,23 @@ public class MemoryStyxFile implements IVirtualStyxFile {
     }
 
     @Override
-    public StyxQID getQID() {return mQID;}
+    public StyxQID getQID() {
+        return mQID;
+    }
+
     @Override
     public StyxStat getStat() {
-        if ( mStat == null ) {
-            mStat = new StyxStat((short)0, 
-                    1, 
-                    mQID, 
+        if (mStat == null) {
+            mStat = new StyxStat((short) 0,
+                    1,
+                    mQID,
                     getMode(),
-                    getAccessTime(), 
-                    getModificationTime(), 
-                    getLength(), 
-                    mName, 
-                    getOwnerName(), 
-                    getGroupName(), 
+                    getAccessTime(),
+                    getModificationTime(),
+                    getLength(),
+                    mName,
+                    getOwnerName(),
+                    getGroupName(),
                     getModificationUser());
         }
         return mStat;
@@ -54,7 +57,7 @@ public class MemoryStyxFile implements IVirtualStyxFile {
 
     @Override
     public int getMode() {
-        return 0x000001FF;
+        return 0x000001FF; // TODO magic number
     }
 
     @Override
@@ -93,50 +96,48 @@ public class MemoryStyxFile implements IVirtualStyxFile {
     }
 
     @Override
-    public boolean open(ClientState client, int mode) throws IOException {
-        return ( (mode == ModeType.OREAD) || 
-                (mode == ModeType.OWRITE) || 
-                (mode==ModeType.ORDWR) );
+    public boolean open(ClientDetails clientDetails, int mode) throws IOException {
+        return ( ( mode == ModeType.OREAD ) ||
+                ( mode == ModeType.OWRITE ) ||
+                ( mode == ModeType.ORDWR ) );
     }
 
     @Override
-    public IVirtualStyxFile walk(Iterator<String> pathElements, List<StyxQID> qids) 
+    public IVirtualStyxFile walk(Iterator<String> pathElements, List<StyxQID> qids)
             throws StyxErrorMessageException {
         return this;
     }
 
-    public int write(ClientState client, byte[] data, ULong offset) throws StyxErrorMessageException {
+    public int write(ClientDetails clientDetails, byte[] data, ULong offset) throws StyxErrorMessageException {
         return 0;
     }
 
     @Override
-    public long read(ClientState client, byte[] outbuffer, ULong offset, long count) throws StyxErrorMessageException {
+    public long read(ClientDetails clientDetails, byte[] outbuffer, ULong offset, long count) throws StyxErrorMessageException {
         return 0;
     }
 
     @Override
-    public void close(ClientState client) {
+    public void close(ClientDetails clientDetails) {
     }
 
-    // ==============================================================
-    // Abstract methods
-    // ==============================================================
     protected int stringReply(String value, byte[] buffer, Charset charset) {
         byte[] bytes = value.getBytes(charset);
         System.arraycopy(bytes, 0, buffer, 0, bytes.length);
         return bytes.length;
     }
+
     protected int stringReplyWithOffset(String value, byte[] buffer, Charset charset,
-            long offset, int count) {
+                                        long offset, int count) {
         return byteReplyWithOffset(value.getBytes(charset), buffer, offset, count);
     }
+
     protected int byteReplyWithOffset(byte[] reply, byte[] buffer, long offset, int count) {
-        long start = offset;
-        if ( start >= reply.length ) {
+        if (offset >= reply.length) {
             return 0;
         } else {
-            if ( start+count > reply.length ) {
-                count = (int) (reply.length-start);
+            if (offset + count > reply.length) {
+                count = (int) ( reply.length - offset );
             }
             System.arraycopy(reply, 0, buffer, 0, count);
             return count;
@@ -144,12 +145,12 @@ public class MemoryStyxFile implements IVirtualStyxFile {
     }
 
     @Override
-    public void onConnectionClosed(ClientState state) {
+    public void onConnectionClosed(ClientDetails state) {
         // ok, nothing to do
     }
 
     @Override
-    public StyxQID create(String name, long permissions, int mode) 
+    public StyxQID create(String name, long permissions, int mode)
             throws StyxErrorMessageException {
         StyxErrorMessageException.doException(
                 "Can't create file, this is read-only file system.");
@@ -157,8 +158,8 @@ public class MemoryStyxFile implements IVirtualStyxFile {
     }
 
     @Override
-    public boolean delete(ClientState client) {
-        close(client);
+    public boolean delete(ClientDetails clientDetails) {
+        close(clientDetails);
         return false;
     }
 }

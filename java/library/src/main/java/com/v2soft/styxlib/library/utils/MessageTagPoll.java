@@ -1,6 +1,6 @@
 package com.v2soft.styxlib.library.utils;
 
-import com.v2soft.styxlib.library.Consts;
+import com.v2soft.styxlib.Consts;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
 
 /**

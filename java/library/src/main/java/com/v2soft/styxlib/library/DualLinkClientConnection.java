@@ -1,11 +1,10 @@
 package com.v2soft.styxlib.library;
 
-import com.v2soft.styxlib.library.core.Messenger;
 import com.v2soft.styxlib.library.core.MessengerWithExport;
-import com.v2soft.styxlib.library.server.IChannelDriver;
-import com.v2soft.styxlib.library.server.IMessageTransmitter;
-import com.v2soft.styxlib.library.server.tcp.TCPDualLinkServerManager;
-import com.v2soft.styxlib.library.server.vfs.IVirtualStyxFile;
+import com.v2soft.styxlib.server.IChannelDriver;
+import com.v2soft.styxlib.server.IMessageTransmitter;
+import com.v2soft.styxlib.server.tcp.TCPDualLinkServerManager;
+import com.v2soft.styxlib.vfs.IVirtualStyxFile;
 
 import java.io.IOException;
 
@@ -30,9 +29,9 @@ public class DualLinkClientConnection extends StyxClientConnection {
 
     @Override
     protected IMessageTransmitter initMessenger(IChannelDriver driver) throws IOException {
-        MessengerWithExport result = new MessengerWithExport(driver, getIOBufSize(), this);
+        MessengerWithExport result = new MessengerWithExport(driver, this);
         if ( mExportedRoot != null ) {
-            result.export(mExportedRoot, getProtocol());
+            result.export(mExportedRoot, mDetails);
         }
         return result;
     }

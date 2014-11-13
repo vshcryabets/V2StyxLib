@@ -1,10 +1,10 @@
-package com.v2soft.styxlib.library.server.tcp;
+package com.v2soft.styxlib.server.tcp;
 
 import com.v2soft.styxlib.library.IClient;
 import com.v2soft.styxlib.library.StyxClientConnection;
-import com.v2soft.styxlib.library.server.ClientState;
-import com.v2soft.styxlib.library.server.IChannelDriver;
-import com.v2soft.styxlib.library.server.vfs.IVirtualStyxFile;
+import com.v2soft.styxlib.server.ClientDetails;
+import com.v2soft.styxlib.server.IChannelDriver;
+import com.v2soft.styxlib.vfs.IVirtualStyxFile;
 import com.v2soft.styxlib.library.types.Credentials;
 
 import java.io.IOException;
@@ -28,9 +28,9 @@ public class TCPDualLinkServerManager extends TCPServerManager {
         return DUAL_LINK_PROTO;
     }
 
-    public IClient getReverseConnectionForClient(ClientState client, Credentials credentials) {
+    public IClient getReverseConnectionForClient(ClientDetails clientDetails, Credentials credentials) {
         StyxClientConnection connection = new StyxClientConnection(credentials);
-        IChannelDriver driver = client.getDriver();
+        IChannelDriver driver = clientDetails.getDriver();
         connection.setDriver(driver);
 //        connection.connect(mDrivers);
         return connection;

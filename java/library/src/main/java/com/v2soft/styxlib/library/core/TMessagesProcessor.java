@@ -1,6 +1,5 @@
-package com.v2soft.styxlib.library.server;
+package com.v2soft.styxlib.library.core;
 
-import com.v2soft.styxlib.library.core.IMessageProcessor;
 import com.v2soft.styxlib.library.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.library.messages.StyxRAttachMessage;
 import com.v2soft.styxlib.library.messages.StyxRAuthMessage;
@@ -23,7 +22,9 @@ import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.messages.base.StyxTMessageFID;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
 import com.v2soft.styxlib.library.messages.base.structs.StyxQID;
-import com.v2soft.styxlib.library.server.vfs.IVirtualStyxFile;
+import com.v2soft.styxlib.server.ClientDetails;
+import com.v2soft.styxlib.library.types.ConnectionDetails;
+import com.v2soft.styxlib.vfs.IVirtualStyxFile;
 
 import java.io.IOException;
 import java.util.LinkedList;
@@ -35,41 +36,36 @@ import java.util.List;
  *
  */
 public class TMessagesProcessor implements IMessageProcessor {
-    private String mProtocol;
-    private int mIOUnit;
+    protected ConnectionDetails mConnectionDetails;
     private IVirtualStyxFile mRoot;
     protected int mHandledPackets, mErrorPackets, mAnswerPackets;
 
-    public TMessagesProcessor(int iounit, IVirtualStyxFile root, String protocol) {
-        mIOUnit = iounit;
+    public TMessagesProcessor(ConnectionDetails details, IVirtualStyxFile root) {
+        mConnectionDetails = details;
         mRoot = root;
-        mProtocol = protocol;
         mHandledPackets = 0;
         mErrorPackets = 0;
         mAnswerPackets = 0;
     }
 
     @Override
-    public void addClient(ClientState client) {
-        client.setIOUnit(mIOUnit);
-        client.setRoot(mRoot);
-        client.setProtocol(mProtocol);
+    public void addClient(ClientDetails clientDetails) {
     }
     @Override
     public void close() {
     }
     @Override
-    public void removeClient(ClientState client) {
-        mRoot.onConnectionClosed(client);
+    public void removeClient(ClientDetails clientDetails) {
+        mRoot.onConnectionClosed(clientDetails);
     }
 
     /**
      * Processing incoming messages
-     * @param message incomming message
+     * @param message incoming message
      * @throws IOException
      */
     @Override
-    public void processPacket(StyxMessage message, ClientState client) throws IOException {
+    public void processPacket(StyxMessage message, ClientDetails clientDetails) throws IOException {
         mHandledPackets++;
         StyxMessage answer = null;
         IVirtualStyxFile file;
@@ -77,46 +73,46 @@ public class TMessagesProcessor implements IMessageProcessor {
         try {
             switch (message.getType()) {
                 case Tversion:
-                    answer = new StyxRVersionMessage(mIOUnit, mProtocol);
+                    answer = new StyxRVersionMessage(mConnectionDetails.getIOUnit(), mConnectionDetails.getProtocol());
                     break;
                 case Tattach:
-                    answer = processAttach(client, (StyxTAttachMessage)message);
+                    answer = processAttach(clientDetails, (StyxTAttachMessage)message);
                     break;
                 case Tauth:
-                    answer = processAuth(client, (StyxTAuthMessage)message);
+                    answer = processAuth(clientDetails, (StyxTAuthMessage)message);
                     break;
                 case Tstat:
                     fid = ((StyxTMessageFID)message).getFID();
-                    file = client.getAssignedFile(fid);
+                    file = clientDetails.getAssignedFile(fid);
                     answer = new StyxRStatMessage(message.getTag(), file.getStat());
                     break;
                 case Tclunk:
-                    answer = processClunk(client, (StyxTMessageFID)message);
+                    answer = processClunk(clientDetails, (StyxTMessageFID)message);
                     break;
                 case Tflush:
                     // TODO do something there
                     answer = new StyxMessage(MessageType.Rflush, message.getTag());
                     break;
                 case Twalk:
-                    answer = processWalk(client, (StyxTWalkMessage) message);
+                    answer = processWalk(clientDetails, (StyxTWalkMessage) message);
                     break;
                 case Topen:
-                    answer = processOpen(client, (StyxTOpenMessage)message);
+                    answer = processOpen(clientDetails, (StyxTOpenMessage)message);
                     break;
                 case Tread:
-                    answer = processRead(client, (StyxTReadMessage)message);
+                    answer = processRead(clientDetails, (StyxTReadMessage)message);
                     break;
                 case Twrite:
-                    answer = processWrite(client, (StyxTWriteMessage)message);
+                    answer = processWrite(clientDetails, (StyxTWriteMessage)message);
                     break;
                 case Twstat:
                     answer = processWStat((StyxTWStatMessage)message);
                     break;
                 case Tcreate:
-                    answer = processCreate(client, (StyxTCreateMessage)message);
+                    answer = processCreate(clientDetails, (StyxTCreateMessage)message);
                     break;
                 case Tremove:
-                    answer = processRemove(client, (StyxTMessageFID)message);
+                    answer = processRemove(clientDetails, (StyxTMessageFID)message);
                     break;
                 default:
                     System.out.println("Got message:");
@@ -130,7 +126,7 @@ public class TMessagesProcessor implements IMessageProcessor {
         }
         if ( answer != null ) {
             mAnswerPackets++;
-            client.getDriver().sendMessage(answer, client);
+            clientDetails.getDriver().sendMessage(answer, clientDetails);
         }
     }
 
@@ -144,49 +140,44 @@ public class TMessagesProcessor implements IMessageProcessor {
         return mErrorPackets;
     }
 
-    private StyxRAttachMessage processAttach(ClientState client, StyxTAttachMessage msg) {
+    private StyxRAttachMessage processAttach(ClientDetails clientDetails, StyxTAttachMessage msg) {
         String mountPoint = msg.getMountPoint();
         IVirtualStyxFile root = mRoot; // TODO .getDirectory(mountPoint); there should be some logic with mountPoint?
-        client.setUserName(msg.getUserName());
+        clientDetails.setUserName(msg.getUserName());
         StyxRAttachMessage answer = new StyxRAttachMessage(msg.getTag(), root.getQID());
-        client.registerOpenedFile(msg.getFID(), root );
+        clientDetails.registerOpenedFile(msg.getFID(), root );
         return answer;
     }
 
-    private StyxMessage processAuth(ClientState client, StyxTAuthMessage msg) {
-        client.setUserName(msg.getUserName());
+    private StyxMessage processAuth(ClientDetails clientDetails, StyxTAuthMessage msg) {
+        // TODO handle auth packet
+        clientDetails.setUserName(msg.getUserName());
         return new StyxRAuthMessage(msg.getTag(), StyxQID.EMPTY);
     }
 
     /**
      * Handle Tclunk message
-     * @param msg
-     * @return
      * @throws StyxErrorMessageException
      */
-    private StyxMessage processClunk(ClientState client, StyxTMessageFID msg) throws StyxErrorMessageException {
-        IVirtualStyxFile file = client.getAssignedFile(msg.getFID());
-        file.close(client);
-        client.closeFile(msg.getFID());
+    private StyxMessage processClunk(ClientDetails clientDetails, StyxTMessageFID msg) throws StyxErrorMessageException {
+        clientDetails.getAssignedFile(msg.getFID()).close(clientDetails);
+        clientDetails.closeFile(msg.getFID());
         return new StyxMessage(MessageType.Rclunk, msg.getTag());
     }
 
     /**
      * Handle TWalk message from client
-     * @param msg
-     * @return
      * @throws StyxErrorMessageException
      * @throws IOException
      */
-    private StyxMessage processWalk(ClientState client, StyxTWalkMessage msg) throws StyxErrorMessageException {
+    private StyxMessage processWalk(ClientDetails clientDetails, StyxTWalkMessage msg) throws StyxErrorMessageException {
         long fid = msg.getFID();
-        IVirtualStyxFile file = client.getAssignedFile(fid);
         List<StyxQID> QIDList = new LinkedList<StyxQID>();
-        final IVirtualStyxFile walkFile = file.walk(
+        final IVirtualStyxFile walkFile = clientDetails.getAssignedFile(fid).walk(
                 msg.getPathElements().iterator(),
                 QIDList);
         if ( walkFile != null ) {
-            client.registerOpenedFile(msg.getNewFID(), walkFile);
+            clientDetails.registerOpenedFile(msg.getNewFID(), walkFile);
             return new StyxRWalkMessage(msg.getTag(), QIDList);
         } else {
             return new StyxRErrorMessage(msg.getTag(),
@@ -196,16 +187,15 @@ public class TMessagesProcessor implements IMessageProcessor {
 
     /**
      * Handle TOpen message from client
-     * @param msg
-     * @return
      * @throws StyxErrorMessageException
      * @throws IOException
      */
-    private StyxMessage processOpen(ClientState client, StyxTOpenMessage msg) throws StyxErrorMessageException, IOException {
+    private StyxMessage processOpen(ClientDetails clientDetails, StyxTOpenMessage msg) throws StyxErrorMessageException, IOException {
         long fid = msg.getFID();
-        IVirtualStyxFile file = client.getAssignedFile(fid);
-        if ( file.open(client, msg.getMode()) ) {
-            return new StyxROpenMessage(msg.getTag(), file.getQID(), mIOUnit-24, false ); // TODO magic number
+        IVirtualStyxFile file = clientDetails.getAssignedFile(fid);
+        if ( file.open(clientDetails, msg.getMode()) ) {
+            return new StyxROpenMessage(msg.getTag(), file.getQID(), mConnectionDetails.getIOUnit() - 24,
+                    false ); // TODO magic number 24
         } else {
             StyxErrorMessageException.doException("Not supported mode for specified file");
             return null;
@@ -214,14 +204,11 @@ public class TMessagesProcessor implements IMessageProcessor {
 
     /**
      * Handle Tremove
-     * @param msg
-     * @return
      * @throws StyxErrorMessageException
      */
-    private StyxMessage processRemove(ClientState client, StyxTMessageFID msg)
+    private StyxMessage processRemove(ClientDetails clientDetails, StyxTMessageFID msg)
             throws StyxErrorMessageException {
-        final IVirtualStyxFile file = client.getAssignedFile(msg.getFID());
-        if ( file.delete(client) ) {
+        if (clientDetails.getAssignedFile(msg.getFID()).delete(clientDetails) ) {
             return new StyxMessage(MessageType.Rremove, msg.getTag());
         } else {
             return new StyxRErrorMessage(msg.getTag(), "Can't delete file");
@@ -230,50 +217,42 @@ public class TMessagesProcessor implements IMessageProcessor {
 
     /**
      * Handle Tcreate message
-     * @param msg
-     * @return
      * @throws StyxErrorMessageException
      */
-    private StyxMessage processCreate(ClientState client, StyxTCreateMessage msg)
+    private StyxMessage processCreate(ClientDetails clientDetails, StyxTCreateMessage msg)
             throws StyxErrorMessageException {
-        final IVirtualStyxFile file = client.getAssignedFile(msg.getFID());
+        final IVirtualStyxFile file = clientDetails.getAssignedFile(msg.getFID());
         StyxQID qid = file.create(msg.getName(), msg.getPermissions(), msg.getMode());
-        return new StyxROpenMessage(msg.getTag(), qid, mIOUnit, true);
+        return new StyxROpenMessage(msg.getTag(), qid, mConnectionDetails.getIOUnit(), true);
     }
 
     private StyxMessage processWStat(StyxTWStatMessage msg) {
-        // TODO Auto-generated method stub
+        // TODO handle Twstat
         return new StyxMessage(MessageType.Rwstat, msg.getTag());
     }
 
     /**
      * Handle TWrite messages
-     * @param msg
-     * @return
      * @throws StyxErrorMessageException
      */
-    private StyxMessage processWrite(ClientState client, StyxTWriteMessage msg) throws StyxErrorMessageException {
+    private StyxMessage processWrite(ClientDetails clientDetails, StyxTWriteMessage msg) throws StyxErrorMessageException {
         long fid = msg.getFID();
-        IVirtualStyxFile file = client.getAssignedFile(fid);
-        int writed = file.write(client, msg.getData(), msg.getOffset());
-        return new StyxRWriteMessage(msg.getTag(), (int) writed);
+        return new StyxRWriteMessage(msg.getTag(),
+                clientDetails.getAssignedFile(fid).write(clientDetails, msg.getData(), msg.getOffset()));
     }
 
     /**
      * Handle read operation
-     * @param msg
-     * @return
      * @throws StyxErrorMessageException
      */
-    private StyxMessage processRead(ClientState client, StyxTReadMessage msg) throws StyxErrorMessageException {
-        if ( msg.getCount() > mIOUnit ) {
+    private StyxMessage processRead(ClientDetails clientDetails, StyxTReadMessage msg) throws StyxErrorMessageException {
+        if ( msg.getCount() > mConnectionDetails.getIOUnit() ) {
             return new StyxRErrorMessage(msg.getTag(), "IOUnit overflow");
         }
         long fid = msg.getFID();
-        IVirtualStyxFile file = client.getAssignedFile(fid);
         byte [] buffer = new byte[(int) msg.getCount()];
-        long readed = file.read(client, buffer, msg.getOffset(), msg.getCount());
-        return new StyxRReadMessage(msg.getTag(), buffer, (int) readed);
+        return new StyxRReadMessage(msg.getTag(), buffer,
+                (int) clientDetails.getAssignedFile(fid).read(clientDetails, buffer, msg.getOffset(), msg.getCount()));
     }
 
     public IVirtualStyxFile getRoot() {

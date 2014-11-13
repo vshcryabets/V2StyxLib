@@ -1,9 +1,8 @@
 package com.v2soft.styxlib.library.core;
 
-import com.v2soft.styxlib.ILogListener;
-import com.v2soft.styxlib.library.server.IChannelDriver;
-import com.v2soft.styxlib.library.server.TMessagesProcessor;
-import com.v2soft.styxlib.library.server.vfs.IVirtualStyxFile;
+import com.v2soft.styxlib.server.IChannelDriver;
+import com.v2soft.styxlib.library.types.ConnectionDetails;
+import com.v2soft.styxlib.vfs.IVirtualStyxFile;
 
 import java.io.IOException;
 
@@ -13,22 +12,22 @@ import java.io.IOException;
 public class MessengerWithExport extends Messenger {
     protected MessagesFilter mFilter;
 
-    public MessengerWithExport(IChannelDriver driver, int io_unit, StyxMessengerListener listener)
+    public MessengerWithExport(IChannelDriver driver, StyxMessengerListener listener)
             throws IOException {
-        super(driver, io_unit, listener);
+        super(driver, listener);
         mFilter = new MessagesFilter(null, mMessageProcessor);
         mMessageProcessor = mFilter;
         mDriver.setMessageHandler(mMessageProcessor);
     }
 
-    public void export(IVirtualStyxFile root, String protocol) throws IOException {
+    public void export(IVirtualStyxFile root, ConnectionDetails details) throws IOException {
         TMessagesProcessor processor = (TMessagesProcessor) mFilter.getTProcessor();
         if ( (processor != null) && (root != null) && (!root.equals(processor.getRoot()))) {
             processor.close();
             processor = null;
         }
         if ( root != null ) {
-            processor = new TMessagesProcessor(mIOBufferSize, root, protocol);
+            processor = new TMessagesProcessor(details, root);
         }
         mFilter.setTProcessor(processor);
     }

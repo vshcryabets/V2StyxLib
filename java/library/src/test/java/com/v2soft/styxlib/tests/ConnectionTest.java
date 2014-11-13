@@ -1,6 +1,5 @@
 package com.v2soft.styxlib.tests;
 
-import com.v2soft.styxlib.ILogListener;
 import com.v2soft.styxlib.library.IClient;
 import com.v2soft.styxlib.library.StyxClientConnection;
 import com.v2soft.styxlib.library.StyxFile;
@@ -9,10 +8,10 @@ import com.v2soft.styxlib.library.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.library.exceptions.StyxException;
 import com.v2soft.styxlib.library.io.StyxFileBufferedInputStream;
 import com.v2soft.styxlib.library.messages.base.enums.FileMode;
-import com.v2soft.styxlib.library.server.IChannelDriver;
-import com.v2soft.styxlib.library.server.tcp.TCPClientChannelDriver;
-import com.v2soft.styxlib.library.server.tcp.TCPServerManager;
-import com.v2soft.styxlib.library.server.vfs.DiskStyxDirectory;
+import com.v2soft.styxlib.server.IChannelDriver;
+import com.v2soft.styxlib.server.tcp.TCPClientChannelDriver;
+import com.v2soft.styxlib.server.tcp.TCPServerManager;
+import com.v2soft.styxlib.vfs.DiskStyxDirectory;
 
 import org.junit.After;
 import org.junit.Before;
@@ -52,7 +51,7 @@ public class ConnectionTest {
         IChannelDriver driver = new TCPClientChannelDriver(
                 InetAddress.getByName("localhost"), PORT,
                 false,
-                mConnection.getIOBufSize());
+                mConnection.getConnectionDetails().getIOUnit());
         assertTrue(mConnection.connect(driver));
     }
 

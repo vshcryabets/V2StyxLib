@@ -1,12 +1,12 @@
-package com.v2soft.styxlib.library.server.tcp;
+package com.v2soft.styxlib.server.tcp;
 
 import com.v2soft.styxlib.ILogListener;
 import com.v2soft.styxlib.library.StyxServerManager;
 import com.v2soft.styxlib.library.core.IMessageProcessor;
 import com.v2soft.styxlib.library.io.StyxDataWriter;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
-import com.v2soft.styxlib.library.server.ClientState;
-import com.v2soft.styxlib.library.server.IChannelDriver;
+import com.v2soft.styxlib.server.ClientDetails;
+import com.v2soft.styxlib.server.IChannelDriver;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -64,15 +64,15 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
     }
 
     @Override
-    public boolean sendMessage(StyxMessage message, ClientState recepient) {
+    public boolean sendMessage(StyxMessage message, ClientDetails recepient) {
         if ( recepient == null ) {
             throw new NullPointerException("Client can't be null");
         }
-        ByteBuffer buffer = ((TCPClientState)recepient).getOutputBuffer();
+        ByteBuffer buffer = ((TCPClientDetails)recepient).getOutputBuffer();
         try {
             message.writeToBuffer(new StyxDataWriter(buffer));
             buffer.position(0);
-            ((TCPClientState)recepient).getChannel().write(buffer);
+            ((TCPClientDetails)recepient).getChannel().write(buffer);
             mTransmittedPacketsCount++;
             if (mLogListener != null) {
                 mLogListener.onMessageTransmited(this, recepient, message);
@@ -101,7 +101,7 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
      * @return
      * @throws IOException
      */
-    public boolean readSocket(TCPClientState client) throws IOException {
+    public boolean readSocket(TCPClientDetails client) throws IOException {
         int read = 0;
         try {
             read = client.getInputBuffer().readFromChannel(client.getChannel());
@@ -122,7 +122,7 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
      * @return true if message was processed
      * @throws IOException
      */
-    private boolean process(TCPClientState client) throws IOException {
+    private boolean process(TCPClientDetails client) throws IOException {
         int inBuffer = client.getInputBuffer().remainsToRead();
         if ( inBuffer > 4 ) {
             long packetSize = client.getInputReader().getUInt32();

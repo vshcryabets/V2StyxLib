@@ -32,7 +32,7 @@ public class StyxTMessageFID extends StyxTMessage {
     // Encoder/Decoder methods
     // ===========================================================================
     @Override
-    public void load(IStyxDataReader input) 
+    public void load(IStyxDataReader input)
             throws IOException  {
         super.load(input);
         mFID = input.readUInt32();

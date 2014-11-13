@@ -1,6 +1,5 @@
-package com.v2soft.styxlib.library.server;
+package com.v2soft.styxlib.server;
 
-import com.v2soft.styxlib.ILogListener;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
 
 import java.io.Closeable;
@@ -12,7 +11,7 @@ import java.io.IOException;
  * @author V.Shcryabets (vshcryabets@gmail.com)
  */
 public interface IMessageTransmitter extends Closeable {
-    boolean sendMessage(StyxMessage answer, ClientState recepient) throws IOException;
+    boolean sendMessage(StyxMessage answer, ClientDetails recepient) throws IOException;
     int getTransmittedCount();
     int getErrorsCount();
 }

@@ -1,7 +1,7 @@
 package com.v2soft.styxlib.library.core;
 
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
-import com.v2soft.styxlib.library.server.ClientState;
+import com.v2soft.styxlib.server.ClientDetails;
 
 import java.io.IOException;
 
@@ -18,7 +18,7 @@ public class MessagesFilter implements IMessageProcessor {
     }
 
     @Override
-    public void addClient(ClientState state) {
+    public void addClient(ClientDetails state) {
         if ( mTProcessor != null ) {
             mTProcessor.addClient(state);
         }
@@ -28,7 +28,7 @@ public class MessagesFilter implements IMessageProcessor {
     }
 
     @Override
-    public void removeClient(ClientState state) {
+    public void removeClient(ClientDetails state) {
         if ( mTProcessor != null ) {
             mTProcessor.addClient(state);
         }
@@ -38,7 +38,7 @@ public class MessagesFilter implements IMessageProcessor {
     }
 
     @Override
-    public void processPacket(StyxMessage message, ClientState transmitter) throws IOException {
+    public void processPacket(StyxMessage message, ClientDetails transmitter) throws IOException {
         if ( message.getType().isTMessage() ) {
             if ( mTProcessor != null ) {
                 mTProcessor.processPacket(message, transmitter);

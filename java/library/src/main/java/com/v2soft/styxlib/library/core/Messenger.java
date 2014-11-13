@@ -1,12 +1,11 @@
 package com.v2soft.styxlib.library.core;
 
-import com.v2soft.styxlib.ILogListener;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.messages.base.StyxTMessage;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
-import com.v2soft.styxlib.library.server.ClientState;
-import com.v2soft.styxlib.library.server.IChannelDriver;
-import com.v2soft.styxlib.library.server.IMessageTransmitter;
+import com.v2soft.styxlib.server.ClientDetails;
+import com.v2soft.styxlib.server.IChannelDriver;
+import com.v2soft.styxlib.server.IMessageTransmitter;
 import com.v2soft.styxlib.library.utils.MessageTagPoll;
 
 import java.io.IOException;
@@ -26,15 +25,13 @@ public class Messenger implements IMessageTransmitter {
     protected StyxMessengerListener mListener;
     protected Map<Integer, StyxTMessage> mMessages = new HashMap<Integer, StyxTMessage>();
     protected MessageTagPoll mActiveTags = new MessageTagPoll();
-    protected int mIOBufferSize;
     protected int mTransmittedCount, mErrorCount;
     protected IChannelDriver mDriver;
     protected IMessageProcessor mMessageProcessor;
 
-    public Messenger(IChannelDriver driver, int io_unit, StyxMessengerListener listener)
+    public Messenger(IChannelDriver driver, StyxMessengerListener listener)
             throws IOException {
         resetStatistics();
-        mIOBufferSize = io_unit;
         mDriver = driver;
         mListener = listener;
         RMessagesProcessor rProcessor = new RMessagesProcessor();
@@ -58,7 +55,7 @@ public class Messenger implements IMessageTransmitter {
      * @param message message to send
      * @return true if success
      */
-    public boolean sendMessage(StyxMessage message, ClientState recepient) throws IOException {
+    public boolean sendMessage(StyxMessage message, ClientDetails recepient) throws IOException {
         if ( recepient == null ) {
             throw new NullPointerException("Recepient is null");
         }

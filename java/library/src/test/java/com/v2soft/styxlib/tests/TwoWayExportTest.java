@@ -5,12 +5,12 @@ import com.v2soft.styxlib.library.DualLinkClientConnection;
 import com.v2soft.styxlib.library.IClient;
 import com.v2soft.styxlib.library.exceptions.StyxException;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
-import com.v2soft.styxlib.library.server.ClientState;
-import com.v2soft.styxlib.library.server.IChannelDriver;
-import com.v2soft.styxlib.library.server.tcp.TCPClientChannelDriver;
-import com.v2soft.styxlib.library.server.tcp.TCPDualLinkServerManager;
-import com.v2soft.styxlib.library.server.vfs.MemoryStyxDirectory;
-import com.v2soft.styxlib.library.server.vfs.MemoryStyxFile;
+import com.v2soft.styxlib.server.ClientDetails;
+import com.v2soft.styxlib.server.IChannelDriver;
+import com.v2soft.styxlib.server.tcp.TCPClientChannelDriver;
+import com.v2soft.styxlib.server.tcp.TCPDualLinkServerManager;
+import com.v2soft.styxlib.vfs.MemoryStyxDirectory;
+import com.v2soft.styxlib.vfs.MemoryStyxFile;
 import com.v2soft.styxlib.library.types.Credentials;
 
 import org.junit.After;
@@ -80,7 +80,7 @@ public class TwoWayExportTest {
         connection.export(root);
         IChannelDriver driver = new TCPClientChannelDriver(
                 InetAddress.getByName("127.0.0.1"), PORT,
-                false, connection.getIOBufSize());
+                false, connection.getConnectionDetails().getIOUnit());
 //        driver.setLogListener(clientlistener);
 
         assertTrue(connection.connect(driver));
@@ -89,9 +89,9 @@ public class TwoWayExportTest {
         ClientServerTest.checkMD5Hash(connection);
 
         // reverse test
-        Set<ClientState> clients = drivers.get(0).getClients();
-        ClientState client = clients.iterator().next();
-        IClient reverseConnection = mServer.getReverseConnectionForClient(client,
+        Set<ClientDetails> clientDetailses = drivers.get(0).getClients();
+        ClientDetails clientDetails = clientDetailses.iterator().next();
+        IClient reverseConnection = mServer.getReverseConnectionForClient(clientDetails,
                 new Credentials(null, null));
         assertNotNull("Can't retrieve reverse connection to client",reverseConnection);
         reverseConnection.connect();
@@ -109,16 +109,16 @@ public class TwoWayExportTest {
         DualLinkClientConnection connection = new DualLinkClientConnection();
         IChannelDriver driver = new TCPClientChannelDriver(
                 InetAddress.getByName("127.0.0.1"), PORT,
-                false, connection.getIOBufSize());
+                false, connection.getConnectionDetails().getIOUnit());
         assertTrue(connection.connect(driver));
-        Set<ClientState> clients = driver.getClients();
-        assertNotNull(clients);
-        assertEquals(1, clients.size());
-        ClientState pseudoClient = clients.iterator().next();
-        assertNotNull(pseudoClient);
-        assertNotNull(pseudoClient.getDriver());
-        assertEquals(driver, pseudoClient.getDriver());
-        assertEquals(TCPClientChannelDriver.PSEUDO_CLIENT_ID, pseudoClient.getId());
+        Set<ClientDetails> clientDetailses = driver.getClients();
+        assertNotNull(clientDetailses);
+        assertEquals(1, clientDetailses.size());
+        ClientDetails pseudoClientDetails = clientDetailses.iterator().next();
+        assertNotNull(pseudoClientDetails);
+        assertNotNull(pseudoClientDetails.getDriver());
+        assertEquals(driver, pseudoClientDetails.getDriver());
+        assertEquals(TCPClientChannelDriver.PSEUDO_CLIENT_ID, pseudoClientDetails.getId());
         connection.close();
     }
 
@@ -132,30 +132,30 @@ public class TwoWayExportTest {
         DualLinkClientConnection connection = new DualLinkClientConnection();
         IChannelDriver driver = new TCPClientChannelDriver(
                 InetAddress.getByName("127.0.0.1"), PORT,
-                false, connection.getIOBufSize());
+                false, connection.getConnectionDetails().getIOUnit());
         assertTrue(connection.connect(driver));
 
         DualLinkClientConnection connection2 = new DualLinkClientConnection();
         IChannelDriver driver2 = new TCPClientChannelDriver(
                 InetAddress.getByName("127.0.0.1"), PORT,
-                false, connection2.getIOBufSize());
+                false, connection2.getConnectionDetails().getIOUnit());
         assertTrue(connection2.connect(driver2));
 
-        Set<ClientState> clients = drivers.get(0).getClients();
-        assertNotNull(clients);
-        assertEquals(2, clients.size());
+        Set<ClientDetails> clientDetailses = drivers.get(0).getClients();
+        assertNotNull(clientDetailses);
+        assertEquals(2, clientDetailses.size());
 
         connection2.close();
         Thread.sleep(500);
-        clients = drivers.get(0).getClients();
-        assertNotNull(clients);
-        assertEquals(1, clients.size());
+        clientDetailses = drivers.get(0).getClients();
+        assertNotNull(clientDetailses);
+        assertEquals(1, clientDetailses.size());
 
         connection.close();
         Thread.sleep(500);
-        clients = drivers.get(0).getClients();
-        assertNotNull(clients);
-        assertEquals(0, clients.size());
+        clientDetailses = drivers.get(0).getClients();
+        assertNotNull(clientDetailses);
+        assertEquals(0, clientDetailses.size());
     }
 
     private class TestLogListener implements ILogListener {
@@ -166,19 +166,19 @@ public class TwoWayExportTest {
         }
 
         @Override
-        public void onMessageReceived(IChannelDriver driver, ClientState client, StyxMessage message) {
+        public void onMessageReceived(IChannelDriver driver, ClientDetails clientDetails, StyxMessage message) {
             System.out.println(String.format("%sR %s client %s message %s %d", mPrefix,
                     driver.toString(),
-                    client.toString(),
+                    clientDetails.toString(),
                     message.getType().toString(),
                     message.getTag()));
         }
 
         @Override
-        public void onMessageTransmited(IChannelDriver driver, ClientState client, StyxMessage message) {
+        public void onMessageTransmited(IChannelDriver driver, ClientDetails clientDetails, StyxMessage message) {
             System.out.println(String.format("%sS %s client %s message %s %d", mPrefix,
                     driver.toString(),
-                    client.toString(),
+                    clientDetails.toString(),
                     message.getType().toString(),
                     message.getTag()));
         }

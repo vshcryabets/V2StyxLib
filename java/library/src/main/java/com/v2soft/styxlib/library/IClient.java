@@ -1,9 +1,10 @@
 package com.v2soft.styxlib.library;
 
 import com.v2soft.styxlib.library.exceptions.StyxException;
-import com.v2soft.styxlib.library.server.ClientState;
-import com.v2soft.styxlib.library.server.IChannelDriver;
-import com.v2soft.styxlib.library.server.IMessageTransmitter;
+import com.v2soft.styxlib.server.ClientDetails;
+import com.v2soft.styxlib.server.IChannelDriver;
+import com.v2soft.styxlib.server.IMessageTransmitter;
+import com.v2soft.styxlib.library.types.ConnectionDetails;
 import com.v2soft.styxlib.library.types.Credentials;
 
 import java.io.Closeable;
@@ -78,11 +79,11 @@ public interface IClient extends Closeable {
 
     long allocateFID();
 
-    int getIOBufSize();
+    ConnectionDetails getConnectionDetails();
 
     /**
      *
      * @return message recepient information
      */
-    ClientState getRecepient();
+    ClientDetails getRecepient();
 }

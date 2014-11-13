@@ -1,6 +1,5 @@
 package com.v2soft.styxlib.library;
 
-import com.v2soft.styxlib.ILogListener;
 import com.v2soft.styxlib.library.core.Messenger;
 import com.v2soft.styxlib.library.core.Messenger.StyxMessengerListener;
 import com.v2soft.styxlib.library.exceptions.StyxErrorMessageException;
@@ -15,9 +14,10 @@ import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.messages.base.StyxTMessageFID;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
 import com.v2soft.styxlib.library.messages.base.structs.StyxQID;
-import com.v2soft.styxlib.library.server.ClientState;
-import com.v2soft.styxlib.library.server.IChannelDriver;
-import com.v2soft.styxlib.library.server.IMessageTransmitter;
+import com.v2soft.styxlib.server.ClientDetails;
+import com.v2soft.styxlib.server.IChannelDriver;
+import com.v2soft.styxlib.server.IMessageTransmitter;
+import com.v2soft.styxlib.library.types.ConnectionDetails;
 import com.v2soft.styxlib.library.types.Credentials;
 import com.v2soft.styxlib.library.utils.FIDPoll;
 
@@ -37,6 +37,7 @@ public class StyxClientConnection
     //---------------------------------------------------------------------------
     public static final String PROTOCOL = "9P2000";
     public static final int DEFAULT_TIMEOUT = 10000;
+    private static final int DEFAULT_IO_SIZE = 8192;
     //---------------------------------------------------------------------------
     // Class fields
     //---------------------------------------------------------------------------
@@ -47,20 +48,21 @@ public class StyxClientConnection
     private boolean mNeedAuth;
     private boolean isConnected, isAttached;
     private IMessageTransmitter mMessenger;
-    private int mIOBufSize = 8192;
     private long mAuthFID = StyxMessage.NOFID;
     private StyxQID mAuthQID;
     private StyxQID mQID;
     private long mFID = StyxMessage.NOFID;
     private FIDPoll mActiveFids = new FIDPoll();
-    protected ClientState mRecepient;
+    protected ClientDetails mRecepient;
     private IChannelDriver mDriver;
+    protected ConnectionDetails mDetails;
 
     public StyxClientConnection() {
         this(new Credentials(null, null));
     }
 
     public StyxClientConnection(Credentials credentials) {
+        mDetails = new ConnectionDetails(getProtocol(), getIOBufSize());
         mCredentials = credentials;
         isConnected = false;
     }
@@ -123,8 +125,7 @@ public class StyxClientConnection
     }
 
     protected IMessageTransmitter initMessenger(IChannelDriver driver) throws IOException {
-        IMessageTransmitter result = new Messenger(driver, mIOBufSize, this);
-        return result;
+        return new Messenger(driver, this);
     }
 
     public StyxFile getRoot() throws StyxException, InterruptedException, TimeoutException, IOException {
@@ -142,8 +143,8 @@ public class StyxClientConnection
         return mActiveFids;
     }
 
-    public int getIOBufSize() {
-        return mIOBufSize;
+    protected int getIOBufSize() {
+        return DEFAULT_IO_SIZE;
     }
 
     public Credentials getCredentials() {
@@ -185,6 +186,11 @@ public class StyxClientConnection
         return mActiveFids.getFreeItem();
     }
 
+    @Override
+    public ConnectionDetails getConnectionDetails() {
+        return mDetails;
+    }
+
     public void sendVersionMessage()
             throws InterruptedException, StyxException, IOException, TimeoutException {
         // release atached FID
@@ -197,14 +203,14 @@ public class StyxClientConnection
             mFID = StyxMessage.NOFID;
         }
 
-        StyxTVersionMessage tVersion = new StyxTVersionMessage(mIOBufSize, getProtocol());
+        StyxTVersionMessage tVersion = new StyxTVersionMessage(mDetails.getIOUnit(), getProtocol());
         mMessenger.sendMessage(tVersion, mRecepient);
 
         StyxMessage rMessage = tVersion.waitForAnswer(mTimeout);
         StyxErrorMessageException.doException(rMessage);
         StyxRVersionMessage rVersion = (StyxRVersionMessage) rMessage;
-        if (rVersion.getMaxPacketSize() < mIOBufSize) {
-            mIOBufSize = (int) rVersion.getMaxPacketSize();
+        if (rVersion.getMaxPacketSize() < mDetails.getIOUnit()) {
+            mDetails = new ConnectionDetails(getProtocol(), (int) rVersion.getMaxPacketSize());
         }
         mActiveFids.clean();
         if (isNeedAuth()) {
@@ -315,7 +321,7 @@ public class StyxClientConnection
     }
 
     @Override
-    public ClientState getRecepient() {
+    public ClientDetails getRecepient() {
         return mRecepient;
     }
 

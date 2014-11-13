@@ -7,8 +7,8 @@ import com.v2soft.styxlib.library.messages.StyxTWriteMessage;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.messages.base.StyxTMessageFID;
 import com.v2soft.styxlib.library.messages.base.enums.MessageType;
-import com.v2soft.styxlib.library.server.ClientState;
-import com.v2soft.styxlib.library.server.IMessageTransmitter;
+import com.v2soft.styxlib.server.ClientDetails;
+import com.v2soft.styxlib.server.IMessageTransmitter;
 import com.v2soft.styxlib.library.types.ULong;
 
 import java.io.IOException;
@@ -25,9 +25,9 @@ public class StyxUnbufferedOutputStream extends OutputStream {
     private long mFID;
     private IMessageTransmitter mMessenger;
     private ULong mFileOffset = ULong.ZERO;
-    protected ClientState mRecepient;
+    protected ClientDetails mRecepient;
 
-    public StyxUnbufferedOutputStream(long fid, IMessageTransmitter messenger, ClientState recepient) {
+    public StyxUnbufferedOutputStream(long fid, IMessageTransmitter messenger, ClientDetails recepient) {
         if ( messenger == null ) {
             throw new NullPointerException("messnger is null");
         }
@@ -46,7 +46,7 @@ public class StyxUnbufferedOutputStream extends OutputStream {
     @Override
     public void write(byte[] data, int dataOffset, int dataLength) throws IOException {
         try {
-            final StyxTWriteMessage tWrite = 
+            final StyxTWriteMessage tWrite =
                     new StyxTWriteMessage(mFID, mFileOffset, data, dataOffset, dataLength);
             mMessenger.sendMessage(tWrite, mRecepient);
             final StyxMessage rMessage = tWrite.waitForAnswer(mTimeout);
@@ -69,7 +69,7 @@ public class StyxUnbufferedOutputStream extends OutputStream {
     public void setTimeout(long mTimeout) {
         this.mTimeout = mTimeout;
     }
-    
+
     @Override
     public void close() throws IOException {
         super.close();

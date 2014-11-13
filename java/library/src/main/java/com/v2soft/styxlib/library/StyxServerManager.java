@@ -1,9 +1,10 @@
 package com.v2soft.styxlib.library;
 
 import com.v2soft.styxlib.library.core.Messenger.StyxMessengerListener;
-import com.v2soft.styxlib.library.server.ClientBalancer;
-import com.v2soft.styxlib.library.server.IChannelDriver;
-import com.v2soft.styxlib.library.server.vfs.IVirtualStyxFile;
+import com.v2soft.styxlib.server.ClientBalancer;
+import com.v2soft.styxlib.server.IChannelDriver;
+import com.v2soft.styxlib.library.types.ConnectionDetails;
+import com.v2soft.styxlib.vfs.IVirtualStyxFile;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -11,11 +12,11 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * 
+ *
  * @author V.Shcriyabets (vshcryabets@gmail.com)
  *
  */
-public class StyxServerManager 
+public class StyxServerManager
 implements Closeable, StyxMessengerListener {
     //---------------------------------------------------------------------------
     // Constants
@@ -31,7 +32,8 @@ implements Closeable, StyxMessengerListener {
     private ClientBalancer mBalancer;
 
     public StyxServerManager(IVirtualStyxFile root) {
-        mBalancer = new ClientBalancer(getIOUnit(), root, getProtocol());
+        ConnectionDetails details = new ConnectionDetails(getProtocol(), getIOUnit());
+        mBalancer = new ClientBalancer(details, root);
         mDrivers = new LinkedList<IChannelDriver>();
     }
 
@@ -92,7 +94,7 @@ implements Closeable, StyxMessengerListener {
     @Override
     public void onFIDReleased(long fid) {
         // TODO Auto-generated method stub
-        
+
     }
 
     public List<IChannelDriver> getDrivers() {

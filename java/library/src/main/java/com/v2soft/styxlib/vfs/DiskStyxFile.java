@@ -1,8 +1,8 @@
-package com.v2soft.styxlib.library.server.vfs;
+package com.v2soft.styxlib.vfs;
 
 import com.v2soft.styxlib.library.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.library.messages.base.enums.ModeType;
-import com.v2soft.styxlib.library.server.ClientState;
+import com.v2soft.styxlib.server.ClientDetails;
 import com.v2soft.styxlib.library.types.ULong;
 
 import java.io.File;
@@ -19,7 +19,7 @@ import java.util.Map;
  */
 public class DiskStyxFile extends MemoryStyxFile {
     protected File mFile;
-    protected Map<ClientState, RandomAccessFile> mFilesMap;
+    protected Map<ClientDetails, RandomAccessFile> mFilesMap;
 
     public DiskStyxFile(File file) throws IOException {
         super(file.getName());
@@ -27,7 +27,7 @@ public class DiskStyxFile extends MemoryStyxFile {
             throw new IOException("File not exists");
         }
         mFile = file;
-        mFilesMap = new HashMap<ClientState, RandomAccessFile>();
+        mFilesMap = new HashMap<ClientDetails, RandomAccessFile>();
     }
 
     @Override
@@ -69,7 +69,7 @@ public class DiskStyxFile extends MemoryStyxFile {
     }
 
     @Override
-    public boolean open(ClientState client, int mode) throws IOException {
+    public boolean open(ClientDetails clientDetails, int mode) throws IOException {
         boolean canOpen = false;
         String ramode = null;
         switch (mode) {
@@ -89,15 +89,15 @@ public class DiskStyxFile extends MemoryStyxFile {
         }
         if ( canOpen ) {
             final RandomAccessFile rf = new RandomAccessFile(mFile, ramode);
-            mFilesMap.put(client, rf);
+            mFilesMap.put(clientDetails, rf);
         }
         return canOpen;
     }
 
-    public int write(ClientState client, byte[] data, ULong offset) 
+    public int write(ClientDetails clientDetails, byte[] data, ULong offset)
             throws StyxErrorMessageException {
-        if ( mFilesMap.containsKey(client)) {
-            final RandomAccessFile rf = mFilesMap.get(client);
+        if ( mFilesMap.containsKey(clientDetails)) {
+            final RandomAccessFile rf = mFilesMap.get(clientDetails);
             try {
                 rf.seek(offset.asLong());
                 rf.write(data);
@@ -111,10 +111,10 @@ public class DiskStyxFile extends MemoryStyxFile {
     }
 
     @Override
-    public long read(ClientState client, byte[] outbuffer, ULong offset, long count) 
+    public long read(ClientDetails clientDetails, byte[] outbuffer, ULong offset, long count)
             throws StyxErrorMessageException {
-        if ( mFilesMap.containsKey(client)) {
-            final RandomAccessFile rf = mFilesMap.get(client);
+        if ( mFilesMap.containsKey(clientDetails)) {
+            final RandomAccessFile rf = mFilesMap.get(clientDetails);
             try {
                 rf.seek(offset.asLong());
                 return rf.read(outbuffer, 0, (int) count);
@@ -127,9 +127,9 @@ public class DiskStyxFile extends MemoryStyxFile {
     }
 
     @Override
-    public void close(ClientState client) {
-        if ( mFilesMap.containsKey(client)) {
-            RandomAccessFile rf = mFilesMap.get(client);
+    public void close(ClientDetails clientDetails) {
+        if ( mFilesMap.containsKey(clientDetails)) {
+            RandomAccessFile rf = mFilesMap.get(clientDetails);
             mFilesMap.remove(rf);
             try {
                 rf.close();
@@ -138,15 +138,15 @@ public class DiskStyxFile extends MemoryStyxFile {
             }
         }
     }
-    
+
     @Override
-    public boolean delete(ClientState client) {
-        super.delete(client);
+    public boolean delete(ClientDetails clientDetails) {
+        super.delete(clientDetails);
         return mFile.delete();
     }
 
     @Override
-    public void onConnectionClosed(ClientState state) {
+    public void onConnectionClosed(ClientDetails state) {
         close(state);
     }
 }

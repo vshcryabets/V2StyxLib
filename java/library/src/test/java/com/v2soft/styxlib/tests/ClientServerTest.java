@@ -6,11 +6,11 @@ import com.v2soft.styxlib.library.StyxFile;
 import com.v2soft.styxlib.library.StyxServerManager;
 import com.v2soft.styxlib.library.exceptions.StyxException;
 import com.v2soft.styxlib.library.io.DualStreams;
-import com.v2soft.styxlib.library.server.IChannelDriver;
-import com.v2soft.styxlib.library.server.tcp.TCPClientChannelDriver;
-import com.v2soft.styxlib.library.server.tcp.TCPServerManager;
-import com.v2soft.styxlib.library.server.vfs.MemoryStyxDirectory;
-import com.v2soft.styxlib.library.server.vfs.MemoryStyxFile;
+import com.v2soft.styxlib.server.IChannelDriver;
+import com.v2soft.styxlib.server.tcp.TCPClientChannelDriver;
+import com.v2soft.styxlib.server.tcp.TCPServerManager;
+import com.v2soft.styxlib.vfs.MemoryStyxDirectory;
+import com.v2soft.styxlib.vfs.MemoryStyxFile;
 
 import org.junit.After;
 import org.junit.Before;
@@ -66,7 +66,7 @@ public class ClientServerTest {
     public void testMD5() throws IOException, StyxException, InterruptedException, TimeoutException, NoSuchAlgorithmException {
         IClient connection = new StyxClientConnection();
         IChannelDriver driver = new TCPClientChannelDriver(
-                InetAddress.getByName("127.0.0.1"), PORT, false, connection.getIOBufSize());
+                InetAddress.getByName("127.0.0.1"), PORT, false, connection.getConnectionDetails().getIOUnit());
         assertTrue(connection.connect(driver));
         checkMD5Hash(connection);
         connection.close();

@@ -1,9 +1,9 @@
-package com.v2soft.styxlib.library.server.vfs;
+package com.v2soft.styxlib.vfs;
 
 import com.v2soft.styxlib.library.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.library.messages.base.structs.StyxQID;
 import com.v2soft.styxlib.library.messages.base.structs.StyxStat;
-import com.v2soft.styxlib.library.server.ClientState;
+import com.v2soft.styxlib.server.ClientDetails;
 import com.v2soft.styxlib.library.types.ULong;
 
 import java.io.IOException;
@@ -40,37 +40,36 @@ public interface IVirtualStyxFile {
     /**
      * Open file
      * @param mode
-     * @throws IOException 
+     * @throws IOException
      */
-    public boolean open(ClientState client, int mode) throws IOException;
+    public boolean open(ClientDetails clientDetails, int mode) throws IOException;
     /**
      * Close file
-     * @param mode
      */
-    public void close(ClientState client);
+    public void close(ClientDetails clientDetails);
     /**
      * Read from file
      * @param offset offset from begining of the file
      * @param count number of bytes to read
      * @return number of bytes that was readed into the buffer
      */
-    public long read(ClientState client, byte[] buffer, ULong offset, long count) throws StyxErrorMessageException;
+    public long read(ClientDetails clientDetails, byte[] buffer, ULong offset, long count) throws StyxErrorMessageException;
     public IVirtualStyxFile walk(Iterator<String> pathElements, List<StyxQID> qids)
             throws StyxErrorMessageException;
     /**
      * Write data to file
-     * @param client
+     * @param clientDetails
      * @param data
      * @param offset
      * @return
      * @throws StyxErrorMessageException
      */
-    public int write(ClientState client, byte[] data, ULong offset) throws StyxErrorMessageException;
+    public int write(ClientDetails clientDetails, byte[] data, ULong offset) throws StyxErrorMessageException;
     /**
      * Will be fired when client close connection to this server
      * @param state
      */
-    public void onConnectionClosed(ClientState state);
+    public void onConnectionClosed(ClientDetails state);
     /**
      * Create new child file
      * @param name
@@ -83,5 +82,5 @@ public interface IVirtualStyxFile {
     /**
      * Delete this file
      */
-    public boolean delete(ClientState client);
+    public boolean delete(ClientDetails clientDetails);
 }
