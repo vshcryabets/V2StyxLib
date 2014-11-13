@@ -143,7 +143,6 @@ public class TMessagesProcessor implements IMessageProcessor {
     private StyxRAttachMessage processAttach(ClientDetails clientDetails, StyxTAttachMessage msg) {
         String mountPoint = msg.getMountPoint();
         IVirtualStyxFile root = mRoot; // TODO .getDirectory(mountPoint); there should be some logic with mountPoint?
-        clientDetails.setUserName(msg.getUserName());
         StyxRAttachMessage answer = new StyxRAttachMessage(msg.getTag(), root.getQID());
         clientDetails.registerOpenedFile(msg.getFID(), root );
         return answer;
@@ -151,7 +150,6 @@ public class TMessagesProcessor implements IMessageProcessor {
 
     private StyxMessage processAuth(ClientDetails clientDetails, StyxTAuthMessage msg) {
         // TODO handle auth packet
-        clientDetails.setUserName(msg.getUserName());
         return new StyxRAuthMessage(msg.getTag(), StyxQID.EMPTY);
     }
 

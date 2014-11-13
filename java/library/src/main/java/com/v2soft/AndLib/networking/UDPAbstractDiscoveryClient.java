@@ -20,29 +20,31 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
+import java.net.SocketTimeoutException;
 
 /**
- *
  * @author V.Shcriyabets (vshcryabets@gmail.com)
- *
  */
 public abstract class UDPAbstractDiscoveryClient extends DiscoveryClient {
     public interface UDPBroadcastListener {
         void onDiscoveryStarted();
+
         void onDiscoveryFinished();
+
         void onNewServer(Object item);
+
         void onException(Throwable error);
     }
 
     protected static final String LOG_TAG = UDPAbstractDiscoveryClient.class.getSimpleName();
 
     protected UDPBroadcastListener mListener;
-    private Thread mSenderThread = null;
-    private Thread mReceiverThread = null;
-    private DatagramSocket mSocket;
+    protected Thread mSenderThread = null;
+    protected Thread mReceiverThread = null;
+    protected DatagramSocket mSocket;
 
     protected int mTargetPort;
-    private InetAddress mTargetAddresses[];
+    protected InetAddress mTargetAddresses[];
     protected boolean isWorking;
 
     /**
@@ -56,16 +58,14 @@ public abstract class UDPAbstractDiscoveryClient extends DiscoveryClient {
     }
 
     /**
-     * Start searching of other hosts
-     * @throws SocketException
+     * Start searching for a other hosts
      */
-    public void startDiscovery() throws SocketException {
-        if ( mSenderThread != null ) {
+    public void startDiscovery() {
+        if (mSenderThread != null) {
             throw new IllegalStateException("Broadcast discovery process already started");
         }
         // start
-        mSenderThread = new Thread(mBackgroundSender,
-                UDPAbstractDiscoveryClient.class.getSimpleName());
+        mSenderThread = new Thread(mBackgroundSender, LOG_TAG);
         mSenderThread.start();
     }
 
@@ -74,6 +74,9 @@ public abstract class UDPAbstractDiscoveryClient extends DiscoveryClient {
      */
     public void stopDiscovery() {
         isWorking = false;
+        if (mSenderThread != null) {
+            mSenderThread.interrupt();
+        }
     }
 
     public boolean isDiscovering() {
@@ -81,6 +84,7 @@ public abstract class UDPAbstractDiscoveryClient extends DiscoveryClient {
     }
 
     protected abstract DatagramPacket prepareRequest();
+
     protected abstract void handleAnswer(DatagramPacket income);
 
     public UDPBroadcastListener getListener() {
@@ -105,12 +109,14 @@ public abstract class UDPAbstractDiscoveryClient extends DiscoveryClient {
         public void run() {
             final byte[] buf = new byte[256];
 
-            while ( isWorking ) {
+            while (isWorking) {
                 try {
                     final DatagramPacket packet = new DatagramPacket(buf, buf.length);
                     mSocket.receive(packet);
                     handleAnswer(packet);
                     Thread.sleep(100);
+                } catch (SocketTimeoutException so) {
+                    // this is normal situation, we can ignore this exception.
                 } catch (IOException e) {
                     onError(e);
                 } catch (InterruptedException e) {
@@ -125,8 +131,7 @@ public abstract class UDPAbstractDiscoveryClient extends DiscoveryClient {
         isWorking = true;
         // start receiver thread
         mReceiverThread = new Thread(mBackgroundReceiver,
-                UDPAbstractDiscoveryClient.class.getSimpleName()+"R");
-        mReceiverThread.start();
+                UDPAbstractDiscoveryClient.class.getSimpleName() + "R");
         if (mListener != null) {
             mListener.onDiscoveryStarted();
         }
@@ -136,10 +141,12 @@ public abstract class UDPAbstractDiscoveryClient extends DiscoveryClient {
             mSocket = new DatagramSocket();
             mSocket.setSoTimeout(getDelayBetweenRetry());
 
-            while ( count -- > 0 && isWorking ) {
+            mReceiverThread.start();
+
+            while (count-- > 0 && isWorking) {
                 // send packet
                 final DatagramPacket packet = prepareRequest();
-                for ( InetAddress address : mTargetAddresses) {
+                for (InetAddress address : mTargetAddresses) {
                     packet.setAddress(address);
                     packet.setPort(mTargetPort);
                     try {
@@ -152,20 +159,21 @@ public abstract class UDPAbstractDiscoveryClient extends DiscoveryClient {
                 Thread.sleep(getDelayBetweenRetry());
             }
         } catch (InterruptedException e) {
-            e.printStackTrace();
         } catch (SocketException e) {
             onError(e);
-        } finally {
-            mSocket.close();
         }
         isWorking = false;
-        if ( mReceiverThread.isAlive() ) {
+        if (mReceiverThread.isAlive()) {
+            mReceiverThread.interrupt();
             try {
                 mReceiverThread.join();
             } catch (InterruptedException e) {
             }
         }
         mReceiverThread = null;
+
+        mSocket.close();
+
         if (mListener != null) {
             mListener.onDiscoveryFinished();
         }
@@ -173,7 +181,7 @@ public abstract class UDPAbstractDiscoveryClient extends DiscoveryClient {
 
     public void onError(Exception e) {
         e.printStackTrace();
-        if ( mListener != null ) {
+        if (mListener != null) {
             mListener.onException(e);
         }
     }
