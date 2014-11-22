@@ -1,12 +1,12 @@
 package com.v2soft.styxlib.library.utils;
 
-import com.v2soft.styxlib.Consts;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
 
 /**
  * @author V.Shcryabets<vshcryabets@gmail.com>
  */
 public class FIDPoll extends AbstractPoll<Long> {
+    public static final long MAXUNINT = 0xFFFFFFFFL;
     @Override
     public boolean release(Long id) {
         if (id == StyxMessage.NOFID)
@@ -16,7 +16,7 @@ public class FIDPoll extends AbstractPoll<Long> {
     @Override
     protected Long getNext() {
         mLast++;
-        if(mLast > Consts.MAXUNINT)
+        if(mLast > MAXUNINT)
             mLast = 0L;
         return mLast;
     }

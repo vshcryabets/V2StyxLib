@@ -1,8 +1,8 @@
 package com.v2soft.styxlib.tests;
 
-import com.v2soft.styxlib.library.IClient;
-import com.v2soft.styxlib.library.StyxClientConnection;
-import com.v2soft.styxlib.library.StyxFile;
+import com.v2soft.styxlib.IClient;
+import com.v2soft.styxlib.StyxClientConnection;
+import com.v2soft.styxlib.StyxFile;
 import com.v2soft.styxlib.library.StyxServerManager;
 import com.v2soft.styxlib.library.exceptions.StyxException;
 import com.v2soft.styxlib.library.io.DualStreams;
@@ -66,7 +66,7 @@ public class ClientServerTest {
     public void testMD5() throws IOException, StyxException, InterruptedException, TimeoutException, NoSuchAlgorithmException {
         IClient connection = new StyxClientConnection();
         IChannelDriver driver = new TCPClientChannelDriver(
-                InetAddress.getByName("127.0.0.1"), PORT, false, connection.getConnectionDetails().getIOUnit());
+                InetAddress.getByName("127.0.0.1"), PORT, false);
         assertTrue(connection.connect(driver));
         checkMD5Hash(connection);
         connection.close();

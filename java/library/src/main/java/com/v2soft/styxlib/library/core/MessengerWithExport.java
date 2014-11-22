@@ -10,25 +10,25 @@ import java.io.IOException;
  * @author V.Shcryabets<vshcryabets@gmail.com>
  */
 public class MessengerWithExport extends Messenger {
-    protected MessagesFilter mFilter;
 
     public MessengerWithExport(IChannelDriver driver, StyxMessengerListener listener)
             throws IOException {
         super(driver, listener);
-        mFilter = new MessagesFilter(null, mMessageProcessor);
-        mMessageProcessor = mFilter;
-        mDriver.setMessageHandler(mMessageProcessor);
     }
 
     public void export(IVirtualStyxFile root, ConnectionDetails details) throws IOException {
-        TMessagesProcessor processor = (TMessagesProcessor) mFilter.getTProcessor();
-        if ( (processor != null) && (root != null) && (!root.equals(processor.getRoot()))) {
+        TMessagesProcessor processor = (TMessagesProcessor) ( (MessagesFilter) mMessageProcessor ).getTProcessor();
+        if (( processor != null ) && ( root != null ) && ( !root.equals(processor.getRoot()) )) {
             processor.close();
             processor = null;
         }
-        if ( root != null ) {
+        if (root != null) {
             processor = new TMessagesProcessor(details, root);
         }
-        mFilter.setTProcessor(processor);
+        ( (MessagesFilter) mMessageProcessor ).setTProcessor(processor);
+    }
+
+    protected IMessageProcessor getMessageProcessor() {
+        return new MessagesFilter(null, super.getMessageProcessor());
     }
 }

@@ -2,7 +2,7 @@ package com.v2soft.styxlib.tests;
 
 import com.v2soft.styxlib.ILogListener;
 import com.v2soft.styxlib.library.DualLinkClientConnection;
-import com.v2soft.styxlib.library.IClient;
+import com.v2soft.styxlib.IClient;
 import com.v2soft.styxlib.library.exceptions.StyxException;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.server.ClientDetails;
@@ -78,9 +78,7 @@ public class TwoWayExportTest {
         root.addFile(md5);
         DualLinkClientConnection connection = new DualLinkClientConnection();
         connection.export(root);
-        IChannelDriver driver = new TCPClientChannelDriver(
-                InetAddress.getByName("127.0.0.1"), PORT,
-                false, connection.getConnectionDetails().getIOUnit());
+        IChannelDriver driver = new TCPClientChannelDriver(InetAddress.getByName("127.0.0.1"), PORT, false);
 //        driver.setLogListener(clientlistener);
 
         assertTrue(connection.connect(driver));
@@ -109,7 +107,7 @@ public class TwoWayExportTest {
         DualLinkClientConnection connection = new DualLinkClientConnection();
         IChannelDriver driver = new TCPClientChannelDriver(
                 InetAddress.getByName("127.0.0.1"), PORT,
-                false, connection.getConnectionDetails().getIOUnit());
+                false);
         assertTrue(connection.connect(driver));
         Set<ClientDetails> clientDetailses = driver.getClients();
         assertNotNull(clientDetailses);
@@ -132,13 +130,13 @@ public class TwoWayExportTest {
         DualLinkClientConnection connection = new DualLinkClientConnection();
         IChannelDriver driver = new TCPClientChannelDriver(
                 InetAddress.getByName("127.0.0.1"), PORT,
-                false, connection.getConnectionDetails().getIOUnit());
+                false);
         assertTrue(connection.connect(driver));
 
         DualLinkClientConnection connection2 = new DualLinkClientConnection();
         IChannelDriver driver2 = new TCPClientChannelDriver(
                 InetAddress.getByName("127.0.0.1"), PORT,
-                false, connection2.getConnectionDetails().getIOUnit());
+                false);
         assertTrue(connection2.connect(driver2));
 
         Set<ClientDetails> clientDetailses = drivers.get(0).getClients();

@@ -65,7 +65,7 @@ public class JavaServerSample {
         StyxServerManager mServer = new TCPServerManager(InetAddress.getByName("127.0.0.1"),
                 PORT,
                 false,
-                root);        
+                root);
         mServer.start().join();
     }
 }
@@ -75,7 +75,7 @@ Java client sample:
 ```java
         StyxClientConnection mConnection = new StyxClientConnection();
         IChannelDriver driver = new TCPClientChannelDriver(
-            InetAddress.getByName("localhost"), PORT, false, mConnection.getIOBufSize());
+            InetAddress.getByName("localhost"), PORT, false);
         mConnection.connect(driver);
         final StyxFile newFile = new StyxFile(mConnection, FILE_NAME);
         OutputStream output = newFile.openForWrite();

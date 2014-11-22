@@ -1,7 +1,7 @@
 package com.v2soft.styxlib.server.tcp;
 
-import com.v2soft.styxlib.library.IClient;
-import com.v2soft.styxlib.library.StyxClientConnection;
+import com.v2soft.styxlib.IClient;
+import com.v2soft.styxlib.StyxClientConnection;
 import com.v2soft.styxlib.server.ClientDetails;
 import com.v2soft.styxlib.server.IChannelDriver;
 import com.v2soft.styxlib.vfs.IVirtualStyxFile;
@@ -32,7 +32,6 @@ public class TCPDualLinkServerManager extends TCPServerManager {
         StyxClientConnection connection = new StyxClientConnection(credentials);
         IChannelDriver driver = clientDetails.getDriver();
         connection.setDriver(driver);
-//        connection.connect(mDrivers);
         return connection;
     }
 }

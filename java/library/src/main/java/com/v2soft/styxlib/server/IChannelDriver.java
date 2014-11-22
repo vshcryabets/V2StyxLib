@@ -12,7 +12,7 @@ import java.util.Set;
  * @author V.Shcryabets (vshcryabets@gmail.com)
  */
 public interface IChannelDriver extends Closeable, IMessageTransmitter {
-    Thread start();
+    Thread start(int iounit);
     void setMessageHandler(IMessageProcessor handler);
     void setLogListener(ILogListener listener);
 

@@ -21,7 +21,7 @@ public class TCPClientDetails extends ClientDetails {
     protected StyxByteBufferReadable mBuffer;
     protected StyxDataReader mReader;
 
-    public TCPClientDetails(SocketChannel channel, IChannelDriver driver, int iounit, int id) throws FileNotFoundException {
+    public TCPClientDetails(SocketChannel channel, IChannelDriver driver, int iounit, int id) {
         super(driver, id);
         if ( channel == null ) throw new NullPointerException("Client channel can't be null");
         mChannel = channel;

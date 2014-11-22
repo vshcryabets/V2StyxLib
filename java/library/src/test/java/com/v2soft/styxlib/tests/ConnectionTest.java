@@ -1,8 +1,8 @@
 package com.v2soft.styxlib.tests;
 
-import com.v2soft.styxlib.library.IClient;
-import com.v2soft.styxlib.library.StyxClientConnection;
-import com.v2soft.styxlib.library.StyxFile;
+import com.v2soft.styxlib.IClient;
+import com.v2soft.styxlib.StyxClientConnection;
+import com.v2soft.styxlib.StyxFile;
 import com.v2soft.styxlib.library.StyxServerManager;
 import com.v2soft.styxlib.library.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.library.exceptions.StyxException;
@@ -50,8 +50,7 @@ public class ConnectionTest {
         mConnection = new StyxClientConnection();
         IChannelDriver driver = new TCPClientChannelDriver(
                 InetAddress.getByName("localhost"), PORT,
-                false,
-                mConnection.getConnectionDetails().getIOUnit());
+                false);
         assertTrue(mConnection.connect(driver));
     }
 

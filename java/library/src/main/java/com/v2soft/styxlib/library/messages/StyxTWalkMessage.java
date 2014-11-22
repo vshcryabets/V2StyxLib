@@ -1,6 +1,6 @@
 package com.v2soft.styxlib.library.messages;
 
-import com.v2soft.styxlib.library.StyxFile;
+import com.v2soft.styxlib.StyxFile;
 import com.v2soft.styxlib.library.io.IStyxDataReader;
 import com.v2soft.styxlib.library.io.IStyxDataWriter;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
@@ -14,11 +14,11 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * 
+ *
  * @author V.Shcriyabets (vshcryabets@gmail.com)
  *
  */
-public class StyxTWalkMessage 
+public class StyxTWalkMessage
 extends StyxTMessageFID {
     private long mNewFID;
     private List<String> mPathElements;

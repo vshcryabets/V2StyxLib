@@ -1,4 +1,4 @@
-package com.v2soft.styxlib.library;
+package com.v2soft.styxlib;
 
 import com.v2soft.styxlib.library.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.library.exceptions.StyxException;
@@ -40,6 +40,14 @@ import java.util.concurrent.TimeoutException;
  *
  */
 public class StyxFile implements Closeable {
+    public interface StyxFileFilter {
+        boolean accept(StyxFile file);
+    }
+
+    public interface StyxFilenameFilter {
+        boolean accept(StyxFile parent, String name);
+    }
+
     public static final String SEPARATOR = "/";
 
     private IClient mClient;

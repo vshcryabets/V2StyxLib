@@ -1,4 +1,4 @@
-package com.v2soft.styxlib.library;
+package com.v2soft.styxlib;
 
 import com.v2soft.styxlib.library.exceptions.StyxException;
 import com.v2soft.styxlib.server.ClientDetails;

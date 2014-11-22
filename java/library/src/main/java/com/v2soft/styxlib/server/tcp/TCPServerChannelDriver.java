@@ -32,8 +32,8 @@ public class TCPServerChannelDriver extends TCPChannelDriver {
     protected Map<SocketChannel, TCPClientDetails> mClientStatesMap;
     protected int mLastClientId = 1;
 
-    public TCPServerChannelDriver(InetAddress address, int port, boolean ssl, int IOUnit) throws IOException {
-        super(address, port, ssl, IOUnit);
+    public TCPServerChannelDriver(InetAddress address, int port, boolean ssl) throws IOException {
+        super(address, port, ssl);
         mClientDetailses = new HashSet<ClientDetails>();
         mNewConnetions = new Stack<SocketChannel>();
         mReadable = new Stack<SocketChannel>();

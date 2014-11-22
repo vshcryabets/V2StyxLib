@@ -25,9 +25,14 @@ public class TCPClientChannelDriver extends TCPChannelDriver {
     protected SocketChannel mChanel;
     protected ClientDetails mPseudoClientDetails;
 
-    public TCPClientChannelDriver(InetAddress address, int port, boolean ssl, int IOUnit) throws IOException {
-        super(address, port, ssl, IOUnit);
-        mPseudoClientDetails = new TCPClientDetails(mChanel, this, IOUnit, PSEUDO_CLIENT_ID);
+    public TCPClientChannelDriver(InetAddress address, int port, boolean ssl) throws IOException {
+        super(address, port, ssl);
+    }
+
+    @Override
+    public Thread start(int iounit) {
+        mPseudoClientDetails = new TCPClientDetails(mChanel, this, iounit, PSEUDO_CLIENT_ID);
+        return super.start(iounit);
     }
 
     @Override

@@ -16,7 +16,7 @@ public abstract class ClientDetails {
     protected IChannelDriver mDriver;
     protected int mId;
 
-    public ClientDetails(IChannelDriver driver, int id) throws FileNotFoundException {
+    public ClientDetails(IChannelDriver driver, int id) {
         if ( driver == null ) throw new NullPointerException("Driver is null");
         mAssignedFiles = new HashMap<Long, IVirtualStyxFile>();
         mDriver = driver;

@@ -1,6 +1,6 @@
 package com.v2soft.styxlib.library.io;
 
-import com.v2soft.styxlib.library.StyxClientConnection;
+import com.v2soft.styxlib.StyxClientConnection;
 import com.v2soft.styxlib.library.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.library.messages.StyxRWriteMessage;
 import com.v2soft.styxlib.library.messages.StyxTWriteMessage;

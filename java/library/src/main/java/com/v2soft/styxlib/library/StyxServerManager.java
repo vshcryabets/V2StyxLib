@@ -12,12 +12,10 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- *
  * @author V.Shcriyabets (vshcryabets@gmail.com)
- *
  */
 public class StyxServerManager
-implements Closeable, StyxMessengerListener {
+        implements Closeable {
     //---------------------------------------------------------------------------
     // Constants
     //---------------------------------------------------------------------------
@@ -37,8 +35,15 @@ implements Closeable, StyxMessengerListener {
         mDrivers = new LinkedList<IChannelDriver>();
     }
 
+    public StyxServerManager(IVirtualStyxFile root, IChannelDriver [] drivers) {
+        this(root);
+        for (IChannelDriver driver : drivers) {
+            addDriver( driver );
+        }
+    }
+
     public void addDriver(IChannelDriver driver) {
-        if ( driver == null ) {
+        if (driver == null) {
             throw new NullPointerException("Driver is null");
         }
         mDrivers.add(driver);
@@ -48,21 +53,20 @@ implements Closeable, StyxMessengerListener {
     public Thread[] start() {
         int count = mDrivers.size();
         Thread[] result = new Thread[count];
-        for ( int i = 0 ; i < count; i++ ) {
-            result[i] = mDrivers.get(i).start();
+        for (int i = 0; i < count; i++) {
+            result[i] = mDrivers.get(i).start(getIOUnit());
         }
         return result;
     }
 
-    public int getIOUnit()
-    {
+    public int getIOUnit() {
         return DEFAULT_IOUNIT;
     }
 
     @Override
     public void close() throws IOException {
         int count = mDrivers.size();
-        for ( int i = 0 ; i < count; i++ ) {
+        for (int i = 0; i < count; i++) {
             mDrivers.get(i).close();
         }
     }
@@ -70,31 +74,19 @@ implements Closeable, StyxMessengerListener {
     public String getProtocol() {
         return PROTOCOL;
     }
+
     //-------------------------------------------------------------------------------------
     // Getters
     //-------------------------------------------------------------------------------------
-    public int getTimeout() {return mTimeout;}
+    public int getTimeout() {
+        return mTimeout;
+    }
+
     //-------------------------------------------------------------------------------------
     // Setters
     //-------------------------------------------------------------------------------------
     public void setTimeout(int mTimeout) {
         this.mTimeout = mTimeout;
-    }
-    //-------------------------------------------------------------------------------------
-    // Messenger listener
-    //-------------------------------------------------------------------------------------
-    @Override
-    public void onSocketDisconnected() {
-    }
-
-    @Override
-    public void onTrashReceived() {
-    }
-
-    @Override
-    public void onFIDReleased(long fid) {
-        // TODO Auto-generated method stub
-
     }
 
     public List<IChannelDriver> getDrivers() {

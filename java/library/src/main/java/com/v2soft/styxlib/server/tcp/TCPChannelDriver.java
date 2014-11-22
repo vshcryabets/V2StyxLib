@@ -30,8 +30,7 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
     protected InetAddress mAddress;
     protected int mPort;
 
-    public TCPChannelDriver(InetAddress address, int port, boolean ssl, int IOUnit) throws IOException {
-        mIOUnit = IOUnit;
+    public TCPChannelDriver(InetAddress address, int port, boolean ssl) throws IOException {
         mPort = port;
         mAddress = address;
 
@@ -50,13 +49,14 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
     }
 
     @Override
-    public Thread start() {
+    public Thread start(int iounit) {
         if ( mMessageHandler == null ) {
             throw new IllegalStateException("Message handler is null");
         }
         if ( mAcceptorThread != null ) {
             throw new IllegalStateException("Already started");
         }
+        mIOUnit = iounit;
         mAcceptorThread = new Thread(this, toString());
         mAcceptorThread.start();
         isWorking = true;

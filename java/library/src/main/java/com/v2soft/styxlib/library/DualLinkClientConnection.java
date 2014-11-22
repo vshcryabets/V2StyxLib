@@ -1,5 +1,6 @@
 package com.v2soft.styxlib.library;
 
+import com.v2soft.styxlib.StyxClientConnection;
 import com.v2soft.styxlib.library.core.MessengerWithExport;
 import com.v2soft.styxlib.server.IChannelDriver;
 import com.v2soft.styxlib.server.IMessageTransmitter;
@@ -30,6 +31,8 @@ public class DualLinkClientConnection extends StyxClientConnection {
     @Override
     protected IMessageTransmitter initMessenger(IChannelDriver driver) throws IOException {
         MessengerWithExport result = new MessengerWithExport(driver, this);
+        result.start(true, getIOBufSize());
+
         if ( mExportedRoot != null ) {
             result.export(mExportedRoot, mDetails);
         }

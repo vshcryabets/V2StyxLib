@@ -67,7 +67,6 @@ public interface IVirtualStyxFile {
             throws StyxErrorMessageException;
     /**
      * Writes data to file at the position offset.
-     * @param client
      * @param data the data
      * @param offset offset from begining of the file
      * @return return the number of bytes written

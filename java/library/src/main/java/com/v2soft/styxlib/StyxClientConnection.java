@@ -1,5 +1,7 @@
-package com.v2soft.styxlib.library;
+package com.v2soft.styxlib;
 
+import com.v2soft.styxlib.IClient;
+import com.v2soft.styxlib.StyxFile;
 import com.v2soft.styxlib.library.core.Messenger;
 import com.v2soft.styxlib.library.core.Messenger.StyxMessengerListener;
 import com.v2soft.styxlib.library.exceptions.StyxErrorMessageException;
@@ -65,6 +67,7 @@ public class StyxClientConnection
         mDetails = new ConnectionDetails(getProtocol(), getIOBufSize());
         mCredentials = credentials;
         isConnected = false;
+        mDriver = null;
     }
 
     /**
@@ -125,7 +128,9 @@ public class StyxClientConnection
     }
 
     protected IMessageTransmitter initMessenger(IChannelDriver driver) throws IOException {
-        return new Messenger(driver, this);
+        Messenger result = new Messenger(driver, this);
+        result.start(true, getIOBufSize());
+        return result;
     }
 
     public StyxFile getRoot() throws StyxException, InterruptedException, TimeoutException, IOException {
@@ -193,7 +198,7 @@ public class StyxClientConnection
 
     public void sendVersionMessage()
             throws InterruptedException, StyxException, IOException, TimeoutException {
-        // release atached FID
+        // release attached FID
         if (mFID != StyxMessage.NOFID) {
             try {
                 releaseFID(mFID);

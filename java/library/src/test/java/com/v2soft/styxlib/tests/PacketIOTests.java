@@ -1,7 +1,7 @@
 package com.v2soft.styxlib.tests;
 
-import com.v2soft.styxlib.library.StyxClientConnection;
-import com.v2soft.styxlib.library.StyxFile;
+import com.v2soft.styxlib.StyxClientConnection;
+import com.v2soft.styxlib.StyxFile;
 import com.v2soft.styxlib.library.StyxServerManager;
 import com.v2soft.styxlib.library.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.library.exceptions.StyxException;
@@ -119,7 +119,7 @@ public class PacketIOTests {
 
         assertTrue(mConnection.connect(
                 new TCPClientChannelDriver(
-                        InetAddress.getByName("localhost"), PORT, false, mConnection.getConnectionDetails().getIOUnit())));
+                        InetAddress.getByName("localhost"), PORT, false)));
 
         final StyxFile newFile = new StyxFile(mConnection, FILE_NAME);
         OutputStream output = newFile.openForWriteUnbuffered();

@@ -34,15 +34,22 @@ public class Messenger implements IMessageTransmitter {
         resetStatistics();
         mDriver = driver;
         mListener = listener;
+    }
+
+    public void start(boolean startDriver, int iounit) {
+        mMessageProcessor = getMessageProcessor();;
+        mDriver.setMessageHandler(mMessageProcessor);
+        if (startDriver && !mDriver.isStarted()) {
+            mDriver.start(iounit);
+        }
+    }
+
+    protected IMessageProcessor getMessageProcessor() {
         RMessagesProcessor rProcessor = new RMessagesProcessor();
         rProcessor.setActiveTags(mActiveTags);
         rProcessor.setListener(mListener);
         rProcessor.setMessagesMap(mMessages);
-        mMessageProcessor = rProcessor;
-        mDriver.setMessageHandler(mMessageProcessor);
-        if ( !mDriver.isStarted() ) {
-            mDriver.start();
-        }
+        return rProcessor;
     }
 
     private void resetStatistics() {
