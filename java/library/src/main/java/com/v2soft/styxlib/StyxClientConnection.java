@@ -1,7 +1,5 @@
 package com.v2soft.styxlib;
 
-import com.v2soft.styxlib.IClient;
-import com.v2soft.styxlib.StyxFile;
 import com.v2soft.styxlib.library.core.Messenger;
 import com.v2soft.styxlib.library.core.Messenger.StyxMessengerListener;
 import com.v2soft.styxlib.library.exceptions.StyxErrorMessageException;
@@ -47,7 +45,6 @@ public class StyxClientConnection
     protected Credentials mCredentials;
     private String mMountPoint;
     private int mTimeout = DEFAULT_TIMEOUT;
-    private boolean mNeedAuth;
     private boolean isConnected, isAttached;
     private IMessageTransmitter mMessenger;
     private long mAuthFID = StyxMessage.NOFID;
@@ -90,7 +87,6 @@ public class StyxClientConnection
         }
         mCredentials = credentials;
         mMountPoint = "/";
-        mNeedAuth = ( mCredentials != null );
         mMessenger = initMessenger(driver);
         mRecepient = driver.getClients().iterator().next();
         sendVersionMessage();
@@ -160,10 +156,6 @@ public class StyxClientConnection
         return mMountPoint;
     }
 
-    public boolean isNeedAuth() {
-        return mNeedAuth;
-    }
-
     public long getFID() {
         return mFID;
     }
@@ -218,7 +210,7 @@ public class StyxClientConnection
             mDetails = new ConnectionDetails(getProtocol(), (int) rVersion.getMaxPacketSize());
         }
         mActiveFids.clean();
-        if (isNeedAuth()) {
+        if ((mCredentials.getUserName() != null) && (mCredentials.getPassword() != null)) {
             sendAuthMessage();
         } else {
             sendAttachMessage();
