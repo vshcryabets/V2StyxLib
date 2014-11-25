@@ -21,6 +21,7 @@
 #include "messages/StyxRWStatMessage.h"
 #include "StyxErrorMessageException.h"
 #include <vector>
+#include <unistd.h>
 
 ClientState::ClientState(size_t iounit,
 		Socket channel,

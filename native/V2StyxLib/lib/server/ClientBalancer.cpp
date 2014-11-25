@@ -7,6 +7,7 @@
 
 #include "server/ClientBalancer.h"
 #include "stdio.h"
+#include <unistd.h>
 
 ClientBalancer::ClientBalancer(int iounit, IVirtualStyxFile *root, std::string protocol) {
 	mAllConnections = new vector<Socket>();

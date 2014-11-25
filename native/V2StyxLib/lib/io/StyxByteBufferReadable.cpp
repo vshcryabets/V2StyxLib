@@ -8,6 +8,7 @@
 #include "io/StyxByteBufferReadable.h"
 #include "string.h"
 #include "stdio.h"
+#include <unistd.h>
 
 StyxByteBufferReadable::StyxByteBufferReadable(size_t capacity) {
 	mWritePosition = 0;
