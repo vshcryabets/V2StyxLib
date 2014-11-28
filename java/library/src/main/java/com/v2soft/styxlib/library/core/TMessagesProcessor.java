@@ -37,6 +37,7 @@ import java.util.List;
  */
 public class TMessagesProcessor implements IMessageProcessor {
     protected ConnectionDetails mConnectionDetails;
+    private static final int DEFAULT_PACKET_HEADER_SIZE = 24;
     private IVirtualStyxFile mRoot;
     protected int mHandledPackets, mErrorPackets, mAnswerPackets;
 
@@ -192,8 +193,8 @@ public class TMessagesProcessor implements IMessageProcessor {
         long fid = msg.getFID();
         IVirtualStyxFile file = clientDetails.getAssignedFile(fid);
         if ( file.open(clientDetails, msg.getMode()) ) {
-            return new StyxROpenMessage(msg.getTag(), file.getQID(), mConnectionDetails.getIOUnit() - 24,
-                    false ); // TODO magic number 24
+            return new StyxROpenMessage(msg.getTag(), file.getQID(),
+                    mConnectionDetails.getIOUnit() - DEFAULT_PACKET_HEADER_SIZE, false );
         } else {
             StyxErrorMessageException.doException("Not supported mode for specified file");
             return null;

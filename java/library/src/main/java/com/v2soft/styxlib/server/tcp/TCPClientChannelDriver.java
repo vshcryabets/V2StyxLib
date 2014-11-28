@@ -124,10 +124,6 @@ public class TCPClientChannelDriver extends TCPChannelDriver {
 
     @Override
     public String toString() {
-        try {
-            return String.format("%s:%s", getClass().getSimpleName(), mChanel.socket().getLocalAddress().toString());
-        } catch (IOException e) {
-            return e.toString();
-        }
+        return String.format("%s:%s", getClass().getSimpleName(), mChanel.socket().getLocalAddress().toString());
     }
 }
