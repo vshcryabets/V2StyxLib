@@ -23,7 +23,7 @@ import java.util.Set;
 public class TCPClientChannelDriver extends TCPChannelDriver {
     public static final int PSEUDO_CLIENT_ID = 1;
     protected SocketChannel mChanel;
-    protected ClientDetails mPseudoClientDetails;
+    protected ClientDetails mServerClientDetails;
 
     public TCPClientChannelDriver(InetAddress address, int port, boolean ssl) throws IOException {
         super(address, port, ssl);
@@ -31,7 +31,7 @@ public class TCPClientChannelDriver extends TCPChannelDriver {
 
     @Override
     public Thread start(int iounit) {
-        mPseudoClientDetails = new TCPClientDetails(mChanel, this, iounit, PSEUDO_CLIENT_ID);
+        mServerClientDetails = new TCPClientDetails(mChanel, this, iounit, PSEUDO_CLIENT_ID);
         return super.start(iounit);
     }
 
@@ -55,7 +55,7 @@ public class TCPClientChannelDriver extends TCPChannelDriver {
 
     @Override
     public boolean sendMessage(StyxMessage message, ClientDetails recepient) {
-        if ( !recepient.equals(mPseudoClientDetails)) {
+        if ( !recepient.equals(mServerClientDetails)) {
             throw new IllegalArgumentException("Wrong recepient");
         }
         return super.sendMessage(message, recepient);
@@ -80,9 +80,9 @@ public class TCPClientChannelDriver extends TCPChannelDriver {
                             if ( buffer.remainsToRead() >= packetSize ) {
                                 final StyxMessage message = StyxMessage.factory(reader, mIOUnit);
                                 if (mLogListener != null) {
-                                    mLogListener.onMessageReceived(this, mPseudoClientDetails, message);
+                                    mLogListener.onMessageReceived(this, mServerClientDetails, message);
                                 }
-                                mMessageHandler.processPacket(message, mPseudoClientDetails);
+                                mMessageHandler.processPacket(message, mServerClientDetails);
                             } else {
                                 break;
                             }
@@ -118,7 +118,7 @@ public class TCPClientChannelDriver extends TCPChannelDriver {
     @Override
     public Set<ClientDetails> getClients() {
         Set<ClientDetails> result = new HashSet<ClientDetails>();
-        result.add(mPseudoClientDetails);
+        result.add(mServerClientDetails);
         return result;
     }
 

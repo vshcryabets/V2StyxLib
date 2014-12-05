@@ -81,7 +81,7 @@ public interface IVirtualStyxFile {
     /**
      * Create new child file
      * @param name new file name
-     * @param permissions
+     * @param permissions file access permissions
      * @param mode
      * @return QID of new file
      */
@@ -91,4 +91,9 @@ public interface IVirtualStyxFile {
      * Delete this file
      */
     public boolean delete(ClientDetails clientDetails);
+
+    /**
+     * Release all resources.
+     */
+    public void release() throws IOException;
 }

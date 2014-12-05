@@ -256,4 +256,8 @@ public class TMessagesProcessor implements IMessageProcessor {
     public IVirtualStyxFile getRoot() {
         return mRoot;
     }
+
+    public void setRoot(IVirtualStyxFile root) {
+        mRoot = root;
+    }
 }

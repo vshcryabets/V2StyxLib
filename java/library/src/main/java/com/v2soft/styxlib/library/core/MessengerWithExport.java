@@ -10,6 +10,7 @@ import java.io.IOException;
  * @author V.Shcryabets<vshcryabets@gmail.com>
  */
 public class MessengerWithExport extends Messenger {
+    protected IVirtualStyxFile mRoot;
 
     public MessengerWithExport(IChannelDriver driver, StyxMessengerListener listener)
             throws IOException {
@@ -17,18 +18,31 @@ public class MessengerWithExport extends Messenger {
     }
 
     public void export(IVirtualStyxFile root, ConnectionDetails details) throws IOException {
-        TMessagesProcessor processor = (TMessagesProcessor) ( (MessagesFilter) mMessageProcessor ).getTProcessor();
-        if (( processor != null ) && ( root != null ) && ( !root.equals(processor.getRoot()) )) {
-            processor.close();
-            processor = null;
+        if ( mRoot != null && root != mRoot ) {
+            mRoot.release();
+            mRoot = null;
         }
         if (root != null) {
-            processor = new TMessagesProcessor(details, root);
+            mRoot = root;
+            TMessagesProcessor processor = (TMessagesProcessor) ( (MessagesFilter) mMessageProcessor ).getTProcessor();
+            if ( processor == null ) {
+                processor = new TMessagesProcessor(details, root);
+            } else {
+                processor.setRoot(root);
+            }
+            ( (MessagesFilter) mMessageProcessor ).setTProcessor(processor);
         }
-        ( (MessagesFilter) mMessageProcessor ).setTProcessor(processor);
     }
 
     protected IMessageProcessor getMessageProcessor() {
         return new MessagesFilter(null, super.getMessageProcessor());
+    }
+
+    @Override
+    public void close() throws IOException {
+        if ( mRoot != null ) {
+            mRoot.release();
+        }
+        super.close();
     }
 }

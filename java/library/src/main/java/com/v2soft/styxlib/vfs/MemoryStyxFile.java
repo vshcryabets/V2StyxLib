@@ -23,6 +23,7 @@ public class MemoryStyxFile implements IVirtualStyxFile {
     protected String mName;
     protected StyxQID mQID;
     protected StyxStat mStat;
+    protected static final int ALL_MODES = 0x000001FF;
 
     public MemoryStyxFile(String name) {
         if (name == null) {
@@ -57,7 +58,7 @@ public class MemoryStyxFile implements IVirtualStyxFile {
 
     @Override
     public int getMode() {
-        return 0x000001FF; // TODO magic number
+        return ALL_MODES;
     }
 
     @Override
@@ -161,5 +162,10 @@ public class MemoryStyxFile implements IVirtualStyxFile {
     public boolean delete(ClientDetails clientDetails) {
         close(clientDetails);
         return false;
+    }
+
+    @Override
+    public void release() throws IOException {
+
     }
 }

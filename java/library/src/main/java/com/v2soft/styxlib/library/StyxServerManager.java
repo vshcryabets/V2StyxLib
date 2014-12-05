@@ -1,6 +1,5 @@
 package com.v2soft.styxlib.library;
 
-import com.v2soft.styxlib.library.core.Messenger.StyxMessengerListener;
 import com.v2soft.styxlib.server.ClientBalancer;
 import com.v2soft.styxlib.server.IChannelDriver;
 import com.v2soft.styxlib.library.types.ConnectionDetails;
@@ -26,10 +25,12 @@ public class StyxServerManager
     // Class fields
     //---------------------------------------------------------------------------
     protected List<IChannelDriver> mDrivers;
-    private int mTimeout = DEFAULT_TIMEOUT;
-    private ClientBalancer mBalancer;
+    protected int mTimeout = DEFAULT_TIMEOUT;
+    protected ClientBalancer mBalancer;
+    protected IVirtualStyxFile mRoot;
 
     public StyxServerManager(IVirtualStyxFile root) {
+        mRoot = root;
         ConnectionDetails details = new ConnectionDetails(getProtocol(), getIOUnit());
         mBalancer = new ClientBalancer(details, root);
         mDrivers = new LinkedList<IChannelDriver>();
@@ -65,9 +66,8 @@ public class StyxServerManager
 
     @Override
     public void close() throws IOException {
-        int count = mDrivers.size();
-        for (int i = 0; i < count; i++) {
-            mDrivers.get(i).close();
+        for (IChannelDriver driver : mDrivers) {
+            driver.close();
         }
     }
 
@@ -78,17 +78,13 @@ public class StyxServerManager
     //-------------------------------------------------------------------------------------
     // Getters
     //-------------------------------------------------------------------------------------
-    public int getTimeout() {
-        return mTimeout;
+    public IVirtualStyxFile getRoot() {
+        return mRoot;
     }
 
     //-------------------------------------------------------------------------------------
     // Setters
     //-------------------------------------------------------------------------------------
-    public void setTimeout(int mTimeout) {
-        this.mTimeout = mTimeout;
-    }
-
     public List<IChannelDriver> getDrivers() {
         return mDrivers;
     }

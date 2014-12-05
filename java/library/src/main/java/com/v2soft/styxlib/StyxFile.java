@@ -545,6 +545,10 @@ public class StyxFile implements Closeable {
         return mStat;
     }
 
+    public IClient getIClient() {
+        return mClient;
+    }
+
     public long getTimeout() {return mTimeout;}
 
     public void setTimeout(long mTimeout) {

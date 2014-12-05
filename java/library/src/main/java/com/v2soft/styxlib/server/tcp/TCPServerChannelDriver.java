@@ -116,7 +116,7 @@ public class TCPServerChannelDriver extends TCPChannelDriver {
         isWorking = false;
     }
 
-    public void processEventsQueue() throws IOException {
+    protected void processEventsQueue() throws IOException {
         // new connections
         for (SocketChannel channel : mNewConnetions) {
             channel.configureBlocking(false);
