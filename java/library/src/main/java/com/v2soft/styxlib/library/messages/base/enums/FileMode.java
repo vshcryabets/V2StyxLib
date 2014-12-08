@@ -2,7 +2,7 @@ package com.v2soft.styxlib.library.messages.base.enums;
 
 /**
  * File mode bits
- * @author V.Shcryabets<vshcryabets@gmail.com>
+ * @author V.Shcryabets <a>vshcryabets@gmail.com</a>
  *
  */
 public enum FileMode {

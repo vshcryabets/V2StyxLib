@@ -14,7 +14,7 @@ import java.util.concurrent.TimeoutException;
 
 /**
  * Dual link client connection.
- * @author V.Shcryabets<vshcryabets@gmail.com>
+ * @author V.Shcryabets <a>vshcryabets@gmail.com</a>
  *
  */
 public class DualLinkClientConnection extends StyxClientConnection {

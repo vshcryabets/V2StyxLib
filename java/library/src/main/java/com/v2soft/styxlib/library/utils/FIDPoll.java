@@ -3,7 +3,7 @@ package com.v2soft.styxlib.library.utils;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
 
 /**
- * @author V.Shcryabets<vshcryabets@gmail.com>
+ * @author V.Shcryabets <a>vshcryabets@gmail.com</a>
  */
 public class FIDPoll extends AbstractPoll<Long> {
     public static final long MAXUNINT = 0xFFFFFFFFL;

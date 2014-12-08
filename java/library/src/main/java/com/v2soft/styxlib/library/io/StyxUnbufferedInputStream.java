@@ -16,7 +16,7 @@ import java.io.InputStream;
 
 /**
  * Unbuffered input styx output stream
- * @author V.Shcryabets<vshcryabets@gmail.com>
+ * @author V.Shcryabets <a>vshcryabets@gmail.com</a>
  *
  */
 public class StyxUnbufferedInputStream extends InputStream {

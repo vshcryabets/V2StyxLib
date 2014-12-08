@@ -28,7 +28,7 @@ import java.util.concurrent.TimeoutException;
 /**
  * Styx client conection
  *
- * @author V.Shcryabets<vshcryabets@gmail.com>
+ * @author V.Shcryabets <a>vshcryabets@gmail.com</a>
  */
 public class StyxClientConnection
         implements Closeable, IClient {
