@@ -82,7 +82,15 @@ public class TCPClientChannelDriver extends TCPChannelDriver {
                                 if (mLogListener != null) {
                                     mLogListener.onMessageReceived(this, mServerClientDetails, message);
                                 }
-                                mMessageHandler.processPacket(message, mServerClientDetails);
+                                if ( message.getType().isTMessage() ) {
+                                    if ( mTMessageHandler != null ) {
+                                        mTMessageHandler.postPacket(message, mServerClientDetails);
+                                    }
+                                } else {
+                                    if ( mRMessageHandler != null ) {
+                                        mRMessageHandler.postPacket(message, mServerClientDetails);
+                                    }
+                                }
                             } else {
                                 break;
                             }

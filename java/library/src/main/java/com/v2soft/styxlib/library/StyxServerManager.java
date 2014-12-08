@@ -48,7 +48,8 @@ public class StyxServerManager
             throw new NullPointerException("Driver is null");
         }
         mDrivers.add(driver);
-        driver.setMessageHandler(mBalancer);
+        driver.setTMessageHandler(mBalancer);
+        driver.setRMessageHandler(mBalancer);
     }
 
     public Thread[] start() {

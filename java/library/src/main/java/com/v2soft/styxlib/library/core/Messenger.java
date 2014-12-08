@@ -38,7 +38,7 @@ public class Messenger implements IMessageTransmitter {
 
     public void start(boolean startDriver, int iounit) {
         mMessageProcessor = getMessageProcessor();;
-        mDriver.setMessageHandler(mMessageProcessor);
+        mDriver.setRMessageHandler(mMessageProcessor);
         if (startDriver && !mDriver.isStarted()) {
             mDriver.start(iounit);
         }

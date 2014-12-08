@@ -22,7 +22,8 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
     private static final String TAG = TCPChannelDriver.class.getSimpleName();
     protected Thread mAcceptorThread;
     protected boolean isWorking;
-    protected IMessageProcessor mMessageHandler;
+    protected IMessageProcessor mTMessageHandler;
+    protected IMessageProcessor mRMessageHandler;
     protected int mIOUnit;
     protected int mTransmittedPacketsCount;
     protected int mTransmissionErrorsCount;
@@ -50,8 +51,8 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
 
     @Override
     public Thread start(int iounit) {
-        if ( mMessageHandler == null ) {
-            throw new IllegalStateException("Message handler is null");
+        if ( mRMessageHandler == null && mTMessageHandler == null ) {
+            throw new IllegalStateException("Both message handlers is null");
         }
         if ( mAcceptorThread != null ) {
             throw new IllegalStateException("Already started");
@@ -87,8 +88,12 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
         return false;
     }
 
-    public void setMessageHandler(IMessageProcessor handler) {
-        mMessageHandler = handler;
+    public void setTMessageHandler(IMessageProcessor handler) {
+        mTMessageHandler = handler;
+    }
+
+    public void setRMessageHandler(IMessageProcessor handler) {
+        mRMessageHandler = handler;
     }
 
     @Override
@@ -131,7 +136,15 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
                 if ( mLogListener != null ) {
                     mLogListener.onMessageReceived(this, client, message);
                 }
-                mMessageHandler.processPacket(message, client);
+                if ( message.getType().isTMessage() ) {
+                    if ( mTMessageHandler != null ) {
+                        mTMessageHandler.postPacket(message, client);
+                    }
+                } else {
+                    if ( mRMessageHandler != null ) {
+                        mRMessageHandler.postPacket(message, client);
+                    }
+                }
                 return true;
             }
         }
@@ -155,5 +168,15 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
     @Override
     public String toString() {
         return String.format("%s:%s:%d", getClass().getSimpleName(), mAddress.toString(), mPort);
+    }
+
+    @Override
+    public IMessageProcessor getTMessageHandler() {
+        return mTMessageHandler;
+    }
+
+    @Override
+    public IMessageProcessor getRMessageHandler() {
+        return mRMessageHandler;
     }
 }

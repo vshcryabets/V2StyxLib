@@ -10,15 +10,26 @@ import com.v2soft.styxlib.library.utils.MessageTagPoll;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author V.Shcryabets<vshcryabets@gmail.com>
  */
-public class RMessagesProcessor implements IMessageProcessor {
+public class RMessagesProcessor extends QueueMessagesProcessor implements IMessageProcessor {
     protected int mReceivedCount, mErrorCount;
     protected Map<Integer, StyxTMessage> mMessagesMap;
     protected Messenger.StyxMessengerListener mListener;
     protected MessageTagPoll mActiveTags;
+
+    private class Pair {
+        public StyxMessage mMessage;
+        public ClientDetails mTransmitter;
+    }
+
+    public RMessagesProcessor() {
+        super();
+    }
 
     @Override
     public void addClient(ClientDetails state) {
@@ -34,8 +45,11 @@ public class RMessagesProcessor implements IMessageProcessor {
     public void processPacket(StyxMessage message, ClientDetails transmitter) throws IOException {
         mReceivedCount++;
         int tag = message.getTag();
-        if (!mMessagesMap.containsKey(tag)) // we didn't send T message with such tag, so ignore this R message
+        if (!mMessagesMap.containsKey(tag)) {
+            // we didn't send T message with such tag, so ignore this R message
+            System.err.println("Got unknown R message from client "+transmitter);
             return;
+        }
         final StyxTMessage tMessage = mMessagesMap.get(tag);
         if (tMessage.getType() == MessageType.Tclunk ||
                 tMessage.getType() == MessageType.Tremove) {
@@ -63,11 +77,6 @@ public class RMessagesProcessor implements IMessageProcessor {
         return mErrorCount;
     }
 
-    @Override
-    public void close() throws IOException {
-
-    }
-
     public void setMessagesMap(Map<Integer, StyxTMessage> mMessagesMap) {
         this.mMessagesMap = mMessagesMap;
     }
@@ -79,5 +88,4 @@ public class RMessagesProcessor implements IMessageProcessor {
     public void setActiveTags(MessageTagPoll mActiveTags) {
         this.mActiveTags = mActiveTags;
     }
-
 }

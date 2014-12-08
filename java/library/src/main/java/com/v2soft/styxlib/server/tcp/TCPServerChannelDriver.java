@@ -121,7 +121,8 @@ public class TCPServerChannelDriver extends TCPChannelDriver {
         for (SocketChannel channel : mNewConnetions) {
             channel.configureBlocking(false);
             TCPClientDetails client = new TCPClientDetails(channel, this, mIOUnit, mLastClientId++);
-            mMessageHandler.addClient(client);
+            mRMessageHandler.addClient(client);
+            mTMessageHandler.addClient(client);
             mClientStatesMap.put(channel, client);
             mClientDetailses.add(client);
         }
@@ -139,7 +140,8 @@ public class TCPServerChannelDriver extends TCPChannelDriver {
 
     private void removeClient(SocketChannel channel) throws IOException {
         final ClientDetails clientDetails = mClientStatesMap.get(channel);
-        mMessageHandler.removeClient(clientDetails);
+        mTMessageHandler.removeClient(clientDetails);
+        mRMessageHandler.removeClient(clientDetails);
         mClientDetailses.remove(clientDetails);
         mClientStatesMap.remove(channel);
         channel.close();

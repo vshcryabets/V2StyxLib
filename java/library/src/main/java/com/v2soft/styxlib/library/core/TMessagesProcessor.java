@@ -29,13 +29,14 @@ import com.v2soft.styxlib.vfs.IVirtualStyxFile;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Income Styx messages processor.
  * @author V.Shcriyabets (vshcryabets@gmail.com)
  *
  */
-public class TMessagesProcessor implements IMessageProcessor {
+public class TMessagesProcessor extends QueueMessagesProcessor implements IMessageProcessor {
     protected ConnectionDetails mConnectionDetails;
     private IVirtualStyxFile mRoot;
     protected int mHandledPackets, mErrorPackets, mAnswerPackets;
@@ -50,9 +51,6 @@ public class TMessagesProcessor implements IMessageProcessor {
 
     @Override
     public void addClient(ClientDetails clientDetails) {
-    }
-    @Override
-    public void close() {
     }
     @Override
     public void removeClient(ClientDetails clientDetails) {

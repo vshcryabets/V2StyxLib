@@ -2,6 +2,7 @@ package com.v2soft.styxlib.server;
 
 import com.v2soft.styxlib.ILogListener;
 import com.v2soft.styxlib.library.core.IMessageProcessor;
+import com.v2soft.styxlib.library.core.TMessagesProcessor;
 
 import java.io.Closeable;
 import java.util.Set;
@@ -13,7 +14,8 @@ import java.util.Set;
  */
 public interface IChannelDriver extends Closeable, IMessageTransmitter {
     Thread start(int iounit);
-    void setMessageHandler(IMessageProcessor handler);
+    void setTMessageHandler(IMessageProcessor handler);
+    void setRMessageHandler(IMessageProcessor handler);
     void setLogListener(ILogListener listener);
 
     /**
@@ -24,4 +26,7 @@ public interface IChannelDriver extends Closeable, IMessageTransmitter {
 
     boolean isConnected();
     boolean isStarted();
+
+    IMessageProcessor getTMessageHandler();
+    IMessageProcessor getRMessageHandler();
 }

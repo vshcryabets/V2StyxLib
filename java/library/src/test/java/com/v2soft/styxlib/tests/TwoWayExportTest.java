@@ -1,19 +1,15 @@
 package com.v2soft.styxlib.tests;
 
-import com.v2soft.styxlib.ILogListener;
 import com.v2soft.styxlib.StyxFile;
 import com.v2soft.styxlib.library.DualLinkClientConnection;
 import com.v2soft.styxlib.IClient;
 import com.v2soft.styxlib.library.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.library.exceptions.StyxException;
-import com.v2soft.styxlib.library.io.StyxUnbufferedOutputStream;
-import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.types.ULong;
 import com.v2soft.styxlib.server.ClientDetails;
 import com.v2soft.styxlib.server.IChannelDriver;
 import com.v2soft.styxlib.server.tcp.TCPClientChannelDriver;
 import com.v2soft.styxlib.server.tcp.TCPDualLinkServerManager;
-import com.v2soft.styxlib.vfs.IVirtualStyxFile;
 import com.v2soft.styxlib.vfs.MemoryStyxDirectory;
 import com.v2soft.styxlib.vfs.MemoryStyxFile;
 import com.v2soft.styxlib.library.types.Credentials;
@@ -167,7 +163,6 @@ public class TwoWayExportTest {
         String messages[] = new String[count];
         DualLinkClientConnection clients[] = new DualLinkClientConnection[count];
         IChannelDriver clientDrivers[] = new TCPClientChannelDriver[count];
-//        IVirtualStyxFile clientFiles[] = new IVirtualStyxFile[count];
         StyxFile reverseFiles[] = new StyxFile[count];
         ChatStyxFile clientFiles[] = new ChatStyxFile[count];
         final OutputStream outputs[] = new OutputStream[count];
@@ -175,16 +170,24 @@ public class TwoWayExportTest {
         // prepare server chat file
         MemoryStyxFile chatServer = new MemoryStyxFile("chat") {
             @Override
-            public int write(ClientDetails clientDetails, byte[] data, ULong offset) throws StyxErrorMessageException {
-                String message = new String(data, mCharset);
-                // sent this message to other clients
-                for (OutputStream out : outputs) {
-                    try {
-                        out.write(data);
-                    } catch (IOException e) {
-                        e.printStackTrace();
+            public int write(ClientDetails clientDetails, final byte[] data, ULong offset) throws StyxErrorMessageException {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        String message = new String(data, mCharset);
+                        System.out.println(String.format("SERVER GOT %s", message));
+                        // sent this message to other clients
+//                        for (OutputStream out : outputs) {
+//                            try {
+//                                out.write(data);
+//                            } catch (IOException e) {
+//                                System.out.println("ERR "+System.currentTimeMillis());
+//                                e.printStackTrace();
+//                            }
+//                        }
+                        System.out.println("END NOTIFY");
                     }
-                }
+                }).start();
                 return data.length;
             }
         };
@@ -196,12 +199,14 @@ public class TwoWayExportTest {
         }
         // create clients
         for ( int i = 0; i < count; i++ ) {
+            String prefix = "CL" + i;
             clients[i] = new DualLinkClientConnection();
             clientDrivers[i] = new TCPClientChannelDriver(
                     InetAddress.getByName("127.0.0.1"), PORT,
                     false);
+//            clientDrivers[i].setLogListener(new TestLogListener(prefix));
             String marker = ( i == 0 ? messages[count-1] : messages[i-1]);
-            clientFiles[i] = new ChatStyxFile("chat", messages[i], marker, (i == 0));
+            clientFiles[i] = new ChatStyxFile("chat", messages[i], marker, (i == 0), prefix);
             MemoryStyxDirectory root = new MemoryStyxDirectory("clientroot");
             root.addFile(clientFiles[i]);
             clients[i].export(root);
@@ -223,12 +228,17 @@ public class TwoWayExportTest {
             pos++;
         }
 
+        Thread.sleep(1000);
+        System.out.println("\t\t========================");
         // lets go
         clientFiles[0].sendMessage();
-        syncObject.wait(5000);
+        synchronized (syncObject) {
+            syncObject.wait(2500);
+        }
 
         // close server connections
         pos = 0;
+        mServer.getDrivers().get(0).setLogListener(new TestLogListener("\tSRV"));
         for (ClientDetails details : clientDetailes) {
             IClient reverseConnection = reverseFiles[pos].getIClient();
             outputs[pos].close();
@@ -246,50 +256,20 @@ public class TwoWayExportTest {
         assertEquals(0, clientDetailes.size());
     }
 
-    private class TestLogListener implements ILogListener {
-        private String mPrefix;
-
-        TestLogListener(String prefix) {
-            mPrefix = prefix;
-        }
-
-        @Override
-        public void onMessageReceived(IChannelDriver driver, ClientDetails clientDetails, StyxMessage message) {
-            System.out.println(String.format("%sR %s client %s message %s %d", mPrefix,
-                    driver.toString(),
-                    clientDetails.toString(),
-                    message.getType().toString(),
-                    message.getTag()));
-        }
-
-        @Override
-        public void onMessageTransmited(IChannelDriver driver, ClientDetails clientDetails, StyxMessage message) {
-            System.out.println(String.format("%sS %s client %s message %s %d", mPrefix,
-                    driver.toString(),
-                    clientDetails.toString(),
-                    message.getType().toString(),
-                    message.getTag()));
-        }
-
-        @Override
-        public void onException(IChannelDriver driver, Throwable err) {
-
-        }
-    }
-
     private class ChatStyxFile extends MemoryStyxFile {
         protected String mMessage;
         protected String mMarker;
         protected boolean isCounter;
         protected OutputStream mOut;
         protected StyxFile mFile;
+        protected String mPrefix;
 
-        public ChatStyxFile(String filename, String message, String marker, boolean isCounter) {
+        public ChatStyxFile(String filename, String message, String marker, boolean isCounter, String prefix) {
             super(filename);
             mMessage = message;
             mMarker = marker;
             this.isCounter = isCounter;
-
+            mPrefix = prefix;
         }
 
         public void attachToserver(IClient client) throws InterruptedException, StyxException, TimeoutException,
@@ -301,13 +281,14 @@ public class TwoWayExportTest {
         @Override
         public int write(ClientDetails clientDetails, byte[] data, ULong offset) throws StyxErrorMessageException {
             String message = new String(data, mCharset);
-            if ( mMarker.equals(message)) {
-                try {
-                    sendMessage();
-                } catch (IOException e) {
-                    StyxErrorMessageException.doException(e.toString());
-                }
-            }
+            System.out.println(String.format("%s GOT %s", mPrefix, message));
+//            if ( mMarker.equals(message)) {
+//                try {
+//                    sendMessage();
+//                } catch (IOException e) {
+//                    StyxErrorMessageException.doException(e.toString());
+//                }
+//            }
             return data.length;
         }
 

@@ -24,18 +24,14 @@ public class MessengerWithExport extends Messenger {
         }
         if (root != null) {
             mRoot = root;
-            TMessagesProcessor processor = (TMessagesProcessor) ( (MessagesFilter) mMessageProcessor ).getTProcessor();
+            TMessagesProcessor processor = (TMessagesProcessor) mDriver.getTMessageHandler();
             if ( processor == null ) {
                 processor = new TMessagesProcessor(details, root);
             } else {
                 processor.setRoot(root);
             }
-            ( (MessagesFilter) mMessageProcessor ).setTProcessor(processor);
+            mDriver.setTMessageHandler(processor);
         }
-    }
-
-    protected IMessageProcessor getMessageProcessor() {
-        return new MessagesFilter(null, super.getMessageProcessor());
     }
 
     @Override
