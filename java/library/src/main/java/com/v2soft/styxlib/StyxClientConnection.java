@@ -1,9 +1,7 @@
 package com.v2soft.styxlib;
 
-import com.v2soft.styxlib.IClient;
-import com.v2soft.styxlib.StyxFile;
-import com.v2soft.styxlib.library.core.Messenger;
-import com.v2soft.styxlib.library.core.Messenger.StyxMessengerListener;
+import com.v2soft.styxlib.library.core.RMessagesProcessor;
+import com.v2soft.styxlib.library.core.TMessageTransmitter;
 import com.v2soft.styxlib.library.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.library.exceptions.StyxException;
 import com.v2soft.styxlib.library.messages.StyxRAttachMessage;
@@ -33,7 +31,7 @@ import java.util.concurrent.TimeoutException;
  * @author V.Shcryabets<vshcryabets@gmail.com>
  */
 public class StyxClientConnection
-        implements Closeable, StyxMessengerListener, IClient {
+        implements Closeable, IClient {
     //---------------------------------------------------------------------------
     // Constants
     //---------------------------------------------------------------------------
@@ -58,6 +56,8 @@ public class StyxClientConnection
     protected ClientDetails mRecepient;
     private IChannelDriver mDriver;
     protected ConnectionDetails mDetails;
+    protected RMessagesProcessor mAnswerProcessor;
+    protected boolean isAutoStartDriver = false;
 
     public StyxClientConnection() {
         this(new Credentials(null, null));
@@ -68,6 +68,16 @@ public class StyxClientConnection
         mCredentials = credentials;
         isConnected = false;
         mDriver = null;
+    }
+
+    public StyxClientConnection(Credentials credentials, IChannelDriver driver) {
+        if (driver == null) {
+            throw new NullPointerException("Driver is null");
+        }
+        mDriver = driver;
+        mDetails = new ConnectionDetails(getProtocol(), getIOBufSize());
+        mCredentials = credentials;
+        isConnected = false;
     }
 
     /**
@@ -85,13 +95,23 @@ public class StyxClientConnection
         if (driver == null) {
             throw new NullPointerException("Channel driver can't be null");
         }
+        setDriver(driver);
+        if (!driver.isStarted()) {
+            driver.start(getIOBufSize());
+            isAutoStartDriver = true;
+        }
         if (credentials == null) {
             throw new NullPointerException("Credentials can't be null");
         }
         mCredentials = credentials;
         mMountPoint = "/";
         mNeedAuth = ( mCredentials != null );
-        mMessenger = initMessenger(driver);
+
+        mAnswerProcessor = new RMessagesProcessor();
+        mAnswerProcessor.setListener(mAnswerListener);
+        driver.setRMessageHandler(mAnswerProcessor);
+        mMessenger = new TMessageTransmitter(mAnswerProcessor, mTransmitterListener);
+
         mRecepient = driver.getClients().iterator().next();
         sendVersionMessage();
         isConnected = driver.isConnected();
@@ -125,12 +145,6 @@ public class StyxClientConnection
     public boolean connect()
             throws IOException, StyxException, InterruptedException, TimeoutException {
         return connect(mDriver, mCredentials);
-    }
-
-    protected IMessageTransmitter initMessenger(IChannelDriver driver) throws IOException {
-        Messenger result = new Messenger(driver, this);
-        result.start(true, getIOBufSize());
-        return result;
     }
 
     public StyxFile getRoot() throws StyxException, InterruptedException, TimeoutException, IOException {
@@ -265,9 +279,17 @@ public class StyxClientConnection
 
     @Override
     public void close() throws IOException {
+        if (mAnswerProcessor != null) {
+            mAnswerProcessor.close();
+            mAnswerProcessor = null;
+        }
         if (mMessenger != null) {
             mMessenger.close();
             mMessenger = null;
+        }
+        if (isAutoStartDriver && mDriver != null) {
+            mDriver.close();
+            mDriver = null;
         }
     }
 
@@ -301,36 +323,37 @@ public class StyxClientConnection
         return isConnected;
     }
 
-    //-------------------------------------------------------------------------------------
-    // Messenger listener
-    //-------------------------------------------------------------------------------------
-    @Override
-    public void onSocketDisconnected() {
-        isConnected = false;
-    }
-
-    @Override
-    public void onTrashReceived() {
-        //something goes wrong, we should restart protocol
-        setAttached(false);
-        try {
-            sendVersionMessage();
-        } catch (Exception e) {
-            e.printStackTrace();
+    private TMessageTransmitter.Listener mTransmitterListener = new TMessageTransmitter.Listener() {
+        @Override
+        public void onSocketDisconnected() {
+            isConnected = false;
         }
-    }
 
-    @Override
-    public void onFIDReleased(long fid) {
-        mActiveFids.release(fid);
-    }
+        @Override
+        public void onTrashReceived() {
+            //something goes wrong, we should restart protocol
+            setAttached(false);
+            try {
+                sendVersionMessage();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    };
+
+    private RMessagesProcessor.Listener mAnswerListener = new RMessagesProcessor.Listener() {
+        @Override
+        public void onFIDReleased(long fid) {
+            mActiveFids.release(fid);
+        }
+    };
 
     @Override
     public ClientDetails getRecepient() {
         return mRecepient;
     }
 
-    public void setDriver(IChannelDriver driver) {
+    protected void setDriver(IChannelDriver driver) {
         mDriver = driver;
     }
 }

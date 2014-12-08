@@ -51,9 +51,6 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
 
     @Override
     public Thread start(int iounit) {
-        if ( mRMessageHandler == null && mTMessageHandler == null ) {
-            throw new IllegalStateException("Both message handlers is null");
-        }
         if ( mAcceptorThread != null ) {
             throw new IllegalStateException("Already started");
         }

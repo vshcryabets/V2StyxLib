@@ -9,18 +9,22 @@ import com.v2soft.styxlib.server.ClientDetails;
 import com.v2soft.styxlib.library.utils.MessageTagPoll;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author V.Shcryabets<vshcryabets@gmail.com>
  */
 public class RMessagesProcessor extends QueueMessagesProcessor implements IMessageProcessor {
+    public interface Listener {
+        void onFIDReleased(long fid);
+    }
+
     protected int mReceivedCount, mErrorCount;
     protected Map<Integer, StyxTMessage> mMessagesMap;
-    protected Messenger.StyxMessengerListener mListener;
+    protected Listener mListener;
     protected MessageTagPoll mActiveTags;
+
 
     private class Pair {
         public StyxMessage mMessage;
@@ -29,6 +33,8 @@ public class RMessagesProcessor extends QueueMessagesProcessor implements IMessa
 
     public RMessagesProcessor() {
         super();
+        mActiveTags = new MessageTagPoll();
+        mMessagesMap = new HashMap<Integer, StyxTMessage>();
     }
 
     @Override
@@ -39,6 +45,15 @@ public class RMessagesProcessor extends QueueMessagesProcessor implements IMessa
     @Override
     public void removeClient(ClientDetails state) {
 
+    }
+
+    public MessageTagPoll getActiveFIDs() {
+        return mActiveTags;
+    }
+
+
+    public Map<Integer, StyxTMessage> getMessagesMap() {
+        return mMessagesMap;
     }
 
     @Override
@@ -77,15 +92,7 @@ public class RMessagesProcessor extends QueueMessagesProcessor implements IMessa
         return mErrorCount;
     }
 
-    public void setMessagesMap(Map<Integer, StyxTMessage> mMessagesMap) {
-        this.mMessagesMap = mMessagesMap;
-    }
-
-    public void setListener(Messenger.StyxMessengerListener mListener) {
+    public void setListener(Listener mListener) {
         this.mListener = mListener;
-    }
-
-    public void setActiveTags(MessageTagPoll mActiveTags) {
-        this.mActiveTags = mActiveTags;
     }
 }

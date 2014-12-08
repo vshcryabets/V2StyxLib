@@ -29,9 +29,8 @@ public class TCPDualLinkServerManager extends TCPServerManager {
     }
 
     public IClient getReverseConnectionForClient(ClientDetails clientDetails, Credentials credentials) {
-        StyxClientConnection connection = new StyxClientConnection(credentials);
         IChannelDriver driver = clientDetails.getDriver();
-        connection.setDriver(driver);
+        StyxClientConnection connection = new StyxClientConnection(credentials, driver);
         return connection;
     }
 }
