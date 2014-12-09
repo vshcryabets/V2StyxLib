@@ -1,8 +1,7 @@
 package com.v2soft.styxlib.server;
 
 import com.v2soft.styxlib.ILogListener;
-import com.v2soft.styxlib.library.core.IMessageProcessor;
-import com.v2soft.styxlib.library.core.TMessagesProcessor;
+import com.v2soft.styxlib.handlers.IMessageProcessor;
 
 import java.io.Closeable;
 import java.util.Set;

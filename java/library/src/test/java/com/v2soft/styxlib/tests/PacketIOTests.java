@@ -1,6 +1,6 @@
 package com.v2soft.styxlib.tests;
 
-import com.v2soft.styxlib.StyxClientConnection;
+import com.v2soft.styxlib.Connection;
 import com.v2soft.styxlib.StyxFile;
 import com.v2soft.styxlib.library.StyxServerManager;
 import com.v2soft.styxlib.library.exceptions.StyxErrorMessageException;
@@ -113,7 +113,7 @@ public class PacketIOTests {
         MessageDigest digest = MessageDigest.getInstance("MD5");
 
 
-        StyxClientConnection mConnection = new StyxClientConnection();
+        Connection mConnection = new Connection();
         byte[] someData = new byte[1024];
         byte [] remoteHash = new byte[16];
 

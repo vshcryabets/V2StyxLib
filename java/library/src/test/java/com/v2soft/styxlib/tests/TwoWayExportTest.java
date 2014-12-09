@@ -1,7 +1,7 @@
 package com.v2soft.styxlib.tests;
 
 import com.v2soft.styxlib.StyxFile;
-import com.v2soft.styxlib.library.DualLinkClientConnection;
+import com.v2soft.styxlib.ConnectionWithExport;
 import com.v2soft.styxlib.IClient;
 import com.v2soft.styxlib.library.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.library.exceptions.StyxException;
@@ -77,7 +77,7 @@ public class TwoWayExportTest {
         MemoryStyxFile md5 = new MD5StyxFile();
         MemoryStyxDirectory root = new MemoryStyxDirectory("clientroot");
         root.addFile(md5);
-        DualLinkClientConnection connection = new DualLinkClientConnection();
+        ConnectionWithExport connection = new ConnectionWithExport();
         connection.export(root);
         IChannelDriver driver = new TCPClientChannelDriver(InetAddress.getByName("127.0.0.1"), PORT, false);
 
@@ -103,7 +103,7 @@ public class TwoWayExportTest {
 
     @Test
     public void testGetClientsFromClient() throws IOException, InterruptedException, TimeoutException, StyxException {
-        DualLinkClientConnection connection = new DualLinkClientConnection();
+        ConnectionWithExport connection = new ConnectionWithExport();
         IChannelDriver driver = new TCPClientChannelDriver(
                 InetAddress.getByName("127.0.0.1"), PORT,
                 false);
@@ -126,13 +126,13 @@ public class TwoWayExportTest {
         assertNotNull(drivers);
         assertEquals(1, drivers.size());
 
-        DualLinkClientConnection connection = new DualLinkClientConnection();
+        ConnectionWithExport connection = new ConnectionWithExport();
         IChannelDriver driver = new TCPClientChannelDriver(
                 InetAddress.getByName("127.0.0.1"), PORT,
                 false);
         assertTrue(connection.connect(driver));
 
-        DualLinkClientConnection connection2 = new DualLinkClientConnection();
+        ConnectionWithExport connection2 = new ConnectionWithExport();
         IChannelDriver driver2 = new TCPClientChannelDriver(
                 InetAddress.getByName("127.0.0.1"), PORT,
                 false);
@@ -161,7 +161,7 @@ public class TwoWayExportTest {
         Object syncObject = new Object();
 
         String messages[] = new String[count];
-        DualLinkClientConnection clients[] = new DualLinkClientConnection[count];
+        ConnectionWithExport clients[] = new ConnectionWithExport[count];
         IChannelDriver clientDrivers[] = new TCPClientChannelDriver[count];
         StyxFile reverseFiles[] = new StyxFile[count];
         ChatStyxFile clientFiles[] = new ChatStyxFile[count];
@@ -200,7 +200,7 @@ public class TwoWayExportTest {
         // create clients
         for ( int i = 0; i < count; i++ ) {
             String prefix = "CL" + i;
-            clients[i] = new DualLinkClientConnection();
+            clients[i] = new ConnectionWithExport();
             clientDrivers[i] = new TCPClientChannelDriver(
                     InetAddress.getByName("127.0.0.1"), PORT,
                     false);
@@ -240,6 +240,7 @@ public class TwoWayExportTest {
         pos = 0;
         mServer.getDrivers().get(0).setLogListener(new TestLogListener("\tSRV"));
         for (ClientDetails details : clientDetailes) {
+            System.out.printf("Trying to disconnect from %s\n", details.toString());
             IClient reverseConnection = reverseFiles[pos].getIClient();
             outputs[pos].close();
             reverseFiles[pos].close();

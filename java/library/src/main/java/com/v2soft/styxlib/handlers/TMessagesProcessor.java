@@ -1,4 +1,4 @@
-package com.v2soft.styxlib.library.core;
+package com.v2soft.styxlib.handlers;
 
 import com.v2soft.styxlib.library.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.library.messages.StyxRAttachMessage;
@@ -29,7 +29,6 @@ import com.v2soft.styxlib.vfs.IVirtualStyxFile;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Income Styx messages processor.
@@ -63,7 +62,7 @@ public class TMessagesProcessor extends QueueMessagesProcessor implements IMessa
      * @throws IOException
      */
     @Override
-    public void processPacket(StyxMessage message, ClientDetails clientDetails) throws IOException {
+    public void processPacket(StyxMessage message, ClientDetails target) throws IOException {
         mHandledPackets++;
         StyxMessage answer = null;
         IVirtualStyxFile file;
@@ -74,43 +73,43 @@ public class TMessagesProcessor extends QueueMessagesProcessor implements IMessa
                     answer = new StyxRVersionMessage(mConnectionDetails.getIOUnit(), mConnectionDetails.getProtocol());
                     break;
                 case Tattach:
-                    answer = processAttach(clientDetails, (StyxTAttachMessage)message);
+                    answer = processAttach(target, (StyxTAttachMessage)message);
                     break;
                 case Tauth:
-                    answer = processAuth(clientDetails, (StyxTAuthMessage)message);
+                    answer = processAuth(target, (StyxTAuthMessage)message);
                     break;
                 case Tstat:
                     fid = ((StyxTMessageFID)message).getFID();
-                    file = clientDetails.getAssignedFile(fid);
+                    file = target.getAssignedFile(fid);
                     answer = new StyxRStatMessage(message.getTag(), file.getStat());
                     break;
                 case Tclunk:
-                    answer = processClunk(clientDetails, (StyxTMessageFID)message);
+                    answer = processClunk(target, (StyxTMessageFID)message);
                     break;
                 case Tflush:
                     // TODO do something there
                     answer = new StyxMessage(MessageType.Rflush, message.getTag());
                     break;
                 case Twalk:
-                    answer = processWalk(clientDetails, (StyxTWalkMessage) message);
+                    answer = processWalk(target, (StyxTWalkMessage) message);
                     break;
                 case Topen:
-                    answer = processOpen(clientDetails, (StyxTOpenMessage)message);
+                    answer = processOpen(target, (StyxTOpenMessage)message);
                     break;
                 case Tread:
-                    answer = processRead(clientDetails, (StyxTReadMessage)message);
+                    answer = processRead(target, (StyxTReadMessage)message);
                     break;
                 case Twrite:
-                    answer = processWrite(clientDetails, (StyxTWriteMessage)message);
+                    answer = processWrite(target, (StyxTWriteMessage)message);
                     break;
                 case Twstat:
                     answer = processWStat((StyxTWStatMessage)message);
                     break;
                 case Tcreate:
-                    answer = processCreate(clientDetails, (StyxTCreateMessage)message);
+                    answer = processCreate(target, (StyxTCreateMessage)message);
                     break;
                 case Tremove:
-                    answer = processRemove(clientDetails, (StyxTMessageFID)message);
+                    answer = processRemove(target, (StyxTMessageFID)message);
                     break;
                 default:
                     System.out.println("Got message:");
@@ -124,7 +123,7 @@ public class TMessagesProcessor extends QueueMessagesProcessor implements IMessa
         }
         if ( answer != null ) {
             mAnswerPackets++;
-            clientDetails.getDriver().sendMessage(answer, clientDetails);
+            target.getDriver().sendMessage(answer, target);
         }
     }
 

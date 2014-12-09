@@ -7,6 +7,7 @@ import com.v2soft.styxlib.server.ClientDetails;
 import com.v2soft.styxlib.server.IChannelDriver;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 
@@ -44,5 +45,14 @@ public class TCPClientDetails extends ClientDetails {
 
     public IStyxDataReader getInputReader() {
         return mReader;
+    }
+
+    @Override
+    public String toString() {
+        try {
+            return String.format("%s:%d", mChannel.getRemoteAddress().toString(), mId);
+        } catch (IOException e) {
+            return super.toString();
+        }
     }
 }

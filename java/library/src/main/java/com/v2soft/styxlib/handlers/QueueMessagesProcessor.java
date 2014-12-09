@@ -1,4 +1,4 @@
-package com.v2soft.styxlib.library.core;
+package com.v2soft.styxlib.handlers;
 
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.server.ClientDetails;
@@ -26,10 +26,10 @@ public abstract class QueueMessagesProcessor implements IMessageProcessor {
     }
 
     @Override
-    public void postPacket(StyxMessage message, ClientDetails transmitter) {
+    public void postPacket(StyxMessage message, ClientDetails target) {
         Pair pair = new Pair();
         pair.mMessage = message;
-        pair.mTransmitter = transmitter;
+        pair.mTransmitter = target;
         mQueue.offer(pair);
     }
 

@@ -1,7 +1,7 @@
 package com.v2soft.styxlib.tests;
 
+import com.v2soft.styxlib.Connection;
 import com.v2soft.styxlib.IClient;
-import com.v2soft.styxlib.StyxClientConnection;
 import com.v2soft.styxlib.StyxFile;
 import com.v2soft.styxlib.library.StyxServerManager;
 import com.v2soft.styxlib.library.exceptions.StyxErrorMessageException;
@@ -47,7 +47,7 @@ public class ConnectionTest {
     @Before
     public void setUp() throws Exception {
         startServer();
-        mConnection = new StyxClientConnection();
+        mConnection = new Connection();
         IChannelDriver driver = new TCPClientChannelDriver(
                 InetAddress.getByName("localhost"), PORT,
                 false);

@@ -1,6 +1,6 @@
 package com.v2soft.styxlib.library.io;
 
-import com.v2soft.styxlib.StyxClientConnection;
+import com.v2soft.styxlib.Connection;
 import com.v2soft.styxlib.library.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.library.messages.StyxRReadMessage;
 import com.v2soft.styxlib.library.messages.StyxTReadMessage;
@@ -20,7 +20,7 @@ import java.io.InputStream;
  *
  */
 public class StyxUnbufferedInputStream extends InputStream {
-    private long mTimeout = StyxClientConnection.DEFAULT_TIMEOUT;
+    private long mTimeout = Connection.DEFAULT_TIMEOUT;
     private byte[] mSingleByteArray = new byte[1];
     private long mFile;
     private IMessageTransmitter mMessenger;

@@ -1,11 +1,10 @@
-package com.v2soft.styxlib.library;
+package com.v2soft.styxlib;
 
-import com.v2soft.styxlib.StyxClientConnection;
-import com.v2soft.styxlib.library.core.TMessagesProcessor;
+import com.v2soft.styxlib.Connection;
+import com.v2soft.styxlib.handlers.TMessagesProcessor;
 import com.v2soft.styxlib.library.exceptions.StyxException;
 import com.v2soft.styxlib.library.types.Credentials;
 import com.v2soft.styxlib.server.IChannelDriver;
-import com.v2soft.styxlib.server.IMessageTransmitter;
 import com.v2soft.styxlib.server.tcp.TCPDualLinkServerManager;
 import com.v2soft.styxlib.vfs.IVirtualStyxFile;
 
@@ -13,11 +12,11 @@ import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 
 /**
- * Dual link client connection.
+ * Connection with export.
  * @author V.Shcryabets<vshcryabets@gmail.com>
  *
  */
-public class DualLinkClientConnection extends StyxClientConnection {
+public class ConnectionWithExport extends Connection {
     //---------------------------------------------------------------------------
     // Constants
     //---------------------------------------------------------------------------

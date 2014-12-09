@@ -1,7 +1,7 @@
 package com.v2soft.styxlib.server;
 
-import com.v2soft.styxlib.library.core.IMessageProcessor;
-import com.v2soft.styxlib.library.core.TMessagesProcessor;
+import com.v2soft.styxlib.handlers.IMessageProcessor;
+import com.v2soft.styxlib.handlers.TMessagesProcessor;
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.types.ConnectionDetails;
 import com.v2soft.styxlib.vfs.IVirtualStyxFile;
@@ -30,13 +30,13 @@ public class ClientBalancer implements IMessageProcessor {
     }
 
     @Override
-    public void postPacket(StyxMessage message, ClientDetails transmitter) {
-        mHandler.postPacket(message, transmitter);
+    public void postPacket(StyxMessage message, ClientDetails target) {
+        mHandler.postPacket(message, target);
     }
 
     @Override
-    public void processPacket(StyxMessage message, ClientDetails transmitter) throws IOException {
-        mHandler.postPacket(message, transmitter);
+    public void processPacket(StyxMessage message, ClientDetails target) throws IOException {
+        mHandler.postPacket(message, target);
     }
 
     @Override

@@ -7,6 +7,11 @@ import com.v2soft.styxlib.library.messages.base.StyxMessage;
  */
 public class FIDPoll extends AbstractPoll<Long> {
     public static final long MAXUNINT = 0xFFFFFFFFL;
+
+    public FIDPoll() {
+        mLast = Long.valueOf(1);
+    }
+
     @Override
     public boolean release(Long id) {
         if (id == StyxMessage.NOFID)

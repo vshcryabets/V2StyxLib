@@ -1,4 +1,4 @@
-package com.v2soft.styxlib.library.core;
+package com.v2soft.styxlib.handlers;
 
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.messages.base.StyxTMessage;
@@ -43,7 +43,7 @@ public class TMessageTransmitter implements IMessageTransmitter {
             // set message tag
             int tag = StyxMessage.NOTAG;
             if (message.getType() != MessageType.Tversion) {
-                tag = mAnswerProcessor.getActiveFIDs().getFreeItem();
+                tag = mAnswerProcessor.getTagPoll().getFreeItem();
             }
             message.setTag((short) tag);
             mAnswerProcessor.getMessagesMap().put(tag, (StyxTMessage) message);
