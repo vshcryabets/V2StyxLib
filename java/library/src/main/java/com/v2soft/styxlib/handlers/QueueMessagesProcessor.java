@@ -8,7 +8,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 /**
- * @author V.Shcryabets<vshcryabets@gmail.com>
+ * @author V.Shcryabets <a>vshcryabets@gmail.com</a>
  */
 public abstract class QueueMessagesProcessor implements IMessageProcessor {
     protected LinkedBlockingQueue<Pair> mQueue;

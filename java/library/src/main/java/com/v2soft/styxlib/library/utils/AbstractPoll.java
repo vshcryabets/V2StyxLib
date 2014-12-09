@@ -4,7 +4,7 @@ import java.security.InvalidParameterException;
 import java.util.HashSet;
 
 /**
- * @author V.Shcryabets<vshcryabets@gmail.com>
+ * @author V.Shcryabets <a>vshcryabets@gmail.com</a>
  */
 public abstract class AbstractPoll<T> {
     protected HashSet<T> mAvailable = new HashSet<T>();

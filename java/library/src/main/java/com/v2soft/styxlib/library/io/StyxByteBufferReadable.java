@@ -72,7 +72,7 @@ public class StyxByteBufferReadable implements IStyxBuffer {
     }
 
     /**
-     * Reset position & limit
+     * Reset position &amp; limit
      */
     public void clear() {
         mWritePosition = 0;

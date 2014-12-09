@@ -13,7 +13,7 @@ import java.util.concurrent.TimeoutException;
 
 /**
  * Connection with export.
- * @author V.Shcryabets<vshcryabets@gmail.com>
+ * @author V.Shcryabets <a>vshcryabets@gmail.com</a>
  *
  */
 public class ConnectionWithExport extends Connection {

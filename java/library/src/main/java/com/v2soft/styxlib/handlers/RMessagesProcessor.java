@@ -15,7 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * @author V.Shcryabets<vshcryabets@gmail.com>
+ * @author V.Shcryabets <a>vshcryabets@gmail.com</a>
  */
 public class RMessagesProcessor extends QueueMessagesProcessor implements IMessageProcessor {
     protected int mReceivedCount, mErrorCount;
