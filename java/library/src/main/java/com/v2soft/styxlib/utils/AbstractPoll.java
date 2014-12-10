@@ -1,4 +1,4 @@
-package com.v2soft.styxlib.library.utils;
+package com.v2soft.styxlib.utils;
 
 import java.security.InvalidParameterException;
 import java.util.HashSet;

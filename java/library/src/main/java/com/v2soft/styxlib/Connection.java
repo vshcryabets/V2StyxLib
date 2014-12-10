@@ -19,7 +19,7 @@ import com.v2soft.styxlib.server.IChannelDriver;
 import com.v2soft.styxlib.server.IMessageTransmitter;
 import com.v2soft.styxlib.library.types.ConnectionDetails;
 import com.v2soft.styxlib.library.types.Credentials;
-import com.v2soft.styxlib.library.utils.FIDPoll;
+import com.v2soft.styxlib.utils.Polls;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -59,6 +59,7 @@ public class Connection
     protected RMessagesProcessor mAnswerProcessor;
     protected boolean isAutoStartDriver = false;
     protected boolean shouldCloseAnswerProcessor = false;
+    protected Polls mPolls;
 
     public Connection() {
         this(new Credentials(null, null));
@@ -93,9 +94,10 @@ public class Connection
      */
     public boolean connect(IChannelDriver driver, Credentials credentials)
             throws IOException, StyxException, InterruptedException, TimeoutException {
-        RMessagesProcessor answerProcessor = new RMessagesProcessor("RH"+driver.toString());
+        mPolls = new Polls();
+        RMessagesProcessor answerProcessor = new RMessagesProcessor("RH"+driver.toString(), mPolls);
         shouldCloseAnswerProcessor = true;
-        TMessageTransmitter transmitter = new TMessageTransmitter(answerProcessor, mTransmitterListener);
+        TMessageTransmitter transmitter = new TMessageTransmitter(mPolls, mTransmitterListener);
 
         if (!driver.isStarted()) {
             driver.start(getIOBufSize());
@@ -232,7 +234,7 @@ public class Connection
 
     @Override
     public long allocateFID() {
-        return mAnswerProcessor.getFIDPoll().getFreeItem();
+        return mPolls.getFIDPoll().getFreeItem();
     }
 
     @Override

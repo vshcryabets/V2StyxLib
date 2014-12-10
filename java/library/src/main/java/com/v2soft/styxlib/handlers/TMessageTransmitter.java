@@ -6,6 +6,7 @@ import com.v2soft.styxlib.library.messages.base.enums.MessageType;
 import com.v2soft.styxlib.server.ClientDetails;
 import com.v2soft.styxlib.server.IChannelDriver;
 import com.v2soft.styxlib.server.IMessageTransmitter;
+import com.v2soft.styxlib.utils.Polls;
 
 import java.io.IOException;
 import java.net.SocketException;
@@ -20,11 +21,14 @@ public class TMessageTransmitter implements IMessageTransmitter {
     }
 
     protected int mTransmittedCount, mErrorCount;
-    protected RMessagesProcessor mAnswerProcessor;
+    protected Polls mPolls;
     protected Listener mListener;
 
-    public TMessageTransmitter(RMessagesProcessor processor, Listener listener) {
-        mAnswerProcessor = processor;
+    public TMessageTransmitter(Polls polls, Listener listener) {
+        if ( polls == null ) {
+            throw new NullPointerException("polls is null");
+        }
+        mPolls = polls;
         mListener = listener;
     }
 
@@ -43,10 +47,10 @@ public class TMessageTransmitter implements IMessageTransmitter {
             // set message tag
             int tag = StyxMessage.NOTAG;
             if (message.getType() != MessageType.Tversion) {
-                tag = mAnswerProcessor.getTagPoll().getFreeItem();
+                tag = mPolls.getTagPoll().getFreeItem();
             }
             message.setTag((short) tag);
-            mAnswerProcessor.getMessagesMap().put(tag, (StyxTMessage) message);
+            mPolls.getMessagesMap().put(tag, (StyxTMessage) message);
 
             driver.sendMessage(message, recepient);
             mTransmittedCount++;

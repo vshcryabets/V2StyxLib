@@ -1,4 +1,4 @@
-package com.v2soft.styxlib.library.utils;
+package com.v2soft.styxlib.utils;
 
 import com.v2soft.styxlib.library.messages.base.StyxMessage;
 
