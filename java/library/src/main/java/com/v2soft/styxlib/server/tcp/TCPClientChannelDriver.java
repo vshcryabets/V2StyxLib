@@ -1,8 +1,8 @@
 package com.v2soft.styxlib.server.tcp;
 
-import com.v2soft.styxlib.library.io.StyxByteBufferReadable;
-import com.v2soft.styxlib.library.io.StyxDataReader;
-import com.v2soft.styxlib.library.messages.base.StyxMessage;
+import com.v2soft.styxlib.io.StyxByteBufferReadable;
+import com.v2soft.styxlib.io.StyxDataReader;
+import com.v2soft.styxlib.messages.base.StyxMessage;
 import com.v2soft.styxlib.server.ClientDetails;
 
 import java.io.IOException;

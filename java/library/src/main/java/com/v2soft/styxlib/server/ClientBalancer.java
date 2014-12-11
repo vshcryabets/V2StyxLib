@@ -2,7 +2,7 @@ package com.v2soft.styxlib.server;
 
 import com.v2soft.styxlib.handlers.IMessageProcessor;
 import com.v2soft.styxlib.handlers.TMessagesProcessor;
-import com.v2soft.styxlib.library.messages.base.StyxMessage;
+import com.v2soft.styxlib.messages.base.StyxMessage;
 import com.v2soft.styxlib.library.types.ConnectionDetails;
 import com.v2soft.styxlib.vfs.IVirtualStyxFile;
 

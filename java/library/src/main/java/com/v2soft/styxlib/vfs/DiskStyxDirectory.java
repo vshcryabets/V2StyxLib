@@ -1,12 +1,12 @@
 package com.v2soft.styxlib.vfs;
 
-import com.v2soft.styxlib.library.exceptions.StyxErrorMessageException;
-import com.v2soft.styxlib.library.io.StyxDataWriter;
-import com.v2soft.styxlib.library.messages.base.enums.FileMode;
-import com.v2soft.styxlib.library.messages.base.enums.ModeType;
-import com.v2soft.styxlib.library.messages.base.enums.QIDType;
-import com.v2soft.styxlib.library.messages.base.structs.StyxQID;
-import com.v2soft.styxlib.library.messages.base.structs.StyxStat;
+import com.v2soft.styxlib.exceptions.StyxErrorMessageException;
+import com.v2soft.styxlib.io.StyxDataWriter;
+import com.v2soft.styxlib.messages.base.enums.FileMode;
+import com.v2soft.styxlib.messages.base.enums.ModeType;
+import com.v2soft.styxlib.messages.base.enums.QIDType;
+import com.v2soft.styxlib.messages.base.structs.StyxQID;
+import com.v2soft.styxlib.messages.base.structs.StyxStat;
 import com.v2soft.styxlib.server.ClientDetails;
 import com.v2soft.styxlib.library.types.ULong;
 

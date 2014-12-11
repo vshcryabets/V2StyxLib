@@ -1,25 +1,25 @@
 package com.v2soft.styxlib;
 
-import com.v2soft.styxlib.library.exceptions.StyxErrorMessageException;
-import com.v2soft.styxlib.library.exceptions.StyxException;
-import com.v2soft.styxlib.library.io.DualStreams;
-import com.v2soft.styxlib.library.io.StyxDataInputStream;
-import com.v2soft.styxlib.library.io.StyxFileBufferedInputStream;
-import com.v2soft.styxlib.library.io.StyxUnbufferedInputStream;
-import com.v2soft.styxlib.library.io.StyxUnbufferedOutputStream;
-import com.v2soft.styxlib.library.messages.StyxROpenMessage;
-import com.v2soft.styxlib.library.messages.StyxRStatMessage;
-import com.v2soft.styxlib.library.messages.StyxRWalkMessage;
-import com.v2soft.styxlib.library.messages.StyxTCreateMessage;
-import com.v2soft.styxlib.library.messages.StyxTOpenMessage;
-import com.v2soft.styxlib.library.messages.StyxTWStatMessage;
-import com.v2soft.styxlib.library.messages.StyxTWalkMessage;
-import com.v2soft.styxlib.library.messages.base.StyxMessage;
-import com.v2soft.styxlib.library.messages.base.StyxTMessageFID;
-import com.v2soft.styxlib.library.messages.base.enums.FileMode;
-import com.v2soft.styxlib.library.messages.base.enums.MessageType;
-import com.v2soft.styxlib.library.messages.base.enums.ModeType;
-import com.v2soft.styxlib.library.messages.base.structs.StyxStat;
+import com.v2soft.styxlib.exceptions.StyxErrorMessageException;
+import com.v2soft.styxlib.exceptions.StyxException;
+import com.v2soft.styxlib.io.DualStreams;
+import com.v2soft.styxlib.io.StyxDataInputStream;
+import com.v2soft.styxlib.io.StyxFileBufferedInputStream;
+import com.v2soft.styxlib.io.StyxUnbufferedInputStream;
+import com.v2soft.styxlib.io.StyxUnbufferedOutputStream;
+import com.v2soft.styxlib.messages.StyxROpenMessage;
+import com.v2soft.styxlib.messages.StyxRStatMessage;
+import com.v2soft.styxlib.messages.StyxRWalkMessage;
+import com.v2soft.styxlib.messages.StyxTCreateMessage;
+import com.v2soft.styxlib.messages.StyxTOpenMessage;
+import com.v2soft.styxlib.messages.StyxTWStatMessage;
+import com.v2soft.styxlib.messages.StyxTWalkMessage;
+import com.v2soft.styxlib.messages.base.StyxMessage;
+import com.v2soft.styxlib.messages.base.StyxTMessageFID;
+import com.v2soft.styxlib.messages.base.enums.FileMode;
+import com.v2soft.styxlib.messages.base.enums.MessageType;
+import com.v2soft.styxlib.messages.base.enums.ModeType;
+import com.v2soft.styxlib.messages.base.structs.StyxStat;
 import com.v2soft.styxlib.server.ClientDetails;
 import com.v2soft.styxlib.server.IMessageTransmitter;
 import com.v2soft.styxlib.library.types.ULong;
@@ -77,7 +77,7 @@ public class StyxFile implements Closeable {
         if ( parent != null ) {
             mParentFID = parent.getFID();
         } else {
-            mParentFID = manager.getFID();
+            mParentFID = manager.getRootFID();
         }
     }
 
@@ -124,7 +124,6 @@ public class StyxFile implements Closeable {
 
         mMessenger.sendMessage(tOpen, mRecepient);
         StyxMessage rMessage = tOpen.waitForAnswer(mTimeout);
-        StyxErrorMessageException.doException(rMessage);
 
         StyxROpenMessage rOpen = (StyxROpenMessage) rMessage;
         return (int)rOpen.getIOUnit();
@@ -136,7 +135,15 @@ public class StyxFile implements Closeable {
             return;
         }
         try {
-            mClient.releaseFID(mFID);
+            // send Tclunk
+            final StyxTMessageFID tClunk = new StyxTMessageFID(MessageType.Tclunk, MessageType.Rclunk, mFID);
+            mMessenger.sendMessage(tClunk, mRecepient);
+            try {
+                tClunk.waitForAnswer(mTimeout);
+            } catch (Exception e) {
+                throw new IOException(e);
+            }
+
             mFID = StyxMessage.NOFID;
             mStat = null;
         } catch (Exception e) {
@@ -163,7 +170,8 @@ public class StyxFile implements Closeable {
         } catch (EOFException e) {
             // That's ok
         } finally {
-            mClient.releaseFID(tempFID);
+            // TODO ???
+//            mRecepient.getPolls().getFIDPoll().release(mFID);
         }
         close();
         return stats.toArray(new StyxStat[0]);
@@ -275,17 +283,17 @@ public class StyxFile implements Closeable {
     public OutputStream openForWrite()
             throws InterruptedException, StyxException, TimeoutException, IOException {
         checkConnection();
-        long tempFID = sendWalkMessage(getFID(), "");
-        int iounit = open(ModeType.OWRITE, tempFID);
-        return new BufferedOutputStream(new StyxUnbufferedOutputStream(tempFID, mMessenger, mRecepient), iounit);
+        long clonedFID = sendWalkMessage(getFID(), "");
+        int iounit = open(ModeType.OWRITE, clonedFID);
+        return new BufferedOutputStream(new StyxUnbufferedOutputStream(clonedFID, mMessenger, mRecepient), iounit);
     }
 
     public OutputStream openForWriteUnbuffered()
             throws InterruptedException, StyxException, TimeoutException, IOException {
         checkConnection();
-        long tempFID = sendWalkMessage(getFID(), "");
-        int iounit = open(ModeType.OWRITE, tempFID);
-        return new StyxUnbufferedOutputStream(tempFID, mMessenger, mRecepient);
+        long clonedFID = sendWalkMessage(getFID(), "");
+        int iounit = open(ModeType.OWRITE, clonedFID);
+        return new StyxUnbufferedOutputStream(clonedFID, mMessenger, mRecepient);
     }
 
 
@@ -297,11 +305,10 @@ public class StyxFile implements Closeable {
         final StyxTCreateMessage tCreate =
                 new StyxTCreateMessage(tempFID, mPath, permissions, ModeType.OREAD);
         mMessenger.sendMessage(tCreate, mRecepient);
-        final StyxMessage rMessage = tCreate.waitForAnswer(mTimeout);
-        StyxErrorMessageException.doException(rMessage);
+        tCreate.waitForAnswer(mTimeout);
 
         // close temp FID
-        mClient.releaseFID(tempFID);
+        mRecepient.getPolls().getFIDPoll().release(tempFID);
     }
 
     public static boolean exists(IClient manager, String fileName)
@@ -355,7 +362,6 @@ public class StyxFile implements Closeable {
         StyxTMessageFID tRemove = new StyxTMessageFID(MessageType.Tremove, MessageType.Rremove, fid);
         mMessenger.sendMessage(tRemove, mRecepient);
         StyxMessage rMessage = tRemove.waitForAnswer(mTimeout);
-        StyxErrorMessageException.doException(rMessage);
     }
 
     public static void delete(IClient manager, String fileName, boolean recurse)
@@ -371,7 +377,6 @@ public class StyxFile implements Closeable {
         StyxTWStatMessage tWStat = new StyxTWStatMessage(getFID(), stat);
         mMessenger.sendMessage(tWStat, mRecepient);
         StyxMessage rMessage = tWStat.waitForAnswer(mTimeout);
-        StyxErrorMessageException.doException(rMessage);
     }
 
     public void mkdir(long permissions) throws InterruptedException, StyxException, TimeoutException, IOException
@@ -382,7 +387,6 @@ public class StyxFile implements Closeable {
         StyxTCreateMessage tCreate = new StyxTCreateMessage(mParentFID, getName(), permissions, ModeType.OREAD);
         mMessenger.sendMessage(tCreate, mRecepient);
         StyxMessage rMessage = tCreate.waitForAnswer(mTimeout);
-        StyxErrorMessageException.doException(rMessage);
     }
 
     public boolean checkFileMode(FileMode mode) throws StyxException, InterruptedException, TimeoutException, IOException
@@ -517,7 +521,7 @@ public class StyxFile implements Closeable {
     // TODO this method is wrong, it should process parent fid and file name separately
     private long sendWalkMessage(long parentFID, String path)
             throws StyxException, InterruptedException, TimeoutException, IOException {
-        long newFID = mClient.allocateFID();
+        long newFID = mRecepient.getPolls().getFIDPoll().getFreeItem();
         final StyxTWalkMessage tWalk = new StyxTWalkMessage(parentFID,
                 newFID, path);
         mMessenger.sendMessage(tWalk, mRecepient);
@@ -542,7 +546,6 @@ public class StyxFile implements Closeable {
             StyxTMessageFID tStat = new StyxTMessageFID(MessageType.Tstat, MessageType.Rstat, getFID());
             mMessenger.sendMessage(tStat, mRecepient);
             StyxMessage rMessage = tStat.waitForAnswer(mTimeout);
-            StyxErrorMessageException.doException(rMessage);
             mStat = ((StyxRStatMessage) rMessage).getStat();
         }
         return mStat;

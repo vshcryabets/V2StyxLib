@@ -1,6 +1,6 @@
 package com.v2soft.styxlib.tests;
 
-import com.v2soft.styxlib.library.io.StyxByteBufferReadable;
+import com.v2soft.styxlib.io.StyxByteBufferReadable;
 
 import org.junit.After;
 import org.junit.Before;

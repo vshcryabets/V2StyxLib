@@ -1,12 +1,11 @@
 package com.v2soft.styxlib.handlers;
 
-import com.v2soft.styxlib.library.messages.base.StyxMessage;
-import com.v2soft.styxlib.library.messages.base.StyxTMessage;
-import com.v2soft.styxlib.library.messages.base.enums.MessageType;
+import com.v2soft.styxlib.messages.base.StyxMessage;
+import com.v2soft.styxlib.messages.base.StyxTMessage;
+import com.v2soft.styxlib.messages.base.enums.MessageType;
 import com.v2soft.styxlib.server.ClientDetails;
 import com.v2soft.styxlib.server.IChannelDriver;
 import com.v2soft.styxlib.server.IMessageTransmitter;
-import com.v2soft.styxlib.utils.Polls;
 
 import java.io.IOException;
 import java.net.SocketException;
@@ -21,14 +20,9 @@ public class TMessageTransmitter implements IMessageTransmitter {
     }
 
     protected int mTransmittedCount, mErrorCount;
-    protected Polls mPolls;
     protected Listener mListener;
 
-    public TMessageTransmitter(Polls polls, Listener listener) {
-        if ( polls == null ) {
-            throw new NullPointerException("polls is null");
-        }
-        mPolls = polls;
+    public TMessageTransmitter(Listener listener) {
         mListener = listener;
     }
 
@@ -47,16 +41,18 @@ public class TMessageTransmitter implements IMessageTransmitter {
             // set message tag
             int tag = StyxMessage.NOTAG;
             if (message.getType() != MessageType.Tversion) {
-                tag = mPolls.getTagPoll().getFreeItem();
+                tag = recepient.getPolls().getTagPoll().getFreeItem();
             }
             message.setTag((short) tag);
-            mPolls.getMessagesMap().put(tag, (StyxTMessage) message);
+            recepient.getPolls().getMessagesMap().put(tag, (StyxTMessage) message);
 
             driver.sendMessage(message, recepient);
             mTransmittedCount++;
             return true;
         } catch (SocketException e) {
-            mListener.onSocketDisconnected();
+            if ( mListener != null ) {
+                mListener.onSocketDisconnected();
+            }
         }
         return false;
     }

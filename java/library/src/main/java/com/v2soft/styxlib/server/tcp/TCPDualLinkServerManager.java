@@ -2,6 +2,8 @@ package com.v2soft.styxlib.server.tcp;
 
 import com.v2soft.styxlib.Connection;
 import com.v2soft.styxlib.IClient;
+import com.v2soft.styxlib.handlers.RMessagesProcessor;
+import com.v2soft.styxlib.handlers.TMessageTransmitter;
 import com.v2soft.styxlib.server.ClientDetails;
 import com.v2soft.styxlib.server.IChannelDriver;
 import com.v2soft.styxlib.vfs.IVirtualStyxFile;
@@ -18,6 +20,8 @@ import java.net.InetAddress;
 public class TCPDualLinkServerManager extends TCPServerManager {
 
     private static final String DUAL_LINK_PROTO = "9P2000_2VDL";
+    protected RMessagesProcessor mReverseAnswerProcessor;
+    protected TMessageTransmitter mReverseTransmitter;
 
     public TCPDualLinkServerManager(InetAddress address, int port, boolean ssl, IVirtualStyxFile root) throws IOException {
         super(address, port, ssl, root);
@@ -28,9 +32,14 @@ public class TCPDualLinkServerManager extends TCPServerManager {
         return DUAL_LINK_PROTO;
     }
 
-    public IClient getReverseConnectionForClient(ClientDetails clientDetails, Credentials credentials) {
-        IChannelDriver driver = clientDetails.getDriver();
-        Connection connection = new Connection(credentials, driver);
+    public synchronized  IClient getReverseConnectionForClient(ClientDetails client, Credentials credentials) {
+        if ( mReverseAnswerProcessor == null ) {
+            mReverseAnswerProcessor = new RMessagesProcessor("RC"+client.toString());
+            mReverseTransmitter = new TMessageTransmitter(null);
+        }
+        IChannelDriver driver = client.getDriver();
+        Connection connection = new Connection(credentials, driver,
+                mReverseAnswerProcessor, mReverseTransmitter, client);
         return connection;
     }
 }

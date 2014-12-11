@@ -3,8 +3,8 @@ package com.v2soft.styxlib.server.tcp;
 import com.v2soft.styxlib.ILogListener;
 import com.v2soft.styxlib.library.StyxServerManager;
 import com.v2soft.styxlib.handlers.IMessageProcessor;
-import com.v2soft.styxlib.library.io.StyxDataWriter;
-import com.v2soft.styxlib.library.messages.base.StyxMessage;
+import com.v2soft.styxlib.io.StyxDataWriter;
+import com.v2soft.styxlib.messages.base.StyxMessage;
 import com.v2soft.styxlib.server.ClientDetails;
 import com.v2soft.styxlib.server.IChannelDriver;
 

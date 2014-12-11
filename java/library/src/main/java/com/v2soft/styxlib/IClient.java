@@ -1,6 +1,6 @@
 package com.v2soft.styxlib;
 
-import com.v2soft.styxlib.library.exceptions.StyxException;
+import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.server.ClientDetails;
 import com.v2soft.styxlib.server.IChannelDriver;
 import com.v2soft.styxlib.server.IMessageTransmitter;
@@ -21,7 +21,7 @@ public interface IClient extends Closeable {
      * Restart session with server
      *
      * @throws InterruptedException
-     * @throws com.v2soft.styxlib.library.exceptions.StyxException
+     * @throws com.v2soft.styxlib.exceptions.StyxException
      * @throws java.io.IOException
      * @throws java.util.concurrent.TimeoutException
      */
@@ -31,7 +31,7 @@ public interface IClient extends Closeable {
      * Connect to server with specified parameters
      * @return true if connected
      * @throws java.io.IOException
-     * @throws com.v2soft.styxlib.library.exceptions.StyxException
+     * @throws com.v2soft.styxlib.exceptions.StyxException
      * @throws java.util.concurrent.TimeoutException
      */
     public boolean connect(IChannelDriver driver)
@@ -41,7 +41,7 @@ public interface IClient extends Closeable {
      * @param credentials user credentials
      * @return true if connected
      * @throws java.io.IOException
-     * @throws com.v2soft.styxlib.library.exceptions.StyxException
+     * @throws com.v2soft.styxlib.exceptions.StyxException
      * @throws java.util.concurrent.TimeoutException
      */
     public boolean connect(IChannelDriver driver, Credentials credentials)
@@ -50,7 +50,7 @@ public interface IClient extends Closeable {
      * Connect to server.
      * @return true if connected
      * @throws java.io.IOException
-     * @throws com.v2soft.styxlib.library.exceptions.StyxException
+     * @throws com.v2soft.styxlib.exceptions.StyxException
      * @throws java.util.concurrent.TimeoutException
      */
     public boolean connect()
@@ -65,19 +65,7 @@ public interface IClient extends Closeable {
      *
      * @return FID of root folder
      */
-    long getFID();
-    /**
-     * Send TClunk message (release FID)
-     * @param fid
-     * @throws InterruptedException
-     * @throws StyxException
-     * @throws TimeoutException
-     * @throws IOException
-     */
-    void releaseFID(long fid)
-            throws InterruptedException, StyxException, TimeoutException, IOException;
-
-    long allocateFID();
+    long getRootFID();
 
     ConnectionDetails getConnectionDetails();
 

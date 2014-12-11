@@ -1,9 +1,9 @@
 package com.v2soft.styxlib.server;
 
-import com.v2soft.styxlib.library.exceptions.StyxErrorMessageException;
+import com.v2soft.styxlib.exceptions.StyxErrorMessageException;
+import com.v2soft.styxlib.utils.Polls;
 import com.v2soft.styxlib.vfs.IVirtualStyxFile;
 
-import java.io.FileNotFoundException;
 import java.util.HashMap;
 
 /**
@@ -15,12 +15,28 @@ public abstract class ClientDetails {
     protected HashMap<Long, IVirtualStyxFile> mAssignedFiles;
     protected IChannelDriver mDriver;
     protected int mId;
+    protected Polls mPolls;
 
     public ClientDetails(IChannelDriver driver, int id) {
         if ( driver == null ) throw new NullPointerException("Driver is null");
         mAssignedFiles = new HashMap<Long, IVirtualStyxFile>();
         mDriver = driver;
         mId = id;
+    }
+
+    /**
+     * Get polls assigned to this client.
+     * @return polls assigned to this client.
+     */
+    public Polls getPolls() {
+        if ( mPolls == null ) {
+            synchronized (this) {
+                if (mPolls == null) {
+                    mPolls = new Polls();
+                }
+            }
+        }
+        return mPolls;
     }
 
     public IVirtualStyxFile getAssignedFile(long fid) throws StyxErrorMessageException {

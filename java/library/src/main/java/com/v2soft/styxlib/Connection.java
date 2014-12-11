@@ -2,24 +2,22 @@ package com.v2soft.styxlib;
 
 import com.v2soft.styxlib.handlers.RMessagesProcessor;
 import com.v2soft.styxlib.handlers.TMessageTransmitter;
-import com.v2soft.styxlib.library.exceptions.StyxErrorMessageException;
-import com.v2soft.styxlib.library.exceptions.StyxException;
-import com.v2soft.styxlib.library.messages.StyxRAttachMessage;
-import com.v2soft.styxlib.library.messages.StyxRAuthMessage;
-import com.v2soft.styxlib.library.messages.StyxRVersionMessage;
-import com.v2soft.styxlib.library.messages.StyxTAttachMessage;
-import com.v2soft.styxlib.library.messages.StyxTAuthMessage;
-import com.v2soft.styxlib.library.messages.StyxTVersionMessage;
-import com.v2soft.styxlib.library.messages.base.StyxMessage;
-import com.v2soft.styxlib.library.messages.base.StyxTMessageFID;
-import com.v2soft.styxlib.library.messages.base.enums.MessageType;
-import com.v2soft.styxlib.library.messages.base.structs.StyxQID;
+import com.v2soft.styxlib.exceptions.StyxException;
+import com.v2soft.styxlib.messages.StyxRAttachMessage;
+import com.v2soft.styxlib.messages.StyxRAuthMessage;
+import com.v2soft.styxlib.messages.StyxRVersionMessage;
+import com.v2soft.styxlib.messages.StyxTAttachMessage;
+import com.v2soft.styxlib.messages.StyxTAuthMessage;
+import com.v2soft.styxlib.messages.StyxTVersionMessage;
+import com.v2soft.styxlib.messages.base.StyxMessage;
+import com.v2soft.styxlib.messages.base.StyxTMessageFID;
+import com.v2soft.styxlib.messages.base.enums.MessageType;
+import com.v2soft.styxlib.messages.base.structs.StyxQID;
 import com.v2soft.styxlib.server.ClientDetails;
 import com.v2soft.styxlib.server.IChannelDriver;
 import com.v2soft.styxlib.server.IMessageTransmitter;
 import com.v2soft.styxlib.library.types.ConnectionDetails;
 import com.v2soft.styxlib.library.types.Credentials;
-import com.v2soft.styxlib.utils.Polls;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -47,7 +45,7 @@ public class Connection
     private int mTimeout = DEFAULT_TIMEOUT;
     private boolean mNeedAuth;
     private boolean isConnected, isAttached;
-    private IMessageTransmitter mTransmitter;
+    private TMessageTransmitter mTransmitter;
     private long mAuthFID = StyxMessage.NOFID;
     private StyxQID mAuthQID;
     private StyxQID mQID;
@@ -59,29 +57,33 @@ public class Connection
     protected RMessagesProcessor mAnswerProcessor;
     protected boolean isAutoStartDriver = false;
     protected boolean shouldCloseAnswerProcessor = false;
-    protected Polls mPolls;
+    protected boolean shouldCloseTransmitter = false;
 
     public Connection() {
         this(new Credentials(null, null));
     }
 
     public Connection(Credentials credentials) {
-        mDetails = new ConnectionDetails(getProtocol(), getIOBufSize());
-        mCredentials = credentials;
-        isConnected = false;
-        mDriver = null;
+        this(credentials, null);
     }
 
     public Connection(Credentials credentials, IChannelDriver driver) {
-        if (driver == null) {
-            throw new NullPointerException("Driver is null");
-        }
+        this(credentials, driver, null, null, null);
+    }
+
+    public Connection(Credentials credentials,
+                      IChannelDriver driver,
+                      RMessagesProcessor answerProcessor,
+                      TMessageTransmitter transmitter,
+                      ClientDetails recepient) {
+        mTransmitter = transmitter;
+        mRecepient = recepient;
+        mAnswerProcessor = answerProcessor;
         mDriver = driver;
         mDetails = new ConnectionDetails(getProtocol(), getIOBufSize());
         mCredentials = credentials;
         isConnected = false;
     }
-
     /**
      * Connect to server with specified parameters
      *
@@ -94,17 +96,26 @@ public class Connection
      */
     public boolean connect(IChannelDriver driver, Credentials credentials)
             throws IOException, StyxException, InterruptedException, TimeoutException {
-        mPolls = new Polls();
-        RMessagesProcessor answerProcessor = new RMessagesProcessor("RH"+driver.toString(), mPolls);
-        shouldCloseAnswerProcessor = true;
-        TMessageTransmitter transmitter = new TMessageTransmitter(mPolls, mTransmitterListener);
+        if ( mAnswerProcessor == null ) {
+            mAnswerProcessor = new RMessagesProcessor("RH" + driver.toString());
+            shouldCloseAnswerProcessor = true;
+        }
+        if ( mTransmitter == null ) {
+            mTransmitter = new TMessageTransmitter(mTransmitterListener);
+            shouldCloseTransmitter = true;
+        }
 
         if (!driver.isStarted()) {
             driver.start(getIOBufSize());
             isAutoStartDriver = true;
         }
 
-        return this.connect(driver, credentials, answerProcessor, transmitter, driver.getClients().iterator().next());
+        if (mRecepient == null) {
+            // get first client from driver
+            mRecepient = driver.getClients().iterator().next();
+        }
+
+        return this.connect(driver, credentials, mAnswerProcessor, mTransmitter, mRecepient);
     }
 
     /**
@@ -210,7 +221,7 @@ public class Connection
         return mNeedAuth;
     }
 
-    public long getFID() {
+    public long getRootFID() {
         return mFID;
     }
 
@@ -226,17 +237,6 @@ public class Connection
         return mAuthQID;
     }
 
-    public void releaseFID(long fid)
-            throws InterruptedException, StyxException, TimeoutException, IOException {
-        final StyxTMessageFID tClunk = new StyxTMessageFID(MessageType.Tclunk, MessageType.Rclunk, fid);
-        mTransmitter.sendMessage(tClunk, mRecepient);
-    }
-
-    @Override
-    public long allocateFID() {
-        return mPolls.getFIDPoll().getFreeItem();
-    }
-
     @Override
     public ConnectionDetails getConnectionDetails() {
         return mDetails;
@@ -247,7 +247,8 @@ public class Connection
         // release attached FID
         if (mFID != StyxMessage.NOFID) {
             try {
-                releaseFID(mFID);
+                final StyxTMessageFID tClunk = new StyxTMessageFID(MessageType.Tclunk, MessageType.Rclunk, mFID);
+                mTransmitter.sendMessage(tClunk, mRecepient);
             } catch (Exception e) {
                 throw new IOException(e);
             }
@@ -258,13 +259,11 @@ public class Connection
         mTransmitter.sendMessage(tVersion, mRecepient);
 
         StyxMessage rMessage = tVersion.waitForAnswer(mTimeout);
-        StyxErrorMessageException.doException(rMessage);
         StyxRVersionMessage rVersion = (StyxRVersionMessage) rMessage;
         if (rVersion.getMaxPacketSize() < mDetails.getIOUnit()) {
             mDetails = new ConnectionDetails(getProtocol(), (int) rVersion.getMaxPacketSize());
         }
-        // TODO we can't do that because at server we can have multiple fids from different clients.
-//        mActiveFids.clean();
+        mRecepient.getPolls().getFIDPoll().clean();
         if (isNeedAuth()) {
             sendAuthMessage();
         } else {
@@ -274,7 +273,7 @@ public class Connection
 
     private void sendAuthMessage()
             throws InterruptedException, StyxException, IOException, TimeoutException {
-        mAuthFID = allocateFID();
+        mAuthFID = mRecepient.getPolls().getFIDPoll().getFreeItem();
 
         StyxTAuthMessage tAuth = new StyxTAuthMessage(mAuthFID);
         tAuth.setUserName(getCredentials().getUserName());
@@ -282,7 +281,6 @@ public class Connection
         mTransmitter.sendMessage(tAuth, mRecepient);
 
         StyxMessage rMessage = tAuth.waitForAnswer(mTimeout);
-        StyxErrorMessageException.doException(rMessage);
         StyxRAuthMessage rAuth = (StyxRAuthMessage) rMessage;
         mAuthQID = rAuth.getQID();
 
@@ -297,14 +295,13 @@ public class Connection
 
     private void sendAttachMessage()
             throws InterruptedException, StyxException, TimeoutException, IOException {
-        mFID = allocateFID();
-        StyxTAttachMessage tAttach = new StyxTAttachMessage(getFID(), getAuthFID(),
+        mFID = mRecepient.getPolls().getFIDPoll().getFreeItem();
+        StyxTAttachMessage tAttach = new StyxTAttachMessage(getRootFID(), getAuthFID(),
                 getCredentials().getUserName(),
                 getMountPoint());
         mTransmitter.sendMessage(tAttach, mRecepient);
 
         StyxMessage rMessage = tAttach.waitForAnswer(mTimeout);
-        StyxErrorMessageException.doException(rMessage);
         StyxRAttachMessage rAttach = (StyxRAttachMessage) rMessage;
         mQID = rAttach.getQID();
         setAttached(true);

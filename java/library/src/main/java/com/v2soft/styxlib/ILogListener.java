@@ -1,6 +1,6 @@
 package com.v2soft.styxlib;
 
-import com.v2soft.styxlib.library.messages.base.StyxMessage;
+import com.v2soft.styxlib.messages.base.StyxMessage;
 import com.v2soft.styxlib.server.ClientDetails;
 import com.v2soft.styxlib.server.IChannelDriver;
 

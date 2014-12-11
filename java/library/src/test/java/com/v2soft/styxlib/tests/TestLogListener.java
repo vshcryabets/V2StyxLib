@@ -1,7 +1,7 @@
 package com.v2soft.styxlib.tests;
 
 import com.v2soft.styxlib.ILogListener;
-import com.v2soft.styxlib.library.messages.base.StyxMessage;
+import com.v2soft.styxlib.messages.base.StyxMessage;
 import com.v2soft.styxlib.server.ClientDetails;
 import com.v2soft.styxlib.server.IChannelDriver;
 
@@ -28,11 +28,10 @@ public class TestLogListener implements ILogListener {
     @Override
     public void onMessageTransmited(IChannelDriver driver, ClientDetails clientDetails, StyxMessage message) {
         long time = System.currentTimeMillis();
-        System.out.println(String.format("%d %s SENT %s client %s message %s %d", time, mPrefix,
+        System.out.println(String.format("%d %s SENT %s client %s message %s", time, mPrefix,
                 driver.toString(),
                 clientDetails.toString(),
-                message.getType().toString(),
-                message.getTag()));
+                message.toString()));
     }
 
     @Override

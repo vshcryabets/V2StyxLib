@@ -1,6 +1,6 @@
 package com.v2soft.styxlib.tests;
 
-import com.v2soft.styxlib.library.exceptions.StyxErrorMessageException;
+import com.v2soft.styxlib.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.server.ClientDetails;
 import com.v2soft.styxlib.vfs.MemoryStyxFile;
 import com.v2soft.styxlib.library.types.ULong;

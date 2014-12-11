@@ -1,6 +1,6 @@
 package com.v2soft.styxlib.utils;
 
-import com.v2soft.styxlib.library.messages.base.StyxMessage;
+import com.v2soft.styxlib.messages.base.StyxMessage;
 
 /**
  * @author V.Shcryabets <a>vshcryabets@gmail.com</a>
