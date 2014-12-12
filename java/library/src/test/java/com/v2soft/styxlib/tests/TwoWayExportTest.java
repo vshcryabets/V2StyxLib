@@ -28,6 +28,8 @@ import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -162,6 +164,7 @@ public class TwoWayExportTest {
     public void testChat() throws IOException, InterruptedException, TimeoutException, StyxException {
         int count = 5;
         final AtomicInteger syncObject = new AtomicInteger(0);
+//        mServer.getDrivers().get(0).setLogListener(new TestLogListener("\tSRV"));
 
         String messages[] = new String[count];
         ConnectionWithExport clients[] = new ConnectionWithExport[count];
@@ -171,35 +174,7 @@ public class TwoWayExportTest {
         final OutputStream outputs[] = new OutputStream[count];
 
         // prepare server chat file
-        MemoryStyxFile chatServer = new MemoryStyxFile("chat") {
-            @Override
-            public int write(ClientDetails clientDetails, final byte[] data, ULong offset) throws StyxErrorMessageException {
-//                new Thread(new Runnable() {
-//                    @Override
-//                    public void run() {
-                        String message = new String(data, mCharset);
-                        System.out.println(String.format("%d SERVER GOT %s", System.currentTimeMillis(), message));
-                        // sent this message to other clients
-                        for (OutputStream out : outputs) {
-                            try {
-                                out.write(data);
-                            } catch (IOException e) {
-                                assertTrue(e.toString(), false);
-                                System.out.println("ERR " + System.currentTimeMillis());
-                                e.printStackTrace();
-                            }
-                        }
-                        System.out.println(System.currentTimeMillis()+" END NOTIFY");
-                        try {
-                            Thread.sleep(10);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-//                    }
-//                }).start();
-                return data.length;
-            }
-        };
+        MemoryStyxFile chatServer = new ChatServerFile(outputs);
         ((MemoryStyxDirectory)mServer.getRoot()).addFile(chatServer);
 
         // prepare messages
@@ -244,17 +219,15 @@ public class TwoWayExportTest {
         }
         assertTrue(syncObject.get() >= 100);
 
+        chatServer.release();
+
         // close server connections
         pos = 0;
-//        mServer.getDrivers().get(0).setLogListener(new TestLogListener("\tSRV"));
         for (ClientDetails details : clientDetails) {
             System.out.printf("Trying to disconnect from %s\n", details.toString());
             IClient reverseConnection = reverseFiles[pos].getIClient();
-            System.out.printf("Close output stream\n");
             outputs[pos].close();
-            System.out.printf("Close file\n");
             reverseFiles[pos].close();
-            System.out.printf("Close connection\n");
             reverseConnection.close();
             pos++;
         }
@@ -267,6 +240,72 @@ public class TwoWayExportTest {
         clientDetails = drivers.get(0).getClients();
         assertNotNull(clientDetails);
         assertEquals(0, clientDetails.size());
+    }
+
+    private class ChatServerFile extends MemoryStyxFile {
+        final OutputStream mOutputs[];
+        protected LinkedBlockingQueue<String> mQueue;
+        protected Thread mWorker;
+        protected boolean isWorking;
+
+        public ChatServerFile(OutputStream[] outputs) {
+            super("chat");
+            mOutputs = outputs;
+            mQueue = new LinkedBlockingQueue<String>();
+            mWorker = new Thread(mRunnable);
+            mWorker.start();
+        }
+
+        @Override
+        public int write(ClientDetails clientDetails, final byte[] data, ULong offset) throws StyxErrorMessageException {
+            String message = new String(data, mCharset);
+            System.out.println(String.format("%d SERVER GOT %s", System.currentTimeMillis(), message));
+            mQueue.offer(message);
+            return data.length;
+        }
+
+        private final Runnable mRunnable = new Runnable() {
+            @Override
+            public void run() {
+                isWorking = true;
+                while (isWorking) {
+                    try {
+                        String value = mQueue.poll(10, TimeUnit.SECONDS);
+                        if ( value == null ) {
+                            continue;
+                        }
+                        // sent this message to other clients
+                        for (OutputStream out : mOutputs) {
+                            try {
+                                out.write(value.getBytes(mCharset));
+                            } catch (IOException e) {
+                                System.err.println("ERR " + System.currentTimeMillis());
+                                e.printStackTrace();
+                                assertTrue(e.toString(), false);
+                            }
+                        }
+                        System.out.println(System.currentTimeMillis() + " END NOTIFY");
+                    } catch (InterruptedException e) {
+                        break;
+                    }
+                }
+            }
+        };
+
+        @Override
+        public void release() throws IOException {
+            super.release();
+            if ( mWorker != null ) {
+                isWorking = false;
+                try {
+                    mWorker.join(3000);
+                } catch (InterruptedException e) {
+                    throw new IOException(e);
+                }
+                mWorker.interrupt();
+                mWorker = null;
+            }
+        }
     }
 
     private class ChatStyxFile extends MemoryStyxFile {
