@@ -43,7 +43,6 @@ public class Connection
     protected Credentials mCredentials;
     private String mMountPoint;
     private int mTimeout = DEFAULT_TIMEOUT;
-    private boolean mNeedAuth;
     private boolean isConnected, isAttached;
     private TMessageTransmitter mTransmitter;
     private long mAuthFID = StyxMessage.NOFID;
@@ -158,8 +157,6 @@ public class Connection
         }
         mCredentials = credentials;
         mMountPoint = "/";
-        mNeedAuth = ( mCredentials != null );
-
         sendVersionMessage();
         isConnected = driver.isConnected();
 
@@ -217,10 +214,6 @@ public class Connection
         return mMountPoint;
     }
 
-    public boolean isNeedAuth() {
-        return mNeedAuth;
-    }
-
     public long getRootFID() {
         return mFID;
     }
@@ -264,7 +257,7 @@ public class Connection
             mDetails = new ConnectionDetails(getProtocol(), (int) rVersion.getMaxPacketSize());
         }
         mRecepient.getPolls().getFIDPoll().clean();
-        if (isNeedAuth()) {
+        if ((mCredentials.getUserName() != null) && (mCredentials.getPassword() != null)) {
             sendAuthMessage();
         } else {
             sendAttachMessage();

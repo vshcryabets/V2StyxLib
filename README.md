@@ -20,9 +20,9 @@ public class JavaServerSample {
 
     public static void main(String[] args) throws IOException, StyxException, InterruptedException, TimeoutException {
         MemoryStyxFile md5 = new MemoryStyxFile(FILE_NAME){
-            protected HashMap<ClientState, MessageDigest> mClientsMap = new HashMap<ClientState, MessageDigest>();
+            protected HashMap<ClientDetails, MessageDigest> mClientsMap = new HashMap<ClientDetails, MessageDigest>();
             @Override
-            public boolean open(ClientState client, int mode)
+            public boolean open(ClientDetails client, int mode)
                     throws IOException {
                 try {
                     MessageDigest md = MessageDigest.getInstance("MD5");
@@ -33,12 +33,12 @@ public class JavaServerSample {
                 return super.open(client, mode);
             }
             @Override
-            public void close(ClientState client) {
+            public void close(ClientDetails client) {
                 mClientsMap.remove(client);
                 super.close(client);
             }
             @Override
-            public int write(ClientState client, byte[] data, ULong offset)
+            public int write(ClientDetails client, byte[] data, ULong offset)
                     throws StyxErrorMessageException {
                 if ( mClientsMap.containsKey(client) ) {
                     mClientsMap.get(client).update(data, 0, data.length);
@@ -46,7 +46,7 @@ public class JavaServerSample {
                 return super.write(client, data, offset);
             }
             @Override
-            public long read(ClientState client, byte[] outbuffer, ULong offset, long count)
+            public long read(ClientDetails client, byte[] outbuffer, ULong offset, long count)
                     throws StyxErrorMessageException {
                 if ( mClientsMap.containsKey(client) ) {
                     byte[] digest = mClientsMap.get(client).digest();
@@ -66,18 +66,21 @@ public class JavaServerSample {
                 PORT,
                 false,
                 root);
-        mServer.start().join();
+        Thread[] threads = mServer.start();
+        for(Thread thread : threads) {
+            thread.join();
+        }
     }
 }
 ```
 
 Java client sample:
 ```java
-        StyxClientConnection mConnection = new StyxClientConnection();
+        IClient connection = new Connection();
         IChannelDriver driver = new TCPClientChannelDriver(
-            InetAddress.getByName("localhost"), PORT, false);
-        mConnection.connect(driver);
-        final StyxFile newFile = new StyxFile(mConnection, FILE_NAME);
+                InetAddress.getByName("127.0.0.1"), PORT, false);
+	connection.connect(driver)
+        final StyxFile newFile = new StyxFile(connection, FILE_NAME);
         OutputStream output = newFile.openForWrite();
         InputStream input = newFile.openForRead();
         output.write(someData);
@@ -86,5 +89,5 @@ Java client sample:
         int read = input.read(remoteHash);
         output.close();
         input.close();
-        mConnection.close();
+        connection.close();
 ```

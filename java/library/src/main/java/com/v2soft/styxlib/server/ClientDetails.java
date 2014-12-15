@@ -70,6 +70,10 @@ public abstract class ClientDetails {
 
     @Override
     public String toString() {
-        return String.format("%d", mId);
+        if ( mDriver != null ) {
+            return String.format("%d:%s", mId, mDriver.toString());
+        } else {
+            return String.format("%d", mId);
+        }
     }
 }
