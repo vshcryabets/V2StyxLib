@@ -22,6 +22,15 @@ public class ConnectionWithExport extends Connection {
     protected IVirtualStyxFile mExportedRoot = null;
     protected TMessagesProcessor mExportProcessor;
 
+
+    public ConnectionWithExport(Credentials credentials, IChannelDriver driver) {
+        super(credentials, driver);
+    }
+
+    public ConnectionWithExport() {
+        super();
+    }
+
     @Override
     public String getProtocol() {
         return TCPDualLinkServerManager.PROTOCOL;

@@ -241,7 +241,7 @@ public class StyxFile implements Closeable {
 
     /**
      * Open input stream to this file.
-     * @return
+     * @return input stream
      * @throws InterruptedException
      * @throws StyxException
      * @throws TimeoutException

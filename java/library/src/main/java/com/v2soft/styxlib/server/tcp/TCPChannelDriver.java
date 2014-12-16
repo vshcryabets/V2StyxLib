@@ -100,10 +100,9 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
 
     /**
      * Read data from assigned SocketChannel
-     * @return
      * @throws IOException
      */
-    public boolean readSocket(TCPClientDetails client) throws IOException {
+    protected boolean readSocket(TCPClientDetails client) throws IOException {
         int read = 0;
         try {
             read = client.getInputBuffer().readFromChannel(client.getChannel());

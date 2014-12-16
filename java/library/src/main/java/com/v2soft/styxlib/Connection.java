@@ -180,7 +180,7 @@ public class Connection
     /**
      * Connect to server with specified parameters
      *
-     * @return
+     * @return true if connection was success
      * @throws IOException
      * @throws StyxException
      * @throws InterruptedException
