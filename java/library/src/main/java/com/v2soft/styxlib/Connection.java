@@ -343,7 +343,7 @@ public class Connection
     }
 
     public boolean isConnected() {
-        return isConnected;
+        return mDriver.isConnected();
     }
 
     private TMessageTransmitter.Listener mTransmitterListener = new TMessageTransmitter.Listener() {

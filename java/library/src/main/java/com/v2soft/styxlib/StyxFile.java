@@ -155,7 +155,7 @@ public class StyxFile implements Closeable {
     {
         if (!isDirectory())
             return new StyxStat[0];
-        long tempFID = sendWalkMessage(getFID(), "");
+        long tempFID = getCloneFID();
         int iounit = open(ModeType.OREAD, tempFID);
         InputStream is = null;
         ArrayList<StyxStat> stats = new ArrayList<StyxStat>();
@@ -175,6 +175,10 @@ public class StyxFile implements Closeable {
         }
         close();
         return stats.toArray(new StyxStat[0]);
+    }
+
+    public long getCloneFID() throws InterruptedException, StyxException, TimeoutException, IOException {
+        return sendWalkMessage(getFID(), "");
     }
 
     public String[] list() throws StyxException, InterruptedException, TimeoutException, IOException
@@ -250,7 +254,7 @@ public class StyxFile implements Closeable {
     public StyxFileBufferedInputStream openForRead()
             throws InterruptedException, StyxException, TimeoutException, IOException {
         checkConnection();
-        long tempFID = sendWalkMessage(getFID(), "");
+        long tempFID = getCloneFID();
         int iounit = open(ModeType.OREAD, tempFID);
         return new StyxFileBufferedInputStream(mMessenger, tempFID, iounit, mRecepient);
     }
@@ -263,11 +267,11 @@ public class StyxFile implements Closeable {
 
     /**
      * Get unbuffered input stream to this file.
-     * @return
+     * @return unbuffered input stream
      */
     public InputStream openForReadUnbuffered() throws IOException, InterruptedException, TimeoutException, StyxException {
         checkConnection();
-        long tempFID = sendWalkMessage(getFID(), "");
+        long tempFID = getCloneFID();
         int iounit = open(ModeType.OREAD, tempFID);
         return new StyxUnbufferedInputStream(tempFID, mMessenger, iounit, mRecepient);
     }
@@ -283,7 +287,7 @@ public class StyxFile implements Closeable {
     public OutputStream openForWrite()
             throws InterruptedException, StyxException, TimeoutException, IOException {
         checkConnection();
-        long clonedFID = sendWalkMessage(getFID(), "");
+        long clonedFID = getCloneFID();
         int iounit = open(ModeType.OWRITE, clonedFID);
         return new BufferedOutputStream(new StyxUnbufferedOutputStream(clonedFID, mMessenger, mRecepient), iounit);
     }
@@ -291,7 +295,7 @@ public class StyxFile implements Closeable {
     public OutputStream openForWriteUnbuffered()
             throws InterruptedException, StyxException, TimeoutException, IOException {
         checkConnection();
-        long clonedFID = sendWalkMessage(getFID(), "");
+        long clonedFID = getCloneFID();
         int iounit = open(ModeType.OWRITE, clonedFID);
         return new StyxUnbufferedOutputStream(clonedFID, mMessenger, mRecepient);
     }
@@ -534,7 +538,7 @@ public class StyxFile implements Closeable {
 
     /**
      * Return stat info of this file
-     * @return
+     * @return return stat structure of the current file.
      * @throws StyxException
      * @throws InterruptedException
      * @throws TimeoutException

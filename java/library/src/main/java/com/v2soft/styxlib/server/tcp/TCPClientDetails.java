@@ -54,4 +54,9 @@ public class TCPClientDetails extends ClientDetails {
             return super.toString();
         }
     }
+
+    public void disconnect() throws IOException {
+        mChannel.close();
+        mChannel = null;
+    }
 }

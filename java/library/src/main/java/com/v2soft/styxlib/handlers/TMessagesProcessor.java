@@ -1,6 +1,7 @@
 package com.v2soft.styxlib.handlers;
 
 import com.v2soft.styxlib.exceptions.StyxErrorMessageException;
+import com.v2soft.styxlib.library.types.Credentials;
 import com.v2soft.styxlib.messages.StyxRAttachMessage;
 import com.v2soft.styxlib.messages.StyxRAuthMessage;
 import com.v2soft.styxlib.messages.StyxRErrorMessage;
@@ -139,6 +140,8 @@ public class TMessagesProcessor extends QueueMessagesProcessor implements IMessa
     }
 
     private StyxRAttachMessage processAttach(ClientDetails clientDetails, StyxTAttachMessage msg) {
+        Credentials credentials = new Credentials(msg.getUserName(), null);
+        clientDetails.setCredentials(credentials);
         String mountPoint = msg.getMountPoint();
         IVirtualStyxFile root = mRoot; // TODO .getDirectory(mountPoint); there should be some logic with mountPoint?
         StyxRAttachMessage answer = new StyxRAttachMessage(msg.getTag(), root.getQID());
@@ -147,6 +150,8 @@ public class TMessagesProcessor extends QueueMessagesProcessor implements IMessa
     }
 
     private StyxMessage processAuth(ClientDetails clientDetails, StyxTAuthMessage msg) {
+        Credentials credentials = new Credentials(msg.getUserName(), null);
+        clientDetails.setCredentials(credentials);
         // TODO handle auth packet
         return new StyxRAuthMessage(msg.getTag(), StyxQID.EMPTY);
     }

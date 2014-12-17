@@ -19,21 +19,21 @@ import java.io.OutputStream;
  *
  */
 public class StyxUnbufferedOutputStream extends OutputStream {
-    private long mTimeout = Connection.DEFAULT_TIMEOUT;
-    private byte[] mSingleByteArray = new byte[1];
-    private long mFID;
-    private IMessageTransmitter mMessenger;
-    private ULong mFileOffset = ULong.ZERO;
-    protected ClientDetails mRecepient;
+    protected long mTimeout = Connection.DEFAULT_TIMEOUT;
+    protected byte[] mSingleByteArray = new byte[1];
+    protected long mFID;
+    protected IMessageTransmitter mMessenger;
+    protected ULong mFileOffset = ULong.ZERO;
+    protected ClientDetails mRecipient;
 
     public StyxUnbufferedOutputStream(long fid, IMessageTransmitter messenger, ClientDetails recepient) {
         if ( messenger == null ) {
-            throw new NullPointerException("messnger is null");
+            throw new NullPointerException("messenger is null");
         }
         if ( recepient == null ) {
-            throw new NullPointerException("recepient is null");
+            throw new NullPointerException("recipient is null");
         }
-        mRecepient = recepient;
+        mRecipient = recepient;
         mFID = fid;
         mMessenger = messenger;
     }
@@ -47,7 +47,7 @@ public class StyxUnbufferedOutputStream extends OutputStream {
         try {
             final StyxTWriteMessage tWrite =
                     new StyxTWriteMessage(mFID, mFileOffset, data, dataOffset, dataLength);
-            mMessenger.sendMessage(tWrite, mRecepient);
+            mMessenger.sendMessage(tWrite, mRecipient);
             final StyxMessage rMessage = tWrite.waitForAnswer(mTimeout);
             final StyxRWriteMessage rWrite = (StyxRWriteMessage) rMessage;
             mFileOffset = mFileOffset.add(rWrite.getCount());
@@ -73,7 +73,7 @@ public class StyxUnbufferedOutputStream extends OutputStream {
         super.close();
         // send Tclunk
         final StyxTMessageFID tClunk = new StyxTMessageFID(MessageType.Tclunk, MessageType.Rclunk, mFID);
-        mMessenger.sendMessage(tClunk, mRecepient);
+        mMessenger.sendMessage(tClunk, mRecipient);
         try {
             tClunk.waitForAnswer(mTimeout);
         } catch (Exception e) {

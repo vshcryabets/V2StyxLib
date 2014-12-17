@@ -85,6 +85,7 @@ public class ClientServerTest {
         streams.output.flush();
         int read = streams.input.read(remoteHash);
         streams.close();
+        newFile.close();
         assertEquals("Wrong remote hash size", 16, read);
         assertArrayEquals("Wrong remote hash", localHash, remoteHash);
     }

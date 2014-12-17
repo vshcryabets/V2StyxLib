@@ -1,6 +1,7 @@
 package com.v2soft.styxlib.server;
 
 import com.v2soft.styxlib.exceptions.StyxErrorMessageException;
+import com.v2soft.styxlib.library.types.Credentials;
 import com.v2soft.styxlib.utils.Polls;
 import com.v2soft.styxlib.vfs.IVirtualStyxFile;
 
@@ -16,6 +17,7 @@ public abstract class ClientDetails {
     protected IChannelDriver mDriver;
     protected int mId;
     protected Polls mPolls;
+    protected Credentials mCredentials;
 
     public ClientDetails(IChannelDriver driver, int id) {
         if ( driver == null ) throw new NullPointerException("Driver is null");
@@ -24,6 +26,13 @@ public abstract class ClientDetails {
         mId = id;
     }
 
+    public void setCredentials(Credentials credential) {
+        mCredentials = credential;
+    }
+
+    public Credentials getCredentials() {
+        return mCredentials;
+    }
     /**
      * Get polls assigned to this client.
      * @return polls assigned to this client.

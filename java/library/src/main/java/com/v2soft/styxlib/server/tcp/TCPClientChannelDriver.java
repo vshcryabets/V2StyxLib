@@ -22,8 +22,8 @@ import java.util.Set;
  */
 public class TCPClientChannelDriver extends TCPChannelDriver {
     public static final int PSEUDO_CLIENT_ID = 1;
+    protected TCPClientDetails mServerClientDetails;
     protected SocketChannel mChanel;
-    protected ClientDetails mServerClientDetails;
 
     public TCPClientChannelDriver(InetAddress address, int port, boolean ssl) throws IOException {
         super(address, port, ssl);
@@ -45,7 +45,10 @@ public class TCPClientChannelDriver extends TCPChannelDriver {
 
     @Override
     public boolean isConnected() {
-        return mChanel.isOpen();
+        if ( mServerClientDetails.getChannel() == null ) {
+            return false;
+        }
+        return mServerClientDetails.getChannel().isOpen();
     }
 
     @Override
@@ -54,11 +57,11 @@ public class TCPClientChannelDriver extends TCPChannelDriver {
     }
 
     @Override
-    public boolean sendMessage(StyxMessage message, ClientDetails recepient) {
-        if ( !recepient.equals(mServerClientDetails)) {
-            throw new IllegalArgumentException("Wrong recepient");
+    public boolean sendMessage(StyxMessage message, ClientDetails recipient) {
+        if ( !recipient.equals(mServerClientDetails)) {
+            throw new IllegalArgumentException("Wrong recipient");
         }
-        return super.sendMessage(message, recepient);
+        return super.sendMessage(message, recipient);
     }
 
     @Override
@@ -71,7 +74,7 @@ public class TCPClientChannelDriver extends TCPChannelDriver {
                 if (Thread.interrupted()) break;
                 // read from socket
                 try {
-                    int readed = buffer.readFromChannel(mChanel);
+                    int readed = buffer.readFromChannel(mServerClientDetails.getChannel());
                     if ( readed > 0 ) {
                         // loop unitl we have unprocessed packets in the input buffer
                         while ( buffer.remainsToRead() > 4 ) {
@@ -99,7 +102,7 @@ public class TCPClientChannelDriver extends TCPChannelDriver {
                 }
                 catch (SocketTimeoutException e) {
                     // Nothing to read
-                    //                    e.printStackTrace();
+                                        e.printStackTrace();
                 } catch (ClosedByInterruptException e) {
                     // finish
                     break;
@@ -109,7 +112,7 @@ public class TCPClientChannelDriver extends TCPChannelDriver {
                 e.printStackTrace();
             } finally {
             try {
-                mChanel.close();
+                mServerClientDetails.disconnect();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -132,6 +135,7 @@ public class TCPClientChannelDriver extends TCPChannelDriver {
 
     @Override
     public String toString() {
-        return String.format("%s:%s", getClass().getSimpleName(), mChanel.socket().getLocalAddress().toString());
+        return String.format("%s:%s", getClass().getSimpleName(),
+                mChanel.socket().getLocalAddress().toString());
     }
 }

@@ -62,18 +62,19 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
     }
 
     @Override
-    public boolean sendMessage(StyxMessage message, ClientDetails recepient) {
-        if ( recepient == null ) {
+    public boolean sendMessage(StyxMessage message, ClientDetails recipient) {
+        if ( recipient == null ) {
             throw new NullPointerException("Client can't be null");
         }
-        ByteBuffer buffer = ((TCPClientDetails)recepient).getOutputBuffer();
+        ByteBuffer buffer = ((TCPClientDetails)recipient).getOutputBuffer();
+        buffer.clear();
         try {
             message.writeToBuffer(new StyxDataWriter(buffer));
-            buffer.position(0);
-            ((TCPClientDetails)recepient).getChannel().write(buffer);
+            buffer.flip();
+            ((TCPClientDetails)recipient).getChannel().write(buffer);
             mTransmittedPacketsCount++;
             if (mLogListener != null) {
-                mLogListener.onMessageTransmited(this, recepient, message);
+                mLogListener.onMessageTransmited(this, recipient, message);
             }
             return true;
         } catch (IOException e) {
@@ -96,6 +97,14 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
     @Override
     public void close() {
         isWorking = false;
+        try {
+            mAcceptorThread.join(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        if ( mAcceptorThread.isAlive() ) {
+            mAcceptorThread.interrupt();
+        }
     }
 
     /**
@@ -145,6 +154,11 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
             }
         }
         return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return mAddress.hashCode()*mPort;
     }
 
     @Override

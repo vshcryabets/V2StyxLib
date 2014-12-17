@@ -60,17 +60,6 @@ public class TCPServerChannelDriver extends TCPChannelDriver {
     }
 
     @Override
-    public void close() {
-        super.close();
-        try {
-            mSelector.close();
-            mChannel.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Override
     public void run() {
         isWorking = true;
         try {
@@ -112,7 +101,19 @@ public class TCPServerChannelDriver extends TCPChannelDriver {
             }
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            try {
+                mSelector.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            try {
+                mChannel.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
+        mChannel = null;
         isWorking = false;
     }
 

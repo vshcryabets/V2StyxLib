@@ -5,6 +5,7 @@ import com.v2soft.styxlib.ConnectionWithExport;
 import com.v2soft.styxlib.IClient;
 import com.v2soft.styxlib.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.exceptions.StyxException;
+import com.v2soft.styxlib.io.StyxUnbufferedFileOutputStream;
 import com.v2soft.styxlib.library.types.ULong;
 import com.v2soft.styxlib.server.ClientDetails;
 import com.v2soft.styxlib.server.IChannelDriver;
@@ -103,6 +104,11 @@ public class TwoWayExportTest {
         ClientServerTest.checkMD5Hash(reverseConnection);
 
         reverseConnection.close();
+
+        ClientServerTest.checkMD5Hash(connection);
+        ClientServerTest.checkMD5Hash(connection);
+        ClientServerTest.checkMD5Hash(connection);
+
         connection.close();
     }
 
@@ -169,7 +175,6 @@ public class TwoWayExportTest {
         String messages[] = new String[count];
         ConnectionWithExport clients[] = new ConnectionWithExport[count];
         IChannelDriver clientDrivers[] = new TCPClientChannelDriver[count];
-        StyxFile reverseFiles[] = new StyxFile[count];
         ChatStyxFile clientFiles[] = new ChatStyxFile[count];
         final OutputStream outputs[] = new OutputStream[count];
 
@@ -205,8 +210,7 @@ public class TwoWayExportTest {
             assertNotNull("Can't retrieve reverse connection to client", reverseConnection);
             reverseConnection.connect();
             // get chat file for client
-            reverseFiles[pos] = new StyxFile(reverseConnection, "/chat");
-            outputs[pos] = reverseFiles[pos].openForWriteUnbuffered();
+            outputs[pos] = new StyxUnbufferedFileOutputStream(reverseConnection, "/chat");
             pos++;
         }
 
@@ -225,9 +229,8 @@ public class TwoWayExportTest {
         pos = 0;
         for (ClientDetails details : clientDetails) {
             System.out.printf("Trying to disconnect from %s\n", details.toString());
-            IClient reverseConnection = reverseFiles[pos].getIClient();
+            IClient reverseConnection = ((StyxUnbufferedFileOutputStream)outputs[pos]).getIClient();
             outputs[pos].close();
-            reverseFiles[pos].close();
             reverseConnection.close();
             pos++;
         }
