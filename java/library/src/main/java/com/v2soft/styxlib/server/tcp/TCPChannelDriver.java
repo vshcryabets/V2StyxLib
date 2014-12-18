@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
+import java.nio.channels.SocketChannel;
 
 /**
  * Created by V.Shcryabets on 5/20/14.
@@ -67,21 +68,26 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
             throw new NullPointerException("Client can't be null");
         }
         ByteBuffer buffer = ((TCPClientDetails)recipient).getOutputBuffer();
-        buffer.clear();
-        try {
-            message.writeToBuffer(new StyxDataWriter(buffer));
-            buffer.flip();
-            ((TCPClientDetails)recipient).getChannel().write(buffer);
-            mTransmittedPacketsCount++;
-            if (mLogListener != null) {
-                mLogListener.onMessageTransmited(this, recipient, message);
+        synchronized (buffer) {
+            buffer.clear();
+            try {
+                message.writeToBuffer(new StyxDataWriter(buffer)); // TODO optimize this line,
+                // no need to create new instance
+                buffer.flip();
+//            System.out.printf("Limit=%d, %d\n", buffer.limit(), buffer.position());
+                SocketChannel channel = ((TCPClientDetails) recipient).getChannel();
+                channel.write(buffer);
+                mTransmittedPacketsCount++;
+                if (mLogListener != null) {
+                    mLogListener.onMessageTransmited(this, recipient, message);
+                }
+                return true;
+            } catch (IOException e) {
+                if (mLogListener != null) {
+                    mLogListener.onException(this, e);
+                }
+                mTransmissionErrorsCount++;
             }
-            return true;
-        } catch (IOException e) {
-            if ( mLogListener != null ) {
-                mLogListener.onException(this, e);
-            }
-            mTransmissionErrorsCount++;
         }
         return false;
     }

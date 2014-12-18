@@ -2,7 +2,9 @@ package com.v2soft.styxlib.io;
 
 import com.v2soft.styxlib.library.types.ULong;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.nio.BufferOverflowException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 
@@ -53,7 +55,15 @@ public class StyxDataWriter implements IStyxDataWriter {
 
     @Override
     public int write(byte[] data, int offset, int count) {
-        mBuffer.put(data, offset, count);
+        try {
+            mBuffer.put(data, offset, count);
+        } catch (BufferOverflowException err) {
+            System.err.printf("Buffer: c=%d, p=%d, l=%d\n", mBuffer.capacity(),
+                    mBuffer.position(), mBuffer.limit());
+            System.err.printf("Write: c=%d, o=%d, l=%d\n", count,
+                    offset, data.length);
+            throw err;
+        }
         return count;
     }
 

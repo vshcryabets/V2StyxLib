@@ -35,7 +35,7 @@ public class StyxTMessage extends StyxMessage {
         if ( mAnswer == null)
             wait(timeout);
         if ( mAnswer == null )
-            throw new TimeoutException();
+            throw new TimeoutException("Don't receive answer for "+this.toString());
         if (mAnswer.getType() == MessageType.Rerror) {
             StyxErrorMessageException.checkException(mAnswer);
         }
