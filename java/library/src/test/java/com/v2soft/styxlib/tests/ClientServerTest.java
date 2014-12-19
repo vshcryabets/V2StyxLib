@@ -35,7 +35,6 @@ import static org.junit.Assert.assertTrue;
 public class ClientServerTest {
     private static final int PORT = 10234;
     private StyxServerManager mServer;
-    private Thread[] mServerThreads;
 
     @Before
     public void setUp() throws Exception {
@@ -44,10 +43,7 @@ public class ClientServerTest {
 
     @After
     public void shutDown() throws InterruptedException, IOException {
-        mServer.close();
-        for ( Thread thread : mServerThreads ) {
-            thread.join();
-        }
+        mServer.closeAndWait();
     }
 
     private void startServer() throws IOException {
@@ -58,7 +54,7 @@ public class ClientServerTest {
                 PORT,
                 false,
                 root);
-        mServerThreads = mServer.start();
+        mServer.start();
     }
 
     // TVersion & TAttach

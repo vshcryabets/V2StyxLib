@@ -26,6 +26,7 @@ import java.io.OutputStream;
 import java.net.InetAddress;
 import java.nio.charset.Charset;
 import java.security.NoSuchAlgorithmException;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -46,7 +47,6 @@ import static org.junit.Assert.assertTrue;
 public class TwoWayExportTest {
     private static final int PORT = 10234;
     private TCPDualLinkServerManager mServer;
-    private Thread[] mServerThreads;
     private Charset mCharset = Charset.forName("utf-8");
 
     @Before
@@ -56,10 +56,7 @@ public class TwoWayExportTest {
 
     @After
     public void shutDown() throws InterruptedException, IOException {
-        mServer.close();
-        for ( Thread thread : mServerThreads ) {
-            thread.join();
-        }
+        mServer.closeAndWait();
     }
 
     private void startServer() throws IOException {
@@ -70,7 +67,7 @@ public class TwoWayExportTest {
                 PORT,
                 false,
                 root);
-        mServerThreads = mServer.start();
+        mServer.start();
     }
 
     // TVersion & TAttach
@@ -93,7 +90,7 @@ public class TwoWayExportTest {
         ClientServerTest.checkMD5Hash(connection);
 
         // reverse test
-        Set<ClientDetails> clientDetailses = drivers.get(0).getClients();
+        Collection<ClientDetails> clientDetailses = drivers.get(0).getClients();
         ClientDetails clientDetails = clientDetailses.iterator().next();
         IClient reverseConnection = mServer.getReverseConnectionForClient(clientDetails,
                 new Credentials(null, null));
@@ -119,7 +116,7 @@ public class TwoWayExportTest {
                 InetAddress.getByName("127.0.0.1"), PORT,
                 false);
         assertTrue(connection.connect(driver));
-        Set<ClientDetails> clientDetailses = driver.getClients();
+        Collection<ClientDetails> clientDetailses = driver.getClients();
         assertNotNull(clientDetailses);
         assertEquals(1, clientDetailses.size());
         ClientDetails pseudoClientDetails = clientDetailses.iterator().next();
@@ -149,7 +146,7 @@ public class TwoWayExportTest {
                 false);
         assertTrue(connection2.connect(driver2));
 
-        Set<ClientDetails> clientDetailses = drivers.get(0).getClients();
+        Collection<ClientDetails> clientDetailses = drivers.get(0).getClients();
         assertNotNull(clientDetailses);
         assertEquals(2, clientDetailses.size());
 
@@ -203,7 +200,7 @@ public class TwoWayExportTest {
 
         // prepare server
         List<IChannelDriver> drivers = mServer.getDrivers();
-        Set<ClientDetails> clientDetails = drivers.get(0).getClients();
+        Collection<ClientDetails> clientDetails = drivers.get(0).getClients();
         int pos = 0;
         for (ClientDetails details : clientDetails ) {
             IClient reverseConnection = mServer.getReverseConnectionForClient(details, new Credentials(null, null));

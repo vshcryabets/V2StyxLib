@@ -42,7 +42,6 @@ public class ConnectionTest {
     private static final int PORT = 10234;
     private IClient mConnection;
     private StyxServerManager mServer;
-    private Thread[] mServerThreads;
 
     @Before
     public void setUp() throws Exception {
@@ -57,10 +56,7 @@ public class ConnectionTest {
     @After
     public void shutDown() throws InterruptedException, IOException {
         mConnection.close();
-        mServer.close();
-        for ( Thread thread : mServerThreads ) {
-            thread.join();
-        }
+        mServer.closeAndWait();
     }
 
     private void startServer() throws IOException {
@@ -72,7 +68,7 @@ public class ConnectionTest {
                 PORT,
                 false,
                 new DiskStyxDirectory(testDirectory));
-        mServerThreads = mServer.start();
+        mServer.start();
     }
 
     // TVersion & TAttach

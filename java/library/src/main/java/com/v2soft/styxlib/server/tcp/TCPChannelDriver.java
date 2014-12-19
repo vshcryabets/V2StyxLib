@@ -195,4 +195,8 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
     public IMessageProcessor getRMessageHandler() {
         return mRMessageHandler;
     }
+
+    public int getPort() {
+        return mPort;
+    }
 }

@@ -12,6 +12,7 @@ import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.nio.channels.ClosedByInterruptException;
 import java.nio.channels.SocketChannel;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -127,7 +128,7 @@ public class TCPClientChannelDriver extends TCPChannelDriver {
     }
 
     @Override
-    public Set<ClientDetails> getClients() {
+    public Collection<ClientDetails> getClients() {
         Set<ClientDetails> result = new HashSet<ClientDetails>();
         result.add(mServerClientDetails);
         return result;

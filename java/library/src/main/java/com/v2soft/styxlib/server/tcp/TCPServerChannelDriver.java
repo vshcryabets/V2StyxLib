@@ -10,6 +10,7 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -28,16 +29,14 @@ public class TCPServerChannelDriver extends TCPChannelDriver {
     protected ServerSocketChannel mChannel;
     protected Selector mSelector;
     protected Stack<SocketChannel> mNewConnetions, mReadable;
-    protected HashSet<ClientDetails> mClientDetailses;
-    protected Map<SocketChannel, TCPClientDetails> mClientStatesMap;
+    protected Map<SocketChannel, ClientDetails> mClientStatesMap;
     protected int mLastClientId = 1;
 
     public TCPServerChannelDriver(InetAddress address, int port, boolean ssl) throws IOException {
         super(address, port, ssl);
-        mClientDetailses = new HashSet<ClientDetails>();
         mNewConnetions = new Stack<SocketChannel>();
         mReadable = new Stack<SocketChannel>();
-        mClientStatesMap = new HashMap<SocketChannel, TCPClientDetails>();
+        mClientStatesMap = new HashMap<SocketChannel, ClientDetails>();
     }
 
     protected void prepareSocket(InetSocketAddress isa, boolean useSSL) throws IOException {
@@ -125,12 +124,11 @@ public class TCPServerChannelDriver extends TCPChannelDriver {
             mRMessageHandler.addClient(client);
             mTMessageHandler.addClient(client);
             mClientStatesMap.put(channel, client);
-            mClientDetailses.add(client);
         }
         mNewConnetions.clear();
         // new readables
         for (SocketChannel channel : mReadable) {
-            final TCPClientDetails state = mClientStatesMap.get(channel);
+            final TCPClientDetails state = (TCPClientDetails) mClientStatesMap.get(channel);
             boolean result = readSocket(state);
             if ( result ) {
                 removeClient(channel);
@@ -143,14 +141,13 @@ public class TCPServerChannelDriver extends TCPChannelDriver {
         final ClientDetails clientDetails = mClientStatesMap.get(channel);
         mTMessageHandler.removeClient(clientDetails);
         mRMessageHandler.removeClient(clientDetails);
-        mClientDetailses.remove(clientDetails);
         mClientStatesMap.remove(channel);
         channel.close();
     }
 
     @Override
-    public Set<ClientDetails> getClients() {
-        return mClientDetailses;
+    public Collection<ClientDetails> getClients() {
+        return mClientStatesMap.values();
     }
 
     @Override

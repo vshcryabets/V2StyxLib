@@ -151,6 +151,11 @@ public class MemoryStyxFile implements IVirtualStyxFile {
     }
 
     @Override
+    public void onConnectionOpened(ClientDetails client) {
+        // ok, nothing to do
+    }
+
+    @Override
     public StyxQID create(String name, long permissions, int mode)
             throws StyxErrorMessageException {
         StyxErrorMessageException.doException(

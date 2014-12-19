@@ -52,6 +52,7 @@ public class TMessagesProcessor extends QueueMessagesProcessor implements IMessa
 
     @Override
     public void addClient(ClientDetails clientDetails) {
+        mRoot.onConnectionOpened(clientDetails);
     }
     @Override
     public void removeClient(ClientDetails clientDetails) {

@@ -4,7 +4,7 @@ import com.v2soft.styxlib.ILogListener;
 import com.v2soft.styxlib.handlers.IMessageProcessor;
 
 import java.io.Closeable;
-import java.util.Set;
+import java.util.Collection;
 
 /**
  * Created by V.Shcryabets on 5/20/14.
@@ -21,7 +21,7 @@ public interface IChannelDriver extends Closeable, IMessageTransmitter {
      * Get all active clients.
      * @return all active clients.
      */
-    Set<ClientDetails> getClients();
+    Collection<ClientDetails> getClients();
 
     boolean isConnected();
     boolean isStarted();
