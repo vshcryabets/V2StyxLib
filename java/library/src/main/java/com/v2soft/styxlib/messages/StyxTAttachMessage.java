@@ -10,15 +10,17 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
 public class StyxTAttachMessage extends StyxTMessageFID {
-    private long mAuthFID;
-    private String mUserName;
-    private String mMountPoint;
+    protected long mAuthFID;
+    protected String mUserName;
+    protected String mMountPoint;
+    protected String mUnameName;
 
-    public StyxTAttachMessage(long fid, long afid, String username, String mountpoint) {
+    public StyxTAttachMessage(long fid, long afid, String username, String mountpoint, String unameName) {
         super(MessageType.Tattach, MessageType.Rattach, fid);
         mAuthFID = afid;
         mUserName = username;
         mMountPoint = mountpoint;
+        mUnameName = unameName;
     }
 
     @Override
@@ -28,6 +30,7 @@ public class StyxTAttachMessage extends StyxTMessageFID {
         setAuthFID(input.readUInt32());
         setUserName(input.readUTFString());
         setMountPoint(input.readUTFString());
+        mUnameName = input.readUTFString();
     }
 
     public long getAuthFID() {
@@ -64,7 +67,8 @@ public class StyxTAttachMessage extends StyxTMessageFID {
     public int getBinarySize() {
         int res = super.getBinarySize() + 4
                 + StyxMessage.getUTFSize(getUserName())
-                + StyxMessage.getUTFSize(getMountPoint());
+                + StyxMessage.getUTFSize(getMountPoint())
+                + StyxMessage.getUTFSize(mUnameName);
         return res;
     }
 
@@ -75,6 +79,7 @@ public class StyxTAttachMessage extends StyxTMessageFID {
         output.writeUInt32(getAuthFID());
         output.writeUTFString(getUserName());
         output.writeUTFString(getMountPoint());
+        output.writeUTFString(mUnameName);
     }
 
     @Override

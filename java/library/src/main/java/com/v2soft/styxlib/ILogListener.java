@@ -13,4 +13,5 @@ public interface ILogListener {
     public void onMessageReceived(IChannelDriver driver, ClientDetails clientDetails, StyxMessage message);
     public void onMessageTransmited(IChannelDriver driver, ClientDetails clientDetails, StyxMessage message);
     public void onException(IChannelDriver driver, Throwable err);
+    public void onUnexpectedSituation(IChannelDriver driver, String message);
 }

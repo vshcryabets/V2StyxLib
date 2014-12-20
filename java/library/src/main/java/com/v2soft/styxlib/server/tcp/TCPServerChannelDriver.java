@@ -121,7 +121,9 @@ public class TCPServerChannelDriver extends TCPChannelDriver {
         for (SocketChannel channel : mNewConnetions) {
             channel.configureBlocking(false);
             TCPClientDetails client = new TCPClientDetails(channel, this, mIOUnit, mLastClientId++);
-            mRMessageHandler.addClient(client);
+            if ( mTMessageHandler != mRMessageHandler ) {
+                mRMessageHandler.addClient(client);
+            }
             mTMessageHandler.addClient(client);
             mClientStatesMap.put(channel, client);
         }

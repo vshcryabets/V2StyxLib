@@ -38,4 +38,9 @@ public class TestLogListener implements ILogListener {
     public void onException(IChannelDriver driver, Throwable err) {
 
     }
+
+    @Override
+    public void onUnexpectedSituation(IChannelDriver driver, String message) {
+        System.err.println(message);
+    }
 }

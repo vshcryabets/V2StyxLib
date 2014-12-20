@@ -29,12 +29,10 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
     protected int mTransmittedPacketsCount;
     protected int mTransmissionErrorsCount;
     protected ILogListener mLogListener;
-    protected InetAddress mAddress;
-    protected int mPort;
+    protected InetSocketAddress mAddress;
 
     public TCPChannelDriver(InetAddress address, int port, boolean ssl) throws IOException {
-        mPort = port;
-        mAddress = address;
+        mAddress = new InetSocketAddress(address, port);
 
         // Bind the server socket to the local host and port
         InetSocketAddress socketAddress = new InetSocketAddress(address, port);
@@ -42,6 +40,7 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
         prepareSocket(socketAddress, ssl);
         mTransmittedPacketsCount = 0;
         mTransmissionErrorsCount = 0;
+        mAcceptorThread = new Thread(this, toString());
     }
 
     protected abstract void prepareSocket(InetSocketAddress socketAddress, boolean ssl) throws IOException;
@@ -51,12 +50,14 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
     }
 
     @Override
-    public Thread start(int iounit) {
-        if ( mAcceptorThread != null ) {
-            throw new IllegalStateException("Already started");
+    public synchronized Thread start(int iounit) throws IOException {
+        if ( isWorking ) {
+            return mAcceptorThread;
+        }
+        if ( mAcceptorThread.isAlive() ) {
+            throw new IllegalStateException("Already started "+isWorking+" "+this+" "+mAcceptorThread.toString());
         }
         mIOUnit = iounit;
-        mAcceptorThread = new Thread(this, toString());
         mAcceptorThread.start();
         isWorking = true;
         return mAcceptorThread;
@@ -164,7 +165,7 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
 
     @Override
     public int hashCode() {
-        return mAddress.hashCode()*mPort;
+        return mAddress.hashCode();
     }
 
     @Override
@@ -183,7 +184,7 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
 
     @Override
     public String toString() {
-        return String.format("%s:%s:%d", getClass().getSimpleName(), mAddress.toString(), mPort);
+        return String.format("%s:%s", getClass().getSimpleName(), mAddress.toString());
     }
 
     @Override
@@ -196,7 +197,7 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
         return mRMessageHandler;
     }
 
-    public int getPort() {
-        return mPort;
+    public InetSocketAddress getAddress() {
+        return mAddress;
     }
 }

@@ -53,7 +53,7 @@ public class StyxServerManager
         return this;
     }
 
-    public Thread[] start() {
+    public Thread[] start() throws IOException {
         int count = mDrivers.size();
         mDriverThreads = new Thread[count];
         for (int i = 0; i < count; i++) {

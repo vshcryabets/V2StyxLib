@@ -104,16 +104,6 @@ public class Connection
             shouldCloseTransmitter = true;
         }
 
-        if (!driver.isStarted()) {
-            driver.start(getIOBufSize());
-            isAutoStartDriver = true;
-        }
-
-        if (mRecepient == null) {
-            // get first client from driver
-            mRecepient = driver.getClients().iterator().next();
-        }
-
         return this.connect(driver, credentials, mAnswerProcessor, mTransmitter, mRecepient);
     }
 
@@ -130,10 +120,6 @@ public class Connection
     public boolean connect(IChannelDriver driver, Credentials credentials, RMessagesProcessor answerProcessor,
                            TMessageTransmitter transmitter, ClientDetails recepient)
             throws IOException, StyxException, InterruptedException, TimeoutException {
-
-        if (recepient == null) {
-            throw new NullPointerException("recepient can't be null");
-        }
         mRecepient = recepient;
 
         if (transmitter == null) {
@@ -145,6 +131,17 @@ public class Connection
             throw new NullPointerException("Channel driver can't be null");
         }
         setDriver(driver);
+        if (!driver.isStarted()) {
+            driver.start(getIOBufSize());
+            isAutoStartDriver = true;
+        }
+        if (mRecepient == null) {
+            // get first client from driver
+            mRecepient = driver.getClients().iterator().next();
+            if (mRecepient == null) {
+                throw new NullPointerException("recepient can't be null");
+            }
+        }
 
         if ( answerProcessor == null ) {
             throw new NullPointerException("answerProcessor can't be null");
@@ -291,7 +288,7 @@ public class Connection
         mFID = mRecepient.getPolls().getFIDPoll().getFreeItem();
         StyxTAttachMessage tAttach = new StyxTAttachMessage(getRootFID(), getAuthFID(),
                 getCredentials().getUserName(),
-                getMountPoint());
+                getMountPoint(), "");
         mTransmitter.sendMessage(tAttach, mRecepient);
 
         StyxMessage rMessage = tAttach.waitForAnswer(mTimeout);

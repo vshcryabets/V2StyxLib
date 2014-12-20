@@ -80,7 +80,7 @@ public class StyxMessage {
             result = new StyxTFlushMessage(NOTAG);
             break;
         case Tattach:
-            result = new StyxTAttachMessage(NOFID, NOFID, null, null);
+            result = new StyxTAttachMessage(NOFID, NOFID, null, null, null);
             break;
         case Twalk:
             result = new StyxTWalkMessage(NOFID, NOFID, "");

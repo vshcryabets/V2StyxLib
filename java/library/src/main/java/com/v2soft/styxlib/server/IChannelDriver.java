@@ -4,6 +4,7 @@ import com.v2soft.styxlib.ILogListener;
 import com.v2soft.styxlib.handlers.IMessageProcessor;
 
 import java.io.Closeable;
+import java.io.IOException;
 import java.util.Collection;
 
 /**
@@ -12,7 +13,7 @@ import java.util.Collection;
  * @author V.Shcryabets (vshcryabets@gmail.com)
  */
 public interface IChannelDriver extends Closeable, IMessageTransmitter {
-    Thread start(int iounit);
+    Thread start(int iounit) throws IOException;
     void setTMessageHandler(IMessageProcessor handler);
     void setRMessageHandler(IMessageProcessor handler);
     void setLogListener(ILogListener listener);

@@ -31,14 +31,15 @@ public class TCPClientChannelDriver extends TCPChannelDriver {
     }
 
     @Override
-    public Thread start(int iounit) {
+    public Thread start(int iounit) throws IOException {
         mServerClientDetails = new TCPClientDetails(mChanel, this, iounit, PSEUDO_CLIENT_ID);
+        mServerClientDetails.getChannel().connect(mAddress);
         return super.start(iounit);
     }
 
     @Override
     protected void prepareSocket(InetSocketAddress socketAddress, boolean ssl) throws IOException {
-        mChanel = SocketChannel.open(socketAddress);
+        mChanel = SocketChannel.open();
         mChanel.configureBlocking(true);
         Socket socket = mChanel.socket();
         socket.setSoTimeout(getTimeout());
@@ -89,6 +90,11 @@ public class TCPClientChannelDriver extends TCPChannelDriver {
                                 if ( message.getType().isTMessage() ) {
                                     if ( mTMessageHandler != null ) {
                                         mTMessageHandler.postPacket(message, mServerClientDetails);
+                                    } else {
+                                        if ( mLogListener != null ) {
+                                            mLogListener.onUnexpectedSituation(this,
+                                                    "We received TMessage but we don't have TMessageHandler");
+                                        }
                                     }
                                 } else {
                                     if ( mRMessageHandler != null ) {
@@ -103,7 +109,7 @@ public class TCPClientChannelDriver extends TCPChannelDriver {
                 }
                 catch (SocketTimeoutException e) {
                     // Nothing to read
-                                        e.printStackTrace();
+                    e.printStackTrace();
                 } catch (ClosedByInterruptException e) {
                     // finish
                     break;
