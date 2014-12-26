@@ -139,7 +139,7 @@ public class Connection
             // get first client from driver
             mRecepient = driver.getClients().iterator().next();
             if (mRecepient == null) {
-                throw new NullPointerException("recepient can't be null");
+                throw new NullPointerException("recipient can't be null");
             }
         }
 
