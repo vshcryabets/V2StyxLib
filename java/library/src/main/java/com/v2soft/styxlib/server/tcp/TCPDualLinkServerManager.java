@@ -22,7 +22,6 @@ public class TCPDualLinkServerManager extends TCPServerManager {
     private static final String DUAL_LINK_PROTO = "9P2000_2VDL";
     protected RMessagesProcessor mReverseAnswerProcessor;
     protected TMessageTransmitter mReverseTransmitter;
-    protected Credentials mCredentials;
 
     public TCPDualLinkServerManager(InetAddress address, int port, boolean ssl, IVirtualStyxFile root) throws IOException {
         super(address, port, ssl, root);
@@ -37,7 +36,6 @@ public class TCPDualLinkServerManager extends TCPServerManager {
         if ( credentials == null ) {
             throw new NullPointerException("Credentials is null");
         }
-        mCredentials = credentials;
 
         if ( mReverseAnswerProcessor == null ) {
             mReverseAnswerProcessor = new RMessagesProcessor("RC"+client.toString());
@@ -45,12 +43,8 @@ public class TCPDualLinkServerManager extends TCPServerManager {
         }
 
         IChannelDriver driver = client.getDriver();
-        Connection connection = new Connection(mCredentials, driver,
+        Connection connection = new Connection(credentials, driver,
                 mReverseAnswerProcessor, mReverseTransmitter, client);
         return connection;
-    }
-
-    public ClientDetails getCredentials() {
-        return null;
     }
 }
