@@ -48,11 +48,7 @@ public class TCPClientDetails extends ClientDetails {
 
     @Override
     public String toString() {
-        try {
-            return String.format("%s:%d", mChannel.getRemoteAddress().toString(), mId);
-        } catch (IOException e) {
-            return super.toString();
-        }
+        return String.format("%s:%d", mChannel.socket().getRemoteSocketAddress().toString(), mId);
     }
 
     public void disconnect() throws IOException {
