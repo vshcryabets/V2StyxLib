@@ -29,4 +29,10 @@ public interface IChannelDriver extends Closeable, IMessageTransmitter {
 
     IMessageProcessor getTMessageHandler();
     IMessageProcessor getRMessageHandler();
+
+    /**
+     * Disconnect specified client.
+     * @param client specified client
+     */
+    void disconnect(ClientDetails client) throws IOException;
 }

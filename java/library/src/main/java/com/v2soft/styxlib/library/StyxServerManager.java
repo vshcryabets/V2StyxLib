@@ -1,6 +1,7 @@
 package com.v2soft.styxlib.library;
 
 import com.v2soft.styxlib.handlers.TMessagesProcessor;
+import com.v2soft.styxlib.server.ClientDetails;
 import com.v2soft.styxlib.server.IChannelDriver;
 import com.v2soft.styxlib.library.types.ConnectionDetails;
 import com.v2soft.styxlib.vfs.IVirtualStyxFile;
@@ -97,5 +98,9 @@ public class StyxServerManager
     //-------------------------------------------------------------------------------------
     public List<IChannelDriver> getDrivers() {
         return mDrivers;
+    }
+
+    public void disconnect(ClientDetails client) throws IOException {
+        client.getDriver().disconnect(client);
     }
 }

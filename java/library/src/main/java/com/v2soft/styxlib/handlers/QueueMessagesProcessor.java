@@ -20,6 +20,9 @@ public abstract class QueueMessagesProcessor implements IMessageProcessor {
 
     @Override
     public void postPacket(final StyxMessage message, final ClientDetails target) {
+        if (mExecutor.isShutdown()) {
+            throw new RuntimeException("QueueMessagesProcessor already stopped");
+        }
         mExecutor.execute(new Runnable() {
             @Override
             public void run() {

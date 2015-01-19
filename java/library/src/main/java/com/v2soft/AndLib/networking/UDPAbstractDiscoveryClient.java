@@ -120,7 +120,8 @@ public abstract class UDPAbstractDiscoveryClient extends DiscoveryClient {
                 } catch (IOException e) {
                     onError(e);
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    // this is normal situation, we can ignore this exception.
+//                    e.printStackTrace();
                     break;
                 }
             }

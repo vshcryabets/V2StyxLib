@@ -59,6 +59,12 @@ public class TCPClientChannelDriver extends TCPChannelDriver {
     }
 
     @Override
+    public void disconnect(ClientDetails client) {
+        // TODO what we should do there?
+        throw new IllegalStateException("Method not implemented");
+    }
+
+    @Override
     public boolean sendMessage(StyxMessage message, ClientDetails recipient) {
         if ( !recipient.equals(mServerClientDetails)) {
             throw new IllegalArgumentException("Wrong recipient");
