@@ -43,7 +43,7 @@ public class Connection
     protected Credentials mCredentials;
     private String mMountPoint;
     private int mTimeout = DEFAULT_TIMEOUT;
-    private boolean isConnected, isAttached;
+    private boolean isAttached;
     private TMessageTransmitter mTransmitter;
     private long mAuthFID = StyxMessage.NOFID;
     private StyxQID mAuthQID;
@@ -81,7 +81,6 @@ public class Connection
         mDriver = driver;
         mDetails = new ConnectionDetails(getProtocol(), getIOBufSize());
         mCredentials = credentials;
-        isConnected = false;
     }
     /**
      * Connect to server with specified parameters
@@ -155,7 +154,6 @@ public class Connection
         mCredentials = credentials;
         mMountPoint = "/";
         sendVersionMessage();
-        isConnected = driver.isConnected();
 
         return driver.isConnected();
     }
@@ -346,7 +344,6 @@ public class Connection
     private TMessageTransmitter.Listener mTransmitterListener = new TMessageTransmitter.Listener() {
         @Override
         public void onSocketDisconnected() {
-            isConnected = false;
         }
 
         @Override

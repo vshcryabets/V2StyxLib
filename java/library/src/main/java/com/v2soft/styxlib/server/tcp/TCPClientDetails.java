@@ -7,6 +7,8 @@ import com.v2soft.styxlib.server.ClientDetails;
 import com.v2soft.styxlib.server.IChannelDriver;
 
 import java.io.IOException;
+import java.net.Socket;
+import java.net.SocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 
@@ -48,11 +50,12 @@ public class TCPClientDetails extends ClientDetails {
 
     @Override
     public String toString() {
-        return String.format("%s:%d", mChannel.socket().getRemoteSocketAddress().toString(), mId);
+        Socket socket = mChannel.socket();
+        SocketAddress address = socket.getRemoteSocketAddress();
+        return String.format("%s:%d", address.toString(), mId);
     }
 
-    public void disconnect() throws IOException {
-        mChannel.close();
-        mChannel = null;
+    public void setChannel(SocketChannel channel) {
+        mChannel = channel;
     }
 }

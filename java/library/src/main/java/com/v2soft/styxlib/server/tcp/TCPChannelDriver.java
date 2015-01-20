@@ -33,11 +33,7 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
 
     public TCPChannelDriver(InetAddress address, int port, boolean ssl) throws IOException {
         mAddress = new InetSocketAddress(address, port);
-
-        // Bind the server socket to the local host and port
-        InetSocketAddress socketAddress = new InetSocketAddress(address, port);
-
-        prepareSocket(socketAddress, ssl);
+        prepareSocket(mAddress, ssl);
         mTransmittedPacketsCount = 0;
         mTransmissionErrorsCount = 0;
         mAcceptorThread = new Thread(this, toString());

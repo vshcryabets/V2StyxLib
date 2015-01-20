@@ -58,7 +58,16 @@ public class TCPServerChannelDriver extends TCPChannelDriver {
 
     @Override
     public void disconnect(ClientDetails client) throws IOException {
-        SocketChannel channel = ((TCPClientDetails) client).getChannel();
+        if ( ! (client instanceof TCPClientDetails) ) {
+            throw new IllegalArgumentException("Not a TCPClientDetails");
+        }
+        if (!mClientsMap.containsValue(client)) {
+            throw new IllegalArgumentException("Unknown client");
+        }
+        TCPClientDetails tcpClient = (TCPClientDetails) client;
+        SocketChannel channel = tcpClient.getChannel();
+//        channel.shutdownInput();
+//        channel.shutdownOutput();
         channel.close();
         removeClient(channel);
     }

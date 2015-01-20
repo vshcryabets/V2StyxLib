@@ -10,7 +10,9 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
+import java.nio.channels.AsynchronousCloseException;
 import java.nio.channels.ClosedByInterruptException;
+import java.nio.channels.ClosedChannelException;
 import java.nio.channels.SocketChannel;
 import java.util.Collection;
 import java.util.HashSet;
@@ -60,8 +62,10 @@ public class TCPClientChannelDriver extends TCPChannelDriver {
 
     @Override
     public void disconnect(ClientDetails client) {
-        // TODO what we should do there?
-        throw new IllegalStateException("Method not implemented");
+        if (!mServerClientDetails.equals(client)) {
+            throw new IllegalArgumentException("Unknown client");
+        }
+        close();
     }
 
     @Override
@@ -76,34 +80,34 @@ public class TCPClientChannelDriver extends TCPChannelDriver {
     public void run() {
         try {
             isWorking = true;
-            final StyxByteBufferReadable buffer = new StyxByteBufferReadable(mIOUnit*2);
+            final StyxByteBufferReadable buffer = new StyxByteBufferReadable(mIOUnit * 2);
             final StyxDataReader reader = new StyxDataReader(buffer);
             while (isWorking) {
                 if (Thread.interrupted()) break;
                 // read from socket
                 try {
                     int readed = buffer.readFromChannel(mServerClientDetails.getChannel());
-                    if ( readed > 0 ) {
+                    if (readed > 0) {
                         // loop unitl we have unprocessed packets in the input buffer
-                        while ( buffer.remainsToRead() > 4 ) {
+                        while (buffer.remainsToRead() > 4) {
                             // try to decode
                             final long packetSize = reader.getUInt32();
-                            if ( buffer.remainsToRead() >= packetSize ) {
+                            if (buffer.remainsToRead() >= packetSize) {
                                 final StyxMessage message = StyxMessage.factory(reader, mIOUnit);
                                 if (mLogListener != null) {
                                     mLogListener.onMessageReceived(this, mServerClientDetails, message);
                                 }
-                                if ( message.getType().isTMessage() ) {
-                                    if ( mTMessageHandler != null ) {
+                                if (message.getType().isTMessage()) {
+                                    if (mTMessageHandler != null) {
                                         mTMessageHandler.postPacket(message, mServerClientDetails);
                                     } else {
-                                        if ( mLogListener != null ) {
+                                        if (mLogListener != null) {
                                             mLogListener.onUnexpectedSituation(this,
                                                     "We received TMessage but we don't have TMessageHandler");
                                         }
                                     }
                                 } else {
-                                    if ( mRMessageHandler != null ) {
+                                    if (mRMessageHandler != null) {
                                         mRMessageHandler.postPacket(message, mServerClientDetails);
                                     }
                                 }
@@ -112,20 +116,30 @@ public class TCPClientChannelDriver extends TCPChannelDriver {
                             }
                         }
                     }
-                }
-                catch (SocketTimeoutException e) {
+                } catch (SocketTimeoutException e) {
                     // Nothing to read
                     e.printStackTrace();
                 } catch (ClosedByInterruptException e) {
                     // finish
                     break;
+                } catch (AsynchronousCloseException e) {
+                    break;
+                } catch (ClosedChannelException e) {
+                    break;
                 }
             }
-            } catch (Exception e) {
-                e.printStackTrace();
-            } finally {
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
             try {
-                mServerClientDetails.disconnect();
+                if ( mTMessageHandler != null ) {
+                    mTMessageHandler.removeClient(mServerClientDetails);
+                }
+                if ( mRMessageHandler != null ) {
+                    mRMessageHandler.removeClient(mServerClientDetails);
+                }
+                mServerClientDetails.getChannel().close();
+                mServerClientDetails.setChannel(null);
             } catch (IOException e) {
                 e.printStackTrace();
             }
