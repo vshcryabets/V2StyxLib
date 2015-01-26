@@ -140,13 +140,14 @@ public class TMessagesProcessor extends QueueMessagesProcessor implements IMessa
         return mErrorPackets;
     }
 
-    private StyxRAttachMessage processAttach(ClientDetails clientDetails, StyxTAttachMessage msg) {
+    private StyxRAttachMessage processAttach(ClientDetails client, StyxTAttachMessage msg) throws StyxErrorMessageException {
         Credentials credentials = new Credentials(msg.getUserName(), null);
-        clientDetails.setCredentials(credentials);
+        client.setCredentials(credentials);
         String mountPoint = msg.getMountPoint();
         IVirtualStyxFile root = mRoot; // TODO .getDirectory(mountPoint); there should be some logic with mountPoint?
+        root.onAttach(client);
         StyxRAttachMessage answer = new StyxRAttachMessage(msg.getTag(), root.getQID());
-        clientDetails.registerOpenedFile(msg.getFID(), root );
+        client.registerOpenedFile(msg.getFID(), root);
         return answer;
     }
 

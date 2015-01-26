@@ -1,7 +1,7 @@
 package com.v2soft.styxlib.library.types;
 
 /**
- * Created by mrco on 11/2/14.
+ * Created by vshcryabets@gmail.com on 11/2/14.
  */
 public class Credentials {
     protected String mUserName;
@@ -18,5 +18,9 @@ public class Credentials {
 
     public String getPassword() {
         return mPassword;
+    }
+
+    public void setUserName(String value) {
+        mUserName = value;
     }
 }

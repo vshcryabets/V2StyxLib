@@ -104,4 +104,9 @@ public interface IVirtualStyxFile {
      */
     public void release() throws IOException;
 
+    /**
+     * Will be fired when client tries to attach to this root
+     * @param client client information
+     */
+    void onAttach(ClientDetails client) throws StyxErrorMessageException;
 }

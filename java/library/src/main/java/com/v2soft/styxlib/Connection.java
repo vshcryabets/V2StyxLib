@@ -366,4 +366,12 @@ public class Connection
     protected void setDriver(IChannelDriver driver) {
         mDriver = driver;
     }
+
+    /**
+     * Return connection driver.
+     * @return connection driver.
+     */
+    public IChannelDriver getDriver() {
+        return mDriver;
+    }
 }
