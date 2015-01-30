@@ -19,6 +19,11 @@ public class ULong {
         this.setValue(l);
     }
 
+    public ULong(ULong l) {
+        this.mBytes = new byte[ULONG_LENGTH];
+        System.arraycopy(l.mBytes, 0, mBytes, 0, ULONG_LENGTH);
+    }
+
     public BigInteger asBigInteger() {
         byte[] revBytes = new byte[ULONG_LENGTH];
         for (int i = 0; i < ULONG_LENGTH; i++) {

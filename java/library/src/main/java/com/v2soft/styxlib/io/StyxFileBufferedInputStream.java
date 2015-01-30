@@ -1,5 +1,6 @@
 package com.v2soft.styxlib.io;
 
+import com.v2soft.styxlib.library.types.ULong;
 import com.v2soft.styxlib.server.ClientDetails;
 import com.v2soft.styxlib.server.IMessageTransmitter;
 
@@ -62,6 +63,20 @@ public class StyxFileBufferedInputStream extends InputStream {
             count = 0;
             pos = 0;
         }
+    }
 
+    @Override
+    public boolean markSupported() {
+        return mUnbufferedInput.markSupported();
+    }
+
+    @Override
+    public synchronized void mark(int readlimit) {
+        mUnbufferedInput.mark(readlimit);
+    }
+
+    @Override
+    public synchronized void reset() throws IOException {
+        mUnbufferedInput.reset();
     }
 }

@@ -24,6 +24,7 @@ public class StyxUnbufferedInputStream extends InputStream {
     private long mFID;
     private IMessageTransmitter mMessenger;
     private ULong mFileOffset = ULong.ZERO;
+    private ULong mFileMark = ULong.ZERO;
     private int mIOUnitSize;
     protected ClientDetails mRecepient;
 
@@ -98,5 +99,20 @@ public class StyxUnbufferedInputStream extends InputStream {
 
     public void seek(long position) {
         mFileOffset.setValue(position);
+    }
+
+    @Override
+    public boolean markSupported() {
+        return true;
+    }
+
+    @Override
+    public synchronized void mark(int readlimit) {
+        mFileMark = new ULong(mFileOffset);
+    }
+
+    @Override
+    public synchronized void reset() throws IOException {
+        mFileOffset = new ULong(mFileMark);
     }
 }
