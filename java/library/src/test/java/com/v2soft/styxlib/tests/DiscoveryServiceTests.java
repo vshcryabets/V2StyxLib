@@ -58,7 +58,7 @@ public class DiscoveryServiceTests {
                 String received = new String(data, 0, packet.getLength());
                 try {
                     socket.send(new DatagramPacket(answer, answer.length,
-                            packet.getAddress(), packet.getPort()));
+                            sourceAddress, sourcePort));
                 } catch (UnknownHostException e) {
                     e.printStackTrace();
                 } catch (IOException e) {
@@ -67,7 +67,7 @@ public class DiscoveryServiceTests {
             }
         };
         server.listen();
-        final int[] flags = new int[]{0, 0, 0};
+        final int[] flags = new int[]{0, 0, 0, 0};
         // start discovery
         UDPAbstractDiscoveryClient explorer = new UDPAbstractDiscoveryClient(PORT,
                 new InetAddress[]{InetAddress.getLoopbackAddress()}) {
@@ -119,13 +119,14 @@ public class DiscoveryServiceTests {
 
             @Override
             public void onException(Throwable error) {
-
+                flags[3]++;
             }
         });
         explorer.startDiscoverySync();
         assertEquals("Wrong number of discovery start count", 1, flags[0]);
         assertEquals("Wrong number of discovery end count", 1, flags[1]);
         assertEquals("Wrong number of discovered servers " + flags[2], 1, flags[2]);
+        assertEquals("Wrong number of errors", 0, flags[3]);
 
         server.close();
     }
