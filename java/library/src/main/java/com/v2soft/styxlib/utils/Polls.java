@@ -5,6 +5,7 @@ import com.v2soft.styxlib.messages.base.StyxTMessageFID;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by vshcryabets on 12/10/14.
@@ -17,7 +18,7 @@ public class Polls {
     public Polls() {
         mFids = new FIDPoll();
         mTags = new MessageTagPoll();
-        mMessagesMap = new HashMap<Integer, StyxTMessage>();
+        mMessagesMap = new ConcurrentHashMap<Integer, StyxTMessage>();
     }
 
     public FIDPoll getFIDPoll() {

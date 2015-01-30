@@ -15,11 +15,11 @@ import java.util.Map;
  */
 public class RMessagesProcessor extends QueueMessagesProcessor implements IMessageProcessor {
     protected int mReceivedCount, mErrorCount;
-    protected String mTag;
+    protected String mLogTag;
 
     public RMessagesProcessor(String tag) {
         super();
-        mTag = tag;
+        mLogTag = tag;
     }
 
     @Override
@@ -39,8 +39,9 @@ public class RMessagesProcessor extends QueueMessagesProcessor implements IMessa
         final Map<Integer, StyxTMessage> clientMessagesMap = client.getPolls().getMessagesMap();
         if (!clientMessagesMap.containsKey(tag)) {
             // we didn't send T message with such tag, so ignore this R message
-            System.err.printf("%d\tGot (%s) unknown R message from client %s\n", System.currentTimeMillis(),
-                    mTag,
+            System.err.printf("%d\tGot (%d) unknown R message \n%s\n from client %s\n", System.currentTimeMillis(),
+                    tag,
+                    message.toString(),
                     client.toString());
             return;
         }

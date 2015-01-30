@@ -38,7 +38,9 @@ public abstract class AbstractPoll<T> {
         }
     }
     public void clean() {
-        mAvailable.clear();
+        synchronized (mAvailable) {
+            mAvailable.clear();
+        }
         mLast = null;
     }
 }
