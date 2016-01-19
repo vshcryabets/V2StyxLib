@@ -72,6 +72,7 @@ public class JavaServerSample {
                 false,
                 root);
         Thread[] threads = mServer.start();
+        System.out.println("Test server listen on 127.0.0.1:" + PORT);
         for(Thread thread : threads) {
             thread.join();
         }

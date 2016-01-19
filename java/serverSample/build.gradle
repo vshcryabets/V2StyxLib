@@ -5,6 +5,7 @@ version = '1.0.0'
 jar {
     manifest {
         attributes 'Implementation-Title': 'V2StyxLibServerDemo', 'Implementation-Version': version
+        attributes 'Main-Class': 'JavaServerSample'
     }
 }
 
