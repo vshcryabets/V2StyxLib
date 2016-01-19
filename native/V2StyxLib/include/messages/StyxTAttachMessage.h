@@ -7,7 +7,7 @@
 
 #ifndef STYXTATTACHMESSAGE_H_
 #define STYXTATTACHMESSAGE_H_
-#include "StyxMessage.h"
+#include "messages/base/StyxMessage.h"
 #include <string>
 
 class StyxTAttachMessage : public StyxMessage {

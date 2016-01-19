@@ -7,7 +7,7 @@
 
 #ifndef STYXERRORMESSAGEEXCEPTION_H_
 #define STYXERRORMESSAGEEXCEPTION_H_
-#include "./messages/StyxRErrorMessage.h"
+#include "../messages/StyxRErrorMessage.h"
 
 class StyxErrorMessageException {
 private:

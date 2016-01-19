@@ -4,12 +4,12 @@
  *  Created on: May 20, 2012
  *      Author: vschryabets@gmail.com
  */
-#include "../io/IStyxDataReader.h"
-#include "../io/IStyxDataWriter.h"
-
 #ifndef STYXQID_H_
 #define STYXQID_H_
-#include "../types.h"
+
+#include "./messages/base/enums/QIDType.h"
+#include "./io/IStyxDataReader.h"
+#include "./io/IStyxDataWriter.h"
 
 class StyxQID {
 private:

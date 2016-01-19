@@ -11,7 +11,7 @@
 #include <string>
 #include "../classes.h"
 #include <map>
-#include "../messages/StyxMessage.h"
+#include "../messages/base/StyxMessage.h"
 #include "../messages/StyxTAttachMessage.h"
 #include "../messages/StyxRAttachMessage.h"
 #include "../messages/StyxTWalkMessage.h"

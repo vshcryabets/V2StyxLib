@@ -7,9 +7,9 @@
 
 #ifndef STYXMESSAGE_H_
 #define STYXMESSAGE_H_
-#include "../types.h"
-#include "../io/IStyxDataReader.h"
-#include "../io/IStyxDataWriter.h"
+#include "./types.h"
+#include "./io/IStyxDataReader.h"
+#include "./io/IStyxDataWriter.h"
 
 class StyxMessage {
 private:

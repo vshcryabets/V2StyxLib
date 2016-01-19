@@ -9,8 +9,8 @@
 #define MEMORYSTYXFILE_H_
 
 #include "IVirtualStyxFile.h"
-#include "../structs/StyxQID.h"
-#include "../structs/StyxStat.h"
+#include "./messages/base/structs/StyxQID.h"
+#include "./messages/base/structs/StyxStat.h"
 #include <string>
 
 class MemoryStyxFile: public IVirtualStyxFile {
