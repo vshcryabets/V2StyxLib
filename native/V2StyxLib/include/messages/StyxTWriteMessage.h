@@ -8,7 +8,7 @@
 #ifndef STYXTWRITE_H_
 #define STYXTWRITE_H_
 
-#include "StyxMessage.h"
+#include "messages/base/StyxMessage.h"
 
 class StyxTWriteMessage: public StyxMessage {
 private:

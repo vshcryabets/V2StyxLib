@@ -9,7 +9,7 @@
 #define STYXTVERSIONMESSAGE_H_
 #include <string>
 #include "../types.h"
-#include "StyxMessage.h"
+#include "messages/base/StyxMessage.h"
 
 class StyxTVersionMessage : public StyxMessage {
 private:

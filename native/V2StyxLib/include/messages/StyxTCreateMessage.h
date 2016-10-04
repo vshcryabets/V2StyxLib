@@ -8,14 +8,16 @@
 #ifndef STYXTCLUNKMESSAGE_H_
 #define STYXTCLUNKMESSAGE_H_
 
-#include "StyxMessage.h"
+#include "messages/base/StyxTMessageFID.h"
 
-class StyxTClunkMessage: public StyxMessage {
+class StyxTCreateMessage: public StyxTMessageFID {
 private:
-	StyxFID mFID;
+	StyxString mName;
+	uint16_t mMode;
+	uint32_t mPermissions;
 public:
-	StyxTClunkMessage(StyxFID fid);
-	virtual ~StyxTClunkMessage();
+	StyxTCreateMessage(StyxFID fid, StyxString name, uint32_t permissions, uint16_t mode);
+	virtual ~StyxTCreateMessage();
 	StyxFID getFID();
 	// =======================================================
 	// Virtual methods

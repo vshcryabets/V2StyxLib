@@ -8,7 +8,7 @@
 #ifndef STYXTWALKMESSAGE_H_
 #define STYXTWALKMESSAGE_H_
 
-#include "StyxMessage.h"
+#include "messages/base/StyxMessage.h"
 #include <vector>
 #include <string>
 

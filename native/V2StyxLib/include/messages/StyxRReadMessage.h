@@ -8,7 +8,7 @@
 #ifndef STYXRREADMESSAGE_H_
 #define STYXRREADMESSAGE_H_
 
-#include "StyxMessage.h"
+#include "messages/base/StyxMessage.h"
 
 class StyxRReadMessage: public StyxMessage {
 private:

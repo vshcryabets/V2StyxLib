@@ -7,9 +7,9 @@
 
 #ifndef STYXSTAT_H_
 #define STYXSTAT_H_
-#include "../types.h"
-#include "../io/IStyxDataReader.h"
-#include "../io/IStyxDataWriter.h"
+#include "types.h"
+#include "io/IStyxDataReader.h"
+#include "io/IStyxDataWriter.h"
 #include "StyxQID.h"
 
 class StyxStat {

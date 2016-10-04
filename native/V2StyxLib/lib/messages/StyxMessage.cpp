@@ -5,7 +5,7 @@
  *      Author: vschryabets@gmail.com
  */
 
-#include "messages/StyxMessage.h"
+#include "messages/base/StyxMessage.h"
 #include "messages/StyxTVersionMessage.h"
 #include "messages/StyxRVersionMessage.h"
 #include "messages/StyxTAttachMessage.h"
@@ -13,12 +13,12 @@
 #include "messages/StyxTStatMessage.h"
 #include "messages/StyxTOpenMessage.h"
 #include "messages/StyxTReadMessage.h"
-#include "messages/StyxTClunkMessage.h"
 #include "messages/StyxTFlushMessage.h"
 #include "messages/StyxTWriteMessage.h"
 #include "messages/StyxTWStatMessage.h"
 #include "io/IStyxDataReader.h"
 #include "stdio.h"
+#include "../../include/messages/StyxTCreateMessage.h"
 
 StyxMessage::StyxMessage(MessageTypeEnum type, StyxTAG tag) {
 	mType = type;
@@ -103,7 +103,7 @@ StyxMessage* StyxMessage::factory(IStyxDataReader* buffer, size_t io_unit) {
 		//		result = new StyxRWriteMessage(tag, 0);
 		//		break;
 	case Tclunk:
-		result = new StyxTClunkMessage(tag);
+		result = new StyxTCreateMessage(tag);
 		break;
 		//	case Rclunk:
 		//		result = new StyxRClunkMessage(tag);

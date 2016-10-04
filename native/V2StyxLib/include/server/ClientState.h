@@ -20,11 +20,11 @@
 #include "../messages/StyxTStatMessage.h"
 #include "../messages/StyxTOpenMessage.h"
 #include "../messages/StyxTReadMessage.h"
-#include "../messages/StyxTClunkMessage.h"
 #include "../messages/StyxTWriteMessage.h"
 #include "../messages/StyxTWStatMessage.h"
 #include "../io/StyxByteBufferReadable.h"
 #include "../io/StyxByteBufferWritable.h"
+#include "../messages/StyxTCreateMessage.h"
 #include "../vfs/IVirtualStyxFile.h"
 
 class ClientState {
@@ -75,7 +75,7 @@ private:
 	/**
 	 * Handle clunk request
 	 */
-	StyxMessage* processClunk(StyxTClunkMessage *msg);
+	StyxMessage* processClunk(StyxTCreateMessage *msg);
 	/**
 	 * Handle Write request
 	 */

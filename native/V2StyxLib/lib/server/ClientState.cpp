@@ -90,7 +90,7 @@ void ClientState::processMessage(StyxMessage *msg) {
 			answer = processStat((StyxTStatMessage*)msg);
 			break;
 		case Tclunk:
-			answer = processClunk((StyxTClunkMessage*) msg);
+			answer = processClunk((StyxTCreateMessage*) msg);
 			break;
 		case Tflush:
 			// TODO do something there
@@ -245,7 +245,7 @@ StyxMessage* ClientState::processRead(StyxTReadMessage *msg) {
  * Handle clunk request
  * @param msg
  */
-StyxMessage* ClientState::processClunk(StyxTClunkMessage *msg) {
+StyxMessage* ClientState::processClunk(StyxTCreateMessage *msg) {
 	map<uint32_t,IVirtualStyxFile*>::iterator iterator = mAssignedFiles->find(msg->getFID());
 	if ( iterator == mAssignedFiles->end() ) {
 		return getNoFIDError(msg, msg->getFID());

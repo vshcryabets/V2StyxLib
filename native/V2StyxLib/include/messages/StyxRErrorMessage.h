@@ -7,7 +7,7 @@
 
 #ifndef STYXRERRORMESSAGE_H_
 #define STYXRERRORMESSAGE_H_
-#include "StyxMessage.h"
+#include "messages/base/StyxMessage.h"
 #include <string>
 #include "StyxRErrorMessage.h"
 #include "../types.h"

@@ -8,8 +8,8 @@
 #ifndef STYXROPENMESSAGE_H_
 #define STYXROPENMESSAGE_H_
 
-#include "StyxMessage.h"
-#include "../structs/StyxQID.h"
+#include "messages/base/StyxMessage.h"
+#include "messages/base/structs/StyxQID.h"
 
 class StyxROpenMessage: public StyxMessage {
 private:

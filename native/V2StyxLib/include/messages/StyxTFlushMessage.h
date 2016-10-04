@@ -8,7 +8,7 @@
 #ifndef STYXTFLUSHMESSAGE_H_
 #define STYXTFLUSHMESSAGE_H_
 
-#include "StyxMessage.h"
+#include "messages/base/StyxMessage.h"
 
 class StyxTFlushMessage: public StyxMessage {
 private:

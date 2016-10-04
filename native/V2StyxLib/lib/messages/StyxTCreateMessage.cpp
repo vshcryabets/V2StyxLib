@@ -5,29 +5,29 @@
  *      Author: mrco
  */
 
-#include "messages/StyxTClunkMessage.h"
+#include "../../include/messages/StyxTCreateMessage.h"
 
-StyxTClunkMessage::StyxTClunkMessage(StyxFID fid) :
+StyxTCreateMessage::StyxTCreateMessage(StyxFID fid) :
 	StyxMessage(Tclunk, NOTAG){
 	mFID = fid;
 }
 
-StyxTClunkMessage::~StyxTClunkMessage() {
+StyxTCreateMessage::~StyxTCreateMessage() {
 }
-StyxFID StyxTClunkMessage::getFID() {
+StyxFID StyxTCreateMessage::getFID() {
 	return mFID;
 }
 // =======================================================
 // Virtual methods
 // =======================================================
-void StyxTClunkMessage::load(IStyxDataReader *input) {
+void StyxTCreateMessage::load(IStyxDataReader *input) {
 	mFID = input->readUInt32();
 }
-size_t StyxTClunkMessage::writeToBuffer(IStyxDataWriter* output) {
+size_t StyxTCreateMessage::writeToBuffer(IStyxDataWriter* output) {
 	StyxMessage::writeToBuffer(output);
 	output->writeUInt32(mFID);
 	return getBinarySize();
 }
-size_t StyxTClunkMessage::getBinarySize() {
+size_t StyxTCreateMessage::getBinarySize() {
 	return StyxMessage::getBinarySize() + sizeof(mFID);
 }

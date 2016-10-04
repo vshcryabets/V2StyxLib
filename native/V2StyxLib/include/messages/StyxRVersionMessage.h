@@ -8,7 +8,7 @@
 #ifndef STYXRVERSIONMESSAGE_H_
 #define STYXRVERSIONMESSAGE_H_
 #include <string>
-#include "StyxMessage.h"
+#include "messages/base/StyxMessage.h"
 
 class StyxRVersionMessage : public StyxMessage {
 private:
