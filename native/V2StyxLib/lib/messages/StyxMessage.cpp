@@ -18,7 +18,11 @@
 #include "messages/StyxTWStatMessage.h"
 #include "io/IStyxDataReader.h"
 #include "stdio.h"
-#include "../../include/messages/StyxTCreateMessage.h"
+#include "messages/StyxTCreateMessage.h"
+
+size_t StyxMessage::getUTFSize(StyxString utf) {
+	return utf.length();
+}
 
 StyxMessage::StyxMessage(MessageTypeEnum type, StyxTAG tag) {
 	mType = type;
@@ -103,17 +107,17 @@ StyxMessage* StyxMessage::factory(IStyxDataReader* buffer, size_t io_unit) {
 		//		result = new StyxRWriteMessage(tag, 0);
 		//		break;
 	case Tclunk:
-		result = new StyxTCreateMessage(tag);
+		result = new StyxTMessageFID(Tclunk, Rclunk, 0);
 		break;
-		//	case Rclunk:
-		//		result = new StyxRClunkMessage(tag);
-		//		break;
-		//	case Tremove:
-		//		result = new StyxTRemoveMessage(tag);
-		//		break;
-		//	case Rremove:
-		//		result = new StyxRRemoveMessage(tag);
-		//		break;
+	case Rclunk:
+		result = new StyxMessage(Rclunk, tag);
+		break;
+	case Tremove:
+		result = new StyxTMessageFID(Tremove, Rremove, 0);
+		break;
+	case Rremove:
+		result = new StyxTMessageFID(Tstat, Rstat, 0);
+		break;
 	case Tstat:
 		result = new StyxTStatMessage(tag);
 		break;
@@ -148,14 +152,16 @@ StyxTAG StyxMessage::getTag() {
 	return mTag;
 }
 
-size_t StyxMessage::writeToBuffer(IStyxDataWriter *output) {
+void StyxMessage::load(IStyxDataReader *buffer) {
+}
+
+void StyxMessage::writeToBuffer(IStyxDataWriter *output) {
 	size_t packetSize = getBinarySize();
 	output->clear();
 	output->limit(packetSize);
 	output->writeUInt32(packetSize);
 	output->writeUInt8(mType);
 	output->writeUInt16(getTag());
-	return getBinarySize();
 }
 
 size_t StyxMessage::getBinarySize()	{

@@ -28,14 +28,15 @@ void StyxRReadMessage::load(IStyxDataReader *input) {
 	mDelete = true;
 	input->read(mData, 0, mDataLength);
 }
-size_t StyxRReadMessage::writeToBuffer(IStyxDataWriter* output) {
+
+void StyxRReadMessage::writeToBuffer(IStyxDataWriter* output) {
 	StyxMessage::writeToBuffer(output);
 	output->writeUInt32(mDataLength);
 	if ( mDataLength > 0 ) {
 		output->write(mData, 0, mDataLength);
 	}
-	return getBinarySize();
 }
+
 size_t StyxRReadMessage::getBinarySize() {
 	return StyxMessage::getBinarySize() + 4
 			+ mDataLength;

@@ -23,7 +23,7 @@ public:
 	// Virtual methods
 	// =======================================================
 	virtual void load(IStyxDataReader *buffer);
-	virtual size_t writeToBuffer(IStyxDataWriter* output);
+	virtual void writeToBuffer(IStyxDataWriter* output);
 	virtual size_t getBinarySize();
 };
 

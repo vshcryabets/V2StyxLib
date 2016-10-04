@@ -5,29 +5,59 @@
  *      Author: mrco
  */
 
-#include "../../include/messages/StyxTCreateMessage.h"
+#include "messages/StyxTCreateMessage.h"
 
-StyxTCreateMessage::StyxTCreateMessage(StyxFID fid) :
-	StyxMessage(Tclunk, NOTAG){
-	mFID = fid;
+StyxTCreateMessage::StyxTCreateMessage(StyxFID fid, StyxString name, uint32_t permissions, uint16_t mode) :
+	StyxTMessageFID(Tcreate, Rcreate, fid), mName(name), mPermissions(permissions), mMode(mode) {
 }
 
 StyxTCreateMessage::~StyxTCreateMessage() {
 }
-StyxFID StyxTCreateMessage::getFID() {
-	return mFID;
+
+StyxString StyxTCreateMessage::getName() {
+	return mName;
 }
+
+void StyxTCreateMessage::setName(StyxString name) {
+	mName = name;
+}
+
+uint32_t StyxTCreateMessage::getPermissions()
+{
+	return mPermissions;
+}
+
+void StyxTCreateMessage::setPermissions(uint32_t permissions)
+{
+	mPermissions = permissions;
+}
+
+uint16_t StyxTCreateMessage::getMode() {
+	return mMode;
+}
+
+void StyxTCreateMessage::setMode(uint16_t mode) {
+	mMode = mode;
+}
+
 // =======================================================
 // Virtual methods
 // =======================================================
 void StyxTCreateMessage::load(IStyxDataReader *input) {
-	mFID = input->readUInt32();
+    mName = input->readUTFString();
+    mPermissions = input->readUInt32();
+    mMode = input->readUInt8();
 }
-size_t StyxTCreateMessage::writeToBuffer(IStyxDataWriter* output) {
-	StyxMessage::writeToBuffer(output);
-	output->writeUInt32(mFID);
-	return getBinarySize();
-}
+
 size_t StyxTCreateMessage::getBinarySize() {
-	return StyxMessage::getBinarySize() + sizeof(mFID);
+	return StyxTCreateMessage::getBinarySize() + 5
+			+ StyxMessage::getUTFSize(this->getName());
 }
+
+void StyxTCreateMessage::writeToBuffer(IStyxDataWriter* output) {
+	StyxTCreateMessage::writeToBuffer(output);
+	output->writeUTFString(&mName);
+	output->writeUInt32(getPermissions());
+	output->writeUInt8(getMode());
+}
+

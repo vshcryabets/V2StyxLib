@@ -214,10 +214,11 @@ public class StyxMessage {
 
     protected void load(IStyxDataReader buffer) throws IOException {
     }
+
     public void writeToBuffer(IStyxDataWriter output)
-            throws UnsupportedEncodingException, IOException {
-        output.clear();
+            throws IOException {
         int packetSize = getBinarySize();
+        output.clear();
         output.limit(packetSize);
         output.writeUInt32(packetSize);
         output.writeUInt8((short) getType().getByte());

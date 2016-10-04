@@ -21,10 +21,9 @@ StyxRWriteMessage::~StyxRWriteMessage() {
 void StyxRWriteMessage::load(IStyxDataReader *input) {
 	mCount = input->readUInt32();
 }
-size_t StyxRWriteMessage::writeToBuffer(IStyxDataWriter* output) {
+void StyxRWriteMessage::writeToBuffer(IStyxDataWriter* output) {
 	StyxMessage::writeToBuffer(output);
 	output->writeUInt32(mCount);
-	return getBinarySize();
 }
 size_t StyxRWriteMessage::getBinarySize() {
 	return StyxMessage::getBinarySize() + 4;

@@ -10,7 +10,7 @@
 #include "messages/base/StyxMessage.h"
 #include <string>
 #include "StyxRErrorMessage.h"
-#include "../types.h"
+#include "types.h"
 
 class StyxRErrorMessage : public StyxMessage {
 private:
@@ -24,7 +24,7 @@ public:
 	// Virtual methods
 	// =======================================================
 	virtual void load(IStyxDataReader *buffer);
-	virtual size_t writeToBuffer(IStyxDataWriter* output);
+	virtual void writeToBuffer(IStyxDataWriter* output);
 	virtual size_t getBinarySize();
 };
 

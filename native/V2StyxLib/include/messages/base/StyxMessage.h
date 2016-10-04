@@ -21,7 +21,9 @@ public:
 	static const StyxFID NOFID = 0xFFFFFFFFL;
 	static const size_t BASE_BINARY_SIZE = 7;
 
+	static size_t getUTFSize(StyxString utf);
 	static StyxMessage* factory(IStyxDataReader *buffer, size_t iounit);
+
 	StyxMessage(MessageTypeEnum type, StyxTAG tag);
 	virtual ~StyxMessage();
 	// =======================================================
@@ -36,8 +38,8 @@ public:
 	// =======================================================
 	// Virtual methods
 	// =======================================================
-	virtual void load(IStyxDataReader *buffer) = 0;
-	virtual size_t writeToBuffer(IStyxDataWriter *outputBuffer);
+	virtual void load(IStyxDataReader *buffer);
+	virtual void writeToBuffer(IStyxDataWriter *outputBuffer);
 	virtual size_t getBinarySize();
 };
 

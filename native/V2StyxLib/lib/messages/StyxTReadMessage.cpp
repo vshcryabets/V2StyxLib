@@ -8,17 +8,11 @@
 #include "messages/StyxTReadMessage.h"
 
 StyxTReadMessage::StyxTReadMessage(StyxFID fid, uint64_t offset, uint32_t count) :
-	StyxMessage(Tread, NOTAG){
-	mFID = fid;
-	mOffset = offset;
-	mCount = count;
+	StyxTMessageFID(Tread, Rread, fid), mOffset(offset), mCount(count){
 }
 
 StyxTReadMessage::~StyxTReadMessage() {
 	// TODO Auto-generated destructor stub
-}
-StyxFID StyxTReadMessage::getFID() {
-	return mFID;
 }
 uint64_t StyxTReadMessage::getOffset() {
 	return mOffset;
@@ -30,17 +24,15 @@ uint32_t StyxTReadMessage::getCount() {
 // Virtual methods
 // =======================================================
 void StyxTReadMessage::load(IStyxDataReader *input) {
-    mFID = input->readUInt32();
+	StyxTMessageFID::load(input);
     mOffset = input->readUInt64();
     mCount = input->readUInt32();
 }
-size_t StyxTReadMessage::writeToBuffer(IStyxDataWriter* output) {
-	StyxMessage::writeToBuffer(output);
-    output->writeUInt32(mFID);
+void StyxTReadMessage::writeToBuffer(IStyxDataWriter* output) {
+	StyxTMessageFID::writeToBuffer(output);
     output->writeUInt64(mOffset);
     output->writeUInt32(mCount);
-    return getBinarySize();
 }
 size_t StyxTReadMessage::getBinarySize() {
-	return StyxMessage::getBinarySize() + sizeof(mFID) + sizeof(mOffset) + sizeof(mCount);
+	return StyxTMessageFID::getBinarySize() + sizeof(mOffset) + sizeof(mCount);
 }

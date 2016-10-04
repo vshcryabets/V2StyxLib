@@ -8,16 +8,11 @@
 #include "messages/StyxTOpenMessage.h"
 
 StyxTOpenMessage::StyxTOpenMessage(StyxFID fid, ModeTypeEnum mode) :
-	StyxMessage(Topen, NOTAG ){
-	mFID = fid;
-	mMode = mode;
+	StyxTMessageFID(Topen, Ropen, fid), mMode(mode) {
 }
 
 StyxTOpenMessage::~StyxTOpenMessage() {
 	// TODO Auto-generated destructor stub
-}
-StyxFID StyxTOpenMessage::getFID() {
-	return mFID;
 }
 StyxMode StyxTOpenMessage::getMode() {
 	return mMode;
@@ -26,15 +21,13 @@ StyxMode StyxTOpenMessage::getMode() {
 // Virtual methods
 // =======================================================
 void StyxTOpenMessage::load(IStyxDataReader *input) {
-	mFID = input->readUInt32();
+	StyxTMessageFID::load(input);
     mMode = (StyxMode)input->readUInt8();
 }
-size_t StyxTOpenMessage::writeToBuffer(IStyxDataWriter *outputBuffer) {
-	StyxMessage::writeToBuffer(outputBuffer);
-	outputBuffer->writeUInt32(mFID);
+void StyxTOpenMessage::writeToBuffer(IStyxDataWriter *outputBuffer) {
+	StyxTMessageFID::writeToBuffer(outputBuffer);
 	outputBuffer->writeUInt8(mMode);
-    return getBinarySize();
 }
 size_t StyxTOpenMessage::getBinarySize() {
-	return StyxMessage::getBinarySize() + sizeof(StyxFID)+1;
+	return StyxTMessageFID::getBinarySize() + 1;
 }

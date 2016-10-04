@@ -21,10 +21,9 @@ StyxTFlushMessage::~StyxTFlushMessage() {
 void StyxTFlushMessage::load(IStyxDataReader *input) {
 	mOldTag = input->readUInt16();
 }
-size_t StyxTFlushMessage::writeToBuffer(IStyxDataWriter* output) {
+void StyxTFlushMessage::writeToBuffer(IStyxDataWriter* output) {
 	StyxMessage::writeToBuffer(output);
 	output->writeUInt16(mOldTag);
-	return getBinarySize();
 }
 size_t StyxTFlushMessage::getBinarySize() {
 	return StyxMessage::getBinarySize() + sizeof(mOldTag);

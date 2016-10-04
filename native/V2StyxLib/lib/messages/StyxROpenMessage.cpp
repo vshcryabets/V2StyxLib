@@ -8,32 +8,24 @@
 #include "messages/StyxROpenMessage.h"
 
 StyxROpenMessage::StyxROpenMessage(StyxTAG tag, StyxQID* qid, size_t iounit) :
-	StyxMessage(Ropen, tag){
-	mQID = qid;
+	StyxRSingleQIDMessage(Ropen, tag, qid){
 	mIOUnit = iounit;
-	mDelete = false;
 }
 
 StyxROpenMessage::~StyxROpenMessage() {
-	if ( mDelete ) {
-		delete mQID;
-	}
 }
 // =======================================================
 // Virtual methods
 // =======================================================
 void StyxROpenMessage::load(IStyxDataReader *input) {
-    mQID = new StyxQID(input);
     mIOUnit = input->readUInt32();
-    mDelete = true;
 }
-size_t StyxROpenMessage::writeToBuffer(IStyxDataWriter *output) {
-    StyxMessage::writeToBuffer(output);
-	mQID->writeBinaryTo(output);
+
+void StyxROpenMessage::writeToBuffer(IStyxDataWriter *output) {
+	StyxRSingleQIDMessage::writeToBuffer(output);
 	output->writeUInt32(mIOUnit);
-	return getBinarySize();
 }
+
 size_t StyxROpenMessage::getBinarySize() {
-	return StyxMessage::getBinarySize()
-		+ StyxQID::CONTENT_SIZE + 4;
+	return StyxRSingleQIDMessage::getBinarySize() + 4;
 }

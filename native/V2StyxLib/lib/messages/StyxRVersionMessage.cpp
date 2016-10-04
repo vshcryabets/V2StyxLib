@@ -22,11 +22,10 @@ void StyxRVersionMessage::load(IStyxDataReader *buffer) {
 	mProtocol = buffer->readUTFString(); // TODO this is wrong, memory leak
 }
 
-size_t StyxRVersionMessage::writeToBuffer(IStyxDataWriter* output) {
+void StyxRVersionMessage::writeToBuffer(IStyxDataWriter* output) {
 	StyxMessage::writeToBuffer(output);
 	output->writeUInt32(mIOUnit);
 	output->writeUTFString(&mProtocol);
-	return getBinarySize();
 }
 
 size_t StyxRVersionMessage::getBinarySize() {

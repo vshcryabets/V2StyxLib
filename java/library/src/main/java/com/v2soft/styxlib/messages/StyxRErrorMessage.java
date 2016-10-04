@@ -36,7 +36,7 @@ public class StyxRErrorMessage extends StyxMessage {
 
 	@Override
 	public void writeToBuffer(IStyxDataWriter output)
-	        throws UnsupportedEncodingException, IOException {
+	        throws IOException {
 	    super.writeToBuffer(output);
 		output.writeUTFString(getError());
 	}

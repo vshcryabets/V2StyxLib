@@ -26,10 +26,10 @@ StyxRErrorMessage::~StyxRErrorMessage() {
 void StyxRErrorMessage::load(IStyxDataReader *buffer) {
 	mMessage = new StyxString(buffer->readUTFString());
 }
-size_t StyxRErrorMessage::writeToBuffer(IStyxDataWriter* output) {
+
+void StyxRErrorMessage::writeToBuffer(IStyxDataWriter* output) {
 	StyxMessage::writeToBuffer(output);
 	output->writeUTFString(mMessage);
-	return getBinarySize();
 }
 size_t StyxRErrorMessage::getBinarySize() {
 	return StyxMessage::getBinarySize()

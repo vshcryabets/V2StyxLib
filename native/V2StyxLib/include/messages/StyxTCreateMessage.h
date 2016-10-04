@@ -19,11 +19,18 @@ public:
 	StyxTCreateMessage(StyxFID fid, StyxString name, uint32_t permissions, uint16_t mode);
 	virtual ~StyxTCreateMessage();
 	StyxFID getFID();
+
+	StyxString getName();
+	void setName(StyxString name);
+	uint32_t getPermissions();
+	void setPermissions(uint32_t permissions);
+	uint16_t getMode();
+	void setMode(uint16_t mode);
 	// =======================================================
 	// Virtual methods
 	// =======================================================
-	virtual void load(IStyxDataReader *input);
-	virtual size_t writeToBuffer(IStyxDataWriter* output);
+	virtual void load(IStyxDataReader* input);
+	virtual void writeToBuffer(IStyxDataWriter* output);
 	virtual size_t getBinarySize();
 };
 

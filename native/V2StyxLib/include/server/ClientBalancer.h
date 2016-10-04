@@ -11,7 +11,6 @@
 #include "ClientsHandler.h"
 #include "vfs/IVirtualStyxFile.h"
 #include "../types.h"
-using namespace std;
 
 class ClientBalancer {
 private:
