@@ -16,8 +16,8 @@ import com.v2soft.styxlib.messages.base.structs.StyxQID;
 import com.v2soft.styxlib.server.ClientDetails;
 import com.v2soft.styxlib.server.IChannelDriver;
 import com.v2soft.styxlib.server.IMessageTransmitter;
-import com.v2soft.styxlib.library.types.ConnectionDetails;
-import com.v2soft.styxlib.library.types.Credentials;
+import com.v2soft.styxlib.types.ConnectionDetails;
+import com.v2soft.styxlib.types.Credentials;
 
 import java.io.Closeable;
 import java.io.IOException;

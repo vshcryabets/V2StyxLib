@@ -6,16 +6,14 @@ import com.v2soft.styxlib.IClient;
 import com.v2soft.styxlib.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.io.StyxUnbufferedFileOutputStream;
-import com.v2soft.styxlib.library.types.ULong;
+import com.v2soft.styxlib.types.ULong;
 import com.v2soft.styxlib.server.ClientDetails;
 import com.v2soft.styxlib.server.IChannelDriver;
 import com.v2soft.styxlib.server.tcp.TCPClientChannelDriver;
 import com.v2soft.styxlib.server.tcp.TCPDualLinkServerManager;
 import com.v2soft.styxlib.vfs.MemoryStyxDirectory;
 import com.v2soft.styxlib.vfs.MemoryStyxFile;
-import com.v2soft.styxlib.library.types.Credentials;
-
-import junit.framework.Assert;
+import com.v2soft.styxlib.types.Credentials;
 
 import org.junit.After;
 import org.junit.Before;
@@ -28,7 +26,6 @@ import java.nio.charset.Charset;
 import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;

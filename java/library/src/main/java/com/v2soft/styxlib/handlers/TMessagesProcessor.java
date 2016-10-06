@@ -1,7 +1,7 @@
 package com.v2soft.styxlib.handlers;
 
 import com.v2soft.styxlib.exceptions.StyxErrorMessageException;
-import com.v2soft.styxlib.library.types.Credentials;
+import com.v2soft.styxlib.types.Credentials;
 import com.v2soft.styxlib.messages.StyxRAttachMessage;
 import com.v2soft.styxlib.messages.StyxRAuthMessage;
 import com.v2soft.styxlib.messages.StyxRErrorMessage;
@@ -24,7 +24,7 @@ import com.v2soft.styxlib.messages.base.StyxTMessageFID;
 import com.v2soft.styxlib.messages.base.enums.MessageType;
 import com.v2soft.styxlib.messages.base.structs.StyxQID;
 import com.v2soft.styxlib.server.ClientDetails;
-import com.v2soft.styxlib.library.types.ConnectionDetails;
+import com.v2soft.styxlib.types.ConnectionDetails;
 import com.v2soft.styxlib.vfs.IVirtualStyxFile;
 
 import java.io.IOException;

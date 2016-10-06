@@ -7,7 +7,7 @@ import com.v2soft.styxlib.handlers.TMessageTransmitter;
 import com.v2soft.styxlib.server.ClientDetails;
 import com.v2soft.styxlib.server.IChannelDriver;
 import com.v2soft.styxlib.vfs.IVirtualStyxFile;
-import com.v2soft.styxlib.library.types.Credentials;
+import com.v2soft.styxlib.types.Credentials;
 
 import java.io.IOException;
 import java.net.InetAddress;

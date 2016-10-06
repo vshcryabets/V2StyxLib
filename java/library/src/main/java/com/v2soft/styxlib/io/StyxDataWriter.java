@@ -1,8 +1,7 @@
 package com.v2soft.styxlib.io;
 
-import com.v2soft.styxlib.library.types.ULong;
+import com.v2soft.styxlib.types.ULong;
 
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.BufferOverflowException;
 import java.nio.ByteBuffer;

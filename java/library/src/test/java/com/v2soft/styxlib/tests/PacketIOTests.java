@@ -10,7 +10,7 @@ import com.v2soft.styxlib.server.tcp.TCPClientChannelDriver;
 import com.v2soft.styxlib.server.tcp.TCPServerManager;
 import com.v2soft.styxlib.vfs.MemoryStyxDirectory;
 import com.v2soft.styxlib.vfs.MemoryStyxFile;
-import com.v2soft.styxlib.library.types.ULong;
+import com.v2soft.styxlib.types.ULong;
 
 import org.junit.After;
 import org.junit.Before;

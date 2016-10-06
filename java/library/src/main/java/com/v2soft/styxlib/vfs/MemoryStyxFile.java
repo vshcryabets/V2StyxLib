@@ -6,7 +6,7 @@ import com.v2soft.styxlib.messages.base.enums.QIDType;
 import com.v2soft.styxlib.messages.base.structs.StyxQID;
 import com.v2soft.styxlib.messages.base.structs.StyxStat;
 import com.v2soft.styxlib.server.ClientDetails;
-import com.v2soft.styxlib.library.types.ULong;
+import com.v2soft.styxlib.types.ULong;
 
 import java.io.IOException;
 import java.nio.charset.Charset;

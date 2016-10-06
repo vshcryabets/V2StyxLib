@@ -2,7 +2,7 @@ package com.v2soft.styxlib;
 
 import com.v2soft.styxlib.handlers.TMessagesProcessor;
 import com.v2soft.styxlib.exceptions.StyxException;
-import com.v2soft.styxlib.library.types.Credentials;
+import com.v2soft.styxlib.types.Credentials;
 import com.v2soft.styxlib.server.IChannelDriver;
 import com.v2soft.styxlib.server.tcp.TCPDualLinkServerManager;
 import com.v2soft.styxlib.vfs.IVirtualStyxFile;

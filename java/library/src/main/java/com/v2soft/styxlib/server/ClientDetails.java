@@ -1,7 +1,7 @@
 package com.v2soft.styxlib.server;
 
 import com.v2soft.styxlib.exceptions.StyxErrorMessageException;
-import com.v2soft.styxlib.library.types.Credentials;
+import com.v2soft.styxlib.types.Credentials;
 import com.v2soft.styxlib.utils.Polls;
 import com.v2soft.styxlib.vfs.IVirtualStyxFile;
 

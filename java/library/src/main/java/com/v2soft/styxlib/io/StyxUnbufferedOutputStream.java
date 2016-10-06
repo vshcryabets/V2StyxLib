@@ -8,7 +8,7 @@ import com.v2soft.styxlib.messages.base.StyxTMessageFID;
 import com.v2soft.styxlib.messages.base.enums.MessageType;
 import com.v2soft.styxlib.server.ClientDetails;
 import com.v2soft.styxlib.server.IMessageTransmitter;
-import com.v2soft.styxlib.library.types.ULong;
+import com.v2soft.styxlib.types.ULong;
 
 import java.io.IOException;
 import java.io.OutputStream;

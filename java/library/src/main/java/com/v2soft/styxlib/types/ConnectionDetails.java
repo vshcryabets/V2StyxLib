@@ -1,4 +1,4 @@
-package com.v2soft.styxlib.library.types;
+package com.v2soft.styxlib.types;
 
 /**
  * Created by vshcryabets on 11/13/14.

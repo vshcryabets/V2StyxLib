@@ -3,7 +3,7 @@ package com.v2soft.styxlib.messages.base.structs;
 import com.v2soft.styxlib.io.IStyxDataReader;
 import com.v2soft.styxlib.io.IStyxDataWriter;
 import com.v2soft.styxlib.messages.base.StyxMessage;
-import com.v2soft.styxlib.library.types.ULong;
+import com.v2soft.styxlib.types.ULong;
 
 import java.io.IOException;
 import java.util.Date;
