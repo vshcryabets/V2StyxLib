@@ -30,7 +30,7 @@ int MemoryStyxDirectory::getMode() {
  * @param mode
  * @throws IOException
  */
-bool MemoryStyxDirectory::open(ClientState *client, int mode){
+bool MemoryStyxDirectory::open(ClientDetails *client, int mode){
 	bool result = ((mode&0x0F) == OREAD);
 	if ( result ) {
 		// prepare binary structure of the directory
@@ -48,7 +48,7 @@ bool MemoryStyxDirectory::open(ClientState *client, int mode){
 				it != stats.end(); it++ ) {
 			(*it)->writeBinaryTo(buffer);
 		}
-		mBuffersMap.insert(std::pair<ClientState*, StyxByteBufferWritable*>(client, buffer));
+		mBuffersMap.insert(std::pair<ClientDetails*, StyxByteBufferWritable*>(client, buffer));
 	}
 	return result;
 }
@@ -56,7 +56,7 @@ bool MemoryStyxDirectory::open(ClientState *client, int mode){
  * Close file
  * @param mode
  */
-void MemoryStyxDirectory::close(ClientState *client) {
+void MemoryStyxDirectory::close(ClientDetails *client) {
 	// remove buffer
 	ClientsMap::iterator item = mBuffersMap.find(client);
 	if ( item != mBuffersMap.end() ) {
@@ -70,7 +70,7 @@ void MemoryStyxDirectory::close(ClientState *client) {
  * @param count number of bytes to read
  * @return number of bytes that was readed into the buffer
  */
-size_t MemoryStyxDirectory::read(ClientState *client, uint8_t* buffer, uint64_t offset, size_t count) {
+size_t MemoryStyxDirectory::read(ClientDetails *client, uint8_t* buffer, uint64_t offset, size_t count) {
 	ClientsMap::iterator it = mBuffersMap.find(client);
 	if ( it == mBuffersMap.end() ) {
 		return -1; // TODO there we should send Rerror with message "This file isn't open"
@@ -100,7 +100,7 @@ IVirtualStyxFile* MemoryStyxDirectory::walk(std::vector<StyxString*> *pathElemen
 	}
 	return MemoryStyxFile::walk(pathElements, qids);
 }
-void MemoryStyxDirectory::onConnectionClosed(ClientState *state) {
+void MemoryStyxDirectory::onConnectionClosed(ClientDetails *state) {
 	for ( FileList::iterator it = mFiles.begin();
 			it != mFiles.end(); it++ ) {
 		(*it)->onConnectionClosed(state);

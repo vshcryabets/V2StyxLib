@@ -15,7 +15,7 @@ class StyxROpenMessage: public StyxRSingleQIDMessage {
 private:
 	size_t mIOUnit;
 public:
-	StyxROpenMessage(StyxTAG tag, StyxQID* qid, size_t iounit);
+	StyxROpenMessage(StyxTAG tag, StyxQID* qid, size_t iounit, bool create);
 	virtual ~StyxROpenMessage();
 	// =======================================================
 	// Virtual methods

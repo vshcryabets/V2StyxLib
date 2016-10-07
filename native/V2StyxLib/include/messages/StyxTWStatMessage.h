@@ -8,16 +8,15 @@
 #ifndef STYXTWSTATMESSAGE_H_
 #define STYXTWSTATMESSAGE_H_
 
-#include "messages/base/StyxMessage.h"
+#include "messages/base/StyxTMessageFID.h"
 #include "messages/base/structs/StyxStat.h"
 
-class StyxTWStatMessage: public StyxMessage {
+class StyxTWStatMessage: public StyxTMessageFID {
 private:
-	StyxFID mFID;
 	StyxStat *mStat;
 	bool mDelete;
 public:
-	StyxTWStatMessage(StyxFID fid, StyxStat *stat);
+	StyxTWStatMessage(StyxFID fid, StyxStat *stat, bool deleteStat);
 	~StyxTWStatMessage();
 	// =======================================================
 	// Virtual methods

@@ -7,15 +7,12 @@
 
 #include "messages/StyxTWStatMessage.h"
 
-StyxTWStatMessage::StyxTWStatMessage(StyxFID fid, StyxStat *stat) :
-	StyxMessage(Twstat, NOTAG) {
-	mFID = fid;
-	mStat = stat;
-	mDelete = false;
+StyxTWStatMessage::StyxTWStatMessage(StyxFID fid, StyxStat *stat, bool deleteStat) :
+	StyxTMessageFID(Twstat, Rwstat, fid), mStat(stat), mDelete(deleteStat) {
 }
 
 StyxTWStatMessage::~StyxTWStatMessage() {
-	if ( mDelete ) {
+	if ( mDelete && mStat != NULL ) {
 		delete mStat;
 	}
 }
@@ -23,19 +20,17 @@ StyxTWStatMessage::~StyxTWStatMessage() {
 // Virtual methods
 // =======================================================
 void StyxTWStatMessage::load(IStyxDataReader *input) {
-	mFID = input->readUInt32();
+	StyxTMessageFID::load(input);
     input->readUInt16();
     mStat = new StyxStat(input);
     mDelete = true;
 }
-size_t StyxTWStatMessage::writeToBuffer(IStyxDataWriter* output) {
-	StyxMessage::writeToBuffer(output);
-    output->writeUInt32(mFID);
+void StyxTWStatMessage::writeToBuffer(IStyxDataWriter* output) {
+	StyxTMessageFID::writeToBuffer(output);
     output->writeUInt16(mStat->getSize());
     mStat->writeBinaryTo(output);
-    return getBinarySize();
 }
 size_t StyxTWStatMessage::getBinarySize() {
-	return StyxMessage::getBinarySize() + 4
+	return StyxTMessageFID::getBinarySize()
 			+ mStat->getSize();
 }

@@ -8,19 +8,17 @@
 #ifndef STYXTWALKMESSAGE_H_
 #define STYXTWALKMESSAGE_H_
 
-#include "messages/base/StyxMessage.h"
+#include "messages/base/StyxTMessageFID.h"
 #include <vector>
-#include <string>
 
-class StyxTWalkMessage: public StyxMessage {
+class StyxTWalkMessage: public StyxTMessageFID {
 private:
-	StyxFID mFID, mNewFID;
+	StyxFID mNewFID;
 	StyxString mPath;
 	std::vector<StyxString*> *mPathElements;
 public:
 	StyxTWalkMessage(StyxFID fid, StyxFID new_fid);
 	virtual ~StyxTWalkMessage();
-	uint32_t getFID();
 	uint32_t getNewFID();
 	std::vector<StyxString*>* getPathElements();
 	// =======================================================

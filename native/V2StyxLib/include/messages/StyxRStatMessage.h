@@ -16,6 +16,7 @@ private:
 	StyxStat *mStat;
 public:
 	StyxRStatMessage(StyxTAG tag, StyxStat *stat);
+	StyxRStatMessage(StyxTAG tag);
 	virtual ~StyxRStatMessage();
 	// =======================================================
 	// Virtual methods

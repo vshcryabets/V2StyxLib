@@ -7,8 +7,8 @@
 
 #ifndef StyxByteBufferReadable_H_
 #define StyxByteBufferReadable_H_
-#include "../types.h"
-#include "StyxDataReader.h"
+#include "types.h"
+#include "io/StyxDataReader.h"
 
 class StyxByteBufferReadable : public StyxDataReader {
 private:

@@ -17,7 +17,7 @@ private:
     StyxQID *mQID;
     bool shouldDeleteQID;
 public:
-    StyxRSingleQIDMessage(MessageTypeEnum type, StyxTAG tag, StyxQID *qid);
+    StyxRSingleQIDMessage(MessageTypeEnum type, StyxTAG tag, const StyxQID *qid);
     virtual ~StyxRSingleQIDMessage();
 	// =======================================================
 	// Virtual methods

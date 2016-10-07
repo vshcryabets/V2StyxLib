@@ -26,10 +26,10 @@
 #include "messages/StyxTCreateMessage.h"
 #include "vfs/IVirtualStyxFile.h"
 
-class ClientState {
+class ClientDetails {
 private:
-	std::string mUserName;
-	std::string mProtocol;
+protected:
+	Credentials *mCredentials;
 	StyxByteBufferReadable *mBuffer;
 	StyxByteBufferWritable *mOutputBuffer;
 	size_t mIOUnit;
@@ -87,11 +87,11 @@ private:
 	void registerOpenedFile(uint32_t fid, IVirtualStyxFile* file);
 	StyxRErrorMessage* getNoFIDError(StyxMessage* message, StyxFID fid);
 public:
-	ClientState(size_t iounit,
+	ClientDetails(size_t iounit,
 			Socket channel,
 			IVirtualStyxFile *root,
 			std::string protocol);
-	~ClientState();
+	~ClientDetails();
 	bool readSocket();
 };
 

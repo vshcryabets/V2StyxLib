@@ -25,6 +25,7 @@ const int INVALID_SOCKET = -1;
 #endif
 typedef int64_t Date;
 typedef int64_t int128_t;
+typedef int32_t StyxThread;
 
 enum MessageTypeEnum {
 	Tversion = 100,
@@ -81,5 +82,15 @@ typedef uint16_t StyxTAG;
 typedef std::string StyxString;
 typedef ModeTypeEnum StyxMode;
 
+class Credentials {
+protected:
+    StyxString mUserName;
+    StyxString mPassword;
+public:
+    Credentials(StyxString username, StyxString password);
+	~Credentials();
+	StyxString getUserName();
+	StyxString getPassword();
+};
 
 #endif /* TYPES_H_ */

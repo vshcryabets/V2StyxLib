@@ -7,19 +7,14 @@
 
 #include "messages/StyxTWriteMessage.h"
 
-StyxTWriteMessage::StyxTWriteMessage() :
-	StyxMessage(Twrite, NOTAG) {
-	// TODO Auto-generated constructor stub
-
+StyxTWriteMessage::StyxTWriteMessage(StyxFID fid, uint64_t offset, uint8_t *data, uint32_t length) :
+	StyxTMessageFID(Twrite, Twrite, fid), mOffset(offset), mData(data), mDataLength(length), mDelete(false) {
 }
 
 StyxTWriteMessage::~StyxTWriteMessage() {
 	if ( mDelete ) {
 		delete [] mData;
 	}
-}
-StyxFID StyxTWriteMessage::getFID() {
-	return mFID;
 }
 uint8_t* StyxTWriteMessage::getData() {
 	return mData;
@@ -34,23 +29,20 @@ uint32_t StyxTWriteMessage::getCount() {
 // Virtual methods
 // =======================================================
 void StyxTWriteMessage::load(IStyxDataReader *input) {
-//	mOldTag = input->readUInt16();
-    mFID = input->readUInt32();
+	StyxTMessageFID::load(input);
     mOffset = input->readUInt64();
     mDataLength = (int)input->readUInt32();
     mData = new uint8_t[mDataLength];
     mDelete = true;
     input->read(mData, 0, mDataLength);
 }
-size_t StyxTWriteMessage::writeToBuffer(IStyxDataWriter* output) {
-	StyxMessage::writeToBuffer(output);
-    output->writeUInt32(mFID);
+void StyxTWriteMessage::writeToBuffer(IStyxDataWriter* output) {
+	StyxTMessageFID::writeToBuffer(output);
     output->writeUInt64(mOffset);
     output->writeUInt32(mDataLength);
     output->write(mData, 0, mDataLength);
-    return getBinarySize();
 }
 size_t StyxTWriteMessage::getBinarySize() {
-	return StyxMessage::getBinarySize() + 16
+	return StyxMessage::getBinarySize() + 12
             + mDataLength;
 }

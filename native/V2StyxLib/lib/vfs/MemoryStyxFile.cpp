@@ -72,7 +72,7 @@ int MemoryStyxFile::getMode() {
 	return 0x01FF;
 }
 
-bool MemoryStyxFile::open(ClientState *client, int mode) {
+bool MemoryStyxFile::open(ClientDetails *client, int mode) {
 	bool result = (
 			(mode&0x0F) == OREAD ||
 			(mode&0x0F) == OWRITE ||
@@ -83,14 +83,14 @@ bool MemoryStyxFile::open(ClientState *client, int mode) {
 IVirtualStyxFile* MemoryStyxFile::walk(std::vector<StyxString*> *pathElements, std::vector<StyxQID*> *qids) {
 	return this;
 }
-size_t MemoryStyxFile::write(ClientState *client, uint8_t* data, uint64_t offset, size_t count) {
+size_t MemoryStyxFile::write(ClientDetails *client, uint8_t* data, uint64_t offset, size_t count) {
 	return 0;
 }
-size_t MemoryStyxFile::read(ClientState *client, uint8_t* buffer, uint64_t offset, size_t count) {
+size_t MemoryStyxFile::read(ClientDetails *client, uint8_t* buffer, uint64_t offset, size_t count) {
 	return 0;
 }
-void MemoryStyxFile::close(ClientState *client) {
+void MemoryStyxFile::close(ClientDetails *client) {
 }
-void MemoryStyxFile::onConnectionClosed(ClientState *state) {
+void MemoryStyxFile::onConnectionClosed(ClientDetails *state) {
 	// ok, nothing to do
 }

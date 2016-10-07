@@ -10,7 +10,7 @@
 
 class IVirtualStyxFile;
 class ClientBalancer;
-class ClientState;
+class ClientDetails;
 class StyxQID;
 class StyxStat;
 class ConnectionAcceptor;

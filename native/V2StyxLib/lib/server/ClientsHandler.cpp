@@ -17,8 +17,8 @@ ClientsHandler::~ClientsHandler() {
 
 void ClientsHandler::addClient(Socket client) {
 	mClientStatesMap.insert(
-			std::pair<Socket, ClientState*>(client,
-					new ClientState(mIOUnit, client, mRoot, mProtocol)));
+			std::pair<Socket, ClientDetails*>(client,
+					new ClientDetails(mIOUnit, client, mRoot, mProtocol)));
 }
 
 bool ClientsHandler::readClient(Socket socket) {

@@ -14,7 +14,7 @@
 
 class ClientBalancer {
 private:
-	ClientsHandler *mHandler;
+	//ClientsHandler *mHandler;
 	vector<Socket> *mAllConnections;
 	vector<Socket> mNewConnections;
 	vector<Socket> mReadable;

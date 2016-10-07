@@ -10,7 +10,6 @@
 #include "messages/StyxRVersionMessage.h"
 #include "messages/StyxTAttachMessage.h"
 #include "messages/StyxTWalkMessage.h"
-#include "messages/StyxTStatMessage.h"
 #include "messages/StyxTOpenMessage.h"
 #include "messages/StyxTReadMessage.h"
 #include "messages/StyxTFlushMessage.h"
@@ -19,6 +18,13 @@
 #include "io/IStyxDataReader.h"
 #include "stdio.h"
 #include "messages/StyxTCreateMessage.h"
+#include "messages/StyxRErrorMessage.h"
+#include "messages/StyxRAttachMessage.h"
+#include "messages/StyxRWalkMessage.h"
+#include "messages/StyxROpenMessage.h"
+#include "messages/StyxRReadMessage.h"
+#include "messages/StyxRWriteMessage.h"
+#include "messages/StyxRStatMessage.h"
 
 size_t StyxMessage::getUTFSize(StyxString utf) {
 	return utf.length();
@@ -70,42 +76,42 @@ StyxMessage* StyxMessage::factory(IStyxDataReader* buffer, size_t io_unit) {
 		//	case Rauth:
 		//		result = new StyxRAuthMessage(tag, StyxQID.EMPTY);
 		//		break;
-		//	case Rerror:
-		//		result = new StyxRErrorMessage(tag, null);
-		//		break;
-		//	case Rflush:
-		//		result = new StyxRFlushMessage(tag);
-		//		break;
-		//	case Rattach:
-		//		result = new StyxRAttachMessage(tag, StyxQID.EMPTY);
-		//		break;
-		//	case Rwalk:
-		//		result = new StyxRWalkMessage(tag, null);
-		//		break;
+    case Rerror:
+        result = new StyxRErrorMessage(tag, NULL);
+        break;
+    case Rflush:
+        result = new StyxMessage(Rflush, tag);
+        break;
+    case Rattach:
+        result = new StyxRAttachMessage(tag, StyxQID::EMPTY);
+        break;
+    case Rwalk:
+        result = new StyxRWalkMessage(tag, NULL);
+        break;
 	case Topen:
 		result = new StyxTOpenMessage(NOFID, OREAD);
 		break;
-		//	case Ropen:
-		//		result = new StyxROpenMessage(tag, null, 0);
-		//		break;
-		//	case Tcreate:
-		//		result = new StyxTCreateMessage(NOFID, null, 0, ModeType.OWRITE);
-		//		break;
-		//	case Rcreate:
-		//		result = new StyxRCreateMessage(tag);
-		//		break;
+    case Ropen:
+        result = new StyxROpenMessage(tag, NULL, 0, false);
+        break;
+    case Tcreate:
+        result = new StyxTCreateMessage(NOFID, NULL, 0, ModeTypeEnum::OWRITE);
+        break;
+    case Rcreate:
+        result = new StyxROpenMessage(tag, NULL, 0, true);
+        break;
 	case Tread:
 		result = new StyxTReadMessage(NOFID, 0, 0);
 		break;
-		//	case Rread:
-		//		result = new StyxRReadMessage(tag, null, 0);
-		//		break;
+    case Rread:
+        result = new StyxRReadMessage(tag, NULL, 0);
+        break;
 	case Twrite:
-		result = new StyxTWriteMessage( );
+		result = new StyxTWriteMessage(NOFID, 0, NULL, 0);
 		break;
-		//	case Rwrite:
-		//		result = new StyxRWriteMessage(tag, 0);
-		//		break;
+    case Rwrite:
+        result = new StyxRWriteMessage(tag, 0);
+        break;
 	case Tclunk:
 		result = new StyxTMessageFID(Tclunk, Rclunk, 0);
 		break;
@@ -116,21 +122,20 @@ StyxMessage* StyxMessage::factory(IStyxDataReader* buffer, size_t io_unit) {
 		result = new StyxTMessageFID(Tremove, Rremove, 0);
 		break;
 	case Rremove:
-		result = new StyxTMessageFID(Tstat, Rstat, 0);
+		result = new StyxMessage(Rremove, tag);
 		break;
 	case Tstat:
-		result = new StyxTStatMessage(tag);
+		result = new StyxTMessageFID(Tstat, Rstat, tag);
 		break;
-		//	case Rstat:
-		//		result = new StyxRStatMessage(tag);
-		//		break;
+	case Rstat:
+		result = new StyxRStatMessage(tag);
+		break;
 	case Twstat:
-		result = new StyxTWStatMessage(NOFID, NULL);
+		result = new StyxTWStatMessage(NOFID, NULL, false);
 		break;
-		//	case Rwstat:
-		//		result = new StyxRWStatMessage(tag);
-		//		break;
-		//	}
+	case Rwstat:
+		result = new StyxMessage(Rwstat, tag);
+		break;
 	default:
 		throw "Unknown message";
 		return NULL;

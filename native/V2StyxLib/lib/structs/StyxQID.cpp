@@ -7,6 +7,8 @@
 
 #include "structs/StyxQID.h"
 
+StyxQID::EMPTY = new StyxQID(QIDType.QTFILE, 0L, ULong.ZERO);
+
 StyxQID::StyxQID(IStyxDataReader *input) {
 	mType = input->readUInt8();
 	mVersion = input->readUInt32();

@@ -11,10 +11,9 @@
 #include <vector>
 #include <map>
 #include "../types.h"
-#include "ClientState.h"
 #include <string>
 
-typedef std::map<Socket, ClientState*> SocketsMap;
+/*typedef std::map<Socket, ClientDetails*> SocketsMap;
 class ClientsHandler {
 private:
 	int mIOUnit;
@@ -28,6 +27,6 @@ public:
 	~ClientsHandler();
 	void addClient(Socket socket);
 	bool readClient(Socket socket);
-};
+};*/
 
 #endif /* CLIENTSHANDLER_H_ */

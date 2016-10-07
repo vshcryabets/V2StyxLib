@@ -21,7 +21,7 @@ public:
 	 * @param offset
 	 * @return
 	 */
-	virtual size_t write(ClientState *client, uint8_t* data, uint64_t offset, size_t count);
+	virtual size_t write(ClientDetails *client, uint8_t* data, uint64_t offset, size_t count);
 };
 
 #endif /* STDOUTFILE_H_ */

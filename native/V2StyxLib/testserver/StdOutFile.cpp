@@ -28,7 +28,7 @@ StdOutFile::~StdOutFile() {
  * @param offset
  * @return
  */
-size_t StdOutFile::write(ClientState *client, uint8_t* data, uint64_t offset, size_t count) {
+size_t StdOutFile::write(ClientDetails *client, uint8_t* data, uint64_t offset, size_t count) {
 	::write(STDOUT_FILENO, data, count);
 	return  count;
 }

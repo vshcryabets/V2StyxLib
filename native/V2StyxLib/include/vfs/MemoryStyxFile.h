@@ -50,19 +50,19 @@ public:
 	 * @param mode
 	 * @throws IOException
 	 */
-	virtual bool open(ClientState *client, int mode);
+	virtual bool open(ClientDetails *client, int mode);
 	/**
 	 * Close file
 	 * @param mode
 	 */
-	virtual void close(ClientState *client);
+	virtual void close(ClientDetails *client);
 	/**
 	 * Read from file
 	 * @param offset offset from begining of the file
 	 * @param count number of bytes to read
 	 * @return number of bytes that was read into the buffer
 	 */
-	virtual size_t read(ClientState *client, uint8_t* buffer, uint64_t offset, size_t count);
+	virtual size_t read(ClientDetails *client, uint8_t* buffer, uint64_t offset, size_t count);
 	virtual IVirtualStyxFile* walk(std::vector<StyxString*> *pathElements, std::vector<StyxQID*> *qids);
 	/**
 	 * Write data to file
@@ -71,12 +71,12 @@ public:
 	 * @param offset
 	 * @return
 	 */
-	virtual size_t write(ClientState *client, uint8_t* data, uint64_t offset, size_t count);
+	virtual size_t write(ClientDetails *client, uint8_t* data, uint64_t offset, size_t count);
 	/**
 	 * Will be called when client close connection to this server
 	 * @param state
 	 */
-	virtual void onConnectionClosed(ClientState *state);
+	virtual void onConnectionClosed(ClientDetails *state);
 };
 
 #endif /* MEMORYSTYXFILE_H_ */

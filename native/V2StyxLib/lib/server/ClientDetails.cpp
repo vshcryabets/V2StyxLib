@@ -23,7 +23,7 @@
 #include <vector>
 #include <unistd.h>
 
-ClientState::ClientState(size_t iounit,
+ClientDetails::ClientDetails(size_t iounit,
 		Socket channel,
 		IVirtualStyxFile *root,
 		std::string protocol)  {
@@ -36,7 +36,7 @@ ClientState::ClientState(size_t iounit,
 	mOutputBuffer = new StyxByteBufferWritable(iounit);
 }
 
-ClientState::~ClientState() {
+ClientDetails::~ClientDetails() {
 	delete mOutputBuffer;
 	delete mBuffer;
 	delete mAssignedFiles;
@@ -46,7 +46,7 @@ ClientState::~ClientState() {
  *
  * @return true if message was processed
  */
-bool ClientState::process() {
+bool ClientDetails::process() {
 	size_t inBuffer = mBuffer->remainsToRead();
 	//	::printf("inBuffer=%p\n", inBuffer);
 	if ( inBuffer > 4 ) {
@@ -68,7 +68,7 @@ bool ClientState::process() {
  * Processing incoming messages
  * @param msg incomming message
  */
-void ClientState::processMessage(StyxMessage *msg) {
+void ClientDetails::processMessage(StyxMessage *msg) {
 	if ( msg == NULL ) {
 		printf("Got unknown message:\n");
 		return;
@@ -126,7 +126,7 @@ void ClientState::processMessage(StyxMessage *msg) {
 	}
 }
 
-void ClientState::sendMessage(StyxMessage *answer) {
+void ClientDetails::sendMessage(StyxMessage *answer) {
 	size_t inbuffer = answer->writeToBuffer(mOutputBuffer);
 #ifdef WIN32
 	size_t writed = ::send(mChannel, (const char*)(mOutputBuffer->getBuffer()), inbuffer, 0 );
@@ -136,7 +136,7 @@ void ClientState::sendMessage(StyxMessage *answer) {
 	inbuffer = inbuffer - writed;
 }
 
-bool ClientState::readSocket() {
+bool ClientDetails::readSocket() {
 	int readCount = mBuffer->readFromFD(mChannel);
 	if ( readCount < 1 ) {
 		return true;
@@ -146,7 +146,7 @@ bool ClientState::readSocket() {
 	return false;
 }
 
-StyxRAttachMessage* ClientState::processAttach(StyxTAttachMessage *msg) {
+StyxRAttachMessage* ClientDetails::processAttach(StyxTAttachMessage *msg) {
 	std::string mountPoint = msg->getMountPoint();
 	mClientRoot = mServerRoot; // FIXME later ->getDirectory(mountPoint);
 	mUserName = msg->getUserName();
@@ -155,7 +155,7 @@ StyxRAttachMessage* ClientState::processAttach(StyxTAttachMessage *msg) {
 	return answer;
 }
 
-void ClientState::registerOpenedFile(uint32_t fid, IVirtualStyxFile* file) {
+void ClientDetails::registerOpenedFile(uint32_t fid, IVirtualStyxFile* file) {
 	mAssignedFiles->insert(
 			std::pair<uint32_t, IVirtualStyxFile*>(fid, file));
 }
@@ -163,7 +163,7 @@ void ClientState::registerOpenedFile(uint32_t fid, IVirtualStyxFile* file) {
  * Handle TWalk message from client
  * @param msg
  */
-StyxMessage* ClientState::processWalk(StyxTWalkMessage* msg) {
+StyxMessage* ClientDetails::processWalk(StyxTWalkMessage* msg) {
 	uint32_t fid = msg->getFID();
 	map<uint32_t,IVirtualStyxFile*>::iterator iterator = mAssignedFiles->find(fid);
 	if ( iterator == mAssignedFiles->end() ) {
@@ -198,13 +198,13 @@ StyxMessage* ClientState::processWalk(StyxTWalkMessage* msg) {
  * @param fid File ID
  * @return new Rerror message
  */
-StyxRErrorMessage* ClientState::getNoFIDError(StyxMessage *message, StyxFID fid) {
+StyxRErrorMessage* ClientDetails::getNoFIDError(StyxMessage *message, StyxFID fid) {
 	return new StyxRErrorMessage(message->getTag(),"Unknown FID (%d)"); // TODO add this , fid);
 }
 /**
  * Process incoming Tstat message
  */
-StyxMessage* ClientState::processStat(StyxTStatMessage *msg) {
+StyxMessage* ClientDetails::processStat(StyxTStatMessage *msg) {
 	map<uint32_t,IVirtualStyxFile*>::iterator iterator = mAssignedFiles->find(msg->getFID());
 	if ( iterator == mAssignedFiles->end() ) {
 		return getNoFIDError(msg, msg->getFID());
@@ -214,7 +214,7 @@ StyxMessage* ClientState::processStat(StyxTStatMessage *msg) {
 /**
  * Handle TOpen message from client
  */
-StyxMessage* ClientState::processTopen(StyxTOpenMessage *msg) {
+StyxMessage* ClientDetails::processTopen(StyxTOpenMessage *msg) {
 	map<uint32_t,IVirtualStyxFile*>::iterator iterator = mAssignedFiles->find(msg->getFID());
 	if ( iterator == mAssignedFiles->end() ) {
 		return getNoFIDError(msg, msg->getFID());
@@ -229,7 +229,7 @@ StyxMessage* ClientState::processTopen(StyxTOpenMessage *msg) {
  * Handle read operation
  * @param msg
  */
-StyxMessage* ClientState::processRead(StyxTReadMessage *msg) {
+StyxMessage* ClientDetails::processRead(StyxTReadMessage *msg) {
 	if ( msg->getCount() > mIOUnit ) {
 		return new StyxRErrorMessage(msg->getTag(), "IOUnit overflow");
 	}
@@ -245,7 +245,7 @@ StyxMessage* ClientState::processRead(StyxTReadMessage *msg) {
  * Handle clunk request
  * @param msg
  */
-StyxMessage* ClientState::processClunk(StyxTCreateMessage *msg) {
+StyxMessage* ClientDetails::processClunk(StyxTCreateMessage *msg) {
 	map<uint32_t,IVirtualStyxFile*>::iterator iterator = mAssignedFiles->find(msg->getFID());
 	if ( iterator == mAssignedFiles->end() ) {
 		return getNoFIDError(msg, msg->getFID());
@@ -258,7 +258,7 @@ StyxMessage* ClientState::processClunk(StyxTCreateMessage *msg) {
  * Handle TWrite messages
  * @param msg
  */
-StyxMessage* ClientState::processWrite(StyxTWriteMessage *msg) {
+StyxMessage* ClientDetails::processWrite(StyxTWriteMessage *msg) {
 	//	printf("Got TWrite %dx%d\n", msg->getOffset(), msg->getCount());
 	map<uint32_t,IVirtualStyxFile*>::iterator iterator = mAssignedFiles->find(msg->getFID());
 	if ( iterator == mAssignedFiles->end() ) {
@@ -274,6 +274,6 @@ StyxMessage* ClientState::processWrite(StyxTWriteMessage *msg) {
  * Handle TWStat messages
  * @param msg
  */
-StyxMessage* ClientState::processWStat(StyxTWStatMessage *msg) {
+StyxMessage* ClientDetails::processWStat(StyxTWStatMessage *msg) {
 	return new StyxRWStatMessage(msg->getTag());
 }

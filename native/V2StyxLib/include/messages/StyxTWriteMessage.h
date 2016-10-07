@@ -8,19 +8,17 @@
 #ifndef STYXTWRITE_H_
 #define STYXTWRITE_H_
 
-#include "messages/base/StyxMessage.h"
+#include "messages/base/StyxTMessageFID.h"
 
-class StyxTWriteMessage: public StyxMessage {
+class StyxTWriteMessage: public StyxTMessageFID {
 private:
-	StyxFID mFID;
 	uint64_t mOffset;
 	uint8_t *mData;
 	uint32_t mDataLength;
 	bool mDelete;
 public:
-	StyxTWriteMessage();
+	StyxTWriteMessage(StyxFID fid, uint64_t offset, uint8_t *data, uint32_t length);
 	~StyxTWriteMessage();
-	StyxFID getFID();
 	uint8_t* getData();
 	uint64_t getOffset();
 	uint32_t getCount();
