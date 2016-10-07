@@ -19,9 +19,6 @@ import static org.junit.Assert.assertTrue;
  */
 public class BuffersTests {
 
-    private static final int PORT = 12395;
-    private static final long TIME_INTERVAL = 1000;
-
     @Before
     public void setUp() {
     }

@@ -11,7 +11,7 @@ import java.util.Collection;
  *
  * @author V.Shcryabets (vshcryabets@gmail.com)
  */
-public interface IChannelDriver extends Closeable, IMessageTransmitter {
+public interface IChannelDriver extends IMessageTransmitter {
     Thread start(int iounit);
     void setTMessageHandler(IMessageProcessor handler);
     void setRMessageHandler(IMessageProcessor handler);

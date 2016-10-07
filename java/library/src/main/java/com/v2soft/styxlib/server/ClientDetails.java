@@ -21,7 +21,7 @@ public abstract class ClientDetails {
 
     public ClientDetails(IChannelDriver driver, int id) {
         if ( driver == null ) throw new NullPointerException("Driver is null");
-        mAssignedFiles = new HashMap<Long, IVirtualStyxFile>();
+        mAssignedFiles = new HashMap<>();
         mDriver = driver;
         mId = id;
     }
