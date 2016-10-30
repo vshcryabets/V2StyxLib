@@ -1,7 +1,8 @@
+#include "BuffersTest.h"
+
 #include <algorithm>
 #include <ctime>
 
-#include "BufferTest.h"
 #include "gtest/gtest.h"
 #include "io/StyxByteBufferReadable.h"
 
@@ -17,8 +18,8 @@ TEST(cpp_sorter_test, int_arr_sort) {
 	}
 
 	for (size_t i = 1; i < maxSize; i++) {
-		readableBuffer->write(testBuffer, 0, i);
-		size_t read = readableBuffer->read(readBuffer, 0, i);
+		readableBuffer->write(testBuffer, i);
+		size_t read = readableBuffer->read(readBuffer, i);
 		ASSERT_EQ(i, read) << "Wrong read bytes count";
 		// check read bytes
 		for (size_t j = 0; j < i; j++) {

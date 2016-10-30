@@ -71,9 +71,7 @@ public class StyxByteBufferReadable implements IStyxBuffer {
         return mBuffer;
     }
 
-    /**
-     * Reset position &amp; limit
-     */
+    @Override
     public void clear() {
         mWritePosition = 0;
         mReadPosition = 0;
@@ -82,6 +80,8 @@ public class StyxByteBufferReadable implements IStyxBuffer {
         mBuffer.position(0);
         mBuffer.limit(mCurrentLimit);
     }
+
+    @Override
     public void limit(int limit) {
         mCurrentLimit = limit;
         mBuffer.limit(mCurrentLimit);
@@ -105,12 +105,7 @@ public class StyxByteBufferReadable implements IStyxBuffer {
         }
     }
 
-    /**
-     * Get byte array from buffer, this operation will not move read position pointer
-     * @param out
-     * @param offset
-     * @param length
-     */
+    @Override
     public int get(byte[] out, int offset, int length) {
         if ( out == null ) throw new NullPointerException("Out buffer is null");
         if ( mStoredBytes < length ) throw new ArrayIndexOutOfBoundsException("Too much bytes to read");

@@ -8,9 +8,9 @@
 #ifndef StyxByteBufferReadable_H_
 #define StyxByteBufferReadable_H_
 #include "types.h"
-#include "io/StyxDataReader.h"
+#include "io/IStyxBuffer.h"
 
-class StyxByteBufferReadable : public StyxDataReader {
+class StyxByteBufferReadable : public IStyxBuffer {
 private:
 	uint8_t *mBuffer;
 	size_t mWritePosition, mReadPosition, mCapacity, mStoredBytes;
@@ -29,14 +29,13 @@ public:
 	// =========================================================
 	// Virtual methods
 	// =========================================================
-	/**
-	 * Read byte array from buffer
-	 * @param out
-	 * @param i
-	 * @param length
-	 */
-	virtual size_t read(uint8_t *out, size_t i, size_t length);
-	virtual uint32_t getUInt32();
+	virtual size_t write(uint8_t *buffer, size_t length);
+	virtual uint8_t *getBuffer();
+	virtual void clear();
+	virtual void limit(int limit);
+	virtual size_t get(uint8_t *out, size_t length);
+	virtual void moveReadPointerBy(size_t bytes);
+	virtual size_t read(uint8_t *out, size_t length);
 };
 
 #endif /* DUALSTATEBUFFER_H_ */

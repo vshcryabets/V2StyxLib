@@ -1,6 +1,6 @@
 /*
- * IVirtualStyxFile.h
- *  Virtual styx file interface
+ * IStyxDataReader.h
+ *  Data stream reader interface
  *  Created on: May 20, 2012
  *      Author: vschryabets@gmail.com
  */
