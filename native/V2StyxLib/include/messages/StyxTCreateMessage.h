@@ -13,8 +13,8 @@
 class StyxTCreateMessage: public StyxTMessageFID {
 private:
 	StyxString mName;
-	uint16_t mMode;
 	uint32_t mPermissions;
+	uint16_t mMode;
 public:
 	StyxTCreateMessage(StyxFID fid, StyxString name, uint32_t permissions, uint16_t mode);
 	virtual ~StyxTCreateMessage();

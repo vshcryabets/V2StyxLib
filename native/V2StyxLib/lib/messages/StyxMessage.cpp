@@ -5,6 +5,8 @@
  *      Author: vschryabets@gmail.com
  */
 
+#include "stdio.h"
+#include "types.h"
 #include "messages/base/StyxMessage.h"
 #include "messages/StyxTVersionMessage.h"
 #include "messages/StyxRVersionMessage.h"
@@ -16,7 +18,6 @@
 #include "messages/StyxTWriteMessage.h"
 #include "messages/StyxTWStatMessage.h"
 #include "io/IStyxDataReader.h"
-#include "stdio.h"
 #include "messages/StyxTCreateMessage.h"
 #include "messages/StyxRErrorMessage.h"
 #include "messages/StyxRAttachMessage.h"
@@ -95,7 +96,7 @@ StyxMessage* StyxMessage::factory(IStyxDataReader* buffer, size_t io_unit) {
         result = new StyxROpenMessage(tag, NULL, 0, false);
         break;
     case Tcreate:
-        result = new StyxTCreateMessage(NOFID, NULL, 0, ModeTypeEnum::OWRITE);
+        result = new StyxTCreateMessage(NOFID, NULL, 0, OWRITE);
         break;
     case Rcreate:
         result = new StyxROpenMessage(tag, NULL, 0, true);

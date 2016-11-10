@@ -11,18 +11,16 @@
 #include <string>
 
 #ifdef WIN32
-#include <winsock2.h>
-typedef SOCKET Socket;
-#define errno WSAGetLastError()
-
+	#include <winsock2.h>
+	typedef SOCKET Socket;
+	#define errno WSAGetLastError()
 #else
-
-#include "errno.h"
-typedef int Socket;
-// Constants
-const int INVALID_SOCKET = -1;
-
+	#include "errno.h"
+	typedef int Socket;
+	// Constants
+	const int INVALID_SOCKET = -1;
 #endif
+
 typedef int64_t Date;
 typedef int64_t int128_t;
 typedef int32_t StyxThread;
@@ -58,10 +56,10 @@ enum MessageTypeEnum {
 };
 
 enum ModeTypeEnum {
-    OREAD = 0,
-    OWRITE = 1,
-    ORDWR = 2,
-    OEXEC = 3,
+    OREAD = 0x00,
+    OWRITE = 0x01,
+    ORDWR = 0x02,
+    OEXEC = 0x03,
     OTRUNC = 0x10
 };
 

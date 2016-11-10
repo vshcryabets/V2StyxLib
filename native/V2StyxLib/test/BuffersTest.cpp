@@ -24,7 +24,7 @@ TEST(cpp_sorter_test, int_arr_sort) {
 		// check read bytes
 		for (size_t j = 0; j < i; j++) {
 			if (readBuffer[j] != testBuffer[j]) {
-				assertTrue("Wrong byte at position " + j, false);
+				ASSERT_TRUE(false) << "Wrong byte at position " + j;
 			}
 		}
 	}
