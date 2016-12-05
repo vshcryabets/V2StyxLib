@@ -1,6 +1,8 @@
 #ifndef ICHANNEL_DRIVER_H_
 #define ICHANNEL_DRIVER_H_
 
+#include <vector>
+#include "ILogListener.h"
 #include "server/IMessageTransmitter.h"
 #include "handlers/IMessageProcessor.h"
 
@@ -9,19 +11,19 @@ public:
     StyxThread start(int iounit);
     void setTMessageHandler(IMessageProcessor* handler);
     void setRMessageHandler(IMessageProcessor* handler);
-    void setLogListener(ILogListener listener);
+    void setLogListener(ILogListener* listener);
 
     /**
      * Get all active clients.
      * @return all active clients.
      */
-    Collection<ClientDetails> getClients();
+    std::vector<ClientDetails> getClients();
 
-    boolean isConnected();
-    boolean isStarted();
+    bool isConnected();
+    bool isStarted();
 
-    IMessageProcessor getTMessageHandler();
-    IMessageProcessor getRMessageHandler();
-}
+    IMessageProcessor* getTMessageHandler();
+    IMessageProcessor* getRMessageHandler();
+};
 
 #endif // ICHANNEL_DRIVER_H_

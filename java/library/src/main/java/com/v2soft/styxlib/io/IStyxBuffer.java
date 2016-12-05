@@ -9,16 +9,16 @@ import java.nio.ByteBuffer;
  */
 public interface IStyxBuffer {
     /**
-     * Read byte array from buffer
-     * @param out
-     * @param offset
+     * Read byte array from buffer.
+     * @param out output buffer.
+     * @param offset offset in out data array.
      * @param length
      */
     int read(byte[] out, int offset, int length);
     /**
-     * Get byte array from buffer, this operation will not move read position pointer
+     * Get byte array from buffer, this operation will not move read position pointer.
      * @param out
-     * @param offset
+     * @param offset offset in out data array.
      * @param length
      */
     int get(byte[] out, int offset, int length);

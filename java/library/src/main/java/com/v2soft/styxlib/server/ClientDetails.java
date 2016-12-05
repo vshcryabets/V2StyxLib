@@ -33,6 +33,7 @@ public abstract class ClientDetails {
     public Credentials getCredentials() {
         return mCredentials;
     }
+
     /**
      * Get polls assigned to this client.
      * @return polls assigned to this client.

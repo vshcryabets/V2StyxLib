@@ -13,9 +13,8 @@ public:
 	virtual ~IStyxBuffer();
 
     /**
-     * Read byte array from buffer
-     * @param out
-     * @param offset
+     * Read byte array from buffer.
+     * @param out output buffer.
      * @param length
      */
     virtual size_t read(uint8_t *out, size_t length) = 0;
@@ -23,7 +22,6 @@ public:
     /**
      * Get byte array from buffer, this operation will not move read position pointer
      * @param out
-     * @param offset
      * @param length
      */
     virtual size_t get(uint8_t *out, size_t length) = 0;
@@ -37,7 +35,6 @@ public:
     /**
      * Write data to buffer. Usually this method used for testing purposes.
      * @param in input data.
-     * @param offset offset in input data array
      * @param length length of input data
      * @return
      */

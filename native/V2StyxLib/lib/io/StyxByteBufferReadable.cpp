@@ -70,19 +70,17 @@ size_t StyxByteBufferReadable::get(uint8_t* out, size_t i, size_t length) {
 	return length;
 }
 
-size_t StyxByteBufferReadable::read(uint8_t *out, size_t i, size_t length) {
-	if ( out == NULL ) throw "Out is null";
-	if ( mStoredBytes < length ) throw "Too much bytes to read";
+size_t StyxByteBufferReadable::read(uint8_t *out, size_t length) {
+	if ( out == NULL ) {
+		throw "Out is null";
+	}
+	if ( mStoredBytes < length ) {
+		throw "Too much bytes to read";
+	}
 //	printf("READ: ps=%d, len=%d\n", mReadPosition, length);
-	size_t res = get(out, i, length);
+	size_t res = get(out, length);
 	mReadPosition += res;
 	mStoredBytes-=res;
 //	printf("READ: ps=%d, stored=%d\n", mReadPosition, mStoredBytes);
 	return res;
-}
-
-uint32_t StyxByteBufferReadable::getUInt32() {
-	uint32_t result = 0;
-	get((uint8_t*)&result, 0, 4);
-	return result;
 }

@@ -12,6 +12,11 @@ import java.util.Collection;
  * @author V.Shcryabets (vshcryabets@gmail.com)
  */
 public interface IChannelDriver extends IMessageTransmitter {
+    /**
+     * Start channel driver thread.
+     * @param iounit
+     * @return
+     */
     Thread start(int iounit);
     void setTMessageHandler(IMessageProcessor handler);
     void setRMessageHandler(IMessageProcessor handler);
