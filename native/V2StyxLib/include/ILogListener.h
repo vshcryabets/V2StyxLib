@@ -9,6 +9,7 @@
 
 #include "server/IChannelDriver.h"
 #include "exceptions/StyxException.h"
+#include "messages/base/StyxMessage.h"
 
 class IChannelDriver;
 

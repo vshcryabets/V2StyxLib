@@ -18,18 +18,14 @@
 #include "fcntl.h"
 #include "string.h"
 #include <stdio.h>
-#include "server/ClientBalancer.h"
-#include "server/ConnectionAcceptor.h"
 #include "StyxLibraryException.h"
 
+const StyxString StyxServerManager::PROTOCOL = "9P2000";
+const size_t StyxServerManager::DEFAULT_IOUNIT = 8192;
 
-StyxServerManager::StyxServerManager(string address,
-		int port,
-		IVirtualStyxFile *root, std::string protocol)
-	:mPort(port),  mIOBufSize(8192), mRoot(root) {
-	mSocket = createSocket(address, port);
-    mBalancer = new ClientBalancer(mIOBufSize, root, protocol);
-    mAcceptor = new ConnectionAcceptor(mSocket, mBalancer);
+StyxServerManager::StyxServerManager(IVirtualStyxFile *root) : mRoot(root) {
+	ConnectionDetails details(getProtocol(), getIOUnit());
+    mBalancer = new TMessagesProcessor(details, root);
 }
 
 StyxServerManager::~StyxServerManager() {
@@ -80,7 +76,6 @@ void StyxServerManager::setNonBlocking(Socket socket) {
 }
 
 void StyxServerManager::start() {
-	mAcceptor->start();
 }
 
 void StyxServerManager::stop() {

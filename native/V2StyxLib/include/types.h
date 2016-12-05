@@ -91,4 +91,14 @@ public:
 	StyxString getPassword();
 };
 
+class ConnectionDetails {
+protected:
+    StyxString mProtocol;
+    size_t mIOUnit;
+public:
+    ConnectionDetails(StyxString protocol, size_t iounit);
+    StyxString getProtocol();
+    size_t getIOUnit();
+};
+
 #endif /* TYPES_H_ */

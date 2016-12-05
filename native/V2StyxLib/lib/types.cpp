@@ -15,3 +15,14 @@ StyxString Credentials::getUserName() {
 StyxString Credentials::getPassword() {
 	return mPassword;
 }
+
+ConnectionDetails::ConnectionDetails(StyxString protocol, size_t iounit) : mProtocol(protocol), mIOUnit(iounit) {
+}
+
+StyxString ConnectionDetails::getProtocol() {
+	return mProtocol;
+}
+
+size_t ConnectionDetails::getIOUnit() {
+	return mIOUnit;
+}

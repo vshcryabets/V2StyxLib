@@ -17,15 +17,20 @@
 
 #include "types.h"
 #include "classes.h"
+#include "handlers/TMessagesProcessor.h"
+#include "server/IChannelDriver.h"
+
+#include <vector>
 using namespace std;
 
 class StyxServerManager {
 private:
-	ClientBalancer *mBalancer;
+	static const StyxString PROTOCOL;
+	static const size_t DEFAULT_IOUNIT;
+
+	std::vector<IChannelDriver*> mDrivers;
+	TMessagesProcessor *mBalancer;
 	ConnectionAcceptor *mAcceptor;
-	Socket mSocket;
-	int mPort;
-	int mIOBufSize;
 	IVirtualStyxFile *mRoot;
 
 	void setAddress(const char * hname,
@@ -35,7 +40,7 @@ private:
 	// create and bind socket
 	Socket createSocket(string address, int port);
 public:
-	StyxServerManager(string address, int port, IVirtualStyxFile *root, string protocol);
+	StyxServerManager(IVirtualStyxFile *root);
 	~StyxServerManager();
 	/**
 	 * start server
@@ -49,6 +54,22 @@ public:
 	* Set non-blocking mode
 	*/
 	static void setNonBlocking(Socket socket);
+
+	/**
+     * Get supported protocol name.
+     * @return supported protocol name.
+     */
+    StyxString getProtocol() {
+        return PROTOCOL;
+    }
+
+    /**
+     * Get supported IO unit size.
+     * @return supported IO unit size.
+     */
+    size_t getIOUnit() {
+        return DEFAULT_IOUNIT;
+    }
 };
 
 #endif /* STYXSERVERMANAGER_H_ */

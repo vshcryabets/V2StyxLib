@@ -62,6 +62,10 @@ public class StyxServerManager
         return mDriverThreads;
     }
 
+    /**
+     * Get supported IO unit size.
+     * @return supported IO unit size.
+     */
     public int getIOUnit() {
         return DEFAULT_IOUNIT;
     }
@@ -81,6 +85,10 @@ public class StyxServerManager
         }
     }
 
+    /**
+     * Get supported protocol name.
+     * @return supported protocol name.
+     */
     public String getProtocol() {
         return PROTOCOL;
     }
