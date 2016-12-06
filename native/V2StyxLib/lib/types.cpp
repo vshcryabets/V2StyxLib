@@ -19,6 +19,11 @@ StyxString Credentials::getPassword() {
 ConnectionDetails::ConnectionDetails(StyxString protocol, size_t iounit) : mProtocol(protocol), mIOUnit(iounit) {
 }
 
+ConnectionDetails::ConnectionDetails() {
+	mIOUnit = 0;
+	mProtocol = "";
+}
+
 StyxString ConnectionDetails::getProtocol() {
 	return mProtocol;
 }

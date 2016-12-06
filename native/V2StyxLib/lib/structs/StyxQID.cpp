@@ -5,9 +5,9 @@
  *      Author: vschryabets@gmail.com
  */
 
-#include "structs/StyxQID.h"
+#include "messages/base/structs/StyxQID.h"
 
-StyxQID::EMPTY = new StyxQID(QIDType.QTFILE, 0L, ULong.ZERO);
+const StyxQID* StyxQID::EMPTY = new StyxQID(QTFILE, 0L, 0L);
 
 StyxQID::StyxQID(IStyxDataReader *input) {
 	mType = input->readUInt8();

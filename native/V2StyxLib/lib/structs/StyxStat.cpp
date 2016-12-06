@@ -5,7 +5,7 @@
  *      Author: vschryabets@gmail.com
  */
 
-#include "structs/StyxStat.h"
+#include "messages/base/structs/StyxStat.h"
 
 StyxStat::StyxStat(IStyxDataReader *input) {
 	//uint16_t size =

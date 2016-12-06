@@ -5,9 +5,9 @@
  *      Author: vova
  */
 
-#include "TMessagesProcessor.h"
+#include "handlers/TMessagesProcessor.h"
 
-TMessagesProcessor::TMessagesProcessor() {
+TMessagesProcessor::TMessagesProcessor(ConnectionDetails details, IVirtualStyxFile *root) {
 	// TODO Auto-generated constructor stub
 
 }

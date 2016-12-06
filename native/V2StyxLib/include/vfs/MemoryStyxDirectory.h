@@ -8,14 +8,12 @@
 #ifndef MEMORYSTYXDIRECTORY_H_
 #define MEMORYSTYXDIRECTORY_H_
 #include <string>
-#include "../structs/StyxQID.h"
-#include "../structs/StyxStat.h"
-#include "../types.h"
-#include "../structs/StyxQID.h"
+#include "messages/base/structs/StyxQID.h"
+#include "messages/base/structs/StyxStat.h"
+#include "types.h"
 #include <vector>
-#include "../structs/StyxStat.h"
 #include <map>
-#include "../io/StyxByteBufferWritable.h"
+#include "io/StyxByteBufferWritable.h"
 #include "MemoryStyxFile.h"
 using namespace std;
 

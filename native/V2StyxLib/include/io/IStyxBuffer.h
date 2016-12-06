@@ -10,7 +10,7 @@
 
 class IStyxBuffer {
 public:
-	virtual ~IStyxBuffer();
+	virtual ~IStyxBuffer() {};
 
     /**
      * Read byte array from buffer.
@@ -44,6 +44,6 @@ public:
 
     virtual void clear() = 0;
 
-    virtual void limit(int limit) = 0;
+    virtual void limit(size_t limit) = 0;
 };
 #endif

@@ -8,6 +8,9 @@
 #ifndef INCLUDE_HANDLERS_TMESSAGESPROCESSOR_H_
 #define INCLUDE_HANDLERS_TMESSAGESPROCESSOR_H_
 
+#include "types.h"
+#include "vfs/IVirtualStyxFile.h"
+
 class TMessagesProcessor {
 protected:
 	ConnectionDetails mConnectionDetails;

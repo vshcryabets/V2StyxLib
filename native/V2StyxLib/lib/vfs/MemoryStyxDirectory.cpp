@@ -7,7 +7,7 @@
 
 #include "vfs/MemoryStyxDirectory.h"
 #include "types.h"
-#include "structs/StyxQID.h"
+#include "messages/base/structs/StyxQID.h"
 #include <vector>
 #include "string.h"
 

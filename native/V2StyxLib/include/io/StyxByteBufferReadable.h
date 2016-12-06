@@ -13,7 +13,12 @@
 class StyxByteBufferReadable : public IStyxBuffer {
 private:
 	uint8_t *mBuffer;
-	size_t mWritePosition, mReadPosition, mCapacity, mStoredBytes;
+	size_t mWritePosition, mReadPosition;
+	size_t mCapacity, mStoredBytes;
+	size_t mCurrentLimit;
+
+	size_t updateBufferLimits();
+	void moveWritePointer(size_t read);
 public:
 	StyxByteBufferReadable(size_t capacity);
 	virtual ~StyxByteBufferReadable();
@@ -32,7 +37,7 @@ public:
 	virtual size_t write(uint8_t *buffer, size_t length);
 	virtual uint8_t *getBuffer();
 	virtual void clear();
-	virtual void limit(int limit);
+	virtual void limit(size_t limit);
 	virtual size_t get(uint8_t *out, size_t length);
 	virtual void moveReadPointerBy(size_t bytes);
 	virtual size_t read(uint8_t *out, size_t length);

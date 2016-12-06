@@ -45,7 +45,7 @@ int main(int argc, char **argv) {
 		s1.addFile(new MemoryStyxFile("testfile22"));
 		s1.addFile(new MemoryStyxFile("testfile32"));
 		s2.addFile(new StdOutFile("out"));
-		StyxServerManager manager(serveraddr, 8080, &root, protocol);
+		StyxServerManager manager(&root);
 		manager.start();
 	} catch (StyxLibraryException *e) {
 		printf("Exception: %s (ac:%d)\n", e->getMessage().c_str(), e->getAdditionalCode());

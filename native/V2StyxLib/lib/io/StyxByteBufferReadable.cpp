@@ -16,6 +16,7 @@ StyxByteBufferReadable::StyxByteBufferReadable(size_t capacity) {
 	mStoredBytes = 0;
 	mCapacity = capacity;
 	mBuffer = new uint8_t[mCapacity];
+	mCurrentLimit = 0;
 }
 
 StyxByteBufferReadable::~StyxByteBufferReadable() {
@@ -46,10 +47,71 @@ size_t StyxByteBufferReadable::readFromFD(Socket fd) {
 	return readed;
 }
 
+size_t StyxByteBufferReadable::write(uint8_t *buffer, size_t length) {
+	size_t free = updateBufferLimits();
+	if ( free <= 0 ) {
+		// not enough free space
+		return 0;
+	}
+	if ( length > free ) {
+		length = free;
+	}
+	int part1size = mCapacity-mWritePosition;
+	if ( part1size > length ) {
+		part1size = length;
+	}
+	int part2size = length-part1size;
+	if ( part1size > 0 ) {
+		memcpy(mBuffer + mWritePosition, buffer, part1size);
+		moveWritePointer(part1size);
+	}
+	if ( part2size > 0 ) {
+		// rewind write pointer to start of buffer
+		updateBufferLimits();
+		memcpy(mBuffer + mWritePosition, buffer + part1size, part2size);
+		moveWritePointer(part2size);
+	}
+	return length;
+}
 
-size_t StyxByteBufferReadable::get(uint8_t* out, size_t i, size_t length) {
-	if ( out == NULL ) throw "Out buffer is null";
-	if ( mStoredBytes < length ) throw "Too much bytes to read";
+void StyxByteBufferReadable::moveWritePointer(size_t read) {
+	if ( read > 0 ) {
+		mStoredBytes += read;
+		mWritePosition += read;
+	}
+}
+
+uint8_t* StyxByteBufferReadable::getBuffer() {
+	return mBuffer;
+}
+
+void StyxByteBufferReadable::clear() {
+	mWritePosition = 0;
+	mReadPosition = 0;
+	mStoredBytes = 0;
+	mCurrentLimit = mCapacity;
+}
+
+void StyxByteBufferReadable::limit(size_t limit) {
+	mCurrentLimit = limit;
+}
+
+size_t StyxByteBufferReadable::updateBufferLimits() {
+	int free = mCapacity-mStoredBytes;
+	if ( free <= 0 ) return 0;
+	if ( mWritePosition >= mCapacity ) {
+		mWritePosition = 0;
+	}
+	return free;
+}
+
+size_t StyxByteBufferReadable::get(uint8_t* out, size_t length) {
+	if ( out == NULL ) {
+		throw "Out buffer is null";
+	}
+	if ( mStoredBytes < length ) {
+		throw "Too much bytes to read";
+	}
 	if ( mReadPosition >= mCapacity ) {
 		mReadPosition -= mCapacity;
 	}
@@ -57,17 +119,25 @@ size_t StyxByteBufferReadable::get(uint8_t* out, size_t i, size_t length) {
 	size_t limit = mWritePosition <= mReadPosition ? mCapacity : mWritePosition;
 	size_t avaiable = limit-mReadPosition;
 	if ( avaiable < length ) {
-		// splited block
+		// split block
 		// read first part
-		memcpy(out+i,mBuffer+position,avaiable);
+		memcpy(out,mBuffer+position,avaiable);
 		// read second part
-		memcpy(out+i+avaiable,mBuffer,length-avaiable);
+		memcpy(out+avaiable,mBuffer,length-avaiable);
 	} else {
 		// single block
-		memcpy(out+i,mBuffer+position, length);
+		memcpy(out,mBuffer+position, length);
 	}
 //	printf("GET: p=%d, l=%d\n", position, limit);
 	return length;
+}
+
+void StyxByteBufferReadable::moveReadPointerBy(size_t bytes) {
+	mReadPosition += bytes;
+	mStoredBytes -= bytes;
+	while ( mReadPosition > mCapacity ) {
+		mReadPosition -= mCapacity;
+	}
 }
 
 size_t StyxByteBufferReadable::read(uint8_t *out, size_t length) {

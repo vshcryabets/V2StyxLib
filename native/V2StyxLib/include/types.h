@@ -96,6 +96,7 @@ protected:
     StyxString mProtocol;
     size_t mIOUnit;
 public:
+    ConnectionDetails();
     ConnectionDetails(StyxString protocol, size_t iounit);
     StyxString getProtocol();
     size_t getIOUnit();
