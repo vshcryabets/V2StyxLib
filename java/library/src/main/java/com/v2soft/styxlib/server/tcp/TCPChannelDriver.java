@@ -92,10 +92,12 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
         return false;
     }
 
+    @Override
     public void setTMessageHandler(IMessageProcessor handler) {
         mTMessageHandler = handler;
     }
 
+    @Override
     public void setRMessageHandler(IMessageProcessor handler) {
         mRMessageHandler = handler;
     }

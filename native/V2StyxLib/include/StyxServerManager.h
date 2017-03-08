@@ -21,7 +21,6 @@
 #include "server/IChannelDriver.h"
 
 #include <vector>
-using namespace std;
 
 class StyxServerManager {
 private:

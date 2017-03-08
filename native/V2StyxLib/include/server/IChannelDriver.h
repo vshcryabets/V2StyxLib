@@ -8,22 +8,23 @@
 
 class IChannelDriver : public IMessageTransmitter {
 public:
-    StyxThread start(int iounit);
-    void setTMessageHandler(IMessageProcessor* handler);
-    void setRMessageHandler(IMessageProcessor* handler);
-    void setLogListener(ILogListener* listener);
+	virtual ~IChannelDriver() {};
+    virtual StyxThread start(int iounit) = 0;
+    virtual void setTMessageHandler(IMessageProcessor* handler) = 0;
+    virtual void setRMessageHandler(IMessageProcessor* handler) = 0;
+    virtual void setLogListener(ILogListener* listener) = 0;
 
     /**
      * Get all active clients.
      * @return all active clients.
      */
-    std::vector<ClientDetails> getClients();
+    virtual std::vector<ClientDetails> getClients() = 0;
 
-    bool isConnected();
-    bool isStarted();
+    virtual bool isConnected() = 0;
+    virtual bool isStarted() = 0;
 
-    IMessageProcessor* getTMessageHandler();
-    IMessageProcessor* getRMessageHandler();
+    virtual IMessageProcessor* getTMessageHandler() = 0;
+    virtual IMessageProcessor* getRMessageHandler() = 0;
 };
 
 #endif // ICHANNEL_DRIVER_H_

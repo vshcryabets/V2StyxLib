@@ -25,7 +25,7 @@ public interface IClient extends Closeable {
      * @throws java.io.IOException
      * @throws java.util.concurrent.TimeoutException
      */
-    public void sendVersionMessage()
+    void sendVersionMessage()
             throws InterruptedException, StyxException, IOException, TimeoutException;
     /**
      * Connect to server with specified parameters
@@ -34,7 +34,7 @@ public interface IClient extends Closeable {
      * @throws com.v2soft.styxlib.exceptions.StyxException
      * @throws java.util.concurrent.TimeoutException
      */
-    public boolean connect(IChannelDriver driver)
+    boolean connect(IChannelDriver driver)
             throws IOException, StyxException, InterruptedException, TimeoutException;
     /**
      * Connect to server with specified parameters
@@ -44,7 +44,7 @@ public interface IClient extends Closeable {
      * @throws com.v2soft.styxlib.exceptions.StyxException
      * @throws java.util.concurrent.TimeoutException
      */
-    public boolean connect(IChannelDriver driver, Credentials credentials)
+    boolean connect(IChannelDriver driver, Credentials credentials)
             throws IOException, StyxException, InterruptedException, TimeoutException;
     /**
      * Connect to server.
@@ -53,7 +53,7 @@ public interface IClient extends Closeable {
      * @throws com.v2soft.styxlib.exceptions.StyxException
      * @throws java.util.concurrent.TimeoutException
      */
-    public boolean connect()
+    boolean connect()
             throws IOException, StyxException, InterruptedException, TimeoutException;
 
     boolean isConnected();
