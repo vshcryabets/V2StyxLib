@@ -13,6 +13,7 @@
 #include "handlers/TMessagesProcessor.h"
 #include "handlers/TMessageTransmitter.h"
 #include "messages/base/structs/StyxQID.h"
+#include "server/ClientDetails.h"
 
 /**
  * Styx client connection.
@@ -49,14 +50,15 @@ protected:
     Credentials mCredentials;
     ClientDetails* mRecepient;
     IChannelDriver* mDriver;
-    ConnectionDetails* mDetails;
+    ConnectionDetails mDetails;
     RMessagesProcessor* mAnswerProcessor;
     bool isAutoStartDriver;
     bool shouldCloseAnswerProcessor;
     bool shouldCloseTransmitter;
 
     virtual size_t getIOBufSize();
-
+    virtual void sendAuthMessage() throw();
+    virtual void sendAttachMessage() throw();
 public:
     Connection();
     Connection(Credentials credentials);

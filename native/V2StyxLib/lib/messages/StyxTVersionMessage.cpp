@@ -7,8 +7,8 @@
 
 #include "messages/StyxTVersionMessage.h"
 
-StyxTVersionMessage::StyxTVersionMessage(uint32_t maxPacketSize, std::string protocolVersion):
-	StyxMessage( Tversion, StyxMessage::NOTAG ) {
+StyxTVersionMessage::StyxTVersionMessage(uint32_t maxPacketSize, std::string protocolVersion)
+	: StyxTMessage(Tversion, Rversion) {
 	mMaxPacketSize = maxPacketSize;
 	mProtocolVersion = protocolVersion;
 

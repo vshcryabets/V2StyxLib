@@ -1,25 +1,24 @@
 /*
- * StyxTAttachMessage.h
+ * StyxTAuthMessage.h
  *
- *  Created on: Jun 1, 2012
- *      Author: mrco
  */
 
-#ifndef STYXTATTACHMESSAGE_H_
-#define STYXTATTACHMESSAGE_H_
+#ifndef STYXTAUTHMESSAGE_H_
+#define STYXTAUTHMESSAGE_H_
 #include "messages/base/StyxTMessageFID.h"
 #include <string>
 
-class StyxTAttachMessage : public StyxTMessageFID {
+class StyxTAuthMessage : public StyxTMessageFID {
 private:
-	uint32_t mAuthFID;
 	StyxString mUserName;
 	StyxString mMountPoint;
 public:
-	StyxTAttachMessage(StyxFID fid, StyxFID afid, StyxString username, StyxString mountpoint);
-	virtual ~StyxTAttachMessage();
+	StyxTAuthMessage(StyxFID fid);
+	virtual ~StyxTAuthMessage();
 	StyxString getMountPoint();
 	StyxString getUserName();
+	void setUserName(StyxString userName);
+	void setMountPoint(StyxString mountPoint);
 	// =======================================================
 	// Virtual methods
 	// =======================================================
@@ -28,4 +27,4 @@ public:
 	virtual size_t getBinarySize();
 };
 
-#endif /* STYXTATTACHMESSAGE_H_ */
+#endif /* STYXTAUTHMESSAGE_H_ */

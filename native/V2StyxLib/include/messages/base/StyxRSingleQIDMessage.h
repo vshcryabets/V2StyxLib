@@ -25,6 +25,11 @@ public:
 	virtual void load(IStyxDataReader *buffer);
 	virtual void writeToBuffer(IStyxDataWriter *outputBuffer);
 	virtual size_t getBinarySize();
+
+    /**
+     * @return QID structure
+     */
+    StyxQID* getQID();
 };
 
 #endif /* STYXRSINGLEQIDMESSAGE_H_ */

@@ -17,6 +17,7 @@ private:
 public:
 	StyxRVersionMessage(size_t iounit, std::string protocol);
 	virtual ~StyxRVersionMessage();
+	size_t getMaxPacketSize();
 	// =======================================================
 	// Virtual methods
 	// =======================================================

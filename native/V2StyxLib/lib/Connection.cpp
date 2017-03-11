@@ -1,5 +1,10 @@
 #include "Connection.h"
-#include "messages/base/StyxMessage.h"
+#include "types.h"
+#include "messages/base/StyxTMessageFID.h"
+#include "messages/StyxTVersionMessage.h"
+#include "messages/StyxTAuthMessage.h"
+#include "messages/StyxRAuthMessage.h"
+#include "messages/StyxRVersionMessage.h"
 
 const size_t Connection::DEFAULT_TIMEOUT = 10000;
 const size_t Connection::DEFAULT_IOUNIT = 8192;
@@ -43,11 +48,36 @@ void Connection::init(IChannelDriver *driver,
 	mRecepient = recepient;
 	mAnswerProcessor = answerProcessor;
 	mDriver = driver;
-	mDetails = new ConnectionDetails(getProtocol(), getIOBufSize());
+	mDetails = ConnectionDetails(getProtocol(), getIOBufSize());
 	isConnectedFlag = false;
 }
 
 void Connection::sendVersionMessage() throw() {
+    // release attached FID
+    if (mFID != StyxMessage::NOFID) {
+        try {
+            StyxTMessageFID tClunk(Tclunk, Rclunk, mFID);
+            mTransmitter->sendMessage(&tClunk, mRecepient);
+        } catch (std::exception e) {
+            throw e;
+        }
+        mFID = StyxMessage::NOFID;
+    }
+
+    StyxTVersionMessage tVersion(mDetails.getIOUnit(), getProtocol());
+    mTransmitter->sendMessage(&tVersion, mRecepient);
+
+    StyxMessage* rMessage = tVersion.waitForAnswer(mTimeout);
+    StyxRVersionMessage* rVersion = (StyxRVersionMessage*) rMessage;
+    if (rVersion->getMaxPacketSize() < mDetails.getIOUnit()) {
+        mDetails = ConnectionDetails(getProtocol(), rVersion->getMaxPacketSize());
+    }
+    mRecepient->getPolls()->getFIDPoll()->clean();
+    if ((mCredentials.getUserName() != NULL) && (mCredentials.getPassword() != NULL)) {
+        sendAuthMessage();
+    } else {
+        sendAttachMessage();
+    }
 
 }
 
@@ -97,4 +127,25 @@ StyxString Connection::getProtocol() {
 
 size_t Connection::getIOBufSize() {
 	return DEFAULT_IOUNIT;
+}
+
+void Connection::sendAuthMessage() throw() {
+	mAuthFID = mRecepient->getPolls()->getFIDPoll()->getFreeItem();
+
+	StyxTAuthMessage tAuth(mAuthFID);
+	tAuth.setUserName(*mCredentials.getUserName());
+	tAuth.setMountPoint(mMountPoint);
+	mTransmitter->sendMessage(&tAuth, mRecepient);
+
+	StyxMessage* rMessage = tAuth.waitForAnswer(mTimeout);
+	StyxRAuthMessage* rAuth = (StyxRAuthMessage*) rMessage;
+	mAuthQID = rAuth->getQID();
+
+	// TODO uncomment later
+	//        StyxOutputStream output = new StyxOutputStream((new StyxFile(this,
+	//                ((StyxTAuthMessage)tMessage).getAuthFID())).openForWrite());
+	//        output.writeString(getPassword());
+	//        output.flush();
+
+	sendAttachMessage();
 }

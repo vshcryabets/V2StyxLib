@@ -31,7 +31,7 @@ public class StyxTAuthMessage extends StyxTMessageFID {
 		return mUserName;
 	}
 
-	public void setUserName(String user_name) {
+	public void setUserName(String userName) {
 		mUserName = user_name;
 	}
 

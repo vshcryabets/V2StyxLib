@@ -9,9 +9,9 @@
 #define STYXTVERSIONMESSAGE_H_
 #include <string>
 #include "../types.h"
-#include "messages/base/StyxMessage.h"
+#include "messages/base/StyxTMessage.h"
 
-class StyxTVersionMessage : public StyxMessage {
+class StyxTVersionMessage : public StyxTMessage {
 private:
 	uint32_t mMaxPacketSize;
 	std::string mProtocolVersion;
