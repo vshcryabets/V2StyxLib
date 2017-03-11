@@ -6,8 +6,11 @@
 #ifndef ICLIENT_H_
 #define ICLIENT_H_
 
+#include "server/IChannelDriver.h"
+
 class IClient {
 public:
+	IClient() {};
 	virtual ~IClient() {};
 
 	/**
@@ -56,7 +59,7 @@ public:
 	/**
 	 * Close connection to server.
 	 */
-	virtual void close() throw();
+	virtual void close() throw() = 0;
 };
 
 #endif // ICLIENT_H_

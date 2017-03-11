@@ -13,6 +13,7 @@ private:
 public:
 	DiskStyxDirectory(std::string name);
 	virtual ~DiskStyxDirectory();
+	virtual IVirtualStyxFile* walk(std::vector<StyxString*> *pathElements, std::vector<StyxQID*> *qids);
 };
 
 #endif /* DISKSTYXDIRECTORY_H_ */

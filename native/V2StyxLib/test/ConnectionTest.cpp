@@ -7,6 +7,7 @@
 #include "Connection.h"
 #include "vfs/DiskStyxDirectory.h"
 #include "server/tcp/TCPClientChannelDriver.h"
+#include "platformtools.h"
 
 static const uint16_t PORT = 10234;
 static Connection* mConnection;
@@ -31,18 +32,15 @@ void setUp() {
 TEST(cpp_connection_test, connection_test) {
 	setUp();
     size_t count = 1000;
-    uint64_t startTime = System.currentTimeMillis();
+    uint64_t startTime = getTimestampInMilliseconds();
     for ( size_t i = 0; i < count; i++ ) {
         mConnection->sendVersionMessage();
-        printf("Send TVersion %d times\n", i);
     }
-    uint64_t diff = System.currentTimeMillis()-startTime;
-    printf("\tTransmited %d messages\n\t"
-    		"Received %d messages\n\t"
-            "Error %d messages\n\t"
-            "Average time for connection %d ms",
+    uint64_t diff = getTimestampInMilliseconds() - startTime;
+    printf("\tTransmited %zu messages\n\t"
+            "Error %zu messages\n\t"
+            "Average time for connection %llu ms",
             mConnection->getMessenger()->getTransmittedCount(),
-            mConnection->getMessenger()->getReceivedCount(),
             mConnection->getMessenger()->getErrorsCount(),
             diff/count
             );

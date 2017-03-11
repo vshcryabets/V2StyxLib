@@ -1,18 +1,28 @@
 #include "types.h"
 
-Credentials::Credentials(StyxString username, StyxString password) : mUserName(username), mPassword(password) {
-
+Credentials::Credentials(StyxString* username, StyxString* password) : mUserName(NULL), mPassword(NULL) {
+	if (username != NULL) {
+		mUserName = new std::string(username->c_str());
+	}
+	if (password != NULL) {
+		mPassword = new std::string(password->c_str());
+	}
 }
 
 Credentials::~Credentials() {
-
+	if (mUserName != NULL) {
+		delete mUserName;
+	}
+	if (mPassword != NULL) {
+		delete mPassword;
+	}
 }
 
-StyxString Credentials::getUserName() {
+StyxString* Credentials::getUserName() {
 	return mUserName;
 }
 
-StyxString Credentials::getPassword() {
+StyxString* Credentials::getPassword() {
 	return mPassword;
 }
 

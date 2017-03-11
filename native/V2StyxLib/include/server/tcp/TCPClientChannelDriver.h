@@ -17,10 +17,10 @@ public:
 	virtual void prepareSocket(std::string socketAddress, bool ssl) throw();
 	virtual bool isConnected();
 	virtual bool isStarted();
-	virtual bool sendMessage(StyxMessage message, ClientDetails recipient);
+	virtual bool sendMessage(StyxMessage message, ClientDetails *recipient) throw();
 	virtual void run();
 	virtual void close() throw();
-	virtual std::vector<ClientDetails> getClients();
+	virtual std::vector<ClientDetails*> getClients();
 };
 
 #endif /* INCLUDE_SERVER_TCP_TCPCLIENTCHANNELDRIVER_H_ */

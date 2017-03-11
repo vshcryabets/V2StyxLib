@@ -10,6 +10,14 @@
 
 class TCPChannelDriver : public IChannelDriver {
 protected:
+	uint16_t mPort;
+	StyxString mAddress;
+	uint32_t mTransmittedPacketsCount;
+	uint32_t mTransmissionErrorsCount;
+    IMessageProcessor* mTMessageHandler;
+    IMessageProcessor* mRMessageHandler;
+    ILogListener* mLogListener;
+
 	virtual void run() = 0;
 	virtual void prepareSocket(std::string socketAddress, bool ssl) throw() = 0;
 public:

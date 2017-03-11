@@ -7,10 +7,12 @@
 #ifndef CONNECTION_H_
 #define CONNECTION_H_
 
+#include "types.h"
 #include "IClient.h"
 #include "handlers/RMessagesProcessor.h"
+#include "handlers/TMessagesProcessor.h"
 #include "handlers/TMessageTransmitter.h"
-
+#include "messages/base/structs/StyxQID.h"
 
 /**
  * Styx client connection.
@@ -19,11 +21,19 @@ class Connection : public IClient {
 private:
 	static const StyxString PROTOCOL;
 	static const size_t DEFAULT_IOUNIT;
+	static const size_t DEFAULT_TIMEOUT;
 
-	std::vector<IChannelDriver*> mDrivers;
-	TMessagesProcessor *mBalancer;
-	ConnectionAcceptor *mAcceptor;
 	IVirtualStyxFile *mRoot;
+    StyxString mMountPoint;
+    size_t mTimeout;
+    bool isConnectedFlag;
+    bool isAttached;
+    TMessageTransmitter* mTransmitter;
+    StyxFID mAuthFID;
+    StyxQID* mAuthQID;
+    StyxQID* mQID;
+    StyxFID mFID;
+
 
 	void setAddress(const char * hname,
 			short port,
@@ -31,16 +41,32 @@ private:
 			char* protocol);
 	// create and bind socket
 	Socket createSocket(string address, int port);
+	void init(IChannelDriver *driver,
+            RMessagesProcessor *answerProcessor,
+            TMessageTransmitter *transmitter,
+            ClientDetails *recepient);
+protected:
+    Credentials mCredentials;
+    ClientDetails* mRecepient;
+    IChannelDriver* mDriver;
+    ConnectionDetails* mDetails;
+    RMessagesProcessor* mAnswerProcessor;
+    bool isAutoStartDriver;
+    bool shouldCloseAnswerProcessor;
+    bool shouldCloseTransmitter;
+
+    virtual size_t getIOBufSize();
+
 public:
     Connection();
     Connection(Credentials credentials);
     Connection(Credentials credentials, IChannelDriver *driver);
-    Connection(Credentials *credentials,
+    Connection(Credentials credentials,
                       IChannelDriver *driver,
                       RMessagesProcessor *answerProcessor,
                       TMessageTransmitter *transmitter,
                       ClientDetails *recepient);
-    ~Connection();
+    virtual ~Connection();
 
 	virtual void sendVersionMessage() throw();
 	virtual bool connect(IChannelDriver *driver) throw();
@@ -53,6 +79,7 @@ public:
 	virtual ConnectionDetails getConnectionDetails();
 	virtual ClientDetails *getRecepient();
 	virtual void close() throw();
+	virtual StyxString getProtocol();
 };
 
-#endif /* STYXSERVERMANAGER_H_ */
+#endif /* CONNECTION_H_ */

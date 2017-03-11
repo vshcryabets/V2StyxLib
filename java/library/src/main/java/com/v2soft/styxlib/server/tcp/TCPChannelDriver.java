@@ -173,6 +173,7 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
     public int getTransmittedCount() {
         return mTransmittedPacketsCount;
     }
+
     @Override
     public int getErrorsCount() {
         return mTransmissionErrorsCount;

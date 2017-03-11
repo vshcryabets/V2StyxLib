@@ -43,7 +43,8 @@ public class Connection
     protected Credentials mCredentials;
     private String mMountPoint;
     private int mTimeout = DEFAULT_TIMEOUT;
-    private boolean isConnected, isAttached;
+    private boolean isConnected;
+    private boolean isAttached;
     private TMessageTransmitter mTransmitter;
     private long mAuthFID = StyxMessage.NOFID;
     private StyxQID mAuthQID;

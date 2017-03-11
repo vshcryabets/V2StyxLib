@@ -18,7 +18,7 @@ public:
      * Get all active clients.
      * @return all active clients.
      */
-    virtual std::vector<ClientDetails> getClients() = 0;
+    virtual std::vector<ClientDetails*> getClients() = 0;
 
     virtual bool isConnected() = 0;
     virtual bool isStarted() = 0;

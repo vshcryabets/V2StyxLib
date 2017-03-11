@@ -82,13 +82,13 @@ typedef ModeTypeEnum StyxMode;
 
 class Credentials {
 protected:
-    StyxString mUserName;
-    StyxString mPassword;
+    StyxString* mUserName;
+    StyxString* mPassword;
 public:
-    Credentials(StyxString username, StyxString password);
+    Credentials(StyxString* username, StyxString* password);
 	~Credentials();
-	StyxString getUserName();
-	StyxString getPassword();
+	StyxString* getUserName();
+	StyxString* getPassword();
 };
 
 class ConnectionDetails {
