@@ -5,6 +5,8 @@
 #include "messages/StyxTAuthMessage.h"
 #include "messages/StyxRAuthMessage.h"
 #include "messages/StyxRVersionMessage.h"
+#include "messages/StyxTAttachMessage.h"
+#include "messages/StyxRAttachMessage.h"
 
 const size_t Connection::DEFAULT_TIMEOUT = 10000;
 const size_t Connection::DEFAULT_IOUNIT = 8192;
@@ -149,3 +151,16 @@ void Connection::sendAuthMessage() throw() {
 
 	sendAttachMessage();
 }
+
+void Connection::sendAttachMessage() throw() {
+        mFID = mRecepient->getPolls()->getFIDPoll()->getFreeItem();
+        StyxTAttachMessage tAttach(getRootFID(), mAuthFID,
+                *mCredentials.getUserName(),
+                mMountPoint);
+        mTransmitter->sendMessage(&tAttach, mRecepient);
+
+        StyxMessage* rMessage = tAttach.waitForAnswer(mTimeout);
+        StyxRAttachMessage* rAttach = (StyxRAttachMessage*) rMessage;
+        mQID = rAttach->getQID();
+        isAttached = true;
+    }
