@@ -11,8 +11,14 @@
 #include "utils/FIDPoll.h"
 #include "utils/MessageTagPoll.h"
 #include <map>
+#include "messages/base/StyxTMessage.h"
+#include "messages/base/StyxTMessageFID.h"
 
 class Polls {
+protected:
+	std::map<StyxTAG, StyxTMessage*> mMessagesMap;
+    MessageTagPoll *mTags;
+    FIDPoll *mFids;
 public:
 	Polls();
 	virtual ~Polls();
@@ -20,8 +26,8 @@ public:
     FIDPoll* getFIDPoll();
     MessageTagPoll* getTagPoll();
     std::map<StyxTAG, StyxTMessage>* getMessagesMap();
-    void releaseTag(int tag);
-    void releaseFID(StyxTMessageFID message);
+    void releaseTag(StyxTAG tag);
+    void releaseFID(StyxTMessageFID* message);
 };
 
 #endif /* INCLUDE_UTILS_POLLS_H_ */

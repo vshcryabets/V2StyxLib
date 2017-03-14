@@ -5,14 +5,36 @@
  *      Author: mrco
  */
 
-#include "Polls.h"
+#include "utils/Polls.h"
 
 Polls::Polls() {
-	// TODO Auto-generated constructor stub
-
+    mFids = new FIDPoll();
+    mTags = new MessageTagPoll();
 }
 
 Polls::~Polls() {
-	// TODO Auto-generated destructor stub
+	delete mFids;
+	delete mTags;
+	mMessagesMap.clear();
+}
+
+FIDPoll* Polls::getFIDPoll() {
+
+}
+
+MessageTagPoll* Polls::getTagPoll() {
+
+}
+
+std::map<StyxTAG, StyxTMessage>* Polls::getMessagesMap() {
+
+}
+
+void Polls::releaseTag(StyxTAG tag) {
+
+}
+
+void Polls::releaseFID(StyxTMessageFID* message) {
+
 }
 

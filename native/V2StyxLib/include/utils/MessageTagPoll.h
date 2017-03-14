@@ -12,6 +12,8 @@ class MessageTagPoll : public AbstractPoll<StyxTAG> {
 public:
 	MessageTagPoll();
 	virtual ~MessageTagPoll();
+	virtual StyxTAG getNext();
+	virtual bool release(StyxTAG id);
 };
 
 #endif /* INCLUDE_UTILS_MESSAGETAGPOLL_H_ */

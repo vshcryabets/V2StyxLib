@@ -8,6 +8,9 @@
 
 template <class T>
 class AbstractPoll {
+protected:
+    T mLast;
+    std::set<T> mAvailable;
 public:
 	AbstractPoll();
 	virtual ~AbstractPoll();

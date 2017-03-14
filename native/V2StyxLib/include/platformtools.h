@@ -7,6 +7,7 @@
 #define PLATFORMTOOLS_H_
 
 #include <stdint.h>
+#include <cstddef>
 
 uint64_t getTimestampInMilliseconds();
 
