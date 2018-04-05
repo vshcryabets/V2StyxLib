@@ -6,8 +6,25 @@
 #ifndef INCLUDE_UTILS_FIDPOLL_H_
 #define INCLUDE_UTILS_FIDPOLL_H_
 
-#include "utils/AbstractPoll.h"
 #include "types.h"
+#include <set>
+#include "utils/Mutex.h"
+
+template <class T>
+class AbstractPoll {
+protected:
+    T mLast;
+    std::set<T> mAvailable;
+    Mutex mMutex;
+public:
+	AbstractPoll();
+	virtual ~AbstractPoll();
+
+	virtual T getFreeItem();
+	virtual bool release(T id);
+	virtual void clean();
+	virtual T getNext() = 0;
+};
 
 class FIDPoll : public AbstractPoll<StyxFID> {
 protected:

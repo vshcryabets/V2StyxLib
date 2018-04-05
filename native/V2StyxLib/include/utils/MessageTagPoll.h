@@ -6,7 +6,7 @@
 #ifndef INCLUDE_UTILS_MESSAGETAGPOLL_H_
 #define INCLUDE_UTILS_MESSAGETAGPOLL_H_
 
-#include "utils/AbstractPoll.h"
+#include "utils/FIDPoll.h"
 
 class MessageTagPoll : public AbstractPoll<StyxTAG> {
 public:

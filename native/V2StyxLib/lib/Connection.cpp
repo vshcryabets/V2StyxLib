@@ -84,7 +84,6 @@ void Connection::sendVersionMessage() throw() {
 }
 
 bool Connection::connect(IChannelDriver *driver) throw() {
-
 }
 
 bool Connection::connect(IChannelDriver *driver, Credentials credentials) throw() {

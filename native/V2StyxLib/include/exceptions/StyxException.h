@@ -8,11 +8,14 @@
 #ifndef STYXEXCEPTION_H_
 #define STYXEXCEPTION_H_
 
+#include <string>
+
 class StyxException {
 private:
 	const char *mMessage;
 public:
 	StyxException(const char *message);
+	StyxException(std::string message);
 	virtual ~StyxException();
 };
 
