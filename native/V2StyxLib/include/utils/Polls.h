@@ -9,7 +9,6 @@
 #define INCLUDE_UTILS_POLLS_H_
 
 #include "utils/FIDPoll.h"
-#include "utils/MessageTagPoll.h"
 #include <map>
 #include "messages/base/StyxTMessage.h"
 #include "messages/base/StyxTMessageFID.h"

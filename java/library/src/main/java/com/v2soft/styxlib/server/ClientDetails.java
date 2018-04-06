@@ -39,6 +39,7 @@ public abstract class ClientDetails {
      * @return polls assigned to this client.
      */
     public Polls getPolls() {
+	// TODO move initialization to constructor
         if ( mPolls == null ) {
             synchronized (this) {
                 if (mPolls == null) {

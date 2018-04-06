@@ -9,11 +9,15 @@
 #define STYX_TMESSAGE_H_
 #include "types.h"
 #include "messages/base/StyxMessage.h"
+#include "exceptions/StyxException.h"
+#include "exceptions/StyxErrorMessageException.h"
+#include <pthread.h>
 
-class StyxTMessage : public StyxMessage{
+class StyxTMessage : public StyxMessage {
 private:
 	MessageTypeEnum mRequiredAnswerType;
     StyxMessage* mAnswer;
+    pthread_cond_t mWaitCondition;
 
 protected:
     bool checkAnswer(StyxMessage *answer);
@@ -27,11 +31,14 @@ public:
 	// =======================================================
 	// Setters
 	// =======================================================
-	void setAnswer(StyxMessage* answer);
+	void setAnswer(StyxMessage* answer) throw(StyxException);
 	// =======================================================
 	// Virtual methods
 	// =======================================================
-	StyxMessage* waitForAnswer(long timeout);
+	/**
+	 * timeout in milliseconds.
+	 */
+	StyxMessage* waitForAnswer(uint32_t timeout) throw(StyxErrorMessageException);
 };
 
 #endif /* STYX_TMESSAGE_H_ */

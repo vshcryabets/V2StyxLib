@@ -32,10 +32,21 @@ protected:
 public:
 	FIDPoll();
 	virtual ~FIDPoll();
-
 	virtual bool release(StyxFID id);
 	virtual StyxFID getNext();
 	virtual void clean();
 };
+
+class MessageTagPoll : public AbstractPoll<StyxTAG> {
+protected:
+	static const uint32_t MAXUSHORT = 0xFFFF;
+public:
+	MessageTagPoll();
+	virtual ~MessageTagPoll();
+	virtual StyxTAG getNext();
+	virtual bool release(StyxTAG id);
+	virtual void clean();
+};
+
 
 #endif /* INCLUDE_UTILS_FIDPOLL_H_ */

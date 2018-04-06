@@ -5,7 +5,7 @@
  *      Author: vschryabets@gmail.com
  */
 
-#include "StyxErrorMessageException.h"
+#include "exceptions/StyxErrorMessageException.h"
 
 StyxErrorMessageException::StyxErrorMessageException(StyxRErrorMessage *message) {
 	mMessage = message;

@@ -1,24 +1,21 @@
 /*
  * StyxErrorMessageException.cpp
  *
- *  Created on: May 27, 2012
+ *  Created on: Apr 06, 2018
  *      Author: vschryabets@gmail.com
  */
 
-#include "StyxErrorMessageException.h"
+#include "exceptions/StyxException.h"
 
-StyxErrorMessageException::StyxErrorMessageException(StyxRErrorMessage *message) {
-	mMessage = message;
+StyxException::StyxException(const char *message) {
+	this->mMessage = std::string(message);
 }
 
-StyxErrorMessageException::StyxErrorMessageException(const char *message) {
-	mMessage = new StyxRErrorMessage(StyxMessage::NOTAG, message);
+StyxException::StyxException(std::string message) {
+	this->mMessage = message;
 }
 
-StyxErrorMessageException::~StyxErrorMessageException() {
-	// TODO Auto-generated destructor stub
+StyxException::~StyxException() {
+
 }
 
-StyxRErrorMessage* StyxErrorMessageException::getErrorMessage() {
-	return mMessage;
-}

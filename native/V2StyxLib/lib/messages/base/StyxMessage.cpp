@@ -26,6 +26,7 @@
 #include "messages/StyxRReadMessage.h"
 #include "messages/StyxRWriteMessage.h"
 #include "messages/StyxRStatMessage.h"
+#include <sstream>
 
 size_t StyxMessage::getUTFSize(StyxString utf) {
 	return utf.length();
@@ -172,4 +173,11 @@ void StyxMessage::writeToBuffer(IStyxDataWriter *output) {
 
 size_t StyxMessage::getBinarySize()	{
 	return StyxMessage::BASE_BINARY_SIZE;
+}
+
+std::string StyxMessage::toString() {
+	std::stringstream stream;
+	stream << "Type " << getType() << " Tag " << getTag();
+    throw stream.str();
+
 }

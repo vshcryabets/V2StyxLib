@@ -7,7 +7,10 @@
 
 #ifndef STYXERRORMESSAGEEXCEPTION_H_
 #define STYXERRORMESSAGEEXCEPTION_H_
-#include "../messages/StyxRErrorMessage.h"
+
+#include "messages/StyxRErrorMessage.h"
+#include "exceptions/StyxException.h"
+
 
 class StyxErrorMessageException {
 private:
@@ -17,6 +20,7 @@ public:
 	StyxErrorMessageException(StyxRErrorMessage *message);
 	virtual ~StyxErrorMessageException();
 	StyxRErrorMessage* getErrorMessage();
+	static void checkException(StyxMessage* answer) throw(StyxException);
 };
 
 #endif /* STYXERRORMESSAGEEXCEPTION_H_ */

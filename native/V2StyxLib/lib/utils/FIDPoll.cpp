@@ -69,3 +69,27 @@ StyxFID FIDPoll::getNext() {
 void FIDPoll::clean() {
 	mLast = 0L;
 }
+
+MessageTagPoll::MessageTagPoll() {
+	mLast = 0;
+}
+
+MessageTagPoll::~MessageTagPoll() {
+}
+
+bool MessageTagPoll::release(StyxTAG id) {
+    if (id == StyxMessage::NOTAG)
+        return false;
+    return AbstractPoll::release(id);
+}
+
+StyxTAG MessageTagPoll::getNext() {
+    mLast++;
+    if(mLast > MessageTagPoll::MAXUSHORT)
+        mLast = 0L;
+    return mLast;
+}
+
+void MessageTagPoll::clean() {
+	mLast = 0L;
+}

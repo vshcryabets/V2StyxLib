@@ -12,7 +12,7 @@
 
 class StyxException {
 private:
-	const char *mMessage;
+	std::string mMessage;
 public:
 	StyxException(const char *message);
 	StyxException(std::string message);
