@@ -74,7 +74,6 @@ enum FileModeEnum {
 };
 
 typedef uint8_t MessageType;
-typedef uint8_t QIDType;
 typedef uint32_t StyxFID;
 typedef uint16_t StyxTAG;
 typedef std::string StyxString;

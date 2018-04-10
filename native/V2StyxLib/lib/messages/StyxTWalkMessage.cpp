@@ -44,7 +44,7 @@ void StyxTWalkMessage::writeToBuffer(IStyxDataWriter* output) {
 	output->writeUInt16(mPathElements->size());
 	for ( std::vector<StyxString*>::iterator it = mPathElements->begin();
 			it != mPathElements->end();) {
-		output->writeUTFString(*it);
+		output->writeUTFString(**it);
 	}
 }
 size_t StyxTWalkMessage::getBinarySize() {

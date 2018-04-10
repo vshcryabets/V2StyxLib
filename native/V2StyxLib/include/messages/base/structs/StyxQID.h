@@ -13,7 +13,7 @@
 
 class StyxQID {
 private:
-	QIDType mType; //the type of the file (directory, etc.), represented as a bit vector corresponding to the high 8 bits of the file's mode word.
+	QIDTypeEnum mType; //the type of the file (directory, etc.), represented as a bit vector corresponding to the high 8 bits of the file's mode word.
 	uint32_t mVersion; // version number for given path
 	uint64_t mPath; //the file server's unique identification for the file
 public:
@@ -24,6 +24,10 @@ public:
 	virtual ~StyxQID();
 	void writeBinaryTo(IStyxDataWriter *output);
 	void setType(QIDTypeEnum type);
+	QIDTypeEnum getType() const;
+	uint32_t getVersion() const;
+	uint64_t getPath() const;
+	StyxString toString();
 };
 
 #endif /* STYXQID_H_ */

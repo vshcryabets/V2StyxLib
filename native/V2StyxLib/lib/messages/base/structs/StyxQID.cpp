@@ -10,7 +10,7 @@
 const StyxQID* StyxQID::EMPTY = new StyxQID(QTFILE, 0L, 0L);
 
 StyxQID::StyxQID(IStyxDataReader *input) {
-	mType = input->readUInt8();
+	mType = (QIDTypeEnum)input->readUInt8();
 	mVersion = input->readUInt32();
 	mPath = input->readUInt64();
 }
@@ -28,6 +28,26 @@ void StyxQID::writeBinaryTo(IStyxDataWriter *output) {
 	output->writeUInt32(mVersion);
 	output->writeUInt64(mPath);
 }
+
 void StyxQID::setType(QIDTypeEnum type) {
 	mType = type;
+}
+
+StyxString StyxQID::toString() {
+	char buffer[4096];
+	snprintf(buffer, sizeof(buffer), "(Type: %d; Version: %d; Path: %llu)",
+			getType(), getVersion(), getPath());
+	return StyxString(buffer);
+}
+
+QIDTypeEnum StyxQID::getType() const {
+	return mType;
+}
+
+uint32_t StyxQID::getVersion() const {
+	return mVersion;
+}
+
+uint64_t StyxQID::getPath() const {
+	return mPath;
 }

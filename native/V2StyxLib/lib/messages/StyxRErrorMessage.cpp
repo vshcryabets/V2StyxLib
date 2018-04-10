@@ -9,22 +9,19 @@
 #include "string.h"
 
 StyxRErrorMessage::StyxRErrorMessage(StyxTAG tag, StyxString message)
-	: StyxMessage( Rerror, tag) {
-	mMessage = new StyxString(message);
+	: StyxMessage( Rerror, tag), mMessage(message) {
 }
 StyxRErrorMessage::StyxRErrorMessage(StyxTAG tag, const char *message)
-	: StyxMessage( Rerror, tag) {
-	mMessage = new StyxString(message);
+	: StyxMessage( Rerror, tag), mMessage(message) {
 }
 
 StyxRErrorMessage::~StyxRErrorMessage() {
-	delete mMessage;
 }
 // =======================================================
 // Virtual methods
 // =======================================================
 void StyxRErrorMessage::load(IStyxDataReader *buffer) {
-	mMessage = new StyxString(buffer->readUTFString());
+	mMessage = buffer->readUTFString();
 }
 
 void StyxRErrorMessage::writeToBuffer(IStyxDataWriter* output) {
@@ -33,5 +30,5 @@ void StyxRErrorMessage::writeToBuffer(IStyxDataWriter* output) {
 }
 size_t StyxRErrorMessage::getBinarySize() {
 	return StyxMessage::getBinarySize()
-		+ mMessage->size()+2;
+		+ mMessage.size()+2;
 }

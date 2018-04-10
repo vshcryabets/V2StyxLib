@@ -7,15 +7,15 @@
 
 #ifndef STYXRVERSIONMESSAGE_H_
 #define STYXRVERSIONMESSAGE_H_
-#include <string>
 #include "messages/base/StyxMessage.h"
+#include "types.h"
 
 class StyxRVersionMessage : public StyxMessage {
 private:
 	size_t mIOUnit;
-	std::string mProtocol;
+	StyxString mProtocol;
 public:
-	StyxRVersionMessage(size_t iounit, std::string protocol);
+	StyxRVersionMessage(size_t iounit, StyxString protocol);
 	virtual ~StyxRVersionMessage();
 	size_t getMaxPacketSize();
 	// =======================================================

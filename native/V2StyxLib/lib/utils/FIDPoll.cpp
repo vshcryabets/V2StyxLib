@@ -3,7 +3,6 @@
  *
  */
 
-#include <sstream>
 #include "utils/FIDPoll.h"
 #include "messages/base/StyxMessage.h"
 #include "exceptions/StyxException.h"
@@ -32,9 +31,7 @@ template <class T>
 bool AbstractPoll<T>::release(T id) {
 	MutexBlock lock(&mMutex);
     if ( mAvailable.find(id) != mAvailable.end()) {
-		std::stringstream stream;
-		stream << "Something goes wrong, this item already has been released " << id;
-        throw StyxException(stream.str());
+        throw StyxException("Something goes wrong, this item already has been released %d", id);
     }
     return mAvailable.insert(id).second;
 }

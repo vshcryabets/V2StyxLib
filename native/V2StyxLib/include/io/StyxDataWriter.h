@@ -22,7 +22,7 @@ public:
 	virtual void writeUInt16(uint16_t val);
 	virtual void writeUInt32(uint32_t val);
 	virtual void writeUInt64(uint64_t value);
-	virtual void writeUTFString(StyxString *string);
+	virtual void writeUTFString(StyxString string);
 };
 
 #endif /* STYXDATAWRITER_H_ */

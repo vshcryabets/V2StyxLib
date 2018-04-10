@@ -6,7 +6,6 @@
 #ifndef STYXTAUTHMESSAGE_H_
 #define STYXTAUTHMESSAGE_H_
 #include "messages/base/StyxTMessageFID.h"
-#include <string>
 
 class StyxTAuthMessage : public StyxTMessageFID {
 private:
@@ -25,6 +24,7 @@ public:
 	virtual void load(IStyxDataReader *buffer);
 	virtual void writeToBuffer(IStyxDataWriter* output);
 	virtual size_t getBinarySize();
+	virtual StyxString toString();
 };
 
 #endif /* STYXTAUTHMESSAGE_H_ */

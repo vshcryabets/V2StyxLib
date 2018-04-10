@@ -7,12 +7,22 @@
 
 #include "exceptions/StyxException.h"
 
-StyxException::StyxException(const char *message) {
-	this->mMessage = std::string(message);
+StyxException::StyxException(const char *message, ...) {
+	char buf[4096];
+	va_list arglist;
+	va_start( arglist, message );
+	vsnprintf(buf, sizeof(buf), message, arglist);
+	va_end( arglist );
+	this->mMessage = StyxString(buf);
 }
 
-StyxException::StyxException(std::string message) {
-	this->mMessage = message;
+StyxException::StyxException(StyxString message, ...) {
+	char buf[4096];
+	va_list arglist;
+	va_start( arglist, message.c_str() );
+	vsnprintf(buf, sizeof(buf), message.c_str(), arglist);
+	va_end( arglist );
+	this->mMessage = StyxString(buf);
 }
 
 StyxException::~StyxException() {

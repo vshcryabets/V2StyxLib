@@ -11,13 +11,14 @@
 #include "io/IStyxDataReader.h"
 #include "io/IStyxDataWriter.h"
 #include "messages/base/StyxMessage.h"
+#include "messages/base/structs/StyxQID.h"
 
 class StyxRSingleQIDMessage : public StyxMessage {
 private:
-    StyxQID *mQID;
+    StyxQID* mQID;
     bool shouldDeleteQID;
 public:
-    StyxRSingleQIDMessage(MessageTypeEnum type, StyxTAG tag, const StyxQID *qid);
+    StyxRSingleQIDMessage(MessageTypeEnum type, StyxTAG tag, const StyxQID* qid);
     virtual ~StyxRSingleQIDMessage();
 	// =======================================================
 	// Virtual methods
@@ -30,6 +31,7 @@ public:
      * @return QID structure
      */
     StyxQID* getQID();
+    virtual StyxString toString();
 };
 
 #endif /* STYXRSINGLEQIDMESSAGE_H_ */

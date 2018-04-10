@@ -14,7 +14,7 @@
 
 class StyxRErrorMessage : public StyxMessage {
 private:
-	StyxString *mMessage;
+	StyxString mMessage;
 public:
 	StyxRErrorMessage(StyxTAG tag, std::string message);
 	StyxRErrorMessage(StyxTAG tag, const char *message);

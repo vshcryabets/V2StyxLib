@@ -175,9 +175,8 @@ size_t StyxMessage::getBinarySize()	{
 	return StyxMessage::BASE_BINARY_SIZE;
 }
 
-std::string StyxMessage::toString() {
+StyxString StyxMessage::toString() {
 	std::stringstream stream;
 	stream << "Type " << getType() << " Tag " << getTag();
-    throw stream.str();
-
+    return stream.str();
 }

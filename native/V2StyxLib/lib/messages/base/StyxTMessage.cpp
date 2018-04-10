@@ -37,7 +37,7 @@ StyxMessage* StyxTMessage::waitForAnswer(uint32_t timeout) throw(StyxErrorMessag
 		pthread_cond_timedwait(&mWaitCondition, NULL, &tm);
 	}
 	if ( mAnswer == NULL )
-		throw new StyxException(std::string("Don't receive answer for ") + this->toString());
+		throw new StyxException("Don't receive answer for %s", this->toString().c_str());
 	if (mAnswer->getType() == Rerror) {
 		StyxErrorMessageException::checkException(mAnswer);
 	}

@@ -41,7 +41,7 @@ public:
 	virtual void load(IStyxDataReader *buffer);
 	virtual void writeToBuffer(IStyxDataWriter *outputBuffer);
 	virtual size_t getBinarySize();
-	virtual std::string toString();
+	virtual StyxString toString();
 };
 
 #endif /* STYXMESSAGE_H_ */

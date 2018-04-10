@@ -32,7 +32,7 @@ void StyxDataWriter::writeUInt64(uint64_t val) {
 			(val>>32)&0xFF, (val>>40)&0xFF, (val>>48)&0xFF,  (val>>56)&0xFF};
 	write(temp, 0, 8);
 }
-void StyxDataWriter::writeUTFString(std::string *string) {
-	writeUInt16(string->length());
-	write((const uint8_t*)string->c_str(), 0, string->length());
+void StyxDataWriter::writeUTFString(StyxString string) {
+	writeUInt16(string.length());
+	write((const uint8_t*)string.c_str(), 0, string.length());
 }

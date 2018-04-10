@@ -61,10 +61,10 @@ size_t StyxStat::writeBinaryTo(IStyxDataWriter *output) {
 	output->writeUInt32(mAccessTime);
 	output->writeUInt32(mModificationTime);
 	output->writeUInt64(mLength);
-	output->writeUTFString(&mName);
-	output->writeUTFString(&mUserName);
-	output->writeUTFString(&mGroupName);
-	output->writeUTFString(&mModificationUser);
+	output->writeUTFString(mName);
+	output->writeUTFString(mUserName);
+	output->writeUTFString(mGroupName);
+	output->writeUTFString(mModificationUser);
 	return getSize();
 }
 void StyxStat::setMode(uint32_t mode) {

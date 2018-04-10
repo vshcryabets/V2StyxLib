@@ -16,13 +16,23 @@ set(EXCEPTIONS_BASE "${LIBRARY_BASE}/exceptions/")
 list(APPEND LIB_SOURCES
 	${EXCEPTIONS_BASE}/StyxException.cpp
     ${EXCEPTIONS_BASE}/StyxErrorMessageException.cpp
+    ${EXCEPTIONS_BASE}/StyxWrongMessageException.cpp
     )
 
 set(MESSAGES_BASE "${LIBRARY_BASE}/messages/base/")
 list(APPEND LIB_SOURCES
 	${MESSAGES_BASE}/StyxMessage.cpp
     ${MESSAGES_BASE}/StyxTMessage.cpp
+    ${MESSAGES_BASE}/StyxTMessageFID.cpp
+    ${MESSAGES_BASE}/StyxRSingleQIDMessage.cpp
     )
+
+set(STRUCTS_BASE "${LIBRARY_BASE}/messages/base/structs/")
+list(APPEND LIB_SOURCES
+	${STRUCTS_BASE}/StyxQID.cpp
+    ${STRUCTS_BASE}/StyxStat.cpp
+    )
+
 
 ADD_LIBRARY( V2StyxServerLibrary STATIC ${LIB_SOURCES} )
 

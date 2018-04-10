@@ -56,7 +56,7 @@ size_t StyxTCreateMessage::getBinarySize() {
 
 void StyxTCreateMessage::writeToBuffer(IStyxDataWriter* output) {
 	StyxTCreateMessage::writeToBuffer(output);
-	output->writeUTFString(&mName);
+	output->writeUTFString(mName);
 	output->writeUInt32(getPermissions());
 	output->writeUInt8(getMode());
 }

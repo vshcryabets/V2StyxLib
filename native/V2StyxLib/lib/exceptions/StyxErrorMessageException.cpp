@@ -22,3 +22,12 @@ StyxErrorMessageException::~StyxErrorMessageException() {
 StyxRErrorMessage* StyxErrorMessageException::getErrorMessage() {
 	return mMessage;
 }
+
+void StyxErrorMessageException::checkException(StyxMessage *rMessage)  throw(StyxException) {
+	if (rMessage == NULL)
+		throw StyxException("rMessage is NULL");
+	if (rMessage->getType() != Rerror)
+		return;
+	StyxRErrorMessage *rError = (StyxRErrorMessage*) rMessage;
+	throw StyxErrorMessageException(rError);
+}
