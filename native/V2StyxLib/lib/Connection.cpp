@@ -83,49 +83,6 @@ void Connection::sendVersionMessage() throw() {
 
 }
 
-bool Connection::connect(IChannelDriver *driver) throw() {
-}
-
-bool Connection::connect(IChannelDriver *driver, Credentials credentials) throw() {
-
-}
-
-bool Connection::connect() throw() {
-
-}
-
-bool Connection::isConnected() {
-
-}
-
-IMessageTransmitter* Connection::getMessenger() {
-
-}
-
-size_t Connection::getTimeout() {
-
-}
-
-StyxFID Connection::getRootFID() {
-
-}
-
-ConnectionDetails Connection::getConnectionDetails() {
-
-}
-
-ClientDetails* Connection::getRecepient() {
-
-}
-
-void Connection::close() throw() {
-
-}
-
-StyxString Connection::getProtocol() {
-
-}
-
 size_t Connection::getIOBufSize() {
 	return DEFAULT_IOUNIT;
 }

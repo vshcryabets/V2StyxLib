@@ -33,6 +33,11 @@ list(APPEND LIB_SOURCES
     ${STRUCTS_BASE}/StyxStat.cpp
     )
 
+set(LIB2_BASE "${LIBRARY_BASE}/library/")
+list(APPEND LIB_SOURCES
+	${LIB2_BASE}/StyxServerManager.cpp
+    )
+
 
 ADD_LIBRARY( V2StyxServerLibrary STATIC ${LIB_SOURCES} )
 

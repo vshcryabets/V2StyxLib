@@ -5,7 +5,7 @@
  *      Author: V.Shcriyabets (vshcryabets@gmail.com)
  */
 
-#include "StyxServerManager.h"
+#include "library/StyxServerManager.h"
 #ifdef WIN32
 #include <WinSock2.h>
 #else
@@ -18,7 +18,6 @@
 #include "fcntl.h"
 #include "string.h"
 #include <stdio.h>
-#include "StyxLibraryException.h"
 
 const StyxString StyxServerManager::PROTOCOL = "9P2000";
 const size_t StyxServerManager::DEFAULT_IOUNIT = 8192;
@@ -26,9 +25,6 @@ const size_t StyxServerManager::DEFAULT_IOUNIT = 8192;
 StyxServerManager::StyxServerManager(IVirtualStyxFile *root) : mRoot(root) {
 	ConnectionDetails details(getProtocol(), getIOUnit());
     mBalancer = new TMessagesProcessor(details, root);
-}
-
-StyxServerManager::~StyxServerManager() {
 }
 
 void StyxServerManager::setAddress(const char * hname,
@@ -73,13 +69,6 @@ void StyxServerManager::setNonBlocking(Socket socket) {
 		throw "Can't create socket fcntl(F_SETFL)";
 	}
 #endif
-}
-
-void StyxServerManager::start() {
-}
-
-void StyxServerManager::stop() {
-	// TODO implement this
 }
 
 // create and bind socket

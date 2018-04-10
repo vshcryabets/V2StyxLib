@@ -8,7 +8,7 @@
 #ifndef INCLUDE_SERVER_TCP_TCPSERVERMANAGER_H_
 #define INCLUDE_SERVER_TCP_TCPSERVERMANAGER_H_
 
-#include "StyxServerManager.h"
+#include "library/StyxServerManager.h"
 
 class TCPServerManager: public StyxServerManager {
 public:

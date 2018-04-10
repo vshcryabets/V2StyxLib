@@ -13,19 +13,23 @@ static const uint16_t PORT = 10234;
 static Connection* mConnection;
 
 StyxServerManager* startServer() {
+	printf("Try to start server\n");
 	std::string testDirectory = "./test";
 	StyxServerManager* mServer = new TCPServerManager("127.0.0.1",
 			PORT,
 			false,
 			new DiskStyxDirectory(testDirectory));
 	mServer->start();
+	printf("Server started\n");
 	return mServer;
 }
 
 void setUp() {
+	printf("Setuo 1\n");
 	StyxServerManager* server = startServer();
 	mConnection = new Connection();
     IChannelDriver* driver = new TCPClientChannelDriver("localhost", PORT, false);
+    printf("Setup finished\n");
     ASSERT_TRUE(mConnection->connect(driver));
 }
 

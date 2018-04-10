@@ -25,6 +25,7 @@
 class StyxServerManager {
 private:
 	static const StyxString PROTOCOL;
+	static const size_t DEFAULT_TIMEOUT;
 	static const size_t DEFAULT_IOUNIT;
 
 	std::vector<IChannelDriver*> mDrivers;
@@ -32,23 +33,26 @@ private:
 	ConnectionAcceptor *mAcceptor;
 	IVirtualStyxFile *mRoot;
 
-	void setAddress(const char * hname,
-			short port,
-			struct sockaddr_in * sap,
-			char* protocol);
-	// create and bind socket
-	Socket createSocket(string address, int port);
 public:
-	StyxServerManager(IVirtualStyxFile *root);
+	StyxServerManager(IVirtualStyxFile *root, std::vector<IChannelDriver*> drivers = std::vector<IChannelDriver*>());
 	~StyxServerManager();
+
+	virtual StyxServerManager* addDriver(IChannelDriver* driver);
+
 	/**
 	 * start server
 	 */
-	void start();
+	virtual void start();
 	/**
 	 * stop server and realease all resources
 	 */
-	void stop();
+	virtual void close();
+
+	/**
+	 * stop server and realease all resources
+	 */
+	virtual void closeAndWait();
+
 	/**
 	* Set non-blocking mode
 	*/
@@ -58,17 +62,15 @@ public:
      * Get supported protocol name.
      * @return supported protocol name.
      */
-    StyxString getProtocol() {
-        return PROTOCOL;
-    }
+    virtual StyxString getProtocol();
 
     /**
      * Get supported IO unit size.
      * @return supported IO unit size.
      */
-    size_t getIOUnit() {
-        return DEFAULT_IOUNIT;
-    }
+    virtual size_t getIOUnit();
+    virtual IVirtualStyxFile* getRoot();
+    virtual std::vector<IChannelDriver*> getDrivers();
 };
 
 #endif /* STYXSERVERMANAGER_H_ */
