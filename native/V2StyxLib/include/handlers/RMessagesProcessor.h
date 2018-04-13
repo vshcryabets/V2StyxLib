@@ -13,14 +13,14 @@ class RMessagesProcessor : public QueueMessagesProcessor {
 protected:
     size_t mReceivedCount;
     size_t mErrorCount;
-    std::string mTag;
+    StyxString mTag;
 public:
-	RMessagesProcessor(ConnectionDetails details, IVirtualStyxFile *root);
+	RMessagesProcessor(StyxString tag);
 	virtual ~RMessagesProcessor();
 
 	virtual void addClient(ClientDetails *state);
 	virtual void removeClient(ClientDetails *state);
-	virtual void processPacket(StyxMessage *message, ClientDetails *client) throw();
+	virtual void processPacket(StyxMessage *message, ClientDetails *client) throw(StyxException);
 	virtual size_t getReceivedPacketsCount();
 	virtual size_t getReceivedErrorPacketsCount();
 };

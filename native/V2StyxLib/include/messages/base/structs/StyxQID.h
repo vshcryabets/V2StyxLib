@@ -18,7 +18,8 @@ private:
 	uint64_t mPath; //the file server's unique identification for the file
 public:
 	static const size_t CONTENT_SIZE = 13;
-	static const StyxQID *EMPTY;
+	static const StyxQID EMPTY;
+	StyxQID();
 	StyxQID(IStyxDataReader *input);
 	StyxQID(QIDTypeEnum type, uint32_t version, uint64_t path);
 	virtual ~StyxQID();

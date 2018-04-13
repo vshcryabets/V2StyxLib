@@ -16,18 +16,18 @@ public:
 	/**
 	 * Restart session with server
 	 */
-	virtual void sendVersionMessage() throw() = 0;
+	virtual void sendVersionMessage() throw(StyxException) = 0;
 	/**
 	 * Connect to server with specified parameters
 	 * @return true if connected
 	 */
-	virtual bool connect(IChannelDriver *driver) throw() = 0;
+	virtual bool connect(IChannelDriver *driver) throw(StyxException) = 0;
 	/**
 	 * Connect to server with specified parameters
 	 * @param credentials user credentials
 	 * @return true if connected
 	 */
-	virtual bool connect(IChannelDriver *driver, Credentials credentials) throw() = 0;
+	virtual bool connect(IChannelDriver *driver, Credentials credentials) throw(StyxException) = 0;
 	/**
 	 * Connect to server.
 	 * @return true if connected
@@ -35,7 +35,7 @@ public:
 	 * @throws com.v2soft.styxlib.exceptions.StyxException
 	 * @throws java.util.concurrent.TimeoutException
 	 */
-	virtual bool connect() throw() = 0;
+	virtual bool connect() throw(StyxException) = 0;
 
 	virtual bool isConnected() = 0;
 
@@ -59,7 +59,7 @@ public:
 	/**
 	 * Close connection to server.
 	 */
-	virtual void close() throw() = 0;
+	virtual void close() throw(StyxException) = 0;
 };
 
 #endif // ICLIENT_H_

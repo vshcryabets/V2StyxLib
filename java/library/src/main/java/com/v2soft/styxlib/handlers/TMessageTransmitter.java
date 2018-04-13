@@ -15,6 +15,7 @@ import java.net.SocketException;
  */
 public class TMessageTransmitter implements IMessageTransmitter {
     public interface Listener {
+	// TODO pass caller
         void onSocketDisconnected(); // TODO why socket?
         void onTrashReceived();
     }

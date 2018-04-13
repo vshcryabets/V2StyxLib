@@ -11,32 +11,24 @@
 const size_t Connection::DEFAULT_TIMEOUT = 10000;
 const size_t Connection::DEFAULT_IOUNIT = 8192;
 
-Connection::Connection() : mCredentials(Credentials(NULL, NULL)) {
-	init(NULL, NULL, NULL, NULL);
-}
-
-Connection::Connection(Credentials credentials) : mCredentials(credentials) {
-	init(NULL, NULL, NULL, NULL);
-}
-
-Connection::Connection(Credentials credentials, IChannelDriver* driver): mCredentials(credentials) {
-	init(driver, NULL, NULL, NULL);
+Connection::Connection(Credentials credentials, IChannelDriver* driver)
+	: mCredentials(credentials), mDriver(driver) {
+	init(NULL, NULL, NULL);
 }
 
 Connection::Connection(Credentials credentials,
 				  IChannelDriver* driver,
 				  RMessagesProcessor* answerProcessor,
 				  TMessageTransmitter* transmitter,
-				  ClientDetails* recepient): mCredentials(credentials) {
-	init(driver, answerProcessor, transmitter, recepient);
+				  ClientDetails* recepient)
+	: mCredentials(credentials), mDriver(driver) {
+	init(answerProcessor, transmitter, recepient);
 }
 
 Connection::~Connection() {
-
 }
 
-void Connection::init(IChannelDriver *driver,
-        RMessagesProcessor *answerProcessor,
+void Connection::init(RMessagesProcessor *answerProcessor,
         TMessageTransmitter *transmitter,
         ClientDetails *recepient) {
 	mTimeout = DEFAULT_TIMEOUT;
@@ -49,12 +41,11 @@ void Connection::init(IChannelDriver *driver,
 	mTransmitter = transmitter;
 	mRecepient = recepient;
 	mAnswerProcessor = answerProcessor;
-	mDriver = driver;
 	mDetails = ConnectionDetails(getProtocol(), getIOBufSize());
 	isConnectedFlag = false;
 }
 
-void Connection::sendVersionMessage() throw() {
+void Connection::sendVersionMessage() throw(StyxException) {
     // release attached FID
     if (mFID != StyxMessage::NOFID) {
         try {
@@ -109,14 +100,99 @@ void Connection::sendAuthMessage() throw() {
 }
 
 void Connection::sendAttachMessage() throw() {
-        mFID = mRecepient->getPolls()->getFIDPoll()->getFreeItem();
-        StyxTAttachMessage tAttach(getRootFID(), mAuthFID,
-                *mCredentials.getUserName(),
-                mMountPoint);
-        mTransmitter->sendMessage(&tAttach, mRecepient);
+	mFID = mRecepient->getPolls()->getFIDPoll()->getFreeItem();
+	StyxTAttachMessage tAttach(getRootFID(), mAuthFID,
+			*mCredentials.getUserName(),
+			mMountPoint);
+	mTransmitter->sendMessage(&tAttach, mRecepient);
 
-        StyxMessage* rMessage = tAttach.waitForAnswer(mTimeout);
-        StyxRAttachMessage* rAttach = (StyxRAttachMessage*) rMessage;
-        mQID = rAttach->getQID();
-        isAttached = true;
-    }
+	StyxMessage* rMessage = tAttach.waitForAnswer(mTimeout);
+	StyxRAttachMessage* rAttach = (StyxRAttachMessage*) rMessage;
+	mQID = rAttach->getQID();
+	isAttached = true;
+}
+
+StyxFID Connection::getRootFID() {
+	return mFID;
+}
+
+size_t Connection::getTimeout() {
+	return mTimeout;
+}
+
+IVirtualStyxFile* Connection::getRoot() {
+	return mRoot;
+}
+
+ConnectionDetails Connection::getConnectionDetails() {
+	return mDetails;
+}
+
+ClientDetails *Connection::getRecepient() {
+	return mRecepient;
+}
+
+void Connection::close() throw(StyxException) {
+	if (shouldCloseAnswerProcessor && mAnswerProcessor != NULL) {
+		mAnswerProcessor->close();
+		delete mAnswerProcessor;
+		mAnswerProcessor = NULL;
+	}
+	if (mTransmitter != NULL) {
+		mTransmitter->close();
+		// TODO Delete?
+		mTransmitter = NULL;
+	}
+	if (isAutoStartDriver && mDriver != NULL) {
+		mDriver->close();
+		// TODO Delete?
+		mDriver = NULL;
+	}
+}
+
+StyxString Connection::getProtocol() {
+	return PROTOCOL;
+}
+
+Credentials Connection::getCredentials() {
+	return mCredentials;
+}
+
+StyxQID Connection::getQID() {
+	return mQID;
+}
+
+bool Connection::isConnected() {
+	return mDriver->isConnected();
+}
+
+IMessageTransmitter *Connection::getMessenger() {
+	return mTransmitter;
+}
+
+StyxString Connection::getMountPoint() {
+	return mMountPoint;
+}
+
+bool Connection::connect(IChannelDriver *driver, Credentials credentials) throw(StyxException) {
+	if ( mAnswerProcessor == NULL ) {
+		mAnswerProcessor = new RMessagesProcessor("RH" + driver->toString());
+		shouldCloseAnswerProcessor = true;
+	}
+	if ( mTransmitter == NULL ) {
+		mTransmitter = new TMessageTransmitter(this);
+		shouldCloseTransmitter = true;
+	}
+
+	if (!driver->isStarted()) {
+		driver->start(getIOBufSize());
+		isAutoStartDriver = true;
+	}
+
+	if (mRecepient == NULL) {
+		// get first client from driver
+		mRecepient = driver->getClients().iterator().next();
+	}
+
+	return this.connect(driver, credentials, mAnswerProcessor, mTransmitter, mRecepient);
+}

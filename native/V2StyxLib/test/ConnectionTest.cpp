@@ -2,7 +2,7 @@
 #include <ctime>
 
 #include "gtest/gtest.h"
-#include "StyxServerManager.h"
+#include "library/StyxServerManager.h"
 #include "server/tcp/TCPServerManager.h"
 #include "Connection.h"
 #include "vfs/DiskStyxDirectory.h"

@@ -18,7 +18,7 @@
 /**
  * Styx client connection.
  */
-class Connection : public IClient {
+class Connection : public IClient, TMessageTransmitter::Listener {
 private:
 	static const StyxString PROTOCOL;
 	static const size_t DEFAULT_IOUNIT;
@@ -31,19 +31,11 @@ private:
     bool isAttached;
     TMessageTransmitter* mTransmitter;
     StyxFID mAuthFID;
-    StyxQID* mAuthQID;
-    StyxQID* mQID;
     StyxFID mFID;
+    StyxQID mAuthQID;
+    StyxQID mQID;
 
-
-	void setAddress(const char * hname,
-			short port,
-			struct sockaddr_in * sap,
-			char* protocol);
-	// create and bind socket
-	Socket createSocket(string address, int port);
-	void init(IChannelDriver *driver,
-            RMessagesProcessor *answerProcessor,
+	void init(RMessagesProcessor *answerProcessor,
             TMessageTransmitter *transmitter,
             ClientDetails *recepient);
 protected:
@@ -60,9 +52,7 @@ protected:
     virtual void sendAuthMessage() throw();
     virtual void sendAttachMessage() throw();
 public:
-    Connection();
-    Connection(Credentials credentials);
-    Connection(Credentials credentials, IChannelDriver *driver);
+    Connection(Credentials credentials = Credentials(NULL, NULL), IChannelDriver *driver = NULL);
     Connection(Credentials credentials,
                       IChannelDriver *driver,
                       RMessagesProcessor *answerProcessor,
@@ -70,18 +60,29 @@ public:
                       ClientDetails *recepient);
     virtual ~Connection();
 
-	virtual void sendVersionMessage() throw();
-	virtual bool connect(IChannelDriver *driver) throw();
-	virtual bool connect(IChannelDriver *driver, Credentials credentials) throw();
-	virtual bool connect() throw();
+	virtual void sendVersionMessage() throw(StyxException);
+	virtual bool connect() throw(StyxException);
+	virtual bool connect(IChannelDriver *driver) throw(StyxException);
+	virtual bool connect(IChannelDriver *driver, Credentials credentials) throw(StyxException);
+	virtual bool connect(IChannelDriver *driver, Credentials credentials,
+			RMessagesProcessor* answerProcessor, TMessageTransmitter* transmitter,
+			ClientDetails* clientDetails) throw(StyxException);
 	virtual bool isConnected();
 	virtual IMessageTransmitter *getMessenger();
 	virtual size_t getTimeout();
+	virtual IVirtualStyxFile* getRoot();
 	virtual StyxFID getRootFID();
 	virtual ConnectionDetails getConnectionDetails();
 	virtual ClientDetails *getRecepient();
-	virtual void close() throw();
+	virtual void close() throw(StyxException);
 	virtual StyxString getProtocol();
+	virtual Credentials getCredentials();
+	virtual StyxString getMountPoint();
+	virtual StyxQID getQID();
+
+    virtual void onSocketDisconnected(TMessageTransmitter *caller) ;
+    virtual void onTrashReceived(TMessageTransmitter *caller);
+
 };
 
 #endif /* CONNECTION_H_ */

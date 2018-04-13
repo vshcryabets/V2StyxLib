@@ -7,7 +7,7 @@
 
 #include "messages/StyxROpenMessage.h"
 
-StyxROpenMessage::StyxROpenMessage(StyxTAG tag, StyxQID* qid, size_t iounit, bool create) :
+StyxROpenMessage::StyxROpenMessage(StyxTAG tag, StyxQID qid, size_t iounit, bool create) :
 	StyxRSingleQIDMessage((create ? Rcreate : Ropen), tag, qid){
 	mIOUnit = iounit;
 }

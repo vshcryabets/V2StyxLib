@@ -15,10 +15,10 @@
 
 class StyxRSingleQIDMessage : public StyxMessage {
 private:
-    StyxQID* mQID;
+    StyxQID mQID;
     bool shouldDeleteQID;
 public:
-    StyxRSingleQIDMessage(MessageTypeEnum type, StyxTAG tag, const StyxQID* qid);
+    StyxRSingleQIDMessage(MessageTypeEnum type, StyxTAG tag, const StyxQID qid);
     virtual ~StyxRSingleQIDMessage();
 	// =======================================================
 	// Virtual methods
@@ -30,7 +30,7 @@ public:
     /**
      * @return QID structure
      */
-    StyxQID* getQID();
+    StyxQID getQID();
     virtual StyxString toString();
 };
 

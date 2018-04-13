@@ -13,8 +13,8 @@ class TMessageTransmitter : public IMessageTransmitter {
 public:
     class Listener {
     public:
-        virtual void onSocketDisconnected() = 0; // TODO why socket?
-        virtual void onTrashReceived() = 0;
+        virtual void onSocketDisconnected(TMessageTransmitter *caller) = 0; // TODO why socket?
+        virtual void onTrashReceived(TMessageTransmitter *caller) = 0;
     };
 
 protected:
@@ -26,10 +26,11 @@ public:
     TMessageTransmitter(Listener *listener);
 	virtual ~TMessageTransmitter();
 
-	virtual bool sendMessage(StyxMessage *message, ClientDetails *recepient) throw();
+	virtual bool sendMessage(StyxMessage *message, ClientDetails *recepient) throw(StyxException);
 	virtual size_t getTransmittedCount();
 	virtual size_t getErrorsCount();
-	virtual void close() throw();
+	virtual void close() throw(StyxException);
+	virtual StyxString toString();
 };
 
 #endif /* TMESSAGE_TRANSMITTER_H_ */

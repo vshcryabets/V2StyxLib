@@ -13,7 +13,7 @@
 
 class StyxRAttachMessage : public StyxRSingleQIDMessage {
 public:
-	StyxRAttachMessage(int tag, const StyxQID *qid);
+	StyxRAttachMessage(int tag, const StyxQID qid);
 	virtual ~StyxRAttachMessage();
 };
 

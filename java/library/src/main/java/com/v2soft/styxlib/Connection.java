@@ -33,6 +33,7 @@ public class Connection
     //---------------------------------------------------------------------------
     // Constants
     //---------------------------------------------------------------------------
+    // TODO duplicates, check all project
     public static final String PROTOCOL = "9P2000";
     public static final int DEFAULT_TIMEOUT = 10000;
     private static final int DEFAULT_IO_SIZE = 8192;

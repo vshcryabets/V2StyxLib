@@ -8,19 +8,11 @@
 #ifndef STYXSERVERMANAGER_H_
 #define STYXSERVERMANAGER_H_
 #include <string>
-#ifdef WIN32
-#include <WinSock2.h>
-#else
-/* According to POSIX.1-2001 */
-#include <sys/select.h>
-#endif
-
 #include "types.h"
 #include "classes.h"
-#include "handlers/TMessagesProcessor.h"
-#include "server/IChannelDriver.h"
-
 #include <vector>
+#include "server/IChannelDriver.h"
+#include "handlers/TMessagesProcessor.h"
 
 class StyxServerManager {
 private:
