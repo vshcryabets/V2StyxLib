@@ -16,18 +16,24 @@ protected:
 	uint32_t mTransmissionErrorsCount;
     IMessageProcessor* mTMessageHandler;
     IMessageProcessor* mRMessageHandler;
+    uint32_t mIOUnit;
     ILogListener* mLogListener;
+    bool isWorking;
+    StyxThread mAcceptorThread;
 
 	virtual void run() = 0;
-	virtual void prepareSocket(std::string socketAddress, bool ssl) throw() = 0;
+	virtual void prepareSocket(StyxString socketAddress, uint16_t port, bool ssl) throw(StyxException) = 0;
+
+	// get connection timeout in miliseconds
+	virtual size_t getTimeout();
 public:
 	TCPChannelDriver(StyxString address, uint16_t port, bool ssl);
 	virtual ~TCPChannelDriver();
-	virtual StyxThread start(int iounit);
-	virtual bool sendMessage(StyxMessage message, ClientDetails *recipient) throw();
+	virtual StyxThread start(uint32_t iounit);
+	virtual bool sendMessage(StyxMessage* message, ClientDetails *recipient) throw(StyxException);
 	virtual void setTMessageHandler(IMessageProcessor *handler);
 	virtual void setRMessageHandler(IMessageProcessor *handler);
-	virtual void close() throw();
+	virtual void close() throw(StyxException);
 	virtual size_t getTransmittedCount();
 	virtual size_t getErrorsCount();
 	virtual void setLogListener(ILogListener *listener);

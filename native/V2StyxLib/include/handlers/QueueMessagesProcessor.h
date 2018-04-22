@@ -6,7 +6,10 @@
 #ifndef QUEUE_MESSAGESPROCESSOR_H_
 #define QUEUE_MESSAGESPROCESSOR_H_
 
+#include <vector>
 #include "types.h"
+#include "messages/base/StyxMessage.h"
+#include "handlers/IMessageProcessor.h"
 
 class QueueMessageProcessorPair {
 public:

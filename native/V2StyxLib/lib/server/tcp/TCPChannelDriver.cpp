@@ -4,6 +4,7 @@
  */
 
 #include "server/tcp/TCPChannelDriver.h"
+#include "library/StyxServerManager.h"
 
 TCPChannelDriver::TCPChannelDriver(StyxString address, uint16_t port, bool ssl) {
     mPort = port;
@@ -16,24 +17,12 @@ TCPChannelDriver::~TCPChannelDriver() {
 	// TODO Auto-generated destructor stub
 }
 
-StyxThread TCPChannelDriver::start(int iounit) {
-
-}
-
-bool TCPChannelDriver::sendMessage(StyxMessage message, ClientDetails *recipient) throw() {
-
-}
-
 void TCPChannelDriver::setTMessageHandler(IMessageProcessor *handler) {
 	mTMessageHandler = handler;
 }
 
 void TCPChannelDriver::setRMessageHandler(IMessageProcessor *handler) {
 	mRMessageHandler = handler;
-}
-
-void TCPChannelDriver::close() throw() {
-
 }
 
 size_t TCPChannelDriver::getTransmittedCount() {
@@ -58,4 +47,9 @@ IMessageProcessor* TCPChannelDriver::getRMessageHandler() {
 
 uint16_t TCPChannelDriver::getPort() {
 	return mPort;
+}
+
+// get connection timeout in miliseconds
+size_t TCPChannelDriver::getTimeout() {
+	return StyxServerManager::DEFAULT_TIMEOUT;
 }

@@ -8,6 +8,8 @@
 #ifndef INCLUDE_HANDLERS_IMESSAGEPROCESSOR_H_
 #define INCLUDE_HANDLERS_IMESSAGEPROCESSOR_H_
 
+#include "exceptions/StyxException.h"
+
 class IMessageProcessor {
 public:
 	virtual ~IMessageProcessor() {};

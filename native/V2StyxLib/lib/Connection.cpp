@@ -191,8 +191,8 @@ bool Connection::connect(IChannelDriver *driver, Credentials credentials) throw(
 
 	if (mRecepient == NULL) {
 		// get first client from driver
-		mRecepient = driver->getClients().iterator().next();
+		mRecepient = driver->getClients().front();
 	}
 
-	return this.connect(driver, credentials, mAnswerProcessor, mTransmitter, mRecepient);
+	return this->connect(driver, credentials, mAnswerProcessor, mTransmitter, mRecepient);
 }

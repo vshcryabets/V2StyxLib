@@ -2,48 +2,141 @@
  * TCPClientChannelDriver.cpp
  *
  */
-
 #include "server/tcp/TCPClientChannelDriver.h"
 
-TCPClientChannelDriver::TCPClientChannelDriver(StyxString address, uint16_t port, bool ssl) :
-	TCPChannelDriver(address, port, ssl) {
-	// TODO Auto-generated constructor stub
+#include <stdio.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <netdb.h>
+#include <strings.h>
 
+#include "io/StyxDataReader.h"
+
+TCPClientChannelDriver::TCPClientChannelDriver(StyxString address, uint16_t port, bool ssl)
+	: TCPChannelDriver(address, port, ssl), mServerClientDetails(NULL) {
 }
 
 TCPClientChannelDriver::~TCPClientChannelDriver() {
-	// TODO Auto-generated destructor stub
+	if (mServerClientDetails != NULL) {
+		delete mServerClientDetails;
+		mServerClientDetails = NULL;
+	}
 }
 
 StyxThread TCPClientChannelDriver::start(int iounit) {
-	return 0;
+	mServerClientDetails = new TCPClientDetails(mChannel, this, iounit, TCPClientChannelDriver::PSEUDO_CLIENT_ID);
+	return TCPChannelDriver::start(iounit);
 }
 
-void TCPClientChannelDriver::prepareSocket(std::string socketAddress, bool ssl) throw() {
+void TCPClientChannelDriver::prepareSocket(StyxString socketAddress, uint16_t port, bool ssl) throw(StyxException) {
+	int sockfd = ::socket(AF_INET, SOCK_STREAM, 0);
+	if (sockfd < 0) {
+		  throw StyxException("Can't create socket");
+	}
+	struct hostent *server;
+	server = ::gethostbyname(socketAddress.c_str());
+	if (server == NULL) {
+		throw StyxException("Can't resolve hostname %s", socketAddress.c_str());
+	}
+	struct sockaddr_in serverAddress;
+	bzero((char *) &serverAddress, sizeof(serverAddress));
+	serverAddress.sin_family = AF_INET;
+	bcopy((char *)server->h_addr,
+	      (char *)&serverAddress.sin_addr.s_addr,
+	      server->h_length);
+	serverAddress.sin_port = htons(port);
+	int connectResult = ::connect(sockfd, (struct sockaddr*)&serverAddress, sizeof(serverAddress));
+	if (connectResult < 0) {
+		throw StyxException("Connect failed %d", errno);
+	}
 
+	size_t timeoutMs = getTimeout();
+	struct timeval timeout;
+	timeout.tv_sec = timeoutMs / 1000;
+	timeout.tv_usec = (timeoutMs - timeout.tv_sec * 1000) * 1000;
+	::setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, (struct timeval *)&timeout, sizeof(struct timeval));
+
+	mChannel = sockfd;
 }
 
 bool TCPClientChannelDriver::isConnected() {
-	return false;
+	if (mServerClientDetails->getChannel() == INVALID_SOCKET) {
+		return false;
+	}
+	return true;
 }
 
 bool TCPClientChannelDriver::isStarted() {
-	return false;
+	return isWorking;
 }
 
-bool TCPClientChannelDriver::sendMessage(StyxMessage message, ClientDetails *recipient) throw() {
-	return false;
+bool TCPClientChannelDriver::sendMessage(StyxMessage* message, ClientDetails *recipient) throw(StyxException) {
+	if (recipient != mServerClientDetails) {
+		throw StyxException("Wrong recepient");
+	}
+	return TCPChannelDriver::sendMessage(message, recipient);
 }
 
 void TCPClientChannelDriver::run() {
+	try {
+		isWorking = true;
+		StyxByteBufferReadable buffer(mIOUnit * 2);
+		StyxDataReader reader(&buffer);
+		while (isWorking) {
+			// TODO thread interrupt flag
+			pthread_testcancel();
+			try {
+				size_t read = buffer.readFromFD(mChannel);
+				if (read > 0) {
+					// loop unitl we have unprocessed packets in the input buffer
+					while ( buffer.remainsToRead() > 4 ) {
+						// try to decode
+						uint32_t packetSize = reader.getUInt32();
+						if ( buffer.remainsToRead() >= packetSize ) {
+							// TODO somebody should release message
+							StyxMessage* message = StyxMessage::factory(&reader, mIOUnit);
+							if (mLogListener != NULL) {
+								mLogListener->onMessageReceived(this, mServerClientDetails, message);
+							}
+							if ( isMessageTypeTMessage(message->getType()) ) {
+								if ( mTMessageHandler != NULL ) {
+									mTMessageHandler->postPacket(message, mServerClientDetails);
+								}
+							} else {
+								if ( mRMessageHandler != NULL ) {
+									mRMessageHandler->postPacket(message, mServerClientDetails);
+								}
+							}
+						} else {
+							break;
+						}
+					}
 
+				}
+			} catch (StyxException exception) {
+				throw exception;
+			}
+		}
+	} catch (StyxException exception) {
+		mServerClientDetails->disconnect();
+		throw exception;
+	}
+	mServerClientDetails->disconnect();
+	isWorking = false;
 }
 
-void TCPClientChannelDriver::close() throw() {
-
+void TCPClientChannelDriver::close() throw(StyxException) {
+	TCPChannelDriver::close();
+	pthread_cancel(mAcceptorThread);
 }
 
 std::vector<ClientDetails*> TCPClientChannelDriver::getClients() {
 	std::vector<ClientDetails*> result;
+	result.push_back(mServerClientDetails);
 	return result;
+}
+
+StyxString TCPClientChannelDriver::toString() {
+    return StyxString("TCPClientChannelDriver");
 }

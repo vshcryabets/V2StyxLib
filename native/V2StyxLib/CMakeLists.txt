@@ -6,6 +6,8 @@ if(CMAKE_COMPILER_IS_GNUCXX)
     add_definitions(-Wall -ansi -g -O2 -fsigned-char -Wall)
 endif()
 
+add_definitions(-DPTHREAD)
+
 set(COMMON_INCLUDES ${PROJECT_SOURCE_DIR}/include)
 set(EXT_PROJECTS_DIR ${PROJECT_SOURCE_DIR}/ext)
 

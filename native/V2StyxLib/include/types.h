@@ -23,7 +23,12 @@
 
 typedef int64_t Date;
 typedef int64_t int128_t;
-typedef int32_t StyxThread;
+
+#ifdef PTHREAD
+#include <pthread.h>
+
+typedef pthread_t StyxThread;
+#endif
 
 enum MessageTypeEnum {
 	Tversion = 100,
@@ -54,6 +59,8 @@ enum MessageTypeEnum {
 	Twstat = 126,
 	Rwstat = 127
 };
+
+bool isMessageTypeTMessage(int messageType) {return messageType % 2 == 0;}
 
 enum ModeTypeEnum {
     OREAD = 0x00,

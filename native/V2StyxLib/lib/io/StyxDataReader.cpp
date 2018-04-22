@@ -7,7 +7,8 @@
 
 #include "io/StyxDataReader.h"
 
-StyxDataReader::StyxDataReader() {
+StyxDataReader::StyxDataReader(IStyxBuffer *buffer)
+	: mBuffer(buffer){
 }
 
 StyxDataReader::~StyxDataReader() {
