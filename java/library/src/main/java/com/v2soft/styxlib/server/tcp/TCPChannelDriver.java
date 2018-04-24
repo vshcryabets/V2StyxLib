@@ -65,16 +65,15 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
     @Override
     public boolean sendMessage(StyxMessage message, ClientDetails recipient) {
         if ( recipient == null ) {
-            throw new NullPointerException("Client can't be null");
+            throw new NullPointerException("Recipient can't be null");
         }
         ByteBuffer buffer = ((TCPClientDetails)recipient).getOutputBuffer();
         synchronized (buffer) {
             buffer.clear();
             try {
                 message.writeToBuffer(new StyxDataWriter(buffer)); // TODO optimize this line,
-                // no need to create new instance
+                // no need to create new instance of StyxDataWriter
                 buffer.flip();
-//            System.out.printf("Limit=%d, %d\n", buffer.limit(), buffer.position());
                 SocketChannel channel = ((TCPClientDetails) recipient).getChannel();
                 channel.write(buffer);
                 mTransmittedPacketsCount++;

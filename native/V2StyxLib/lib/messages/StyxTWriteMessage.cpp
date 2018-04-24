@@ -34,13 +34,13 @@ void StyxTWriteMessage::load(IStyxDataReader *input) {
     mDataLength = (int)input->readUInt32();
     mData = new uint8_t[mDataLength];
     mDelete = true;
-    input->read(mData, 0, mDataLength);
+    input->read(mData, mDataLength);
 }
 void StyxTWriteMessage::writeToBuffer(IStyxDataWriter* output) {
 	StyxTMessageFID::writeToBuffer(output);
     output->writeUInt64(mOffset);
     output->writeUInt32(mDataLength);
-    output->write(mData, 0, mDataLength);
+    output->write(mData, mDataLength);
 }
 size_t StyxTWriteMessage::getBinarySize() {
 	return StyxMessage::getBinarySize() + 12

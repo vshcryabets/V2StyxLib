@@ -51,6 +51,7 @@ protected:
     virtual size_t getIOBufSize();
     virtual void sendAuthMessage() throw();
     virtual void sendAttachMessage() throw();
+    virtual void setDriver(IChannelDriver* driver);
 public:
     Connection(Credentials credentials = Credentials(NULL, NULL), IChannelDriver *driver = NULL);
     Connection(Credentials credentials,
@@ -79,6 +80,7 @@ public:
 	virtual Credentials getCredentials();
 	virtual StyxString getMountPoint();
 	virtual StyxQID getQID();
+	virtual void setAttached(bool isAttached);
 
     virtual void onSocketDisconnected(TMessageTransmitter *caller) ;
     virtual void onTrashReceived(TMessageTransmitter *caller);

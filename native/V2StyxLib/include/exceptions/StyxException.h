@@ -17,6 +17,7 @@ public:
 	StyxException(const char *format, ...);
 	StyxException(StyxString message, ...);
 	virtual ~StyxException();
+	virtual void printStackTrace();
 };
 
 #endif /* STYXEXCEPTION_H_ */

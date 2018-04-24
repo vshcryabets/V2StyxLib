@@ -85,6 +85,7 @@ public class Connection
         mCredentials = credentials;
         isConnected = false;
     }
+
     /**
      * Connect to server with specified parameters
      *
@@ -97,11 +98,11 @@ public class Connection
      */
     public boolean connect(IChannelDriver driver, Credentials credentials)
             throws IOException, StyxException, InterruptedException, TimeoutException {
-        if ( mAnswerProcessor == null ) {
+        if (mAnswerProcessor == null) {
             mAnswerProcessor = new RMessagesProcessor("RH" + driver.toString());
             shouldCloseAnswerProcessor = true;
         }
-        if ( mTransmitter == null ) {
+        if (mTransmitter == null) {
             mTransmitter = new TMessageTransmitter(mTransmitterListener);
             shouldCloseTransmitter = true;
         }
@@ -134,12 +135,12 @@ public class Connection
             throws IOException, StyxException, InterruptedException, TimeoutException {
 
         if (recepient == null) {
-            throw new NullPointerException("recepient can't be null");
+            throw new NullPointerException("Recipient can't be null");
         }
         mRecepient = recepient;
 
         if (transmitter == null) {
-            throw new NullPointerException("transmitter can't be null");
+            throw new NullPointerException("Transmitter can't be null");
         }
         mTransmitter = transmitter;
 
@@ -148,11 +149,11 @@ public class Connection
         }
         setDriver(driver);
 
-        if ( answerProcessor == null ) {
+        if (answerProcessor == null) {
             throw new NullPointerException("answerProcessor can't be null");
         }
         mAnswerProcessor = answerProcessor;
-        driver.setRMessageHandler(mAnswerProcessor);
+        mDriver.setRMessageHandler(mAnswerProcessor);
 
         if (credentials == null) {
             throw new NullPointerException("Credentials can't be null");
@@ -160,9 +161,9 @@ public class Connection
         mCredentials = credentials;
         mMountPoint = "/";
         sendVersionMessage();
-        isConnected = driver.isConnected();
+        isConnected = mDriver.isConnected();
 
-        return driver.isConnected();
+        return isConnected;
     }
 
     /**

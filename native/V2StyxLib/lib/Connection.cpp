@@ -11,6 +11,8 @@
 const size_t Connection::DEFAULT_TIMEOUT = 10000;
 const size_t Connection::DEFAULT_IOUNIT = 8192;
 
+const StyxString Connection::PROTOCOL = StyxString("9P2000");
+
 Connection::Connection(Credentials credentials, IChannelDriver* driver)
 	: mCredentials(credentials), mDriver(driver) {
 	init(NULL, NULL, NULL);
@@ -174,6 +176,14 @@ StyxString Connection::getMountPoint() {
 	return mMountPoint;
 }
 
+bool Connection::connect() throw(StyxException) {
+	return connect(mDriver, mCredentials);
+}
+
+bool Connection::connect(IChannelDriver *driver) throw(StyxException) {
+	return connect(driver, mCredentials);
+}
+
 bool Connection::connect(IChannelDriver *driver, Credentials credentials) throw(StyxException) {
 	if ( mAnswerProcessor == NULL ) {
 		mAnswerProcessor = new RMessagesProcessor("RH" + driver->toString());
@@ -195,4 +205,60 @@ bool Connection::connect(IChannelDriver *driver, Credentials credentials) throw(
 	}
 
 	return this->connect(driver, credentials, mAnswerProcessor, mTransmitter, mRecepient);
+}
+
+bool Connection::connect(IChannelDriver *driver, Credentials credentials,
+		RMessagesProcessor* answerProcessor, TMessageTransmitter* transmitter,
+		ClientDetails* recipient) throw(StyxException) {
+    if (recipient == NULL) {
+        throw StyxException("Recipient can't be null");
+    }
+    mRecepient = recipient;
+
+    if (transmitter == NULL) {
+        throw StyxException("Transmitter can't be null");
+    }
+    mTransmitter = transmitter;
+
+    if (driver == NULL) {
+        throw StyxException("Channel driver can't be null");
+    }
+    setDriver(driver);
+
+    if (answerProcessor == NULL) {
+        throw StyxException("answerProcessor can't be null");
+    }
+    mAnswerProcessor = answerProcessor;
+    mDriver->setRMessageHandler(mAnswerProcessor);
+
+    mCredentials = credentials;
+    mMountPoint = "/";
+    sendVersionMessage();
+    isConnectedFlag = mDriver->isConnected();
+
+    return isConnectedFlag;
+}
+
+
+void Connection::setAttached(bool isAttached) {
+	this->isAttached = isAttached;
+}
+
+
+void Connection::onTrashReceived(TMessageTransmitter *caller) {
+    //something goes wrong, we should restart protocol
+    setAttached(false);
+    try {
+        sendVersionMessage();
+    } catch (StyxException e) {
+        e.printStackTrace();
+    }
+}
+
+void Connection::onSocketDisconnected(TMessageTransmitter *caller) {
+	isConnectedFlag = false;
+}
+
+void Connection::setDriver(IChannelDriver* driver) {
+	mDriver = driver;
 }

@@ -7,13 +7,11 @@
 
 #ifndef CLIENTSTATE_H_
 #define CLIENTSTATE_H_
-#include "../types.h"
-#include <string>
-#include "../classes.h"
+#include "types.h"
+#include "classes.h"
 #include <map>
 #include "messages/base/StyxMessage.h"
 #include "io/StyxByteBufferReadable.h"
-#include "io/StyxByteBufferWritable.h"
 #include "messages/StyxTCreateMessage.h"
 #include "vfs/IVirtualStyxFile.h"
 #include "server/IChannelDriver.h"
@@ -23,7 +21,7 @@
 class ClientDetails {
 protected:
 	std::map<StyxFID,IVirtualStyxFile*> *mAssignedFiles;
-	IChannelDriver	*mDriver;
+	IChannelDriver *mDriver;
 	uint32_t mId;
 	Polls* mPolls;
 	Credentials *mCredentials;

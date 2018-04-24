@@ -96,9 +96,11 @@ void TCPClientChannelDriver::run() {
 						if ( buffer.remainsToRead() >= packetSize ) {
 							// TODO somebody should release message
 							StyxMessage* message = StyxMessage::factory(&reader, mIOUnit);
+#ifdef USE_LOGGING
 							if (mLogListener != NULL) {
 								mLogListener->onMessageReceived(this, mServerClientDetails, message);
 							}
+#endif
 							if ( isMessageTypeTMessage(message->getType()) ) {
 								if ( mTMessageHandler != NULL ) {
 									mTMessageHandler->postPacket(message, mServerClientDetails);

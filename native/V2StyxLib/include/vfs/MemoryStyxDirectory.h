@@ -13,11 +13,10 @@
 #include "types.h"
 #include <vector>
 #include <map>
-#include "io/StyxByteBufferWritable.h"
 #include "MemoryStyxFile.h"
 using namespace std;
 
-typedef map<ClientDetails*, StyxByteBufferWritable*> ClientsMap;
+typedef map<ClientDetails*, std::vector<uint8_t>*> ClientsMap;
 typedef vector<IVirtualStyxFile*> FileList;
 
 class MemoryStyxDirectory : public MemoryStyxFile

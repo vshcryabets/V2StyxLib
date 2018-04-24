@@ -6,6 +6,7 @@
  */
 
 #include "exceptions/StyxException.h"
+#include <iostream>
 
 StyxException::StyxException(const char *message, ...) {
 	char buf[4096];
@@ -29,3 +30,6 @@ StyxException::~StyxException() {
 
 }
 
+void StyxException::printStackTrace() {
+	std::cerr << mMessage << std::endl;
+}

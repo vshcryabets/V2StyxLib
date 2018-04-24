@@ -26,14 +26,14 @@ void StyxRReadMessage::load(IStyxDataReader *input) {
 	mDataLength = input->readUInt32();
 	mData = new uint8_t[mDataLength];
 	mDelete = true;
-	input->read(mData, 0, mDataLength);
+	input->read(mData, mDataLength);
 }
 
 void StyxRReadMessage::writeToBuffer(IStyxDataWriter* output) {
 	StyxMessage::writeToBuffer(output);
 	output->writeUInt32(mDataLength);
 	if ( mDataLength > 0 ) {
-		output->write(mData, 0, mDataLength);
+		output->write(mData, mDataLength);
 	}
 }
 

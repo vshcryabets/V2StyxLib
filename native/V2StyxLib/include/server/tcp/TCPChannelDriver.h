@@ -17,9 +17,12 @@ protected:
     IMessageProcessor* mTMessageHandler;
     IMessageProcessor* mRMessageHandler;
     uint32_t mIOUnit;
-    ILogListener* mLogListener;
     bool isWorking;
     StyxThread mAcceptorThread;
+
+#ifdef USE_LOGGING
+    ILogListener* mLogListener;
+#endif
 
 	virtual void run() = 0;
 	virtual void prepareSocket(StyxString socketAddress, uint16_t port, bool ssl) throw(StyxException) = 0;

@@ -10,6 +10,7 @@
 #include "messages/base/structs/StyxQID.h"
 #include <vector>
 #include "string.h"
+#include "io/StyxDataWriter.h"
 
 MemoryStyxDirectory::MemoryStyxDirectory(std::string name):
 	MemoryStyxFile(name) {
@@ -43,12 +44,13 @@ bool MemoryStyxDirectory::open(ClientDetails *client, int mode){
 			stats.push_back(stat);
 		}
 		// allocate buffer
-		StyxByteBufferWritable *buffer = new StyxByteBufferWritable(size);
+		uint8_t* buffer = new uint8_t(size);
+		StyxDataWriter writer(buffer);
 		for ( std::vector<StyxStat*>::iterator it = stats.begin();
 				it != stats.end(); it++ ) {
-			(*it)->writeBinaryTo(buffer);
+			(*it)->writeBinaryTo(&writer);
 		}
-		mBuffersMap.insert(std::pair<ClientDetails*, StyxByteBufferWritable*>(client, buffer));
+		mBuffersMap.insert(std::pair<ClientDetails*, uint8_t*>(client, buffer));
 	}
 	return result;
 }
@@ -75,7 +77,7 @@ size_t MemoryStyxDirectory::read(ClientDetails *client, uint8_t* buffer, uint64_
 	if ( it == mBuffersMap.end() ) {
 		return -1; // TODO there we should send Rerror with message "This file isn't open"
 	}
-	StyxByteBufferWritable *preparedData = it->second;
+	uint8_t* preparedData = it->second;
 	size_t dataSize = preparedData->getCapacity();
 	if ( offset > dataSize ) return 0;
 	size_t remaining = dataSize - offset;
