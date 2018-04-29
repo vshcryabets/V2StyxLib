@@ -25,6 +25,7 @@ import com.v2soft.styxlib.messages.base.enums.MessageType;
 import com.v2soft.styxlib.messages.base.structs.StyxQID;
 import com.v2soft.styxlib.server.ClientDetails;
 import com.v2soft.styxlib.library.types.ConnectionDetails;
+import com.v2soft.styxlib.utils.MetricsAndStats;
 import com.v2soft.styxlib.vfs.IVirtualStyxFile;
 
 import java.io.IOException;
@@ -253,6 +254,7 @@ public class TMessagesProcessor extends QueueMessagesProcessor implements IMessa
         }
         long fid = msg.getFID();
         byte [] buffer = new byte[(int) msg.getCount()];
+        MetricsAndStats.byteArrayAllocation++;
         return new StyxRReadMessage(msg.getTag(), buffer,
                 (int) clientDetails.getAssignedFile(fid).read(clientDetails, buffer, msg.getOffset(), msg.getCount()));
     }

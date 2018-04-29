@@ -9,6 +9,7 @@ import com.v2soft.styxlib.messages.base.structs.StyxQID;
 import com.v2soft.styxlib.messages.base.structs.StyxStat;
 import com.v2soft.styxlib.server.ClientDetails;
 import com.v2soft.styxlib.library.types.ULong;
+import com.v2soft.styxlib.utils.MetricsAndStats;
 
 import java.io.File;
 import java.io.IOException;
@@ -104,6 +105,7 @@ extends DiskStyxFile {
 
             // allocate buffer
             final ByteBuffer buffer = ByteBuffer.allocate(size);
+            MetricsAndStats.byteBufferAllocation++;
             for (StyxStat state : stats) {
                 state.writeBinaryTo(new StyxDataWriter(buffer));
             }

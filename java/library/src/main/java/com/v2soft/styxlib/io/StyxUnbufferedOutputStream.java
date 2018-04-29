@@ -9,6 +9,7 @@ import com.v2soft.styxlib.messages.base.enums.MessageType;
 import com.v2soft.styxlib.server.ClientDetails;
 import com.v2soft.styxlib.server.IMessageTransmitter;
 import com.v2soft.styxlib.library.types.ULong;
+import com.v2soft.styxlib.utils.MetricsAndStats;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -20,7 +21,7 @@ import java.io.OutputStream;
  */
 public class StyxUnbufferedOutputStream extends OutputStream {
     protected long mTimeout = Connection.DEFAULT_TIMEOUT;
-    protected byte[] mSingleByteArray = new byte[1];
+    protected byte[] mSingleByteArray;
     protected long mFID;
     protected IMessageTransmitter mMessenger;
     protected ULong mFileOffset = ULong.ZERO;
@@ -33,6 +34,8 @@ public class StyxUnbufferedOutputStream extends OutputStream {
         if ( recepient == null ) {
             throw new NullPointerException("recipient is null");
         }
+        mSingleByteArray = new byte[1];
+        MetricsAndStats.byteArrayAllocation++;
         mRecipient = recepient;
         mFID = fid;
         mMessenger = messenger;

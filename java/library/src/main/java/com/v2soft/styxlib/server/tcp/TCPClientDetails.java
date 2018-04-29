@@ -5,6 +5,7 @@ import com.v2soft.styxlib.io.StyxByteBufferReadable;
 import com.v2soft.styxlib.io.StyxDataReader;
 import com.v2soft.styxlib.server.ClientDetails;
 import com.v2soft.styxlib.server.IChannelDriver;
+import com.v2soft.styxlib.utils.MetricsAndStats;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -26,6 +27,7 @@ public class TCPClientDetails extends ClientDetails {
         if ( channel == null ) throw new NullPointerException("Client channel can't be null");
         mChannel = channel;
         mOutputBuffer = ByteBuffer.allocate(iounit);
+        MetricsAndStats.byteBufferAllocation++;
         mBuffer = new StyxByteBufferReadable(iounit * 2);
         mReader = new StyxDataReader(mBuffer);
     }

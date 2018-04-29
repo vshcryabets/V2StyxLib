@@ -1,5 +1,7 @@
 package com.v2soft.styxlib.library.types;
 
+import com.v2soft.styxlib.utils.MetricsAndStats;
+
 import java.math.BigInteger;
 
 public class ULong {
@@ -16,11 +18,13 @@ public class ULong {
 
     public ULong(long l) {
         this.mBytes = new byte[ULONG_LENGTH];
+        MetricsAndStats.byteArrayAllocation++;
         this.setValue(l);
     }
 
     public BigInteger asBigInteger() {
         byte[] revBytes = new byte[ULONG_LENGTH];
+        MetricsAndStats.byteArrayAllocation++;
         for (int i = 0; i < ULONG_LENGTH; i++) {
             revBytes[i] = this.mBytes[ULONG_LENGTH - 1 - i];
         }

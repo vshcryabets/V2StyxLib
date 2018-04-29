@@ -6,6 +6,7 @@ import com.v2soft.AndLib.networking.UDPAbstractDiscoveryClient;
 import com.v2soft.AndLib.networking.UDPAbstractDiscoveryServer;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -28,6 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  *
  * @author V.Shcriyabets (vshcryabets@gmail.com)
  */
+@Disabled
 public class DiscoveryServiceTests {
 
     private static final int PORT = 12395;
