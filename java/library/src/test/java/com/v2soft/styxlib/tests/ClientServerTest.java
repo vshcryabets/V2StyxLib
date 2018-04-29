@@ -12,9 +12,9 @@ import com.v2soft.styxlib.server.tcp.TCPServerManager;
 import com.v2soft.styxlib.vfs.MemoryStyxDirectory;
 import com.v2soft.styxlib.vfs.MemoryStyxFile;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -23,9 +23,9 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Random;
 import java.util.concurrent.TimeoutException;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Client JUnit tests
@@ -36,12 +36,12 @@ public class ClientServerTest {
     private static final int PORT = 10234;
     private StyxServerManager mServer;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         startServer();
     }
 
-    @After
+    @AfterEach
     public void shutDown() throws InterruptedException, IOException {
         mServer.closeAndWait();
     }
@@ -82,7 +82,7 @@ public class ClientServerTest {
         int read = streams.input.read(remoteHash);
         streams.close();
         newFile.close();
-        assertEquals("Wrong remote hash size", 16, read);
-        assertArrayEquals("Wrong remote hash", localHash, remoteHash);
+        assertEquals(16, read, "Wrong remote hash size");
+        assertArrayEquals(localHash, remoteHash, "Wrong remote hash");
     }
 }

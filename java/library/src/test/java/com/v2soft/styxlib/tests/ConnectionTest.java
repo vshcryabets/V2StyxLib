@@ -13,9 +13,9 @@ import com.v2soft.styxlib.server.tcp.TCPClientChannelDriver;
 import com.v2soft.styxlib.server.tcp.TCPServerManager;
 import com.v2soft.styxlib.vfs.DiskStyxDirectory;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,11 +27,11 @@ import java.util.UUID;
 import java.util.concurrent.TimeoutException;
 import java.util.zip.CRC32;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Client JUnit tests
@@ -43,7 +43,7 @@ public class ConnectionTest {
     private IClient mConnection;
     private StyxServerManager mServer;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         startServer();
         mConnection = new Connection();
@@ -53,7 +53,7 @@ public class ConnectionTest {
         assertTrue(mConnection.connect(driver));
     }
 
-    @After
+    @AfterEach
     public void shutDown() throws InterruptedException, IOException {
         mConnection.close();
         mServer.closeAndWait();
@@ -157,7 +157,7 @@ public class ConnectionTest {
 
         try {
             dirA.delete();
-            assertTrue("Delete should return an error", false);
+            assertTrue(false, "Delete should return an error");
         } catch (StyxErrorMessageException e) {
         }
         // we lost FID, restore it

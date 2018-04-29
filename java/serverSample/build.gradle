@@ -15,5 +15,5 @@ repositories {
 
 
 dependencies {
-    compile project(":styxlib")
+    compile project(":library")
 }
