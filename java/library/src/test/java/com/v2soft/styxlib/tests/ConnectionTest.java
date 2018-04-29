@@ -247,7 +247,7 @@ public class ConnectionTest {
     public void testWriteTransmitionSpeed()
             throws IOException, InterruptedException, TimeoutException, StyxException {
         int blockSize = 128;
-        long blocksCount = 1024;
+        long blocksCount = 1024 * 1024;
         final String filename = "write";
         final long[] stat = new long[1];
         ((DiskStyxDirectory) mServer.getRoot()).addFile(new MemoryStyxFile(filename) {
@@ -286,7 +286,6 @@ public class ConnectionTest {
         System.out.println(String.format("\tbyte[] allocations count %d", MetricsAndStats.byteArrayAllocation));
         System.out.println(String.format("\tbyte[] allocations count RRead %d", MetricsAndStats.byteArrayAllocationRRead));
         System.out.println(String.format("\tbyte[] allocations count TWrite %d", MetricsAndStats.byteArrayAllocationTWrite));
-        System.out.println(String.format("\tbyte[] allocations count Ulong %d", MetricsAndStats.byteArrayAllocationUlong));
         System.out.println(String.format("\tbyte[] allocations count IO %d", MetricsAndStats.byteArrayAllocationIo));
     }
 

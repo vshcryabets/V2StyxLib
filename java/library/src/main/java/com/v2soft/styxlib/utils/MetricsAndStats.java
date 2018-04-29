@@ -6,7 +6,6 @@ public class MetricsAndStats {
     public static int newStyxMessage = 0;
     public static int byteArrayAllocationRRead = 0;
     public static int byteArrayAllocationTWrite = 0;
-    public static int byteArrayAllocationUlong = 0;
     public static int byteArrayAllocationIo = 0;
 
     public static void reset() {
@@ -15,7 +14,6 @@ public class MetricsAndStats {
         newStyxMessage = 0;
         byteArrayAllocationRRead = 0;
         byteArrayAllocationTWrite = 0;
-        byteArrayAllocationUlong = 0;
         byteArrayAllocationIo = 0;
     }
 }
