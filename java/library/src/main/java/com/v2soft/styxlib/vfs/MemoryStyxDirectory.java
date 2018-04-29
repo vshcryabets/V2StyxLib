@@ -9,7 +9,6 @@ import com.v2soft.styxlib.messages.base.enums.QIDType;
 import com.v2soft.styxlib.messages.base.structs.StyxQID;
 import com.v2soft.styxlib.messages.base.structs.StyxStat;
 import com.v2soft.styxlib.server.ClientDetails;
-import com.v2soft.styxlib.library.types.ULong;
 import com.v2soft.styxlib.utils.MetricsAndStats;
 
 import java.io.IOException;
@@ -83,12 +82,12 @@ extends MemoryStyxFile {
     }
 
     @Override
-    public long read(ClientDetails clientDetails, byte[] outbuffer, ULong offset, long count) throws StyxErrorMessageException {
+    public long read(ClientDetails clientDetails, byte[] outbuffer, long offset, long count) throws StyxErrorMessageException {
         if ( !mBuffersMap.containsKey(clientDetails)) StyxErrorMessageException.doException("This file isn't open");
         final ByteBuffer buffer = mBuffersMap.get(clientDetails);
         int boffset = buffer.limit();
-        if ( offset.asLong() > boffset ) return 0;
-        buffer.position((int) offset.asLong());
+        if ( offset > boffset ) return 0;
+        buffer.position((int) offset);
         int bleft = buffer.remaining();
         if ( count > bleft ) {
             count = bleft;
@@ -115,7 +114,7 @@ extends MemoryStyxFile {
     }
 
     @Override
-    public int write(ClientDetails clientDetails, byte[] data, ULong offset)
+    public int write(ClientDetails clientDetails, byte[] data, long offset)
             throws StyxErrorMessageException {
         StyxErrorMessageException.doException("Can't write to directory");
         return 0;

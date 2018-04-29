@@ -4,7 +4,6 @@ import com.v2soft.styxlib.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.messages.base.structs.StyxQID;
 import com.v2soft.styxlib.messages.base.structs.StyxStat;
 import com.v2soft.styxlib.server.ClientDetails;
-import com.v2soft.styxlib.library.types.ULong;
 
 import java.io.IOException;
 import java.util.Date;
@@ -33,7 +32,7 @@ public interface IVirtualStyxFile {
     public String getName();
     public Date getAccessTime();
     public Date getModificationTime();
-    public ULong getLength();
+    public long getLength();
     public String getOwnerName();
     public String getGroupName();
     public String getModificationUser();
@@ -62,7 +61,7 @@ public interface IVirtualStyxFile {
      * @param count number of bytes to read
      * @return number of bytes that was readed into the buffer
      */
-    public long read(ClientDetails clientDetails, byte[] buffer, ULong offset, long count) throws StyxErrorMessageException;
+    public long read(ClientDetails clientDetails, byte[] buffer, long offset, long count) throws StyxErrorMessageException;
     public IVirtualStyxFile walk(Iterator<String> pathElements, List<StyxQID> qids)
             throws StyxErrorMessageException;
     /**
@@ -72,7 +71,7 @@ public interface IVirtualStyxFile {
      * @return return the number of bytes written
      * @throws StyxErrorMessageException
      */
-    public int write(ClientDetails clientDetails, byte[] data, ULong offset) throws StyxErrorMessageException;
+    public int write(ClientDetails clientDetails, byte[] data, long offset) throws StyxErrorMessageException;
     /**
      * Will be fired when client close connection to this server
      * @param client client information

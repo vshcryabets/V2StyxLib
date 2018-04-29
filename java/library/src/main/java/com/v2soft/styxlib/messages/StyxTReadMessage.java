@@ -4,16 +4,15 @@ import com.v2soft.styxlib.io.IStyxDataReader;
 import com.v2soft.styxlib.io.IStyxDataWriter;
 import com.v2soft.styxlib.messages.base.StyxTMessageFID;
 import com.v2soft.styxlib.messages.base.enums.MessageType;
-import com.v2soft.styxlib.library.types.ULong;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
 public class StyxTReadMessage extends StyxTMessageFID {
-	private ULong mOffset;
+	private long mOffset;
 	private long mCount;
 
-	public StyxTReadMessage(long fid, ULong offset, long count)	{
+	public StyxTReadMessage(long fid, long offset, long count)	{
 		super(MessageType.Tread, MessageType.Rread, fid);
 		mOffset = offset;
 		mCount = count;
@@ -27,12 +26,12 @@ public class StyxTReadMessage extends StyxTMessageFID {
         mCount = input.readUInt32();
     }
 
-	public ULong getOffset()
+	public long getOffset()
 	{
 		return mOffset;
 	}
 
-	public void setOffset(ULong offset)
+	public void setOffset(long offset)
 	{
 		mOffset = offset;
 	}
@@ -62,7 +61,7 @@ public class StyxTReadMessage extends StyxTMessageFID {
 
 	@Override
     public String toString() {
-	    return String.format("%s\nOffset: %s\nCount: %d",
-				super.toString(), getOffset().toString(), getCount());
+	    return String.format("%s\nOffset: %d\nCount: %d",
+				super.toString(), getOffset(), getCount());
 	}
 }

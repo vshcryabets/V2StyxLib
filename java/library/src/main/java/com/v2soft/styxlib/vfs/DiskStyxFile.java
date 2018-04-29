@@ -3,7 +3,6 @@ package com.v2soft.styxlib.vfs;
 import com.v2soft.styxlib.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.messages.base.enums.ModeType;
 import com.v2soft.styxlib.server.ClientDetails;
-import com.v2soft.styxlib.library.types.ULong;
 
 import java.io.File;
 import java.io.IOException;
@@ -49,8 +48,8 @@ public class DiskStyxFile extends MemoryStyxFile {
     }
 
     @Override
-    public ULong getLength() {
-        return new ULong(mFile.length());
+    public long getLength() {
+        return mFile.length();
     }
 
     @Override
@@ -94,12 +93,13 @@ public class DiskStyxFile extends MemoryStyxFile {
         return canOpen;
     }
 
-    public int write(ClientDetails clientDetails, byte[] data, ULong offset)
+    @Override
+    public int write(ClientDetails clientDetails, byte[] data, long offset)
             throws StyxErrorMessageException {
         if ( mFilesMap.containsKey(clientDetails)) {
             final RandomAccessFile rf = mFilesMap.get(clientDetails);
             try {
-                rf.seek(offset.asLong());
+                rf.seek(offset);
                 rf.write(data);
             } catch (IOException e) {
                 throw StyxErrorMessageException.newInstance(e.toString());
@@ -111,12 +111,12 @@ public class DiskStyxFile extends MemoryStyxFile {
     }
 
     @Override
-    public long read(ClientDetails clientDetails, byte[] outbuffer, ULong offset, long count)
+    public long read(ClientDetails clientDetails, byte[] outbuffer, long offset, long count)
             throws StyxErrorMessageException {
         if ( mFilesMap.containsKey(clientDetails)) {
             final RandomAccessFile rf = mFilesMap.get(clientDetails);
             try {
-                rf.seek(offset.asLong());
+                rf.seek(offset);
                 return rf.read(outbuffer, 0, (int) count);
             } catch (IOException e) {
                 throw StyxErrorMessageException.newInstance(e.toString());

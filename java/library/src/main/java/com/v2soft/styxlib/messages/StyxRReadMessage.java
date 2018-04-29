@@ -26,7 +26,7 @@ public class StyxRReadMessage extends StyxMessage {
         super.load(input);
         mDataLength = (int)input.readUInt32();
         mData = new byte[mDataLength];
-        MetricsAndStats.byteArrayAllocation++;
+        MetricsAndStats.byteArrayAllocationRRead++;
         input.read(mData, 0, mDataLength);
     }
 

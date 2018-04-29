@@ -10,7 +10,6 @@ import com.v2soft.styxlib.server.tcp.TCPClientChannelDriver;
 import com.v2soft.styxlib.server.tcp.TCPServerManager;
 import com.v2soft.styxlib.vfs.MemoryStyxDirectory;
 import com.v2soft.styxlib.vfs.MemoryStyxFile;
-import com.v2soft.styxlib.library.types.ULong;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,7 +35,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author V.Shcriyabets (vshcryabets@gmail.com)
  *
  */
-@Disabled
 public class PacketIOTests {
 
     private static final int PORT = 10234;
@@ -73,7 +71,7 @@ public class PacketIOTests {
                 super.close(client);
             }
             @Override
-            public int write(ClientDetails client, byte[] data, ULong offset)
+            public int write(ClientDetails client, byte[] data, long offset)
                     throws StyxErrorMessageException {
                 if ( mClientsMap.containsKey(client) ) {
                     mClientsMap.get(client).reset();
@@ -82,7 +80,7 @@ public class PacketIOTests {
                 return super.write(client, data, offset);
             }
             @Override
-            public long read(ClientDetails client, byte[] outbuffer, ULong offset, long count)
+            public long read(ClientDetails client, byte[] outbuffer, long offset, long count)
                     throws StyxErrorMessageException {
                 if ( mClientsMap.containsKey(client) ) {
                     byte[] digest = mClientsMap.get(client).digest();

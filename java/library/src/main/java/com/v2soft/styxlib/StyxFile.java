@@ -22,7 +22,6 @@ import com.v2soft.styxlib.messages.base.enums.ModeType;
 import com.v2soft.styxlib.messages.base.structs.StyxStat;
 import com.v2soft.styxlib.server.ClientDetails;
 import com.v2soft.styxlib.server.IMessageTransmitter;
-import com.v2soft.styxlib.library.types.ULong;
 
 import java.io.BufferedOutputStream;
 import java.io.Closeable;
@@ -486,7 +485,7 @@ public class StyxFile implements Closeable {
         return stat.getModificationTime();
     }
 
-    public ULong getLength() throws StyxException, InterruptedException, TimeoutException, IOException
+    public long getLength() throws StyxException, InterruptedException, TimeoutException, IOException
     {
         StyxStat stat = getStat();
         return stat.getLength();
