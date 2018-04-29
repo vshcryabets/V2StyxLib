@@ -6,8 +6,6 @@
  */
 #ifndef IStyxDataReader_H_
 #define IStyxDataReader_H_
-#include <string>
-#include "classes.h"
 #include "types.h"
 
 class IStyxDataReader {

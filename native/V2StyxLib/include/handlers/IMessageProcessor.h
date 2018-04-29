@@ -9,6 +9,7 @@
 #define INCLUDE_HANDLERS_IMESSAGEPROCESSOR_H_
 
 #include "exceptions/StyxException.h"
+#include "server/ClientDetails.h"
 
 class IMessageProcessor {
 public:

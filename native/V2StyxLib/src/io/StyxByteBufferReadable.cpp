@@ -28,21 +28,18 @@ size_t StyxByteBufferReadable::remainsToRead() {
 }
 
 size_t StyxByteBufferReadable::readFromFD(Socket fd) {
-	size_t free = mCapacity-mStoredBytes;
-	if ( free <= 0 ) return 0;
-	if ( mWritePosition >= mCapacity ) {
-		mWritePosition = 0;
-	}
-	size_t count = ( mWritePosition < mReadPosition ? mReadPosition-mWritePosition : mCapacity-mWritePosition );
+	size_t free = updateBufferLimits();
+	size_t count = ( mWritePosition < mReadPosition ? mReadPosition - mWritePosition : mCapacity - mWritePosition );
 	size_t position = mWritePosition;
+	int readed;
 #ifdef WIN32
-	int readed = ::recv(fd, (char*)(mBuffer+position), count, 0);
+	readed = ::recv(fd, (char*)(mBuffer+position), count, 0);
 #else
-	int readed = ::read(fd, mBuffer+position, count);
+	readed = ::read(fd, mBuffer+position, count);
 #endif
 	if ( readed > 0 ) {
-		mStoredBytes+=readed;
-		mWritePosition+=readed;
+		mStoredBytes += readed;
+		mWritePosition += readed;
 	}
 	return readed;
 }
@@ -97,7 +94,7 @@ void StyxByteBufferReadable::limit(size_t limit) {
 }
 
 size_t StyxByteBufferReadable::updateBufferLimits() {
-	int free = mCapacity-mStoredBytes;
+	size_t free = mCapacity - mStoredBytes;
 	if ( free <= 0 ) return 0;
 	if ( mWritePosition >= mCapacity ) {
 		mWritePosition = 0;

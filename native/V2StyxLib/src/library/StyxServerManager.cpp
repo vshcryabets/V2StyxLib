@@ -12,7 +12,7 @@ const size_t StyxServerManager::DEFAULT_IOUNIT = 8192;
 const size_t StyxServerManager::DEFAULT_TIMEOUT = 5000;
 
 StyxServerManager::StyxServerManager(IVirtualStyxFile *root, std::vector<IChannelDriver*> drivers)
-	: mRoot(root), mDrivers(drivers) {
+	: mDrivers(drivers), mRoot(root) {
 	ConnectionDetails details(getProtocol(), getIOUnit());
     mBalancer = new TMessagesProcessor(details, root);
 }

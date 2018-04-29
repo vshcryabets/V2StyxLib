@@ -13,17 +13,12 @@ const size_t Connection::DEFAULT_IOUNIT = 8192;
 
 const StyxString Connection::PROTOCOL = StyxString("9P2000");
 
-Connection::Connection(Credentials credentials, IChannelDriver* driver)
-	: mCredentials(credentials), mDriver(driver) {
-	init(NULL, NULL, NULL);
-}
-
 Connection::Connection(Credentials credentials,
 				  IChannelDriver* driver,
 				  RMessagesProcessor* answerProcessor,
 				  TMessageTransmitter* transmitter,
 				  ClientDetails* recepient)
-	: mCredentials(credentials), mDriver(driver) {
+	: mCredentials(credentials), mDriver(driver), mAuthQID(StyxQID::EMPTY), mQID(StyxQID::EMPTY) {
 	init(answerProcessor, transmitter, recepient);
 }
 

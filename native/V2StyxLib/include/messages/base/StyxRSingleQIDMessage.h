@@ -16,7 +16,6 @@
 class StyxRSingleQIDMessage : public StyxMessage {
 private:
     StyxQID mQID;
-    bool shouldDeleteQID;
 public:
     StyxRSingleQIDMessage(MessageTypeEnum type, StyxTAG tag, const StyxQID qid);
     virtual ~StyxRSingleQIDMessage();

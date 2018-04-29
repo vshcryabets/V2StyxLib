@@ -8,8 +8,9 @@
 #ifndef STYXRWALKMESSAGE_H_
 #define STYXRWALKMESSAGE_H_
 
-#include "messages/base/StyxMessage.h"
 #include <vector>
+#include "messages/base/StyxMessage.h"
+#include "messages/base/structs/StyxQID.h"
 
 class StyxRWalkMessage: public StyxMessage {
 private:

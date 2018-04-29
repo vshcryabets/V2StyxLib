@@ -50,12 +50,12 @@ void StyxTCreateMessage::load(IStyxDataReader *input) {
 }
 
 size_t StyxTCreateMessage::getBinarySize() {
-	return StyxTCreateMessage::getBinarySize() + 5
+	return StyxTMessageFID::getBinarySize() + 5
 			+ StyxMessage::getUTFSize(this->getName());
 }
 
 void StyxTCreateMessage::writeToBuffer(IStyxDataWriter* output) {
-	StyxTCreateMessage::writeToBuffer(output);
+	StyxTMessageFID::writeToBuffer(output);
 	output->writeUTFString(mName);
 	output->writeUInt32(getPermissions());
 	output->writeUInt8(getMode());

@@ -13,6 +13,7 @@ class StyxDataWriter : public IStyxDataWriter {
 private:
     uint8_t mInternalBuffer[16];
     std::vector<uint8_t>* mBuffer;
+	size_t writePosition;
 public:
 	StyxDataWriter(std::vector<uint8_t>* buffer);
 	~StyxDataWriter();

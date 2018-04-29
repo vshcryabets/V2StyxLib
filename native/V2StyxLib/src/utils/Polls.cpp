@@ -19,22 +19,5 @@ Polls::~Polls() {
 }
 
 FIDPoll* Polls::getFIDPoll() {
-
+	return mFids;
 }
-
-MessageTagPoll* Polls::getTagPoll() {
-
-}
-
-std::map<StyxTAG, StyxTMessage>* Polls::getMessagesMap() {
-
-}
-
-void Polls::releaseTag(StyxTAG tag) {
-
-}
-
-void Polls::releaseFID(StyxTMessageFID* message) {
-
-}
-

@@ -9,8 +9,7 @@
 #include <sstream>
 
 StyxRSingleQIDMessage::StyxRSingleQIDMessage(MessageTypeEnum type, StyxTAG tag, const StyxQID qid) :
-	StyxMessage(type, tag) {
-	mQID = qid;
+	StyxMessage(type, tag), mQID(qid) {
 }
 
 StyxRSingleQIDMessage::~StyxRSingleQIDMessage() {

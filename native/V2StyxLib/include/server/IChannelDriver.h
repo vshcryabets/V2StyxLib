@@ -2,14 +2,18 @@
 #define ICHANNEL_DRIVER_H_
 
 #include <vector>
-#include "ILogListener.h"
+
+class IChannelDriver;
+class IMessageProcessor;
+class ILogListener;
+
 #include "server/IMessageTransmitter.h"
 #include "handlers/IMessageProcessor.h"
 
 class IChannelDriver : public IMessageTransmitter {
 public:
 	virtual ~IChannelDriver() {};
-    virtual StyxThread start(int iounit) = 0;
+    virtual StyxThread start(size_t iounit) = 0;
     virtual void setTMessageHandler(IMessageProcessor* handler) = 0;
     virtual void setRMessageHandler(IMessageProcessor* handler) = 0;
     virtual void setLogListener(ILogListener* listener) = 0;
@@ -25,6 +29,15 @@ public:
 
     virtual IMessageProcessor* getTMessageHandler() = 0;
     virtual IMessageProcessor* getRMessageHandler() = 0;
+};
+
+class ILogListener {
+public:
+	virtual void onMessageReceived(IChannelDriver* driver,
+			ClientDetails* clientDetails, StyxMessage* message) = 0;
+	virtual void onMessageTransmited(IChannelDriver* driver,
+			ClientDetails* clientDetails, StyxMessage* message) = 0;
+	virtual void onException(IChannelDriver* driver, StyxException *error) = 0;
 };
 
 #endif // ICHANNEL_DRIVER_H_

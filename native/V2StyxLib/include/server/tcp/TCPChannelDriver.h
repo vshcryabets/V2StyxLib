@@ -32,7 +32,7 @@ protected:
 public:
 	TCPChannelDriver(StyxString address, uint16_t port, bool ssl);
 	virtual ~TCPChannelDriver();
-	virtual StyxThread start(uint32_t iounit);
+	virtual StyxThread start(size_t iounit);
 	virtual bool sendMessage(StyxMessage* message, ClientDetails *recipient) throw(StyxException);
 	virtual void setTMessageHandler(IMessageProcessor *handler);
 	virtual void setRMessageHandler(IMessageProcessor *handler);

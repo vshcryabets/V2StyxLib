@@ -44,13 +44,13 @@ bool MemoryStyxDirectory::open(ClientDetails *client, int mode){
 			stats.push_back(stat);
 		}
 		// allocate buffer
-		uint8_t* buffer = new uint8_t(size);
+		std::vector<uint8_t>* buffer = new std::vector<uint8_t>(size);
 		StyxDataWriter writer(buffer);
 		for ( std::vector<StyxStat*>::iterator it = stats.begin();
 				it != stats.end(); it++ ) {
 			(*it)->writeBinaryTo(&writer);
 		}
-		mBuffersMap.insert(std::pair<ClientDetails*, uint8_t*>(client, buffer));
+		mBuffersMap.insert(std::pair<ClientDetails*, std::vector<uint8_t>*>(client, buffer));
 	}
 	return result;
 }
@@ -77,14 +77,14 @@ size_t MemoryStyxDirectory::read(ClientDetails *client, uint8_t* buffer, uint64_
 	if ( it == mBuffersMap.end() ) {
 		return -1; // TODO there we should send Rerror with message "This file isn't open"
 	}
-	uint8_t* preparedData = it->second;
-	size_t dataSize = preparedData->getCapacity();
+	std::vector<uint8_t>* preparedData = it->second;
+	size_t dataSize = preparedData->size();
 	if ( offset > dataSize ) return 0;
 	size_t remaining = dataSize - offset;
 	if ( count > remaining ) {
 		count = remaining;
 	}
-	memcpy(buffer, preparedData->getBuffer()+offset, count);
+	memcpy(buffer, preparedData->data() + offset, count);
 	return count;
 }
 IVirtualStyxFile* MemoryStyxDirectory::walk(std::vector<StyxString*> *pathElements, std::vector<StyxQID*> *qids) {

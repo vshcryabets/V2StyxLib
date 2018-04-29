@@ -20,7 +20,7 @@ StyxException::StyxException(const char *message, ...) {
 StyxException::StyxException(StyxString message, ...) {
 	char buf[4096];
 	va_list arglist;
-	va_start( arglist, message.c_str() );
+	va_start( arglist, message );
 	vsnprintf(buf, sizeof(buf), message.c_str(), arglist);
 	va_end( arglist );
 	this->mMessage = StyxString(buf);

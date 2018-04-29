@@ -10,8 +10,8 @@
 
 StyxTAuthMessage::StyxTAuthMessage(StyxFID fid) :
 	StyxTMessageFID(Tauth, Rauth, fid),
-	mMountPoint(""),
-	mUserName("") {
+    mUserName(""),
+	mMountPoint("") {
 }
 
 StyxTAuthMessage::~StyxTAuthMessage() {

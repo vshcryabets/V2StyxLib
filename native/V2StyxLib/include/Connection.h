@@ -53,12 +53,10 @@ protected:
     virtual void sendAttachMessage() throw();
     virtual void setDriver(IChannelDriver* driver);
 public:
-    Connection(Credentials credentials = Credentials(NULL, NULL), IChannelDriver *driver = NULL);
-    Connection(Credentials credentials,
-                      IChannelDriver *driver,
-                      RMessagesProcessor *answerProcessor,
-                      TMessageTransmitter *transmitter,
-                      ClientDetails *recepient);
+    Connection(Credentials credentials = Credentials(NULL, NULL), IChannelDriver *driver = NULL,
+                      RMessagesProcessor *answerProcessor = NULL,
+                      TMessageTransmitter *transmitter = NULL,
+                      ClientDetails *recepient = NULL);
     virtual ~Connection();
 
 	virtual void sendVersionMessage() throw(StyxException);

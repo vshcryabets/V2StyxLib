@@ -6,7 +6,6 @@
  */
 #ifndef IStyxDataWriter_H_
 #define IStyxDataWriter_H_
-#include "classes.h"
 #include "types.h"
 
 class IStyxDataWriter {
