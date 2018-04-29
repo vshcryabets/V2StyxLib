@@ -1,6 +1,5 @@
 package com.v2soft.styxlib.io;
 
-import com.v2soft.styxlib.library.types.ULong;
 import com.v2soft.styxlib.utils.MetricsAndStats;
 
 import java.io.UnsupportedEncodingException;
@@ -12,7 +11,7 @@ public class StyxDataReader implements IStyxDataReader {
 
     public StyxDataReader(IStyxBuffer buffer) {
         mInternalBuffer = new byte[getInternalBufferSize()];
-        MetricsAndStats.byteArrayAllocation++;
+        MetricsAndStats.byteArrayAllocationIo++;
         mBuffer = buffer;
     }
 
@@ -43,7 +42,7 @@ public class StyxDataReader implements IStyxDataReader {
     public String readUTFString() throws UnsupportedEncodingException {
         int count = readUInt16();
         byte[] bytes = new byte[count];
-        MetricsAndStats.byteArrayAllocation++;
+        MetricsAndStats.byteArrayAllocationIo++;
         read(bytes, 0, count);
         return new String(bytes, StyxDataWriter.sUTFCharset);
     }
@@ -54,11 +53,8 @@ public class StyxDataReader implements IStyxDataReader {
     @Override
     public long readUInt32() {return (readInteger(4) &0xFFFFFFFF);}
     @Override
-    public ULong readUInt64() {
-        byte[] bytes = new byte[ULong.ULONG_LENGTH];
-        MetricsAndStats.byteArrayAllocation++;
-        read(bytes, 0, ULong.ULONG_LENGTH);
-        return new ULong(bytes);
+    public long readUInt64() {
+        return readInteger(8);
     }
     @Override
     public int read(byte[] data, int offset, int count) {

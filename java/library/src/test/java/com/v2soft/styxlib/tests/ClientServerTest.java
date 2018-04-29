@@ -33,7 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author V.Shcriyabets (vshcryabets@gmail.com)
  *
  */
-@Disabled
 public class ClientServerTest {
     private static final int PORT = 10234;
     private StyxServerManager mServer;

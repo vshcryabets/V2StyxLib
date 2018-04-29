@@ -7,7 +7,6 @@ import com.v2soft.styxlib.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.io.StyxUnbufferedFileOutputStream;
 import com.v2soft.styxlib.library.types.Credentials;
-import com.v2soft.styxlib.library.types.ULong;
 import com.v2soft.styxlib.server.ClientDetails;
 import com.v2soft.styxlib.server.IChannelDriver;
 import com.v2soft.styxlib.server.tcp.TCPClientChannelDriver;
@@ -39,7 +38,6 @@ import java.util.concurrent.atomic.AtomicInteger;
  *
  * @author V.Shcriyabets (vshcryabets@gmail.com)
  */
-@Disabled
 public class TwoWayExportTest {
     private static final int PORT = 10234;
     private TCPDualLinkServerManager mServer;
@@ -253,7 +251,8 @@ public class TwoWayExportTest {
         }
 
         @Override
-        public int write(ClientDetails clientDetails, final byte[] data, ULong offset) throws StyxErrorMessageException {
+        public int write(ClientDetails clientDetails, final byte[] data,
+                         long offset) throws StyxErrorMessageException {
             String message = new String(data, mCharset);
             System.out.println(String.format("%d SERVER GOT %s", System.currentTimeMillis(), message));
             mQueue.offer(message);
@@ -327,7 +326,8 @@ public class TwoWayExportTest {
         }
 
         @Override
-        public int write(ClientDetails clientDetails, byte[] data, ULong offset) throws StyxErrorMessageException {
+        public int write(ClientDetails clientDetails, byte[] data,
+                         long offset) throws StyxErrorMessageException {
             String message = new String(data, mCharset);
             System.out.println(String.format("%s GOT %s", mPrefix, message));
             if (mMarker.equals(message)) {

@@ -7,7 +7,6 @@ import com.v2soft.styxlib.library.StyxServerManager;
 import com.v2soft.styxlib.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.io.StyxFileBufferedInputStream;
-import com.v2soft.styxlib.library.types.ULong;
 import com.v2soft.styxlib.messages.base.enums.FileMode;
 import com.v2soft.styxlib.server.ClientDetails;
 import com.v2soft.styxlib.server.IChannelDriver;
@@ -73,7 +72,6 @@ public class ConnectionTest {
 
     // TVersion & TAttach
     @Test
-    @Disabled
     public void testConnection() throws IOException, StyxException, InterruptedException, TimeoutException {
         int count = 1000;
         long startTime = System.currentTimeMillis();
@@ -95,7 +93,6 @@ public class ConnectionTest {
 
     // TVersion, Tattach, Twalk, create, write, Tclunk, open, read, remove
     @Test
-    @Disabled
     public void testFileCreation() throws IOException, StyxException, InterruptedException, TimeoutException {
         final StyxFile newFile = new StyxFile(mConnection, UUID.randomUUID().toString());
         newFile.create(FileMode.ReadOthersPermission.getMode() |
@@ -117,7 +114,6 @@ public class ConnectionTest {
     }
 
     @Test
-    @Disabled
     public void testFSTree() throws IOException, StyxException, InterruptedException, TimeoutException {
         // create 2 directory and 4 sub-directories
         String nameA = UUID.randomUUID().toString();
@@ -181,7 +177,6 @@ public class ConnectionTest {
     }
 
     @Test
-    @Disabled
     public void testBigFileTransmition()
             throws IOException, StyxException, InterruptedException, TimeoutException {
         byte[] buffer = new byte[156];
@@ -252,12 +247,12 @@ public class ConnectionTest {
     public void testWriteTransmitionSpeed()
             throws IOException, InterruptedException, TimeoutException, StyxException {
         int blockSize = 128;
-        long blocksCount = 1024 * 1024;
+        long blocksCount = 1024;
         final String filename = "write";
         final long[] stat = new long[1];
         ((DiskStyxDirectory) mServer.getRoot()).addFile(new MemoryStyxFile(filename) {
             @Override
-            public int write(ClientDetails clientDetails, byte[] data, ULong offset)
+            public int write(ClientDetails clientDetails, byte[] data, long offset)
                     throws StyxErrorMessageException {
                 stat[0] += data.length;
                 return data.length;
@@ -289,11 +284,14 @@ public class ConnectionTest {
         System.out.println(String.format("\tError %d messages", mConnection.getMessenger().getErrorsCount()));
         System.out.println(String.format("\tByteBuffer allocations count %d", MetricsAndStats.byteBufferAllocation));
         System.out.println(String.format("\tbyte[] allocations count %d", MetricsAndStats.byteArrayAllocation));
+        System.out.println(String.format("\tbyte[] allocations count RRead %d", MetricsAndStats.byteArrayAllocationRRead));
+        System.out.println(String.format("\tbyte[] allocations count TWrite %d", MetricsAndStats.byteArrayAllocationTWrite));
+        System.out.println(String.format("\tbyte[] allocations count Ulong %d", MetricsAndStats.byteArrayAllocationUlong));
+        System.out.println(String.format("\tbyte[] allocations count IO %d", MetricsAndStats.byteArrayAllocationIo));
     }
 
     // TVersion, Tattach, Twalk, create, write, Tclunk, open, read, remove
     @Test
-    @Disabled
     public void testFileSeek() throws IOException, StyxException, InterruptedException, TimeoutException {
         final StyxFile newFile = new StyxFile(mConnection, UUID.randomUUID().toString());
         newFile.create(FileMode.ReadOthersPermission.getMode() |

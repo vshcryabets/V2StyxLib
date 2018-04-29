@@ -1,6 +1,5 @@
 package com.v2soft.styxlib.io;
 
-import com.v2soft.styxlib.library.types.ULong;
 import com.v2soft.styxlib.utils.MetricsAndStats;
 
 import java.io.FilterInputStream;
@@ -24,7 +23,7 @@ public class StyxDataInputStream
     public StyxDataInputStream(InputStream in) {
         super(in);
         mDataBuffer = new byte[sDataBufferSize];
-        MetricsAndStats.byteArrayAllocation++;
+        MetricsAndStats.byteArrayAllocationIo++;
     }
 
 
@@ -52,24 +51,20 @@ public class StyxDataInputStream
     @Override
     public long readUInt32() throws IOException {return (readInteger(4) &0xFFFFFFFF);}
     @Override
-    public ULong readUInt64() throws IOException {
-        byte[] bytes = new byte[ULong.ULONG_LENGTH];
-        MetricsAndStats.byteArrayAllocation++;
-        read(bytes, 0, ULong.ULONG_LENGTH);
-        return new ULong(bytes);
+    public long readUInt64() throws IOException {
+        return readInteger(8);
     }
 
     @Override
     public long getUInt32() {
-        // TODO Auto-generated method stub
-        return 0;
+        throw  new IllegalStateException("Not implemented");
     }
 
     @Override
     public String readUTFString() throws IOException {
         int count = readUInt16();
         byte[] bytes = new byte[count];
-        MetricsAndStats.byteArrayAllocation++;
+        MetricsAndStats.byteArrayAllocationIo++;
         read(bytes, 0, count);
         return new String(bytes, "utf-8");
     }

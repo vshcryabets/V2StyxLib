@@ -254,7 +254,7 @@ public class TMessagesProcessor extends QueueMessagesProcessor implements IMessa
         }
         long fid = msg.getFID();
         byte [] buffer = new byte[(int) msg.getCount()];
-        MetricsAndStats.byteArrayAllocation++;
+        MetricsAndStats.byteArrayAllocationRRead++;
         return new StyxRReadMessage(msg.getTag(), buffer,
                 (int) clientDetails.getAssignedFile(fid).read(clientDetails, buffer, msg.getOffset(), msg.getCount()));
     }

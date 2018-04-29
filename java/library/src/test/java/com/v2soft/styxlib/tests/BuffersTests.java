@@ -14,7 +14,6 @@ import java.util.Random;
  *
  * @author V.Shcriyabets (vshcryabets@gmail.com)
  */
-@Disabled
 public class BuffersTests {
 
     @Test
