@@ -7,6 +7,7 @@ import com.v2soft.styxlib.messages.base.StyxMessage;
 import com.v2soft.styxlib.messages.base.StyxTMessageFID;
 import com.v2soft.styxlib.messages.base.enums.MessageType;
 import com.v2soft.styxlib.library.types.ULong;
+import com.v2soft.styxlib.utils.MetricsAndStats;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -34,6 +35,7 @@ public class StyxTWriteMessage extends StyxTMessageFID {
         mDataLength = (int)input.readUInt32();
         mDataOffset = 0;
         mData = new byte[mDataLength];
+        MetricsAndStats.byteArrayAllocation++;
         input.read(mData, 0, mDataLength);
     }
     @Override
@@ -60,8 +62,10 @@ public class StyxTWriteMessage extends StyxTMessageFID {
     // ===========================================================================
     public ULong getOffset(){return mOffset;}
     public byte[] getData() {
-        if (mData == null)
+        if (mData == null) {
+            MetricsAndStats.byteArrayAllocation++;
             return new byte[0];
+        }
         return mData;
     }
     @Override

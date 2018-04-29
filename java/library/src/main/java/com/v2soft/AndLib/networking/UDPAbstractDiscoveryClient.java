@@ -15,6 +15,8 @@
  */
 package com.v2soft.AndLib.networking;
 
+import com.v2soft.styxlib.utils.MetricsAndStats;
+
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -108,7 +110,7 @@ public abstract class UDPAbstractDiscoveryClient extends DiscoveryClient {
         @Override
         public void run() {
             final byte[] buf = new byte[256];
-
+            MetricsAndStats.byteArrayAllocation++;
             while (isWorking) {
                 try {
                     final DatagramPacket packet = new DatagramPacket(buf, buf.length);

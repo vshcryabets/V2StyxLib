@@ -1,5 +1,7 @@
 package com.v2soft.styxlib.io;
 
+import com.v2soft.styxlib.utils.MetricsAndStats;
+
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
@@ -21,6 +23,7 @@ public class StyxByteBufferReadable implements IStyxBuffer {
     public StyxByteBufferReadable(int capacity) {
         mCapacity = capacity;
         mBuffer = ByteBuffer.allocateDirect(mCapacity);
+        MetricsAndStats.byteBufferAllocation++;
         clear();
     }
     // ==========================================================

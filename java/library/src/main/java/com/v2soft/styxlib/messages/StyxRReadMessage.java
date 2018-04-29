@@ -5,6 +5,7 @@ import com.v2soft.styxlib.io.IStyxDataReader;
 import com.v2soft.styxlib.io.IStyxDataWriter;
 import com.v2soft.styxlib.messages.base.StyxMessage;
 import com.v2soft.styxlib.messages.base.enums.MessageType;
+import com.v2soft.styxlib.utils.MetricsAndStats;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -25,6 +26,7 @@ public class StyxRReadMessage extends StyxMessage {
         super.load(input);
         mDataLength = (int)input.readUInt32();
         mData = new byte[mDataLength];
+        MetricsAndStats.byteArrayAllocation++;
         input.read(mData, 0, mDataLength);
     }
 

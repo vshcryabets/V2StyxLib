@@ -1,6 +1,7 @@
 package com.v2soft.styxlib.io;
 
 import com.v2soft.styxlib.library.types.ULong;
+import com.v2soft.styxlib.utils.MetricsAndStats;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -16,6 +17,7 @@ public class StyxDataWriter implements IStyxDataWriter {
 
     public StyxDataWriter(ByteBuffer buffer) {
         mInternalBuffer = new byte[sDataBufferSize];
+        MetricsAndStats.byteArrayAllocation++;
         mBuffer = buffer;
     }
 

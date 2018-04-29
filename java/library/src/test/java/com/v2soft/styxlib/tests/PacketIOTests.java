@@ -14,6 +14,7 @@ import com.v2soft.styxlib.library.types.ULong;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -35,6 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author V.Shcriyabets (vshcryabets@gmail.com)
  *
  */
+@Disabled
 public class PacketIOTests {
 
     private static final int PORT = 10234;

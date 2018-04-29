@@ -11,8 +11,10 @@ jar {
 }
 
 dependencies {
-    testCompile('org.junit.jupiter:junit-jupiter-api:5.0.1')
-    testRuntime('org.junit.jupiter:junit-jupiter-engine:5.0.1')
+    testCompile('org.junit.jupiter:junit-jupiter-api:5.1.1')
+    testRuntime('org.junit.jupiter:junit-jupiter-engine:5.1.1',
+            'org.junit.platform:junit-platform-launcher:1.1.0',
+            'org.junit.platform:junit-platform-runner:1.1.0')
 }
 
 sourceSets {
@@ -20,6 +22,7 @@ sourceSets {
 
 junitPlatform {
     //details 'flat'
+    reportsDir file('build/test-results/junit-platform')
 }
 
 uploadArchives {
