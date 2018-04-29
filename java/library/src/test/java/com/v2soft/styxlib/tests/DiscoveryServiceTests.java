@@ -29,6 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  *
  * @author V.Shcriyabets (vshcryabets@gmail.com)
  */
+@Disabled
 public class DiscoveryServiceTests {
 
     private static final int PORT = 12395;
