@@ -286,7 +286,8 @@ public class ConnectionTest {
         System.out.println(String.format("\tbyte[] allocations count %d", MetricsAndStats.byteArrayAllocation));
         System.out.println(String.format("\tbyte[] allocations count RRead %d", MetricsAndStats.byteArrayAllocationRRead));
         System.out.println(String.format("\tbyte[] allocations count TWrite %d", MetricsAndStats.byteArrayAllocationTWrite));
-        System.out.println(String.format("\tbyte[] allocations count IO %d", MetricsAndStats.byteArrayAllocationIo));
+        System.out.println(String.format("\tbyte[] allocations count IO %d",
+                MetricsAndStats.byteArrayAllocationIo));
     }
 
     // TVersion, Tattach, Twalk, create, write, Tclunk, open, read, remove
