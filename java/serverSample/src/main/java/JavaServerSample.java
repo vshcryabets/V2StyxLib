@@ -42,7 +42,7 @@ public class JavaServerSample {
                 super.close(client);
             }
             @Override
-            public int write(ClientDetails client, byte[] data, ULong offset)
+            public int write(ClientDetails client, byte[] data, long offset)
                     throws StyxErrorMessageException {
                 if ( mClientsMap.containsKey(client) ) {
                     mClientsMap.get(client).update(data, 0, data.length);
@@ -50,7 +50,7 @@ public class JavaServerSample {
                 return super.write(client, data, offset);
             }
             @Override
-            public long read(ClientDetails client, byte[] outbuffer, ULong offset, long count)
+            public long read(ClientDetails client, byte[] outbuffer, long offset, long count)
                     throws StyxErrorMessageException {
                 if ( mClientsMap.containsKey(client) ) {
                     byte[] digest = mClientsMap.get(client).digest();

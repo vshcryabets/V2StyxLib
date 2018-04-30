@@ -67,16 +67,13 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
         if ( recipient == null ) {
             throw new NullPointerException("Client can't be null");
         }
-        ByteBuffer buffer = ((TCPClientDetails)recipient).getOutputBuffer();
-        synchronized (buffer) {
-            buffer.clear();
+        TCPClientDetails client = (TCPClientDetails) recipient;
+        ByteBuffer buffer = client.getOutputBuffer();
+        synchronized (client) {
             try {
-                message.writeToBuffer(new StyxDataWriter(buffer)); // TODO optimize this line,
-                // no need to create new instance
+                message.writeToBuffer(client.getOutputWriter());
                 buffer.flip();
-//            System.out.printf("Limit=%d, %d\n", buffer.limit(), buffer.position());
-                SocketChannel channel = ((TCPClientDetails) recipient).getChannel();
-                channel.write(buffer);
+                client.getChannel().write(buffer);
                 mTransmittedPacketsCount++;
                 if (mLogListener != null) {
                     mLogListener.onMessageTransmited(this, recipient, message);
