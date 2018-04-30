@@ -3,6 +3,7 @@ package com.v2soft.styxlib.server.tcp;
 import com.v2soft.styxlib.io.IStyxDataReader;
 import com.v2soft.styxlib.io.StyxByteBufferReadable;
 import com.v2soft.styxlib.io.StyxDataReader;
+import com.v2soft.styxlib.io.StyxDataWriter;
 import com.v2soft.styxlib.server.ClientDetails;
 import com.v2soft.styxlib.server.IChannelDriver;
 import com.v2soft.styxlib.utils.MetricsAndStats;
@@ -19,6 +20,7 @@ import java.nio.channels.SocketChannel;
 public class TCPClientDetails extends ClientDetails {
     private SocketChannel mChannel;
     private ByteBuffer mOutputBuffer;
+    private StyxDataWriter mOutputWriter;
     protected StyxByteBufferReadable mBuffer;
     protected StyxDataReader mReader;
 
@@ -30,10 +32,15 @@ public class TCPClientDetails extends ClientDetails {
         MetricsAndStats.byteBufferAllocation++;
         mBuffer = new StyxByteBufferReadable(iounit * 2);
         mReader = new StyxDataReader(mBuffer);
+        mOutputWriter = new StyxDataWriter(mOutputBuffer);
     }
 
     public ByteBuffer getOutputBuffer() {
         return mOutputBuffer;
+    }
+
+    public StyxDataWriter getOutputWriter() {
+        return mOutputWriter;
     }
 
     public SocketChannel getChannel() {
