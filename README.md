@@ -38,7 +38,7 @@ public class JavaServerSample {
                 super.close(client);
             }
             @Override
-            public int write(ClientDetails client, byte[] data, ULong offset)
+            public int write(ClientDetails client, byte[] data, long offset)
                     throws StyxErrorMessageException {
                 if ( mClientsMap.containsKey(client) ) {
                     mClientsMap.get(client).update(data, 0, data.length);
@@ -46,7 +46,7 @@ public class JavaServerSample {
                 return super.write(client, data, offset);
             }
             @Override
-            public long read(ClientDetails client, byte[] outbuffer, ULong offset, long count)
+            public long read(ClientDetails client, byte[] outbuffer, long offset, long count)
                     throws StyxErrorMessageException {
                 if ( mClientsMap.containsKey(client) ) {
                     byte[] digest = mClientsMap.get(client).digest();
@@ -67,6 +67,7 @@ public class JavaServerSample {
                 false,
                 root);
         Thread[] threads = mServer.start();
+        System.out.println("Test server listen on 127.0.0.1:" + PORT);
         for(Thread thread : threads) {
             thread.join();
         }
@@ -79,7 +80,7 @@ Java client sample:
         IClient connection = new Connection();
         IChannelDriver driver = new TCPClientChannelDriver(
                 InetAddress.getByName("127.0.0.1"), PORT, false);
-	connection.connect(driver)
+	    connection.connect(driver)
         final StyxFile newFile = new StyxFile(connection, FILE_NAME);
         OutputStream output = newFile.openForWrite();
         InputStream input = newFile.openForRead();
