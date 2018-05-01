@@ -24,7 +24,7 @@ TCPClientChannelDriver::~TCPClientChannelDriver() {
 	}
 }
 
-StyxThread TCPClientChannelDriver::start(int iounit) {
+StyxThread* TCPClientChannelDriver::start(int iounit) {
 	mServerClientDetails = new TCPClientDetails(mChannel, this, iounit, TCPClientChannelDriver::PSEUDO_CLIENT_ID);
 	return TCPChannelDriver::start(iounit);
 }
@@ -78,14 +78,13 @@ bool TCPClientChannelDriver::sendMessage(StyxMessage* message, ClientDetails *re
 	return TCPChannelDriver::sendMessage(message, recipient);
 }
 
-void TCPClientChannelDriver::run() {
+void* TCPClientChannelDriver::run() {
 	try {
 		isWorking = true;
 		StyxByteBufferReadable buffer(mIOUnit * 2);
 		StyxDataReader reader(&buffer);
 		while (isWorking) {
-			// TODO thread interrupt flag
-			pthread_testcancel();
+			if (mAcceptorThread->interrupted()) break;
 			try {
 				size_t read = buffer.readFromFD(mChannel);
 				if (read > 0) {
@@ -126,11 +125,12 @@ void TCPClientChannelDriver::run() {
 	}
 	mServerClientDetails->disconnect();
 	isWorking = false;
+	return 0;
 }
 
 void TCPClientChannelDriver::close() throw(StyxException) {
 	TCPChannelDriver::close();
-	pthread_cancel(mAcceptorThread);
+	mAcceptorThread->cancel();
 }
 
 std::vector<ClientDetails*> TCPClientChannelDriver::getClients() {

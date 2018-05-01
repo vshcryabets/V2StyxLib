@@ -10,6 +10,11 @@
 #include <stdint.h>
 #include <string>
 
+// typedef unsigned char uint8_t;
+// typedef unsigned short uint16_t;
+// typedef unsigned int uint32_t;
+//typedef long int64_t;
+
 #ifdef WIN32
 	#include <winsock2.h>
 	typedef SOCKET Socket;
@@ -23,12 +28,6 @@
 
 typedef int64_t Date;
 typedef int64_t int128_t;
-
-#ifdef PTHREAD
-#include <pthread.h>
-
-typedef pthread_t StyxThread;
-#endif
 
 enum MessageTypeEnum {
 	Tversion = 100,

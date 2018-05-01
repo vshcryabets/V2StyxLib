@@ -5,7 +5,6 @@
  *      Author: vshcryabets@gmail.com
  */
 #include <string>
-#include "StyxServerManager.h"
 #include "vfs/IVirtualStyxFile.h"
 #include "vfs/MemoryStyxDirectory.h"
 #include "StdOutFile.h"

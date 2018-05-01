@@ -18,7 +18,7 @@ Connection::Connection(Credentials credentials,
 				  RMessagesProcessor* answerProcessor,
 				  TMessageTransmitter* transmitter,
 				  ClientDetails* recepient)
-	: mCredentials(credentials), mDriver(driver), mAuthQID(StyxQID::EMPTY), mQID(StyxQID::EMPTY) {
+	: mAuthQID(StyxQID::EMPTY), mQID(StyxQID::EMPTY), mCredentials(credentials), mDriver(driver)  {
 	init(answerProcessor, transmitter, recepient);
 }
 

@@ -8,12 +8,14 @@
 #ifndef STYXDATAWRITER_H_
 #define STYXDATAWRITER_H_
 #include "IStyxDataWriter.h"
+#include <vector>
 
 class StyxDataWriter : public IStyxDataWriter {
 private:
     uint8_t mInternalBuffer[16];
     std::vector<uint8_t>* mBuffer;
-	size_t writePosition;
+	size_t mWritePosition;
+	size_t mMaxWritePosition;
 public:
 	StyxDataWriter(std::vector<uint8_t>* buffer);
 	~StyxDataWriter();

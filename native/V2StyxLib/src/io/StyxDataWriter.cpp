@@ -8,7 +8,7 @@
 #include "io/StyxDataWriter.h"
 
 StyxDataWriter::StyxDataWriter(std::vector<uint8_t>* buffer)
-	: mBuffer(buffer) {
+	: mBuffer(buffer), mWritePosition(0), mMaxWritePosition(0) {
 }
 
 StyxDataWriter::~StyxDataWriter() {
@@ -35,3 +35,23 @@ void StyxDataWriter::writeUTFString(StyxString string) {
 	writeUInt16(string.length());
 	write((const uint8_t*)string.c_str(), string.length());
 }
+
+size_t StyxDataWriter::getPosition() {
+	return mBuffer->size();
+}
+
+void StyxDataWriter::clear() {
+	mWritePosition = 0;
+}
+
+void StyxDataWriter::limit(size_t limit) {
+	mMaxWritePosition = limit;
+}
+
+// size_t StyxDataWriter::write(const uint8_t* data, size_t count) {
+// 	// TODO optimize this logic
+//  writeposition maxwriteposition
+// 	for (size_t i = 0; i < count; i++) {
+// 		mBuffer->push_back(data[i]);
+// 	}
+// }

@@ -17,7 +17,7 @@ TCPChannelDriver::TCPChannelDriver(StyxString address, uint16_t port, bool ssl) 
 }
 
 TCPChannelDriver::~TCPChannelDriver() {
-	// TODO Auto-generated destructor stub
+	close();
 }
 
 void TCPChannelDriver::setTMessageHandler(IMessageProcessor *handler) {
@@ -88,6 +88,30 @@ bool TCPChannelDriver::sendMessage(StyxMessage* message, ClientDetails *recipien
 #endif
 		mTransmissionErrorsCount++;
 	}
-
     return false;
+}
+
+void TCPChannelDriver::close() throw(StyxException) {
+	isWorking = false;
+	if (mAcceptorThread == NULL) {
+		return;
+	}
+	mAcceptorThread->cancel();
+	mAcceptorThread->tryjoin(2000);
+	if ( mAcceptorThread->isAlive() ) {
+		mAcceptorThread->forceCancel();
+	}
+	delete mAcceptorThread;
+	mAcceptorThread = NULL;
+}
+
+StyxThread* TCPChannelDriver::start(size_t iounit) {
+		if ( mAcceptorThread != NULL ) {
+            throw StyxException("Already started");
+        }
+        mIOUnit = iounit;
+        mAcceptorThread = new StyxThread();
+        mAcceptorThread->startRunnable(this);
+        isWorking = true;
+        return mAcceptorThread;
 }
