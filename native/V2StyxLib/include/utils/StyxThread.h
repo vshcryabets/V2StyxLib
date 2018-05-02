@@ -30,6 +30,7 @@ public:
 	int forceCancel(); //	pthread_cancel(mAcceptorThread);
 	int start(void* (*startPoint) (void *), void *arg);
 	int startRunnable(IRunnable* runnale);
+	int join(void **value_ptr = NULL); 
 	static void* threadIn(void *context);
 };
 

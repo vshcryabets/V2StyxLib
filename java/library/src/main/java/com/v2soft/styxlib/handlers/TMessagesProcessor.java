@@ -36,7 +36,7 @@ import java.util.List;
  * @author V.Shcriyabets (vshcryabets@gmail.com)
  *
  */
-public class TMessagesProcessor extends QueueMessagesProcessor implements IMessageProcessor {
+public class TMessagesProcessor extends QueueMessagesProcessor {
     protected ConnectionDetails mConnectionDetails;
     private static final int DEFAULT_PACKET_HEADER_SIZE = 24;
     private IVirtualStyxFile mRoot;

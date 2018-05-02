@@ -1,5 +1,6 @@
 package com.v2soft.styxlib.library;
 
+import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.handlers.TMessagesProcessor;
 import com.v2soft.styxlib.server.IChannelDriver;
 import com.v2soft.styxlib.types.ConnectionDetails;
@@ -36,14 +37,18 @@ public class StyxServerManager
         mDrivers = new LinkedList<IChannelDriver>();
     }
 
-    public StyxServerManager(IVirtualStyxFile root, IChannelDriver [] drivers) {
+    public StyxServerManager(IVirtualStyxFile root, IChannelDriver[] drivers) {
         this(root);
         for (IChannelDriver driver : drivers) {
-            addDriver( driver );
+            addDriver(driver);
         }
     }
 
     public StyxServerManager addDriver(IChannelDriver driver) {
+        if (mDriverThreads != null) {
+            // we already called start
+            throw new IllegalStateException("Start() already called");
+        }
         if (driver == null) {
             throw new NullPointerException("Driver is null");
         }
@@ -54,16 +59,18 @@ public class StyxServerManager
     }
 
     public Thread[] start() {
-        int count = mDrivers.size();
+        final int count = mDrivers.size();
+        final int ioUnit = getIOUnit();
         mDriverThreads = new Thread[count];
         for (int i = 0; i < count; i++) {
-            mDriverThreads[i] = mDrivers.get(i).start(getIOUnit());
+            mDriverThreads[i] = mDrivers.get(i).start(ioUnit);
         }
         return mDriverThreads;
     }
 
     /**
      * Get supported IO unit size.
+     *
      * @return supported IO unit size.
      */
     public int getIOUnit() {
@@ -80,13 +87,14 @@ public class StyxServerManager
 
     public void closeAndWait() throws IOException, InterruptedException {
         close();
-        for ( Thread thread : mDriverThreads ) {
+        for (Thread thread : mDriverThreads) {
             thread.join();
         }
     }
 
     /**
      * Get supported protocol name.
+     *
      * @return supported protocol name.
      */
     public String getProtocol() {

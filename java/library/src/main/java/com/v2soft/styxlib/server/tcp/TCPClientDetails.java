@@ -56,6 +56,7 @@ public class TCPClientDetails extends ClientDetails {
     }
 
     public void disconnect() throws IOException {
+        // TODO something wrong, close should in same place where we have opened it.
         mChannel.close();
         mChannel = null;
     }

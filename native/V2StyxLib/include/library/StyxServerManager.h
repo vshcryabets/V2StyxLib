@@ -15,14 +15,15 @@
 #include "handlers/TMessagesProcessor.h"
 
 class StyxServerManager {
-private:
+public:
 	static const StyxString PROTOCOL;
 	static const size_t DEFAULT_IOUNIT;
-
+protected:
 	std::vector<IChannelDriver*> mDrivers;
-	TMessagesProcessor *mBalancer;
+	TMessagesProcessor *mBalancer; // TODO can we remove pointer?
 	ConnectionAcceptor *mAcceptor;
 	IVirtualStyxFile *mRoot;
+	std::vector<StyxThread*> mDriverThreads;
 
 public:
 	static const size_t DEFAULT_TIMEOUT;
@@ -30,12 +31,12 @@ public:
 	StyxServerManager(IVirtualStyxFile *root, std::vector<IChannelDriver*> drivers = std::vector<IChannelDriver*>());
 	~StyxServerManager();
 
-	virtual StyxServerManager* addDriver(IChannelDriver* driver);
+	virtual StyxServerManager* addDriver(IChannelDriver* driver) throw(StyxException);
 
 	/**
 	 * start server
 	 */
-	virtual void start();
+	virtual std::vector<StyxThread*> start();
 	/**
 	 * stop server and realease all resources
 	 */

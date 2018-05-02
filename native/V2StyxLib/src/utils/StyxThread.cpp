@@ -66,3 +66,7 @@ int StyxThread::tryjoin(size_t timeoutMs) {
 int StyxThread::forceCancel() {
     return pthread_cancel(mThreadId);
 }
+
+int StyxThread::join(void **value_ptr) {
+    return pthread_join(mThreadId, value_ptr);
+}
