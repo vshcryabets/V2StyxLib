@@ -15,7 +15,7 @@ public interface IChannelDriver extends IMessageTransmitter {
     /**
      * Start channel driver thread.
      * @param iounit
-     * @return
+     * @return driver thread.
      */
     Thread start(int iounit);
     void setTMessageHandler(IMessageProcessor handler);
@@ -28,7 +28,16 @@ public interface IChannelDriver extends IMessageTransmitter {
      */
     Collection<ClientDetails> getClients();
 
+    /**
+     * Is connected to another peer?
+     * @return true if connected to another peer.
+     */
     boolean isConnected();
+
+    /**
+     * Is driver started?
+     * @return true if driver working.
+     */
     boolean isStarted();
 
     IMessageProcessor getTMessageHandler();

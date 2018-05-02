@@ -11,6 +11,7 @@
 #include "exceptions/StyxErrorMessageException.h"
 #include <vector>
 #include <unistd.h>
+#include <sstream>
 
 ClientDetails::ClientDetails(IChannelDriver* driver, uint32_t id)  {
 	mAssignedFiles = new std::map<StyxFID,IVirtualStyxFile*>();
@@ -29,4 +30,13 @@ void ClientDetails::registerOpenedFile(StyxFID fid, IVirtualStyxFile* file) {
 
 Polls *ClientDetails::getPolls() {
 	return mPolls;
+}
+
+StyxString ClientDetails::toString() {
+	std::stringstream stream;
+	stream << "id " << mClientId;
+	if ( mDriver != NULL ) {
+		stream << " driver " << mDriver->toString();
+	}
+	return stream.str();
 }

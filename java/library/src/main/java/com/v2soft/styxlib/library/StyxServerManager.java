@@ -12,6 +12,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
+ * Class that manage drivers.
  * @author V.Shcriyabets (vshcryabets@gmail.com)
  */
 public class StyxServerManager

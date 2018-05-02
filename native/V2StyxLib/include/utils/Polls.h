@@ -24,7 +24,7 @@ public:
 
     FIDPoll* getFIDPoll();
     MessageTagPoll* getTagPoll();
-    std::map<StyxTAG, StyxTMessage>* getMessagesMap();
+    std::map<StyxTAG, StyxTMessage*>* getMessagesMap();
     void releaseTag(StyxTAG tag);
     void releaseFID(StyxTMessageFID* message);
 };

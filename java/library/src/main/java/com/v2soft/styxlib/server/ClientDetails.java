@@ -15,15 +15,15 @@ import java.util.HashMap;
 public abstract class ClientDetails {
     protected HashMap<Long, IVirtualStyxFile> mAssignedFiles;
     protected IChannelDriver mDriver;
-    protected int mId;
-    protected Polls mPolls;
+    protected int mClientId;
+    protected Polls mPolls; // TODO probably we can move polls here, and remove Polls class
     protected Credentials mCredentials;
 
     public ClientDetails(IChannelDriver driver, int id) {
         if ( driver == null ) throw new NullPointerException("Driver is null");
         mAssignedFiles = new HashMap<>();
         mDriver = driver;
-        mId = id;
+        mClientId = id;
     }
 
     public void setCredentials(Credentials credential) {
@@ -71,20 +71,20 @@ public abstract class ClientDetails {
     }
 
     public int getId() {
-        return mId;
+        return mClientId;
     }
 
     @Override
     public int hashCode() {
-        return mDriver.hashCode()*mId;
+        return mDriver.hashCode()* mClientId;
     }
 
     @Override
     public String toString() {
         if ( mDriver != null ) {
-            return String.format("%d:%s", mId, mDriver.toString());
+            return String.format("%d:%s", mClientId, mDriver.toString());
         } else {
-            return String.format("%d", mId);
+            return String.format("%d", mClientId);
         }
     }
 }

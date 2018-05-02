@@ -49,7 +49,7 @@ public class TCPClientDetails extends ClientDetails {
     @Override
     public String toString() {
         try {
-            return String.format("%s:%d", mChannel.getRemoteAddress().toString(), mId);
+            return String.format("%s:%d", mChannel.getRemoteAddress().toString(), mClientId);
         } catch (IOException e) {
             return super.toString();
         }

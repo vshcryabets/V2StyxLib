@@ -9,6 +9,9 @@
 #include "handlers/QueueMessagesProcessor.h"
 #include "types.h"
 
+/**
+ * Class that processes RMessages (i.e answer from server).
+ */
 class RMessagesProcessor : public QueueMessagesProcessor {
 protected:
     size_t mReceivedCount;

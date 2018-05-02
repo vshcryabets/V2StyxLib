@@ -22,8 +22,8 @@ class ClientDetails {
 protected:
 	std::map<StyxFID,IVirtualStyxFile*> *mAssignedFiles;
 	IChannelDriver *mDriver;
-	uint32_t mId;
-	Polls* mPolls;
+	uint32_t mClientId;
+	Polls* mPolls; // TODO probably we can move polls here, and remove Polls class
 	Credentials *mCredentials;
 
 public:
@@ -46,6 +46,7 @@ public:
 
 	IChannelDriver* getDriver();
 	uint32_t getId();
+	virtual StyxString toString();
 };
 
 #endif /* CLIENTSTATE_H_ */
