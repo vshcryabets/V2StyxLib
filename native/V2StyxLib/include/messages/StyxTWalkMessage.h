@@ -15,18 +15,19 @@ class StyxTWalkMessage: public StyxTMessageFID {
 private:
 	StyxFID mNewFID;
 	StyxString mPath;
-	std::vector<StyxString*> *mPathElements;
+	std::vector<StyxString> mPathElements;
 public:
 	StyxTWalkMessage(StyxFID fid, StyxFID new_fid);
 	virtual ~StyxTWalkMessage();
 	uint32_t getNewFID();
-	std::vector<StyxString*>* getPathElements();
+	std::vector<StyxString>* getPathElements();
 	// =======================================================
 	// Virtual methods
 	// =======================================================
 	virtual void load(IStyxDataReader *buffer);
 	virtual void writeToBuffer(IStyxDataWriter* output);
 	virtual size_t getBinarySize();
+	StyxString getPath();
 };
 
 #endif /* STYXTWALKMESSAGE_H_ */

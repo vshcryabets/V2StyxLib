@@ -46,7 +46,7 @@ uint64_t StyxDataReader::getInteger(const size_t bytes) {
 
 }
 
-std::string StyxDataReader::readUTFString() {
+StyxString StyxDataReader::readUTFString() {
 	size_t count = readUInt16();
 	char* bytes = new char[count];
 	read((uint8_t*)bytes, count);

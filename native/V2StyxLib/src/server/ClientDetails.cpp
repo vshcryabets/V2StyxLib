@@ -53,3 +53,11 @@ IChannelDriver* ClientDetails::getDriver() {
 void ClientDetails::setCredentials(Credentials credentials) {
 	mCredentials = credentials;
 }
+
+void ClientDetails::unregisterClosedFile(StyxFID fid) {
+	std::map<StyxFID, IVirtualStyxFile*>::iterator it = mAssignedFiles.find(fid);
+	if (it == mAssignedFiles.end()) {
+		throw StyxErrorMessageException("Unknown FID (%d)", fid);
+	}
+	mAssignedFiles.erase(it);
+	}

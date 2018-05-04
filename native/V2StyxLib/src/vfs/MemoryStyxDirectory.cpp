@@ -87,12 +87,13 @@ size_t MemoryStyxDirectory::read(ClientDetails *client, uint8_t* buffer, uint64_
 	memcpy(buffer, preparedData->data() + offset, count);
 	return count;
 }
-IVirtualStyxFile* MemoryStyxDirectory::walk(std::vector<StyxString*> *pathElements, std::vector<StyxQID> *qids) {
+
+IVirtualStyxFile* MemoryStyxDirectory::walk(std::vector<StyxString> *pathElements, std::vector<StyxQID> *qids) {
 	if ( pathElements->size() > 0 ) {
-		StyxString* filename = *(pathElements->begin());
+		StyxString filename = *(pathElements->begin());
 		for ( FileList::iterator iterator = mFiles.begin(); iterator < mFiles.end(); iterator++ ) {
 			StyxString itemFileName = (*iterator)->getName();
-			if ( itemFileName.compare(*filename) == 0 ) {
+			if ( itemFileName.compare(filename) == 0 ) {
 				pathElements->erase(pathElements->begin());
 				qids->push_back((*iterator)->getQID());
 				return (*iterator)->walk(pathElements, qids);

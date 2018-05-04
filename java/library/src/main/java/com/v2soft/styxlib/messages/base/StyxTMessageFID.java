@@ -5,7 +5,6 @@ import com.v2soft.styxlib.io.IStyxDataWriter;
 import com.v2soft.styxlib.messages.base.enums.MessageType;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 
 public class StyxTMessageFID extends StyxTMessage {
     private long mFID;
@@ -45,14 +44,13 @@ public class StyxTMessageFID extends StyxTMessage {
 
     @Override
     public void writeToBuffer(IStyxDataWriter output)
-            throws UnsupportedEncodingException, IOException {
+            throws IOException {
         super.writeToBuffer(output);
         output.writeUInt32(mFID);
     }
 
     @Override
     public String toString() {
-        String result = super.toString();
-        return String.format("%s\tFID: %d", result, getFID());
+        return String.format("%s\tFID: %d", super.toString(), getFID());
     }
 }

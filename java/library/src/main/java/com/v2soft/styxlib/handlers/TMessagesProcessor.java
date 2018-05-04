@@ -4,7 +4,6 @@ import com.v2soft.styxlib.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.types.Credentials;
 import com.v2soft.styxlib.messages.StyxRAttachMessage;
 import com.v2soft.styxlib.messages.StyxRAuthMessage;
-import com.v2soft.styxlib.messages.StyxRErrorMessage;
 import com.v2soft.styxlib.messages.StyxROpenMessage;
 import com.v2soft.styxlib.messages.StyxRReadMessage;
 import com.v2soft.styxlib.messages.StyxRStatMessage;
@@ -188,7 +187,7 @@ public class TMessagesProcessor extends QueueMessagesProcessor {
             clientDetails.registerOpenedFile(msg.getNewFID(), walkFile);
             return new StyxRWalkMessage(msg.getTag(), QIDList);
         } else {
-            return new StyxRErrorMessage(msg.getTag(),
+            throw StyxErrorMessageException.newInstance(
                     String.format("file \"%s\" does not exist", msg.getPath()));
         }
     }
@@ -200,8 +199,7 @@ public class TMessagesProcessor extends QueueMessagesProcessor {
      * @throws IOException
      */
     private StyxMessage processOpen(ClientDetails clientDetails, StyxTOpenMessage msg) throws StyxErrorMessageException, IOException {
-        long fid = msg.getFID();
-        IVirtualStyxFile file = clientDetails.getAssignedFile(fid);
+        IVirtualStyxFile file = clientDetails.getAssignedFile(msg.getFID());
         if (file.open(clientDetails, msg.getMode())) {
             return new StyxROpenMessage(msg.getTag(), file.getQID(),
                     mConnectionDetails.getIOUnit() - DEFAULT_PACKET_HEADER_SIZE, false);
@@ -217,11 +215,8 @@ public class TMessagesProcessor extends QueueMessagesProcessor {
      */
     private StyxMessage processRemove(ClientDetails clientDetails, StyxTMessageFID msg)
             throws StyxErrorMessageException {
-        if (clientDetails.getAssignedFile(msg.getFID()).delete(clientDetails)) {
-            return new StyxMessage(MessageType.Rremove, msg.getTag());
-        } else {
-            return new StyxRErrorMessage(msg.getTag(), "Can't delete file");
-        }
+        clientDetails.getAssignedFile(msg.getFID()).deleteFile(clientDetails);
+        return new StyxMessage(MessageType.Rremove, msg.getTag());
     }
 
     /**
@@ -232,7 +227,7 @@ public class TMessagesProcessor extends QueueMessagesProcessor {
     private StyxMessage processCreate(ClientDetails clientDetails, StyxTCreateMessage msg)
             throws StyxErrorMessageException {
         final IVirtualStyxFile file = clientDetails.getAssignedFile(msg.getFID());
-        StyxQID qid = file.create(msg.getName(), msg.getPermissions(), msg.getMode());
+        StyxQID qid = file.createFile(msg.getName(), msg.getPermissions(), msg.getMode());
         return new StyxROpenMessage(msg.getTag(), qid, mConnectionDetails.getIOUnit(), true);
     }
 
@@ -247,24 +242,26 @@ public class TMessagesProcessor extends QueueMessagesProcessor {
      * @throws StyxErrorMessageException
      */
     private StyxMessage processWrite(ClientDetails clientDetails, StyxTWriteMessage msg) throws StyxErrorMessageException {
-        long fid = msg.getFID();
-        return new StyxRWriteMessage(msg.getTag(),
-                clientDetails.getAssignedFile(fid).write(clientDetails, msg.getData(), msg.getOffset()));
+        IVirtualStyxFile file = clientDetails.getAssignedFile(msg.getFID());
+        int count = file.write(clientDetails, msg.getData(), msg.getOffset());
+        return new StyxRWriteMessage(msg.getTag(), count);
     }
 
     /**
-     * Handle read operation
+     * Handle read operation.
      *
-     * @throws StyxErrorMessageException
+     * @throws StyxErrorMessageException in case of IO error.
      */
-    private StyxMessage processRead(ClientDetails clientDetails, StyxTReadMessage msg) throws StyxErrorMessageException {
+    private StyxMessage processRead(ClientDetails clientDetails, StyxTReadMessage msg)
+            throws StyxErrorMessageException {
         if (msg.getCount() > mConnectionDetails.getIOUnit()) {
-            return new StyxRErrorMessage(msg.getTag(), "IOUnit overflow");
+            throw StyxErrorMessageException.newInstance("IOUnit overflow");
         }
         long fid = msg.getFID();
+        IVirtualStyxFile file = clientDetails.getAssignedFile(fid);
         byte[] buffer = new byte[(int) msg.getCount()];
-        return new StyxRReadMessage(msg.getTag(), buffer,
-                (int) clientDetails.getAssignedFile(fid).read(clientDetails, buffer, msg.getOffset(), msg.getCount()));
+        int read = (int) file.read(clientDetails, buffer, msg.getOffset(), msg.getCount());
+        return new StyxRReadMessage(msg.getTag(), buffer, read);
     }
 
     public IVirtualStyxFile getRoot() {

@@ -18,7 +18,6 @@ private:
 public:
 	StyxTCreateMessage(StyxFID fid, StyxString name, uint32_t permissions, uint16_t mode);
 	virtual ~StyxTCreateMessage();
-	StyxFID getFID();
 
 	StyxString getName();
 	void setName(StyxString name);

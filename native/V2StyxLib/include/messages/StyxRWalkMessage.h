@@ -14,12 +14,10 @@
 
 class StyxRWalkMessage: public StyxMessage {
 private:
-	std::vector<StyxQID*> *mQIDList;
-	bool mDelete;
+	std::vector<StyxQID> mQIDList;
 public:
-	StyxRWalkMessage(StyxTAG tag, std::vector<StyxQID*> *QIDList);
+	StyxRWalkMessage(StyxTAG tag, std::vector<StyxQID> QIDList);
 	virtual ~StyxRWalkMessage();
-	void setDeleteQIDs(bool value);
 	// =======================================================
 	// Virtual methods
 	// =======================================================

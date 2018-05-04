@@ -7,7 +7,7 @@
 
 #include "messages/base/structs/StyxStat.h"
 
-StyxStat::StyxStat(IStyxDataReader *input) {
+StyxStat::StyxStat(IStyxDataReader *input) : mQID(StyxQID::EMPTY) {
 	//uint16_t size =
 	input->readUInt16(); // skip size bytes
 	mType = input->readUInt16();
@@ -25,7 +25,7 @@ StyxStat::StyxStat(IStyxDataReader *input) {
 
 StyxStat::StyxStat(uint16_t type, uint32_t dev, StyxQID qid, uint32_t mode, Date accessTime,
 		Date modificationTime, uint64_t length, StyxString name, StyxString userName,
-		StyxString groupName, StyxString modificationUser) {
+		StyxString groupName, StyxString modificationUser) : mQID(StyxQID::EMPTY) {
 	mType = type;
 	mDev = dev;
 	mQID = qid;

@@ -28,6 +28,7 @@ protected:
 	size_t mErrorPackets;
 	size_t mAnswerPackets;
 private:
+	static const size_t DEFAULT_PACKET_HEADER_SIZE = 24;
 	StyxMessage* processAttach(ClientDetails* clientDetails, StyxTAttachMessage* msg);
 	StyxMessage* processAuth(ClientDetails* clientDetails, StyxTAuthMessage* msg);
 	StyxMessage* processClunk(ClientDetails* clientDetails, StyxTMessageFID* msg) throw(StyxErrorMessageException);

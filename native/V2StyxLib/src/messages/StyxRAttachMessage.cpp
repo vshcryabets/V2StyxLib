@@ -1,5 +1,5 @@
 /*
- * StyxRVersionMessage.cpp
+ * StyxRAttachMessage.cpp
  *
  *  Created on: May 27, 2012
  *      Author: vschryabets@gmail.com

@@ -56,7 +56,7 @@ public:
 	 * @return number of bytes that was readed into the buffer
 	 */
 	size_t read(ClientDetails *client, uint8_t* buffer, uint64_t offset, size_t count);
-	virtual IVirtualStyxFile* walk(std::vector<StyxString*> *pathElements, std::vector<StyxQID> *qids);
+	virtual IVirtualStyxFile* walk(std::vector<StyxString> *pathElements, std::vector<StyxQID> *qids);
 	/**
 	 * Write data to file
 	 * @param client

@@ -28,6 +28,10 @@ public:
 	// =======================================================
 	// Virtual methods
 	// =======================================================
+	virtual void load(IStyxDataReader *buffer);
+	virtual void writeToBuffer(IStyxDataWriter *outputBuffer);
+	virtual size_t getBinarySize();
+	virtual StyxString toString();
 };
 
 #endif /* STYX_TMESSAGE_FID_H_ */

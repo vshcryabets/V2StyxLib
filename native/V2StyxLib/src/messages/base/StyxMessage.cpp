@@ -88,7 +88,7 @@ StyxMessage* StyxMessage::factory(IStyxDataReader* buffer, size_t io_unit) {
         result = new StyxRAttachMessage(tag, StyxQID::EMPTY);
         break;
     case Rwalk:
-        result = new StyxRWalkMessage(tag, NULL);
+        result = new StyxRWalkMessage(tag, std::vector<StyxQID>());
         break;
 	case Topen:
 		result = new StyxTOpenMessage(NOFID, OREAD);
@@ -106,7 +106,7 @@ StyxMessage* StyxMessage::factory(IStyxDataReader* buffer, size_t io_unit) {
 		result = new StyxTReadMessage(NOFID, 0, 0);
 		break;
     case Rread:
-        result = new StyxRReadMessage(tag, NULL, 0);
+        result = new StyxRReadMessage(tag, StyxBuffer(0), 0);
         break;
 	case Twrite:
 		result = new StyxTWriteMessage(NOFID, 0, NULL, 0);

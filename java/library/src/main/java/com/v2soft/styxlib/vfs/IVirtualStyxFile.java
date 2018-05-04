@@ -70,14 +70,9 @@ public interface IVirtualStyxFile {
      * @param data the data
      * @param offset offset from begining of the file
      * @return return the number of bytes written
-     * @throws StyxErrorMessageException
+     * @throws StyxErrorMessageException in case of any error.
      */
-    public int write(ClientDetails clientDetails, byte[] data, ULong offset) throws StyxErrorMessageException;
-    /**
-     * Will be fired when client close connection to this server
-     * @param client client information
-     */
-    void onConnectionClosed(ClientDetails client);
+    int write(ClientDetails clientDetails, byte[] data, ULong offset) throws StyxErrorMessageException;
 
     /**
      * Will be fired when client connect to this server
@@ -86,22 +81,28 @@ public interface IVirtualStyxFile {
     void onConnectionOpened(ClientDetails client);
 
     /**
+     * Will be fired when client close connection to this server
+     * @param client client information
+     */
+    void onConnectionClosed(ClientDetails client);
+
+    /**
      * Create new child file
      * @param name new file name
      * @param permissions file access permissions
-     * @param mode create mode
+     * @param mode createFile mode
      * @return QID of new file
      */
-    public StyxQID create(String name, long permissions, int mode)
+    StyxQID createFile(String name, long permissions, int mode)
             throws StyxErrorMessageException;
     /**
      * Delete this file
      */
-    public boolean delete(ClientDetails clientDetails);
+    void deleteFile(ClientDetails clientDetails) throws StyxErrorMessageException;
 
     /**
      * Release all resources.
      */
-    public void release() throws IOException;
+    void release() throws IOException;
 
 }

@@ -58,6 +58,10 @@ public abstract class ClientDetails {
         return mAssignedFiles.get(fid);
     }
 
+    /**
+     * Remove specified file from map.
+     * @param fid File ID.
+     */
     public void unregisterClosedFile(long fid) {
         mAssignedFiles.remove(fid);
     }

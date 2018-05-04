@@ -57,11 +57,15 @@ extends StyxTMessageFID {
     {
         return mNewFID;
     }
+
+    /**
+     * Get request path in "/" separated form.
+     * @return request path.
+     */
     public String getPath()	{
         StringBuilder builder = new StringBuilder();
         for (String string : mPathElements) {
-            builder.append('/');
-            builder.append(string);
+            builder.append('/').append(string);
         }
         return builder.toString();
     }

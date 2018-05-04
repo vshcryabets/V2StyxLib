@@ -140,9 +140,12 @@ public class DiskStyxFile extends MemoryStyxFile {
     }
 
     @Override
-    public boolean delete(ClientDetails clientDetails) {
-        super.delete(clientDetails);
-        return mFile.delete();
+    public void deleteFile(ClientDetails clientDetails)
+            throws StyxErrorMessageException {
+        super.deleteFile(clientDetails);
+        if (!mFile.delete()) {
+            throw StyxErrorMessageException.newInstance("Can't deleteFile file");
+        }
     }
 
     @Override

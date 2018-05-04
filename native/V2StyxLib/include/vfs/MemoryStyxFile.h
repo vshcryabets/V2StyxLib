@@ -63,7 +63,7 @@ public:
 	 * @return number of bytes that was read into the buffer
 	 */
 	virtual size_t read(ClientDetails *client, uint8_t* buffer, uint64_t offset, size_t count);
-	virtual IVirtualStyxFile* walk(std::vector<StyxString*> *pathElements, std::vector<StyxQID> *qids);
+	virtual IVirtualStyxFile* walk(std::vector<StyxString> *pathElements, std::vector<StyxQID> *qids);
 	/**
 	 * Write data to file
 	 * @param client
@@ -77,6 +77,7 @@ public:
 	 * @param state
 	 */
 	virtual void onConnectionClosed(ClientDetails *state);
+	virtual void onConnectionOpened(ClientDetails* client);
 };
 
 #endif /* MEMORYSTYXFILE_H_ */

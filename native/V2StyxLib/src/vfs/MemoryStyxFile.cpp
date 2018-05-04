@@ -79,7 +79,7 @@ bool MemoryStyxFile::open(ClientDetails *client, int mode) {
 	);
 	return result;
 }
-IVirtualStyxFile* MemoryStyxFile::walk(std::vector<StyxString*> *pathElements, std::vector<StyxQID> *qids) {
+IVirtualStyxFile* MemoryStyxFile::walk(std::vector<StyxString> *pathElements, std::vector<StyxQID> *qids) {
 	return this;
 }
 size_t MemoryStyxFile::write(ClientDetails *client, uint8_t* data, uint64_t offset, size_t count) {

@@ -7,8 +7,9 @@
 #ifndef IVirtualStyxFile_H_
 #define IVirtualStyxFile_H_
 #include <string>
-#include "../classes.h"
-#include "../types.h"
+#include "classes.h"
+#include "types.h"
+#include "exceptions/StyxErrorMessageException.h"
 #include <vector>
 using namespace std;
 
@@ -54,7 +55,7 @@ public:
 	 * @return number of bytes that was read into the buffer
 	 */
 	virtual size_t read(ClientDetails *client, uint8_t* buffer, uint64_t offset, size_t count) = 0;
-	virtual IVirtualStyxFile* walk(std::vector<StyxString*> *pathElements, std::vector<StyxQID> *qids) = 0;
+	virtual IVirtualStyxFile* walk(std::vector<StyxString> *pathElements, std::vector<StyxQID> *qids) = 0;
 	/**
 	 * Write data to file
 	 * @param client
@@ -63,10 +64,32 @@ public:
 	 * @return
 	 */
 	virtual size_t write(ClientDetails *client, uint8_t* data, uint64_t offset, size_t count) = 0;
+
+ 	/**
+     * Will be fired when client connect to this server
+     * @param client client information
+     */
+    virtual void onConnectionOpened(ClientDetails* client) = 0;
+
     /**
      * Will be called when client close connection to this server
      * @param state
      */
    virtual void onConnectionClosed(ClientDetails *state) = 0;
+
+	/**
+     * Create new child file
+     * @param name new file name
+     * @param permissions file access permissions
+     * @param mode create mode
+     * @return QID of new file
+     */
+    virtual StyxQID createFile(StyxString name, long permissions, int mode) throw(StyxErrorMessageException) = 0;
+
+	/**
+     * Delete this file
+     */
+    virtual void deleteFile(ClientDetails* clientDetails) throw(StyxErrorMessageException) = 0;
+
 };
 #endif

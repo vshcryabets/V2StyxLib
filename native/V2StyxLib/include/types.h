@@ -9,6 +9,7 @@
 #define TYPES_H_
 #include <stdint.h>
 #include <string>
+#include <vector>
 
 // typedef unsigned char uint8_t;
 // typedef unsigned short uint16_t;
@@ -83,6 +84,7 @@ typedef uint8_t MessageType;
 typedef uint32_t StyxFID;
 typedef uint16_t StyxTAG;
 typedef std::string StyxString;
+typedef std::vector<uint8_t> StyxBuffer;
 typedef ModeTypeEnum StyxMode;
 
 class Credentials {

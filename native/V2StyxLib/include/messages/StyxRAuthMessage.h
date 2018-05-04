@@ -6,11 +6,11 @@
 #ifndef STYXRAUTHMESSAGE_H_
 #define STYXRAUTHMESSAGE_H_
 #include "messages/base/structs/StyxQID.h"
-#include "./messages/base/StyxRSingleQIDMessage.h"
+#include "messages/base/StyxRSingleQIDMessage.h"
 
 class StyxRAuthMessage : public StyxRSingleQIDMessage {
 public:
-	StyxRAuthMessage(StyxTAG tag, const StyxQID *qid);
+	StyxRAuthMessage(StyxTAG tag, StyxQID qid);
 	virtual ~StyxRAuthMessage();
 };
 

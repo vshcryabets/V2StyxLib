@@ -9,14 +9,14 @@
 #define STYXRREADMESSAGE_H_
 
 #include "messages/base/StyxMessage.h"
+#include "types.h"
 
 class StyxRReadMessage: public StyxMessage {
 private:
-	uint8_t *mData;
+	StyxBuffer mData;
 	size_t mDataLength;
-	bool mDelete;
 public:
-	StyxRReadMessage(StyxTAG tag, uint8_t *data, size_t length);
+	StyxRReadMessage(StyxTAG tag, StyxBuffer data, size_t length);
 	virtual ~StyxRReadMessage();
 	// =======================================================
 	// Virtual methods
