@@ -20,17 +20,17 @@
 
 class ClientDetails {
 protected:
-	std::map<StyxFID,IVirtualStyxFile*> *mAssignedFiles;
+	std::map<StyxFID,IVirtualStyxFile*> mAssignedFiles;
 	IChannelDriver *mDriver;
 	uint32_t mClientId;
 	Polls* mPolls; // TODO probably we can move polls here, and remove Polls class
-	Credentials *mCredentials;
+	Credentials mCredentials;
 
 public:
 	ClientDetails(IChannelDriver* driver, uint32_t id);
 	~ClientDetails();
-	void setCredentials(Credentials *credentials);
-	Credentials* getCredentials();
+	void setCredentials(Credentials credentials);
+	Credentials getCredentials();
 
     /**
      * Get polls assigned to this client.
@@ -38,10 +38,9 @@ public:
      */
     Polls *getPolls();
 
-    IVirtualStyxFile* getAssignedFile(long fid) throw(StyxErrorMessageException);
+    IVirtualStyxFile* getAssignedFile(StyxFID fid) throw(StyxErrorMessageException);
 
-    void closeFile(StyxFID fid);
-
+    void unregisterClosedFile(StyxFID fid);
 	void registerOpenedFile(StyxFID fid, IVirtualStyxFile *file);
 
 	IChannelDriver* getDriver();

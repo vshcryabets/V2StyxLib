@@ -13,19 +13,16 @@
 #include <unistd.h>
 #include <sstream>
 
-ClientDetails::ClientDetails(IChannelDriver* driver, uint32_t id)  {
-	mAssignedFiles = new std::map<StyxFID,IVirtualStyxFile*>();
+ClientDetails::ClientDetails(IChannelDriver* driver, uint32_t id) : mCredentials("", "") {
 	mPolls = new Polls();
 }
 
 ClientDetails::~ClientDetails() {
 	delete mPolls;
-	delete mAssignedFiles;
 }
 
 void ClientDetails::registerOpenedFile(StyxFID fid, IVirtualStyxFile* file) {
-	mAssignedFiles->insert(
-			std::pair<StyxFID, IVirtualStyxFile*>(fid, file));
+	mAssignedFiles.insert(std::pair<StyxFID, IVirtualStyxFile*>(fid, file));
 }
 
 Polls *ClientDetails::getPolls() {
@@ -39,4 +36,20 @@ StyxString ClientDetails::toString() {
 		stream << " driver " << mDriver->toString();
 	}
 	return stream.str();
+}
+
+IVirtualStyxFile* ClientDetails::getAssignedFile(StyxFID fid) throw(StyxErrorMessageException) {
+	std::map<StyxFID, IVirtualStyxFile*>::iterator it = mAssignedFiles.find(fid);
+	if (it == mAssignedFiles.end() ) {
+		throw StyxErrorMessageException("Unknown FID (%d)", fid);
+	}
+	return it->second;
+}
+
+IChannelDriver* ClientDetails::getDriver() {
+	return mDriver;
+}
+
+void ClientDetails::setCredentials(Credentials credentials) {
+	mCredentials = credentials;
 }

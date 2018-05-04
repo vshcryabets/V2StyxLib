@@ -7,7 +7,7 @@
 
 #include "messages/StyxRAttachMessage.h"
 
-StyxRAttachMessage::StyxRAttachMessage(int tag, const StyxQID qid)
+StyxRAttachMessage::StyxRAttachMessage(StyxTAG tag, const StyxQID qid)
 	: StyxRSingleQIDMessage( Rattach, tag, qid ) {
 }
 

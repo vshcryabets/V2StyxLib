@@ -7,7 +7,7 @@
 
 DiskStyxFile::DiskStyxFile(std::string name):
 	MemoryStyxFile(name) {
-	mQID->setType(QTDIR);
+	mQID.setType(QTDIR);
 	mStat->setMode(getMode());
 }
 

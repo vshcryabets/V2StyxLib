@@ -158,9 +158,8 @@ public class MemoryStyxFile implements IVirtualStyxFile {
     @Override
     public StyxQID create(String name, long permissions, int mode)
             throws StyxErrorMessageException {
-        StyxErrorMessageException.doException(
+        throw StyxErrorMessageException.newInstance(
                 "Can't create file, this is read-only file system.");
-        return null;
     }
 
     @Override

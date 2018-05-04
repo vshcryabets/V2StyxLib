@@ -12,7 +12,7 @@ StyxStat::StyxStat(IStyxDataReader *input) {
 	input->readUInt16(); // skip size bytes
 	mType = input->readUInt16();
 	mDev = input->readUInt32();
-	mQID = new StyxQID(input);
+	mQID = StyxQID(input);
 	mMode = input->readUInt32();
 	mAccessTime = input->readUInt32();
 	mModificationTime = input->readUInt32();
@@ -21,9 +21,9 @@ StyxStat::StyxStat(IStyxDataReader *input) {
 	mUserName = input->readUTFString();
 	mGroupName = input->readUTFString();
 	mModificationUser = input->readUTFString();
-	mNeedDelete = true;
 }
-StyxStat::StyxStat(uint16_t type, uint32_t dev, StyxQID *qid, uint32_t mode, Date accessTime,
+
+StyxStat::StyxStat(uint16_t type, uint32_t dev, StyxQID qid, uint32_t mode, Date accessTime,
 		Date modificationTime, uint64_t length, StyxString name, StyxString userName,
 		StyxString groupName, StyxString modificationUser) {
 	mType = type;
@@ -37,14 +37,11 @@ StyxStat::StyxStat(uint16_t type, uint32_t dev, StyxQID *qid, uint32_t mode, Dat
 	mUserName = userName;
 	mGroupName = groupName;
 	mModificationUser = modificationUser;
-	mNeedDelete = false;
 }
+
 StyxStat::~StyxStat() {
-	if ( mNeedDelete ) {
-		delete mQID;
-		mQID = NULL;
-	}
 }
+
 uint16_t StyxStat::getSize() {
 	return 28 + StyxQID::CONTENT_SIZE
 			+ 2 + mName.length() +
@@ -56,7 +53,7 @@ size_t StyxStat::writeBinaryTo(IStyxDataWriter *output) {
 	output->writeUInt16(getSize() - 2); // TODO -2??? what does it mean?
 	output->writeUInt16(mType);
 	output->writeUInt32(mDev);
-	mQID->writeBinaryTo(output);
+	mQID.writeBinaryTo(output);
 	output->writeUInt32(mMode);
 	output->writeUInt32(mAccessTime);
 	output->writeUInt32(mModificationTime);

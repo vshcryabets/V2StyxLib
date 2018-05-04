@@ -32,7 +32,7 @@ public class StyxTAuthMessage extends StyxTMessageFID {
 	}
 
 	public void setUserName(String userName) {
-		mUserName = user_name;
+		mUserName = userName;
 	}
 
 	public String getMountPoint() {

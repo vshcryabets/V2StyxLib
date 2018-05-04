@@ -17,7 +17,7 @@ class MemoryStyxFile: public IVirtualStyxFile {
 protected:
 	StyxString mName;
 	StyxString mOwner;
-	StyxQID *mQID;
+	StyxQID mQID;
 	StyxStat *mStat;
 public:
 	MemoryStyxFile(std::string name);
@@ -28,7 +28,7 @@ public:
 	/**
 	 * @return unic ID of the file
 	 */
-	virtual StyxQID* getQID();
+	virtual StyxQID getQID();
 
 	virtual StyxStat* getStat();
 	/**
@@ -63,7 +63,7 @@ public:
 	 * @return number of bytes that was read into the buffer
 	 */
 	virtual size_t read(ClientDetails *client, uint8_t* buffer, uint64_t offset, size_t count);
-	virtual IVirtualStyxFile* walk(std::vector<StyxString*> *pathElements, std::vector<StyxQID*> *qids);
+	virtual IVirtualStyxFile* walk(std::vector<StyxString*> *pathElements, std::vector<StyxQID> *qids);
 	/**
 	 * Write data to file
 	 * @param client

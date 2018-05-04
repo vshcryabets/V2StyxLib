@@ -9,11 +9,11 @@
 #define STYXRATTACHMESSAGE_H_
 #include <string>
 #include "messages/base/structs/StyxQID.h"
-#include "./messages/base/StyxRSingleQIDMessage.h"
+#include "messages/base/StyxRSingleQIDMessage.h"
 
 class StyxRAttachMessage : public StyxRSingleQIDMessage {
 public:
-	StyxRAttachMessage(int tag, const StyxQID qid);
+	StyxRAttachMessage(StyxTAG tag, const StyxQID qid);
 	virtual ~StyxRAttachMessage();
 };
 

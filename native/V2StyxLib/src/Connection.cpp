@@ -63,7 +63,7 @@ void Connection::sendVersionMessage() throw(StyxException) {
         mDetails = ConnectionDetails(getProtocol(), rVersion->getMaxPacketSize());
     }
     mRecepient->getPolls()->getFIDPoll()->clean();
-    if ((mCredentials.getUserName() != NULL) && (mCredentials.getPassword() != NULL)) {
+    if ((!mCredentials.getUserName().empty()) && (!mCredentials.getPassword().empty())) {
         sendAuthMessage();
     } else {
         sendAttachMessage();
@@ -79,7 +79,7 @@ void Connection::sendAuthMessage() throw() {
 	mAuthFID = mRecepient->getPolls()->getFIDPoll()->getFreeItem();
 
 	StyxTAuthMessage tAuth(mAuthFID);
-	tAuth.setUserName(*mCredentials.getUserName());
+	tAuth.setUserName(mCredentials.getUserName());
 	tAuth.setMountPoint(mMountPoint);
 	mTransmitter->sendMessage(&tAuth, mRecepient);
 
@@ -99,7 +99,7 @@ void Connection::sendAuthMessage() throw() {
 void Connection::sendAttachMessage() throw() {
 	mFID = mRecepient->getPolls()->getFIDPoll()->getFreeItem();
 	StyxTAttachMessage tAttach(getRootFID(), mAuthFID,
-			*mCredentials.getUserName(),
+			mCredentials.getUserName(),
 			mMountPoint);
 	mTransmitter->sendMessage(&tAttach, mRecepient);
 

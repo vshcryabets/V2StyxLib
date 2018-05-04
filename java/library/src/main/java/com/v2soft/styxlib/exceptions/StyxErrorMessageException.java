@@ -23,13 +23,7 @@ public class StyxErrorMessageException extends StyxException {
         throw new StyxErrorMessageException(rError);
     }
 
-    public static void doException(String message)
-            throws StyxErrorMessageException {
-        throw newInstance(message);
-    }
-
-    public static StyxErrorMessageException newInstance(String message)
-            throws StyxErrorMessageException {
+    public static StyxErrorMessageException newInstance(String message) {
         if (message == null)
             throw new NullPointerException("Message is null");
         return new StyxErrorMessageException(new StyxRErrorMessage(StyxMessage.NOTAG, message));

@@ -9,21 +9,14 @@
 #include <iostream>
 
 StyxException::StyxException(const char *message, ...) {
-	char buf[4096];
 	va_list arglist;
 	va_start( arglist, message );
-	vsnprintf(buf, sizeof(buf), message, arglist);
+	setMessage(message, arglist);
 	va_end( arglist );
-	this->mMessage = StyxString(buf);
 }
 
-StyxException::StyxException(StyxString message, ...) {
-	char buf[4096];
-	va_list arglist;
-	va_start( arglist, message );
-	vsnprintf(buf, sizeof(buf), message.c_str(), arglist);
-	va_end( arglist );
-	this->mMessage = StyxString(buf);
+StyxException::StyxException() {
+	
 }
 
 StyxException::~StyxException() {
@@ -32,4 +25,14 @@ StyxException::~StyxException() {
 
 void StyxException::printStackTrace() {
 	std::cerr << mMessage << std::endl;
+}
+
+StyxString StyxException::getMessage() {
+	return mMessage;
+}
+
+void StyxException::setMessage(const char *format, va_list arglist) {
+	char buf[4096];
+	vsnprintf(buf, sizeof(buf), format, arglist);
+	this->mMessage = StyxString(buf);
 }

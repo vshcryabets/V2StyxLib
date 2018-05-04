@@ -14,10 +14,12 @@ class StyxException {
 private:
 	StyxString mMessage;
 public:
+	StyxException();
 	StyxException(const char *format, ...);
-	StyxException(StyxString message, ...);
+	void setMessage(const char *format, va_list list);
 	virtual ~StyxException();
 	virtual void printStackTrace();
+	StyxString getMessage();
 };
 
 #endif /* STYXEXCEPTION_H_ */

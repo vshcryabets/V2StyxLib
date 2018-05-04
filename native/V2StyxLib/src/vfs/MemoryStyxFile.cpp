@@ -8,9 +8,9 @@
 #include "vfs/MemoryStyxFile.h"
 #include "messages/base/structs/StyxQID.h"
 
-MemoryStyxFile::MemoryStyxFile(std::string name) {
+MemoryStyxFile::MemoryStyxFile(std::string name)
+	: mQID(QTFILE, 0, (uint64_t)this) {
 	mName = name;
-	mQID = new StyxQID(QTFILE, 0, (uint64_t)this);
 	mOwner = "nobody";
 	mStat = new StyxStat(0,
 			1,
@@ -26,14 +26,13 @@ MemoryStyxFile::MemoryStyxFile(std::string name) {
 }
 
 MemoryStyxFile::~MemoryStyxFile() {
-	delete mQID;
 	delete mStat;
 }
 
 /**
  * @return unic ID of the file
  */
-StyxQID* MemoryStyxFile::getQID() {
+StyxQID MemoryStyxFile::getQID() {
 	return mQID;
 }
 
@@ -80,7 +79,7 @@ bool MemoryStyxFile::open(ClientDetails *client, int mode) {
 	);
 	return result;
 }
-IVirtualStyxFile* MemoryStyxFile::walk(std::vector<StyxString*> *pathElements, std::vector<StyxQID*> *qids) {
+IVirtualStyxFile* MemoryStyxFile::walk(std::vector<StyxString*> *pathElements, std::vector<StyxQID> *qids) {
 	return this;
 }
 size_t MemoryStyxFile::write(ClientDetails *client, uint8_t* data, uint64_t offset, size_t count) {

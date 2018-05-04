@@ -16,7 +16,7 @@ class StyxStat {
 private:
 	uint16_t mType; //for kernel use
 	uint32_t mDev; //for kernel use
-	StyxQID *mQID;
+	StyxQID mQID;
 	uint32_t mMode; // permissions and flags
 	Date mAccessTime; // last access time
 	Date mModificationTime; // last modification time
@@ -25,10 +25,9 @@ private:
 	StyxString mUserName; //owner name
 	StyxString mGroupName; //group name
 	StyxString mModificationUser; //name of the user who last modified the file
-	bool mNeedDelete;
 public:
 	StyxStat(IStyxDataReader *input);
-	StyxStat(uint16_t type, uint32_t dev, StyxQID *qid, uint32_t mode, Date accessTime,
+	StyxStat(uint16_t type, uint32_t dev, StyxQID qid, uint32_t mode, Date accessTime,
             Date modificationTime, uint64_t length, StyxString name, StyxString userName,
             StyxString groupName, StyxString modificationUser);
 	virtual ~StyxStat();

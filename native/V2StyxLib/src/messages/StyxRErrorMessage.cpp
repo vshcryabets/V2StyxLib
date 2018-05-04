@@ -32,3 +32,7 @@ size_t StyxRErrorMessage::getBinarySize() {
 	return StyxMessage::getBinarySize()
 		+ mMessage.size()+2;
 }
+
+StyxString StyxRErrorMessage::getError() {
+	return mMessage;
+}

@@ -31,8 +31,8 @@ void RMessagesProcessor::processPacket(StyxMessage *message, ClientDetails *clie
 	}
 	StyxTMessage* tMessage = it->second;
 	// TODO i'm not sure that this is proper place for that logic
-	if (tMessage->getType() == MessageTypeEnum::Tclunk ||
-			tMessage->getType() == MessageTypeEnum::Tremove) {
+	if (tMessage->getType() == Tclunk ||
+			tMessage->getType() == Tremove) {
 		client->getPolls()->releaseFID((StyxTMessageFID*) tMessage);
 	}
 	try {
@@ -40,7 +40,7 @@ void RMessagesProcessor::processPacket(StyxMessage *message, ClientDetails *clie
 	} catch (StyxException e) {
 		e.printStackTrace();
 	}
-	if (message->getType() == MessageTypeEnum::Rerror) {
+	if (message->getType() == Rerror) {
 		mErrorCount++;
 	}
 	client->getPolls()->releaseTag(tag);

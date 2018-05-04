@@ -14,7 +14,7 @@
 
 MemoryStyxDirectory::MemoryStyxDirectory(std::string name):
 	MemoryStyxFile(name) {
-	mQID->setType(QTDIR);
+	mQID.setType(QTDIR);
 	mStat->setMode(getMode());
 }
 
@@ -87,7 +87,7 @@ size_t MemoryStyxDirectory::read(ClientDetails *client, uint8_t* buffer, uint64_
 	memcpy(buffer, preparedData->data() + offset, count);
 	return count;
 }
-IVirtualStyxFile* MemoryStyxDirectory::walk(std::vector<StyxString*> *pathElements, std::vector<StyxQID*> *qids) {
+IVirtualStyxFile* MemoryStyxDirectory::walk(std::vector<StyxString*> *pathElements, std::vector<StyxQID> *qids) {
 	if ( pathElements->size() > 0 ) {
 		StyxString* filename = *(pathElements->begin());
 		for ( FileList::iterator iterator = mFiles.begin(); iterator < mFiles.end(); iterator++ ) {

@@ -19,7 +19,7 @@ public:
 	/**
 	 * @return unic ID of the file
 	 */
-	virtual StyxQID* getQID() = 0;
+	virtual StyxQID getQID() = 0;
 
 	virtual StyxStat* getStat() = 0;
 	/**
@@ -54,7 +54,7 @@ public:
 	 * @return number of bytes that was read into the buffer
 	 */
 	virtual size_t read(ClientDetails *client, uint8_t* buffer, uint64_t offset, size_t count) = 0;
-	virtual IVirtualStyxFile* walk(std::vector<StyxString*> *pathElements, std::vector<StyxQID*> *qids) = 0;
+	virtual IVirtualStyxFile* walk(std::vector<StyxString*> *pathElements, std::vector<StyxQID> *qids) = 0;
 	/**
 	 * Write data to file
 	 * @param client

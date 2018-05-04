@@ -16,9 +16,8 @@ class StyxRErrorMessage : public StyxMessage {
 private:
 	StyxString mMessage;
 public:
-	StyxRErrorMessage(StyxTAG tag, std::string message);
+	StyxRErrorMessage(StyxTAG tag, StyxString message);
 	StyxRErrorMessage(StyxTAG tag, const char *message);
-//	StyxRErrorMessage(StyxTAG tag, const char *fmt, ...);
 	virtual ~StyxRErrorMessage();
 	// =======================================================
 	// Virtual methods
@@ -26,6 +25,7 @@ public:
 	virtual void load(IStyxDataReader *buffer);
 	virtual void writeToBuffer(IStyxDataWriter* output);
 	virtual size_t getBinarySize();
+	virtual StyxString getError();
 };
 
 #endif /* STYXRERRORMESSAGE_H_ */

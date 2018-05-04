@@ -12,14 +12,12 @@
 #include "exceptions/StyxException.h"
 
 
-class StyxErrorMessageException {
-private:
-	StyxRErrorMessage *mMessage;
+class StyxErrorMessageException : public StyxException {
 public:
-	StyxErrorMessageException(const char *message);
+	StyxErrorMessageException(const char *message, ...);
 	StyxErrorMessageException(StyxRErrorMessage *message);
 	virtual ~StyxErrorMessageException();
-	StyxRErrorMessage* getErrorMessage();
+	StyxRErrorMessage* constructErrorMessage();
 	static void checkException(StyxMessage* answer) throw(StyxException);
 };
 

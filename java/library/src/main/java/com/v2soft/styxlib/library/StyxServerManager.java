@@ -31,17 +31,16 @@ public class StyxServerManager
     protected IVirtualStyxFile mRoot;
     protected Thread[] mDriverThreads;
 
-    public StyxServerManager(IVirtualStyxFile root) {
+    public StyxServerManager(IVirtualStyxFile root, IChannelDriver[] drivers) {
         mRoot = root;
+        // TODO inheritance not works in constructor
         ConnectionDetails details = new ConnectionDetails(getProtocol(), getIOUnit());
         mBalancer = new TMessagesProcessor(details, root);
-        mDrivers = new LinkedList<IChannelDriver>();
-    }
-
-    public StyxServerManager(IVirtualStyxFile root, IChannelDriver[] drivers) {
-        this(root);
-        for (IChannelDriver driver : drivers) {
-            addDriver(driver);
+        mDrivers = new LinkedList<>();
+        if (drivers != null) {
+            for (IChannelDriver driver : drivers) {
+                addDriver(driver);
+            }
         }
     }
 

@@ -52,7 +52,7 @@ public abstract class QueueMessagesProcessor implements IMessageProcessor {
                     if ( pair != null ) {
                         try {
                             processPacket(pair.mMessage, pair.mTransmitter);
-                        } catch (IOException e) {
+                        } catch (Exception e) {
                             e.printStackTrace();
                         }
                     }

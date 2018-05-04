@@ -52,13 +52,13 @@ public abstract class ClientDetails {
 
     public IVirtualStyxFile getAssignedFile(long fid) throws StyxErrorMessageException {
         if ( !mAssignedFiles.containsKey(fid) ) {
-            StyxErrorMessageException.doException(
+            throw StyxErrorMessageException.newInstance(
                     String.format("Unknown FID (%d)", fid));
         }
         return mAssignedFiles.get(fid);
     }
 
-    public void closeFile(long fid) {
+    public void unregisterClosedFile(long fid) {
         mAssignedFiles.remove(fid);
     }
 

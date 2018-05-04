@@ -11,10 +11,33 @@
 #include "types.h"
 #include "vfs/IVirtualStyxFile.h"
 #include "handlers/QueueMessagesProcessor.h"
+#include "messages/StyxTAttachMessage.h"
+#include "messages/StyxTAuthMessage.h"
+#include "messages/StyxTWalkMessage.h"
+#include "messages/StyxTOpenMessage.h"
+#include "messages/StyxTReadMessage.h"
+#include "messages/StyxTWriteMessage.h"
+#include "messages/StyxTWStatMessage.h"
+#include "messages/StyxTCreateMessage.h"
 
 class TMessagesProcessor : public QueueMessagesProcessor {
 protected:
 	ConnectionDetails mConnectionDetails;
+	IVirtualStyxFile *mRoot;
+	size_t mHandledPackets;
+	size_t mErrorPackets;
+	size_t mAnswerPackets;
+private:
+	StyxMessage* processAttach(ClientDetails* clientDetails, StyxTAttachMessage* msg);
+	StyxMessage* processAuth(ClientDetails* clientDetails, StyxTAuthMessage* msg);
+	StyxMessage* processClunk(ClientDetails* clientDetails, StyxTMessageFID* msg) throw(StyxErrorMessageException);
+	StyxMessage* processWalk(ClientDetails* clientDetails, StyxTWalkMessage* msg) throw(StyxErrorMessageException);
+	StyxMessage* processOpen(ClientDetails* clientDetails, StyxTOpenMessage* msg) throw(StyxErrorMessageException);
+	StyxMessage* processRead(ClientDetails* clientDetails, StyxTReadMessage* msg) throw(StyxErrorMessageException);
+	StyxMessage* processWrite(ClientDetails* clientDetails, StyxTWriteMessage* msg) throw(StyxErrorMessageException);
+	StyxMessage* processWStat(ClientDetails* clientDetails, StyxTWStatMessage* msg) throw(StyxErrorMessageException);
+	StyxMessage* processCreate(ClientDetails* clientDetails, StyxTCreateMessage* msg) throw(StyxErrorMessageException);
+	StyxMessage* processRemove(ClientDetails* clientDetails, StyxTMessageFID* msg) throw(StyxErrorMessageException);
 public:
 	TMessagesProcessor(ConnectionDetails details, IVirtualStyxFile *root);
 	virtual ~TMessagesProcessor();

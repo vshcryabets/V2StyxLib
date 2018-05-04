@@ -7,20 +7,24 @@
 
 #include "exceptions/StyxErrorMessageException.h"
 
-StyxErrorMessageException::StyxErrorMessageException(StyxRErrorMessage *message) {
-	mMessage = message;
+StyxErrorMessageException::StyxErrorMessageException(StyxRErrorMessage *message) 
+	: StyxException(message->getError().c_str()) {
 }
 
-StyxErrorMessageException::StyxErrorMessageException(const char *message) {
-	mMessage = new StyxRErrorMessage(StyxMessage::NOTAG, message);
+StyxErrorMessageException::StyxErrorMessageException(const char *message, ...) {
+	va_list va;
+	va_start(va, message);
+	setMessage(message, va);
+	va_end(va);
 }
 
 StyxErrorMessageException::~StyxErrorMessageException() {
 	// TODO Auto-generated destructor stub
 }
 
-StyxRErrorMessage* StyxErrorMessageException::getErrorMessage() {
-	return mMessage;
+StyxRErrorMessage* StyxErrorMessageException::constructErrorMessage() {
+	StyxRErrorMessage* message = new StyxRErrorMessage(StyxMessage::NOTAG, getMessage());
+	return message;
 }
 
 void StyxErrorMessageException::checkException(StyxMessage *rMessage)  throw(StyxException) {
