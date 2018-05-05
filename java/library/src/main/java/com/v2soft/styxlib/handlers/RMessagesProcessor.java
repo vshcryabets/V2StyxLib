@@ -8,7 +8,6 @@ import com.v2soft.styxlib.messages.base.enums.MessageType;
 import com.v2soft.styxlib.server.ClientDetails;
 
 import java.io.IOException;
-import java.util.Map;
 
 /**
  * Class that processes RMessages (i.e answer from server).
@@ -37,8 +36,7 @@ public class RMessagesProcessor extends QueueMessagesProcessor implements IMessa
     public void processPacket(StyxMessage message, ClientDetails client) throws IOException, StyxException {
         mReceivedCount++;
         int tag = message.getTag();
-        final Map<Integer, StyxTMessage> clientMessagesMap = client.getPolls().getMessagesMap();
-        final StyxTMessage tMessage = clientMessagesMap.get(tag);
+        final StyxTMessage tMessage = client.getPolls().getTMessage(tag);
         if (tMessage == null) {
             // we didn't send T message with such tag, so ignore this R message
             throw new StyxException(String.format("Got (%s) unknown R message from client %s\n",

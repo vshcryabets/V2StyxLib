@@ -40,7 +40,7 @@ void* StyxThread::threadIn(void *context) {
     pthread_exit(result);  
 }
 
-bool StyxThread::interrupted() {
+bool StyxThread::isInterrupted() {
     return mInterruptFlag;
 }
 

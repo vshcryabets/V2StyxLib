@@ -9,7 +9,7 @@
 #include "vfs/MemoryStyxDirectory.h"
 #include "StdOutFile.h"
 #include "stdio.h"
-#include "StyxLibraryException.h"
+#include "exceptions/StyxException.h"
 #ifdef WIN32
 #include "WinSock2.h"
 #endif

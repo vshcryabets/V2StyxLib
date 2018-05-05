@@ -166,8 +166,7 @@ public class MemoryStyxFile implements IVirtualStyxFile {
     public void deleteFile(ClientDetails clientDetails)
             throws StyxErrorMessageException{
         close(clientDetails);
-        throw StyxErrorMessageException.newInstance(
-                "Can't delete file, this is read-only file system.");
+        throw StyxErrorMessageException.newInstance("Can't delete file, this is read-only file system.");
     }
 
     @Override

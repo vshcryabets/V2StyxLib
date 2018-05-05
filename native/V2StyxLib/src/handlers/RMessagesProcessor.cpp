@@ -21,15 +21,13 @@ void RMessagesProcessor::removeClient(ClientDetails *state) {
 void RMessagesProcessor::processPacket(StyxMessage *message, ClientDetails *client) throw(StyxException) {
 	mReceivedCount++;
 	StyxTAG tag = message->getTag();
-	std::map<StyxTAG, StyxTMessage*>* clientMessagesMap = client->getPolls()->getMessagesMap();
-	std::map<StyxTAG, StyxTMessage*>::iterator it = clientMessagesMap->find(tag);
-	if (it == clientMessagesMap->end()) {
+	StyxTMessage* tMessage = client->getPolls()->getTMessage(tag);
+	if (tMessage == NULL) {
 		// we didn't send T message with such tag, so ignore this R message
 		throw StyxException("Got (%s) unknown R message from client %s\n",
 				mTag.c_str(),
 				client->toString().c_str());
 	}
-	StyxTMessage* tMessage = it->second;
 	// TODO i'm not sure that this is proper place for that logic
 	if (tMessage->getType() == Tclunk ||
 			tMessage->getType() == Tremove) {

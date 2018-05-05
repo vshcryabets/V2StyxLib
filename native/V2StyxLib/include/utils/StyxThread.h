@@ -25,7 +25,7 @@ public:
 	~StyxThread();
 	int tryjoin(size_t dealyMs);
 	bool isAlive();
-	bool interrupted();
+	bool isInterrupted();
 	int cancel(); 
 	int forceCancel(); //	pthread_cancel(mAcceptorThread);
 	int start(void* (*startPoint) (void *), void *arg);

@@ -60,7 +60,7 @@ enum MessageTypeEnum {
 	Rwstat = 127
 };
 
-bool isMessageTypeTMessage(int messageType) {return messageType % 2 == 0;}
+bool isMessageTypeTMessage(int messageType);
 
 enum ModeTypeEnum {
     OREAD = 0x00,

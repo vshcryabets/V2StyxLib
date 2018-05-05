@@ -1,11 +1,8 @@
-package com.v2soft.styxlib.handlers;
+package com.v2soft.styxlib.server;
 
 import com.v2soft.styxlib.messages.base.StyxMessage;
 import com.v2soft.styxlib.messages.base.StyxTMessage;
 import com.v2soft.styxlib.messages.base.enums.MessageType;
-import com.v2soft.styxlib.server.ClientDetails;
-import com.v2soft.styxlib.server.IChannelDriver;
-import com.v2soft.styxlib.server.IMessageTransmitter;
 
 import java.io.IOException;
 import java.net.SocketException;
@@ -15,9 +12,9 @@ import java.net.SocketException;
  */
 public class TMessageTransmitter implements IMessageTransmitter {
     public interface Listener {
-	// TODO pass caller
-        void onSocketDisconnected(); // TODO why socket?
-        void onTrashReceived();
+	    // TODO pass caller
+        void onSocketDisconnected(TMessageTransmitter caller); // TODO why socket?
+        void onTrashReceived(TMessageTransmitter caller);
     }
 
     protected int mTransmittedCount, mErrorCount;
@@ -45,14 +42,14 @@ public class TMessageTransmitter implements IMessageTransmitter {
                 tag = recepient.getPolls().getTagPoll().getFreeItem();
             }
             message.setTag((short) tag);
-            recepient.getPolls().getMessagesMap().put(tag, (StyxTMessage) message);
+            recepient.getPolls().putTMessage(tag, (StyxTMessage) message);
 
             driver.sendMessage(message, recepient);
             mTransmittedCount++;
             return true;
         } catch (SocketException e) {
             if ( mListener != null ) {
-                mListener.onSocketDisconnected();
+                mListener.onSocketDisconnected(this);
             }
         }
         return false;

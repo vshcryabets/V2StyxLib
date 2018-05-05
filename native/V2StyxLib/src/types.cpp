@@ -30,3 +30,7 @@ StyxString ConnectionDetails::getProtocol() {
 size_t ConnectionDetails::getIOUnit() {
 	return mIOUnit;
 }
+
+bool isMessageTypeTMessage(int messageType) {
+	return messageType % 2 == 0;
+}

@@ -58,4 +58,5 @@ size_t StyxDataWriter::write(const uint8_t* data, size_t count) throw(StyxExcept
 		}
 		mBuffer->push_back(data[i]);
 	}
+	return count;
 }

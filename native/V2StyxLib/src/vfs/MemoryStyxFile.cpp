@@ -88,8 +88,14 @@ size_t MemoryStyxFile::write(ClientDetails *client, uint8_t* data, uint64_t offs
 size_t MemoryStyxFile::read(ClientDetails *client, uint8_t* buffer, uint64_t offset, size_t count) {
 	return 0;
 }
+
 void MemoryStyxFile::close(ClientDetails *client) {
 }
+
 void MemoryStyxFile::onConnectionClosed(ClientDetails *state) {
+	// ok, nothing to do
+}
+
+void MemoryStyxFile::onConnectionOpened(ClientDetails* client) {
 	// ok, nothing to do
 }

@@ -7,7 +7,8 @@
 #define TMESSAGE_TRANSMITTER_H_
 
 #include "types.h"
-#include "vfs/IVirtualStyxFile.h"
+#include "server/IMessageTransmitter.h"
+#include "server/ClientDetails.h"
 
 class TMessageTransmitter : public IMessageTransmitter {
 public:

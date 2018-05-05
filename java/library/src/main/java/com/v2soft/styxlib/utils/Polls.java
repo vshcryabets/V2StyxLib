@@ -27,11 +27,7 @@ public class Polls {
     public MessageTagPoll getTagPoll() {
         return mTags;
     }
-
-    public Map<Integer, StyxTMessage> getMessagesMap() {
-        return mMessagesMap;
-    }
-
+    
     public void releaseTag(int tag) {
         mMessagesMap.remove(tag);
         mTags.release(tag);
@@ -39,5 +35,14 @@ public class Polls {
 
     public void releaseFID(StyxTMessageFID message) {
         mFids.release(message.getFID());
+    }
+
+    public void putTMessage(int tag, StyxTMessage message) {
+        mMessagesMap.put(tag, message);
+    }
+
+    // TODO probably we can use one call instead getTMessage && releaseTag
+    public StyxTMessage getTMessage(int tag) {
+        return mMessagesMap.get(tag);
     }
 }

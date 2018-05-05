@@ -2,8 +2,9 @@
 #define IMESSAGE_TRANSMITTER_H_
 
 #include "messages/base/StyxMessage.h"
-#include "server/ClientDetails.h"
 #include "exceptions/StyxException.h"
+
+class ClientDetails;
 
 class IMessageTransmitter {
 public:

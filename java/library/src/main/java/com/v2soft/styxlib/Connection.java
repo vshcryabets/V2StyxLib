@@ -1,7 +1,7 @@
 package com.v2soft.styxlib;
 
 import com.v2soft.styxlib.handlers.RMessagesProcessor;
-import com.v2soft.styxlib.handlers.TMessageTransmitter;
+import com.v2soft.styxlib.server.TMessageTransmitter;
 import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.messages.StyxRAttachMessage;
 import com.v2soft.styxlib.messages.StyxRAuthMessage;
@@ -19,7 +19,6 @@ import com.v2soft.styxlib.server.IMessageTransmitter;
 import com.v2soft.styxlib.types.ConnectionDetails;
 import com.v2soft.styxlib.types.Credentials;
 
-import java.io.Closeable;
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 
@@ -351,12 +350,12 @@ public class Connection
 
     private TMessageTransmitter.Listener mTransmitterListener = new TMessageTransmitter.Listener() {
         @Override
-        public void onSocketDisconnected() {
+        public void onSocketDisconnected(TMessageTransmitter caller) {
             isConnected = false;
         }
 
         @Override
-        public void onTrashReceived() {
+        public void onTrashReceived(TMessageTransmitter caller) {
             //something goes wrong, we should restart protocol
             setAttached(false);
             try {

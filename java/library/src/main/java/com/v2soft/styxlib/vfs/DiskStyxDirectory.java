@@ -163,30 +163,30 @@ extends DiskStyxFile {
     }
 
     @Override
-    public StyxQID create(String name, long permissions, int mode)
+    public StyxQID createFile(String name, long permissions, int mode)
             throws StyxErrorMessageException {
         File newFile = new File(mFile, name);
         if ( newFile.exists() ) {
-            throw StyxErrorMessageException.newInstance("Can't create file, already exists");
+            throw StyxErrorMessageException.newInstance("Can't createFile file, already exists");
         }
         try {
             if ( (permissions & FileMode.Directory.getMode()) != 0 ) {
-                // create directory
+                // createFile directory
                 if ( !newFile.mkdir() ) {
-                    throw StyxErrorMessageException.newInstance("Can't create directory, unknown error.");
+                    throw StyxErrorMessageException.newInstance("Can't createFile directory, unknown error.");
                 }
                 DiskStyxDirectory file = new DiskStyxDirectory(newFile);
                 return file.getQID();
             } else {
-                // create file
+                // createFile file
                 if ( !newFile.createNewFile() ) {
-                    StyxErrorMessageException.newInstance("Can't create file, unknown error.");
+                    StyxErrorMessageException.newInstance("Can't createFile file, unknown error.");
                 }
                 DiskStyxFile file = new DiskStyxFile(newFile);
                 return file.getQID();
             }
         } catch (IOException e) {
-            StyxErrorMessageException.newInstance("Can't create file, unknown error.");
+            StyxErrorMessageException.newInstance("Can't createFile file, unknown error.");
         }
         return null;
     }

@@ -84,7 +84,7 @@ void* TCPClientChannelDriver::run() {
 		StyxByteBufferReadable buffer(mIOUnit * 2);
 		StyxDataReader reader(&buffer);
 		while (isWorking) {
-			if (mAcceptorThread->interrupted()) break;
+			if (mAcceptorThread->isInterrupted()) break;
 			try {
 				size_t read = buffer.readFromFD(mChannel);
 				if (read > 0) {

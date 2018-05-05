@@ -3,7 +3,7 @@ package com.v2soft.styxlib.server.tcp;
 import com.v2soft.styxlib.Connection;
 import com.v2soft.styxlib.IClient;
 import com.v2soft.styxlib.handlers.RMessagesProcessor;
-import com.v2soft.styxlib.handlers.TMessageTransmitter;
+import com.v2soft.styxlib.server.TMessageTransmitter;
 import com.v2soft.styxlib.server.ClientDetails;
 import com.v2soft.styxlib.server.IChannelDriver;
 import com.v2soft.styxlib.vfs.IVirtualStyxFile;

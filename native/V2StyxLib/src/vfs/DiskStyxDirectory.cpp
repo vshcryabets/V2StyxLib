@@ -18,3 +18,11 @@ IVirtualStyxFile* DiskStyxDirectory::walk(
 		std::vector<StyxQID*> *qids) {
 	return NULL;
 }
+
+StyxQID DiskStyxDirectory::createFile(StyxString name, long permissions, int mode) throw(StyxErrorMessageException) {
+	throw StyxErrorMessageException("Not implemented");
+}
+
+void DiskStyxDirectory::deleteFile(ClientDetails* clientDetails) throw(StyxErrorMessageException) {
+	throw StyxErrorMessageException("Not implemented");
+}

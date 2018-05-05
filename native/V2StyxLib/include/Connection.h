@@ -11,7 +11,7 @@
 #include "IClient.h"
 #include "handlers/RMessagesProcessor.h"
 #include "handlers/TMessagesProcessor.h"
-#include "handlers/TMessageTransmitter.h"
+#include "server/TMessageTransmitter.h"
 #include "messages/base/structs/StyxQID.h"
 #include "server/ClientDetails.h"
 
