@@ -27,7 +27,7 @@ public class Polls {
     public MessageTagPoll getTagPoll() {
         return mTags;
     }
-    
+
     public void releaseTag(int tag) {
         mMessagesMap.remove(tag);
         mTags.release(tag);

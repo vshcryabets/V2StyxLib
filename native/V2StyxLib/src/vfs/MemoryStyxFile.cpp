@@ -99,3 +99,12 @@ void MemoryStyxFile::onConnectionClosed(ClientDetails *state) {
 void MemoryStyxFile::onConnectionOpened(ClientDetails* client) {
 	// ok, nothing to do
 }
+
+StyxQID MemoryStyxFile::createFile(StyxString name, long permissions, int mode) throw(StyxErrorMessageException) {
+		throw StyxErrorMessageException("Can't create file, this is read-only file system.");
+}
+
+void MemoryStyxFile::deleteFile(ClientDetails* clientDetails) throw(StyxErrorMessageException) {
+	close(clientDetails);
+	throw StyxErrorMessageException("Can't delete file, this is read-only file system.");
+}

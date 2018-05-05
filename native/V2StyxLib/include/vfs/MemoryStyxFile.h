@@ -78,6 +78,8 @@ public:
 	 */
 	virtual void onConnectionClosed(ClientDetails *state);
 	virtual void onConnectionOpened(ClientDetails* client);
+	virtual StyxQID createFile(StyxString name, long permissions, int mode) throw(StyxErrorMessageException);
+	virtual void deleteFile(ClientDetails* clientDetails) throw(StyxErrorMessageException);
 };
 
 #endif /* MEMORYSTYXFILE_H_ */

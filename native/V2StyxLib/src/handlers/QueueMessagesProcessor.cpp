@@ -19,7 +19,7 @@ void QueueMessagesProcessor::postPacket(StyxMessage *message, ClientDetails *tar
 	QueueMessageProcessorPair pair;
 	pair.mMessage = message;
 	pair.mTransmitter = target;
-	// TODO synchronise this
+#warning TODO synchronise this
 	mQueue.push(pair);
 }
 

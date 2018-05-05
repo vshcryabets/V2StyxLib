@@ -44,4 +44,4 @@ else()
         )
 endif()
 
-add_subdirectory(testserver out/testserver)
+##add_subdirectory(testserver out/testserver)

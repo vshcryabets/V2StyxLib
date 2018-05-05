@@ -137,12 +137,12 @@ void Connection::close() throw(StyxException) {
 	}
 	if (mTransmitter != NULL) {
 		mTransmitter->close();
-		// TODO Delete?
+#warning TODO Delete?
 		mTransmitter = NULL;
 	}
 	if (isAutoStartDriver && mDriver != NULL) {
 		mDriver->close();
-		// TODO Delete?
+#warning  TODO Delete?
 		mDriver = NULL;
 	}
 }
