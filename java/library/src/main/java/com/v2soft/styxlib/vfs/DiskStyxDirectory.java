@@ -8,7 +8,7 @@ import com.v2soft.styxlib.messages.base.enums.QIDType;
 import com.v2soft.styxlib.messages.base.structs.StyxQID;
 import com.v2soft.styxlib.messages.base.structs.StyxStat;
 import com.v2soft.styxlib.server.ClientDetails;
-import com.v2soft.styxlib.types.ULong;
+import com.v2soft.styxlib.utils.MetricsAndStats;
 
 import java.io.File;
 import java.io.IOException;
@@ -104,6 +104,7 @@ extends DiskStyxFile {
 
             // allocate buffer
             final ByteBuffer buffer = ByteBuffer.allocate(size);
+            MetricsAndStats.byteBufferAllocation++;
             for (StyxStat state : stats) {
                 state.writeBinaryTo(new StyxDataWriter(buffer));
             }
@@ -114,14 +115,14 @@ extends DiskStyxFile {
     }
 
     @Override
-    public long read(ClientDetails clientDetails, byte[] outbuffer, ULong offset, long count) throws StyxErrorMessageException {
+    public long read(ClientDetails clientDetails, byte[] outbuffer, long offset, long count) throws StyxErrorMessageException {
         if ( !mBuffersMap.containsKey(clientDetails)) {
             throw StyxErrorMessageException.newInstance("This file isn't open");
         }
         final ByteBuffer buffer = mBuffersMap.get(clientDetails);
         int boffset = buffer.limit();
-        if ( offset.asLong() > boffset ) return 0;
-        buffer.position((int) offset.asLong());
+        if ( offset > boffset ) return 0;
+        buffer.position((int) offset);
         int bleft = buffer.remaining();
         if ( count > bleft ) {
             count = bleft;
@@ -149,7 +150,7 @@ extends DiskStyxFile {
     }
 
     @Override
-    public int write(ClientDetails clientDetails, byte[] data, ULong offset)
+    public int write(ClientDetails clientDetails, byte[] data, long offset)
             throws StyxErrorMessageException {
         throw StyxErrorMessageException.newInstance("Can't write to directory");
     }
@@ -167,26 +168,26 @@ extends DiskStyxFile {
             throws StyxErrorMessageException {
         File newFile = new File(mFile, name);
         if ( newFile.exists() ) {
-            throw StyxErrorMessageException.newInstance("Can't createFile file, already exists");
+            throw StyxErrorMessageException.newInstance("Can't create file, already exists");
         }
         try {
             if ( (permissions & FileMode.Directory.getMode()) != 0 ) {
                 // createFile directory
                 if ( !newFile.mkdir() ) {
-                    throw StyxErrorMessageException.newInstance("Can't createFile directory, unknown error.");
+                    throw StyxErrorMessageException.newInstance("Can't create directory, unknown error.");
                 }
                 DiskStyxDirectory file = new DiskStyxDirectory(newFile);
                 return file.getQID();
             } else {
                 // createFile file
                 if ( !newFile.createNewFile() ) {
-                    StyxErrorMessageException.newInstance("Can't createFile file, unknown error.");
+                    StyxErrorMessageException.newInstance("Can't create file, unknown error.");
                 }
                 DiskStyxFile file = new DiskStyxFile(newFile);
                 return file.getQID();
             }
         } catch (IOException e) {
-            StyxErrorMessageException.newInstance("Can't createFile file, unknown error.");
+            StyxErrorMessageException.newInstance("Can't create file, IO error.");
         }
         return null;
     }

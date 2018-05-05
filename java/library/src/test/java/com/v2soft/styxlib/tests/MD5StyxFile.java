@@ -3,7 +3,6 @@ package com.v2soft.styxlib.tests;
 import com.v2soft.styxlib.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.server.ClientDetails;
 import com.v2soft.styxlib.vfs.MemoryStyxFile;
-import com.v2soft.styxlib.types.ULong;
 
 import java.io.IOException;
 import java.security.MessageDigest;
@@ -41,7 +40,7 @@ public class MD5StyxFile extends MemoryStyxFile {
         super.close(clientDetails);
     }
     @Override
-    public int write(ClientDetails clientDetails, byte[] data, ULong offset)
+    public int write(ClientDetails clientDetails, byte[] data, long offset)
             throws StyxErrorMessageException {
         if ( mClientsMap.containsKey(clientDetails) ) {
             mClientsMap.get(clientDetails).update(data, 0, data.length);
@@ -49,7 +48,7 @@ public class MD5StyxFile extends MemoryStyxFile {
         return super.write(clientDetails, data, offset);
     }
     @Override
-    public long read(ClientDetails clientDetails, byte[] outbuffer, ULong offset, long count)
+    public long read(ClientDetails clientDetails, byte[] outbuffer, long offset, long count)
             throws StyxErrorMessageException {
         if ( mClientsMap.containsKey(clientDetails) ) {
             byte[] digest = mClientsMap.get(clientDetails).digest();

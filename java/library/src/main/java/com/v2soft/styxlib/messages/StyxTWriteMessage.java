@@ -6,23 +6,23 @@ import com.v2soft.styxlib.io.IStyxDataWriter;
 import com.v2soft.styxlib.messages.base.StyxMessage;
 import com.v2soft.styxlib.messages.base.StyxTMessageFID;
 import com.v2soft.styxlib.messages.base.enums.MessageType;
-import com.v2soft.styxlib.types.ULong;
+import com.v2soft.styxlib.utils.MetricsAndStats;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 
 public class StyxTWriteMessage extends StyxTMessageFID {
-    private ULong mOffset;
+    private long mOffset;
     private byte[] mData;
     private int mDataOffset;
     private int mDataLength;
 
-    public StyxTWriteMessage(long fid, ULong offset, byte [] data, int dataOffset, int dataLength)
+    public StyxTWriteMessage(long fid, long offset, byte [] data, int dataOffset, int dataLength)
             throws IOException {
         super(MessageType.Twrite, MessageType.Rwrite, fid);
         mOffset = offset;
         mData = data;
         mDataLength = dataLength;
+        mDataOffset = dataOffset;
     }
     // ===========================================================================
     // Styx message methods
@@ -34,11 +34,12 @@ public class StyxTWriteMessage extends StyxTMessageFID {
         mDataLength = (int)input.readUInt32();
         mDataOffset = 0;
         mData = new byte[mDataLength];
+        MetricsAndStats.byteArrayAllocationTWrite++;
         input.read(mData, 0, mDataLength);
     }
     @Override
     public void writeToBuffer(IStyxDataWriter output)
-            throws UnsupportedEncodingException, IOException {
+            throws IOException {
         super.writeToBuffer(output);
         output.writeUInt64(mOffset);
         output.writeUInt32(mDataLength);
@@ -48,20 +49,22 @@ public class StyxTWriteMessage extends StyxTMessageFID {
     @Override
     public String toString() {
         if ( Config.LOG_DATA_FIELDS ) {
-            return String.format("%s\nOffset: %s\nData: %s",
-                    super.toString(), getOffset().toString(), StyxMessage.toString(getData()));
+            return String.format("%s\nOffset: %d\nData: %s",
+                    super.toString(), getOffset(), StyxMessage.toString(getData()));
         } else {
             return String.format("%s\nOffset: %d",
-                    super.toString(), getOffset().asLong());
+                    super.toString(), getOffset());
         }
     }
     // ===========================================================================
     // Getters
     // ===========================================================================
-    public ULong getOffset(){return mOffset;}
+    public long getOffset(){return mOffset;}
     public byte[] getData() {
-        if (mData == null)
+        if (mData == null) {
+            MetricsAndStats.byteArrayAllocation++;
             return new byte[0];
+        }
         return mData;
     }
     @Override

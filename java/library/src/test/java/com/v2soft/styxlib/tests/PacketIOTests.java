@@ -10,11 +10,11 @@ import com.v2soft.styxlib.server.tcp.TCPClientChannelDriver;
 import com.v2soft.styxlib.server.tcp.TCPServerManager;
 import com.v2soft.styxlib.vfs.MemoryStyxDirectory;
 import com.v2soft.styxlib.vfs.MemoryStyxFile;
-import com.v2soft.styxlib.types.ULong;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,9 +26,9 @@ import java.util.HashMap;
 import java.util.Random;
 import java.util.concurrent.TimeoutException;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Styx buffers tests.
@@ -41,12 +41,12 @@ public class PacketIOTests {
     private static final String FILE_NAME = "md5file";
     private StyxServerManager mServer;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         startServer();
     }
 
-    @After
+    @AfterEach
     public void shutDown() throws InterruptedException, IOException {
         mServer.closeAndWait();
     }
@@ -71,7 +71,7 @@ public class PacketIOTests {
                 super.close(client);
             }
             @Override
-            public int write(ClientDetails client, byte[] data, ULong offset)
+            public int write(ClientDetails client, byte[] data, long offset)
                     throws StyxErrorMessageException {
                 if ( mClientsMap.containsKey(client) ) {
                     mClientsMap.get(client).reset();
@@ -80,7 +80,7 @@ public class PacketIOTests {
                 return super.write(client, data, offset);
             }
             @Override
-            public long read(ClientDetails client, byte[] outbuffer, ULong offset, long count)
+            public long read(ClientDetails client, byte[] outbuffer, long offset, long count)
                     throws StyxErrorMessageException {
                 if ( mClientsMap.containsKey(client) ) {
                     byte[] digest = mClientsMap.get(client).digest();
@@ -131,8 +131,8 @@ public class PacketIOTests {
             output.write(someData);
             int read = input.read(remoteHash);
 
-            assertEquals("Wrong remote hash size", 16, read);
-            assertArrayEquals("Wrong remote hash", localHash, remoteHash);
+            assertEquals(16, read, "Wrong remote hash size");
+            assertArrayEquals(localHash, remoteHash, "Wrong remote hash");
         }
 
         output.close();

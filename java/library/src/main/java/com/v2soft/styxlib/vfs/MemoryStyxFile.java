@@ -6,7 +6,6 @@ import com.v2soft.styxlib.messages.base.enums.QIDType;
 import com.v2soft.styxlib.messages.base.structs.StyxQID;
 import com.v2soft.styxlib.messages.base.structs.StyxStat;
 import com.v2soft.styxlib.server.ClientDetails;
-import com.v2soft.styxlib.types.ULong;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -30,7 +29,7 @@ public class MemoryStyxFile implements IVirtualStyxFile {
             throw new NullPointerException("Filename is null");
         }
         mName = name;
-        mQID = new StyxQID(QIDType.QTFILE, 0, new ULong(mName.hashCode()));
+        mQID = new StyxQID(QIDType.QTFILE, 0, mName.hashCode());
     }
 
     @Override
@@ -77,8 +76,8 @@ public class MemoryStyxFile implements IVirtualStyxFile {
     }
 
     @Override
-    public ULong getLength() {
-        return new ULong(0);
+    public long getLength() {
+        return 0;
     }
 
     @Override
@@ -109,12 +108,14 @@ public class MemoryStyxFile implements IVirtualStyxFile {
         return this;
     }
 
-    public int write(ClientDetails clientDetails, byte[] data, ULong offset) throws StyxErrorMessageException {
+    public int write(ClientDetails clientDetails, byte[] data,
+                     long offset) throws StyxErrorMessageException {
         return 0;
     }
 
     @Override
-    public long read(ClientDetails clientDetails, byte[] outbuffer, ULong offset, long count) throws StyxErrorMessageException {
+    public long read(ClientDetails clientDetails, byte[] outbuffer, long offset,
+                     long count) throws StyxErrorMessageException {
         return 0;
     }
 

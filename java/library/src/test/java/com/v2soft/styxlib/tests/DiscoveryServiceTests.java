@@ -5,9 +5,9 @@ import com.v2soft.AndLib.networking.DiscoveryServer;
 import com.v2soft.AndLib.networking.UDPAbstractDiscoveryClient;
 import com.v2soft.AndLib.networking.UDPAbstractDiscoveryServer;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -22,25 +22,17 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * UDP broadcast discovery service tests.
  *
  * @author V.Shcriyabets (vshcryabets@gmail.com)
  */
+@Disabled
 public class DiscoveryServiceTests {
 
     private static final int PORT = 12395;
-
-    @Before
-    public void setUp() {
-    }
-
-    @After
-    public void shutDown() {
-
-    }
 
     //
     @Test
@@ -123,9 +115,9 @@ public class DiscoveryServiceTests {
             }
         });
         explorer.startDiscoverySync();
-        assertEquals("Wrong number of discovery start count", 1, flags[0]);
-        assertEquals("Wrong number of discovery end count", 1, flags[1]);
-        assertEquals("Wrong number of discovered servers " + flags[2], 1, flags[2]);
+        assertEquals(1, flags[0], "Wrong number of discovery start count");
+        assertEquals(1, flags[1], "Wrong number of discovery end count");
+        assertEquals(1, flags[2], "Wrong number of discovered servers " + flags[2]);
 
         server.close();
     }

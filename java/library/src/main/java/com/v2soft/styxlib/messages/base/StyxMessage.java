@@ -24,6 +24,7 @@ import com.v2soft.styxlib.messages.StyxTWriteMessage;
 import com.v2soft.styxlib.messages.base.enums.MessageType;
 import com.v2soft.styxlib.messages.base.enums.ModeType;
 import com.v2soft.styxlib.messages.base.structs.StyxQID;
+import com.v2soft.styxlib.utils.MetricsAndStats;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -50,7 +51,7 @@ public class StyxMessage {
      * @param buffer input buffer
      * @param io_unit packet size
      * @return constructed Message object
-     * @throws IOException
+     * @throws IOException in case of parse error.
      */
     public static StyxMessage factory(IStyxDataReader buffer, int io_unit)
             throws IOException {
@@ -113,13 +114,13 @@ public class StyxMessage {
             result = new StyxROpenMessage(tag, null, 0, true);
             break;
         case Tread:
-            result = new StyxTReadMessage(NOFID, null, 0);
+            result = new StyxTReadMessage(NOFID, 0, 0);
             break;
         case Rread:
             result = new StyxRReadMessage(tag, null, 0);
             break;
         case Twrite:
-            result = new StyxTWriteMessage(NOFID, null, null, 0, 0 );
+            result = new StyxTWriteMessage(NOFID, 0, null, 0, 0 );
             break;
         case Rwrite:
             result = new StyxRWriteMessage(tag, 0);
@@ -192,6 +193,7 @@ public class StyxMessage {
     }
 
     public StyxMessage(MessageType type, int tag) {
+        MetricsAndStats.newStyxMessage++;
         mType = type;
         mTag = tag;
     }

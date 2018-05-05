@@ -1,6 +1,6 @@
 package com.v2soft.styxlib.io;
 
-import com.v2soft.styxlib.types.ULong;
+import com.v2soft.styxlib.utils.MetricsAndStats;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.BufferOverflowException;
@@ -10,11 +10,12 @@ import java.nio.charset.Charset;
 public class StyxDataWriter implements IStyxDataWriter {
     private static final int sDataBufferSize = 16;
     protected static final Charset sUTFCharset = Charset.forName("utf-8");
-    private byte [] mInternalBuffer;
+    private byte[] mInternalBuffer;
     protected ByteBuffer mBuffer;
 
     public StyxDataWriter(ByteBuffer buffer) {
         mInternalBuffer = new byte[sDataBufferSize];
+        MetricsAndStats.byteArrayAllocationIo++;
         mBuffer = buffer;
     }
 
@@ -27,27 +28,39 @@ public class StyxDataWriter implements IStyxDataWriter {
         mInternalBuffer[0] = (byte) val;
         write(mInternalBuffer, 0, 1);
     }
+
     @Override
     public void writeUInt16(int val) {
-        mInternalBuffer[0] = (byte) ((byte) val&0xFF);
-        mInternalBuffer[1] = (byte) ((byte) (val>>8)&0xFF);
+        mInternalBuffer[0] = (byte) ((byte) val & 0xFF);
+        mInternalBuffer[1] = (byte) ((byte) (val >> 8) & 0xFF);
         write(mInternalBuffer, 0, 2);
     }
+
     @Override
     public void writeUInt32(long val) {
-        mInternalBuffer[0] = (byte) ((byte) val&0xFF);
-        mInternalBuffer[1] = (byte) ((byte) (val>>8)&0xFF);
-        mInternalBuffer[2] = (byte) ((byte) (val>>16)&0xFF);
-        mInternalBuffer[3] = (byte) ((byte) (val>>24)&0xFF);
+        mInternalBuffer[0] = (byte) ((byte) val & 0xFF);
+        mInternalBuffer[1] = (byte) ((byte) (val >> 8) & 0xFF);
+        mInternalBuffer[2] = (byte) ((byte) (val >> 16) & 0xFF);
+        mInternalBuffer[3] = (byte) ((byte) (val >> 24) & 0xFF);
         write(mInternalBuffer, 0, 4);
     }
+
     @Override
-    public void writeUInt64(ULong value) {
-        write(value.getBytes());
+    public void writeUInt64(long val) {
+        mInternalBuffer[0] = (byte) ((byte) val & 0xFF);
+        mInternalBuffer[1] = (byte) ((byte) (val >> 8) & 0xFF);
+        mInternalBuffer[2] = (byte) ((byte) (val >> 16) & 0xFF);
+        mInternalBuffer[3] = (byte) ((byte) (val >> 24) & 0xFF);
+        mInternalBuffer[4] = (byte) ((byte) (val >> 32) & 0xFF);
+        mInternalBuffer[5] = (byte) ((byte) (val >> 40) & 0xFF);
+        mInternalBuffer[6] = (byte) ((byte) (val >> 48) & 0xFF);
+        mInternalBuffer[7] = (byte) ((byte) (val >> 56) & 0xFF);
+        write(mInternalBuffer, 0, 8);
     }
+
     @Override
     public void writeUTFString(String string) throws UnsupportedEncodingException {
-        byte [] data = string.getBytes(sUTFCharset);
+        byte[] data = string.getBytes(sUTFCharset);
         writeUInt16(data.length);
         write(data);
     }

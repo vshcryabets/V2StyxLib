@@ -1,9 +1,8 @@
 package com.v2soft.styxlib.server.tcp;
 
 import com.v2soft.styxlib.ILogListener;
-import com.v2soft.styxlib.library.StyxServerManager;
 import com.v2soft.styxlib.handlers.IMessageProcessor;
-import com.v2soft.styxlib.io.StyxDataWriter;
+import com.v2soft.styxlib.library.StyxServerManager;
 import com.v2soft.styxlib.messages.base.StyxMessage;
 import com.v2soft.styxlib.server.ClientDetails;
 import com.v2soft.styxlib.server.IChannelDriver;
@@ -12,7 +11,6 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
-import java.nio.channels.SocketChannel;
 
 /**
  * Created by V.Shcryabets on 5/20/14.
@@ -67,15 +65,13 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
         if ( recipient == null ) {
             throw new NullPointerException("Recipient can't be null");
         }
-        ByteBuffer buffer = ((TCPClientDetails)recipient).getOutputBuffer();
-        synchronized (buffer) {
-            buffer.clear();
+        TCPClientDetails client = (TCPClientDetails) recipient;
+        ByteBuffer buffer = client.getOutputBuffer();
+        synchronized (client) {
             try {
-                message.writeToBuffer(new StyxDataWriter(buffer)); // TODO optimize this line,
-                // no need to create new instance of StyxDataWriter
+                message.writeToBuffer(client.getOutputWriter());
                 buffer.flip();
-                SocketChannel channel = ((TCPClientDetails) recipient).getChannel();
-                channel.write(buffer);
+                client.getChannel().write(buffer);
                 mTransmittedPacketsCount++;
                 if (mLogListener != null) {
                     mLogListener.onMessageTransmited(this, recipient, message);

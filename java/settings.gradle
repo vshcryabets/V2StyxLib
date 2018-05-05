@@ -1,4 +1,3 @@
-include ':styxlib'
+include ':library'
 include ':serverSample'
 
-project(":styxlib").projectDir = new File(settingsDir as String, "library/")

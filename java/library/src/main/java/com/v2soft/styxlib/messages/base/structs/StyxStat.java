@@ -3,14 +3,13 @@ package com.v2soft.styxlib.messages.base.structs;
 import com.v2soft.styxlib.io.IStyxDataReader;
 import com.v2soft.styxlib.io.IStyxDataWriter;
 import com.v2soft.styxlib.messages.base.StyxMessage;
-import com.v2soft.styxlib.types.ULong;
 
 import java.io.IOException;
 import java.util.Date;
 
 public class StyxStat {
     public static final StyxStat EMPTY = new StyxStat((short)0, 0, null,
-            0, null, null, ULong.ZERO, null, null, null, null);
+            0, null, null, 0, null, null, null, null);
 
     private int mType; //for kernel use
     private long mDev; //for kernel use
@@ -18,7 +17,7 @@ public class StyxStat {
     private long mMode; // permissions and flags
     private Date mAccessTime; // last access time
     private Date mModificationTime; // last modification time
-    private ULong mLength; //length of file in bytes
+    private long mLength; //length of file in bytes
     private String mName; // file name; must be / if the file is the root directory of the server
     private String mUserName; //owner name
     private String mGroupName; //group name
@@ -37,7 +36,7 @@ public class StyxStat {
     }
 
     public StyxStat(short type, int dev, StyxQID qid, int mode, Date accessTime,
-            Date modificationTime, ULong length, String name, String userName,
+            Date modificationTime, long length, String name, String userName,
             String groupName, String modificationUser) {
         mType = type;
         mDev = dev;
@@ -142,12 +141,12 @@ public class StyxStat {
         mModificationTime = modificationTime;
     }
 
-    public ULong getLength()
+    public long getLength()
     {
         return mLength;
     }
 
-    public void setLength(ULong length)
+    public void setLength(long length)
     {
         mLength = length;
     }
@@ -217,12 +216,12 @@ public class StyxStat {
     @Override
     public String toString() {
         return String.format("(Type: %d; Dev: %d; QID: %s; Mode: %d;"
-                + " AccessTime: %s; ModificationTime: %s; Length: %s;"
+                + " AccessTime: %s; ModificationTime: %s; Length: %d;"
                 + " Name: %s; UserName: %s; GroupName: %s;"
                 + " ModificationUser: %s)",
                 getType(), getDev(), getQID().toString(), getMode(),
                 getAccessTime().toString(), getModificationTime().toString(),
-                getLength().toString(), getName(), getUserName(), getGroupName(),
+                getLength(), getName(), getUserName(), getGroupName(),
                 getModificationUser());
     }
 

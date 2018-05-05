@@ -1,7 +1,5 @@
 package com.v2soft.styxlib.io;
 
-import com.v2soft.styxlib.types.ULong;
-
 import java.io.IOException;
 
 public interface IStyxDataReader {
@@ -27,13 +25,8 @@ public interface IStyxDataReader {
      */
     long readUInt32() throws IOException;
 
-    /**
-     * Read 64-bits unsigned value.
-     * @return 64-bits unsigned value.
-     * @throws IOException
-     */
-    ULong readUInt64() throws IOException;
-
+    // For java this is 64 bit signed, but it should be interpreted as 64 bit unsigned.
+    long readUInt64() throws IOException;
     long getUInt32();
     String readUTFString() throws IOException;
     int read(byte[] data, int offset, int dataLength) throws IOException;

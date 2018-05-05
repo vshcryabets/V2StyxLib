@@ -8,7 +8,7 @@ import com.v2soft.styxlib.messages.base.StyxTMessageFID;
 import com.v2soft.styxlib.messages.base.enums.MessageType;
 import com.v2soft.styxlib.server.ClientDetails;
 import com.v2soft.styxlib.server.IMessageTransmitter;
-import com.v2soft.styxlib.types.ULong;
+import com.v2soft.styxlib.utils.MetricsAndStats;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,10 +20,10 @@ import java.io.InputStream;
  */
 public class StyxUnbufferedInputStream extends InputStream {
     private long mTimeout = Connection.DEFAULT_TIMEOUT;
-    private byte[] mSingleByteArray = new byte[1];
+    private byte[] mSingleByteArray;
     private long mFID;
     private IMessageTransmitter mMessenger;
-    private ULong mFileOffset = ULong.ZERO;
+    private long mFileOffset = 0;
     private int mIOUnitSize;
     protected ClientDetails mRecepient;
 
@@ -34,6 +34,8 @@ public class StyxUnbufferedInputStream extends InputStream {
         if ( messenger == null ) {
             throw new NullPointerException("messenger is null");
         }
+        mSingleByteArray = new byte[1];
+        MetricsAndStats.byteArrayAllocationIo++;
         mRecepient = recepient;
         mIOUnitSize = iounit;
         mFID = file;
@@ -64,7 +66,7 @@ public class StyxUnbufferedInputStream extends InputStream {
             read = rRead.getDataLength();
             if ( read > 0 ) {
                 System.arraycopy(rRead.getDataBuffer(), 0, b, 0, read);
-                mFileOffset = mFileOffset.add(read);
+                mFileOffset += read;
             } else {
                 read = -1;
             }
@@ -97,6 +99,6 @@ public class StyxUnbufferedInputStream extends InputStream {
     }
 
     public void seek(long position) {
-        mFileOffset.setValue(position);
+        mFileOffset = position;
     }
 }
