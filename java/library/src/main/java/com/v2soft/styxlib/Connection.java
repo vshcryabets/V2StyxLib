@@ -59,18 +59,22 @@ public class Connection
     protected boolean shouldCloseAnswerProcessor = false;
     protected boolean shouldCloseTransmitter = false;
 
+    // TODO remove or simplify
     public Connection() {
         this(new Credentials(null, null));
     }
 
+    // TODO remove or simplify
     public Connection(Credentials credentials) {
         this(credentials, null);
     }
 
+    // TODO remove or simplify
     public Connection(Credentials credentials, IChannelDriver driver) {
         this(credentials, driver, null, null, null);
     }
 
+    // TODO remove or simplify
     public Connection(Credentials credentials,
                       IChannelDriver driver,
                       RMessagesProcessor answerProcessor,
@@ -95,6 +99,7 @@ public class Connection
      * @throws StyxException
      * @throws TimeoutException
      */
+    // TODO remove or simplify
     public boolean connect(IChannelDriver driver, Credentials credentials)
             throws IOException, StyxException, InterruptedException, TimeoutException {
         if (mAnswerProcessor == null) {
@@ -106,8 +111,14 @@ public class Connection
             shouldCloseTransmitter = true;
         }
 
-        if (!driver.isStarted()) {
-            driver.start(getIOBufSize());
+        if (driver == null) {
+            throw new NullPointerException("Channel driver can't be null");
+        }
+        mDriver = driver;
+        if (!mDriver.isStarted()) {
+            mDriver.setRMessageHandler(mAnswerProcessor);
+            mDriver.setTMessageHandler(mAnswerProcessor); // TODO fixme, this temp fix. TMessages shoul be handled in other way.
+            mDriver.start(getIOBufSize());
             isAutoStartDriver = true;
         }
 
@@ -129,6 +140,7 @@ public class Connection
      * @throws StyxException
      * @throws TimeoutException
      */
+    // TODO remove or simplify
     public boolean connect(IChannelDriver driver, Credentials credentials, RMessagesProcessor answerProcessor,
                            TMessageTransmitter transmitter, ClientDetails recepient)
             throws IOException, StyxException, InterruptedException, TimeoutException {
@@ -143,16 +155,16 @@ public class Connection
         }
         mTransmitter = transmitter;
 
-        if (driver == null) {
-            throw new NullPointerException("Channel driver can't be null");
-        }
-        setDriver(driver);
 
         if (answerProcessor == null) {
             throw new NullPointerException("answerProcessor can't be null");
         }
         mAnswerProcessor = answerProcessor;
-        mDriver.setRMessageHandler(mAnswerProcessor);
+
+        if (driver == null) {
+            throw new NullPointerException("Channel driver can't be null");
+        }
+        mDriver = driver;
 
         if (credentials == null) {
             throw new NullPointerException("Credentials can't be null");
@@ -174,6 +186,7 @@ public class Connection
      * @throws StyxException
      * @throws TimeoutException
      */
+    // TODO remove or simplify
     public boolean connect(IChannelDriver driver)
             throws IOException, StyxException, InterruptedException, TimeoutException {
         return connect(driver, mCredentials);
@@ -188,6 +201,7 @@ public class Connection
      * @throws InterruptedException
      * @throws TimeoutException
      */
+    // TODO remove or simplify
     public boolean connect()
             throws IOException, StyxException, InterruptedException, TimeoutException {
         return connect(mDriver, mCredentials);
@@ -369,9 +383,5 @@ public class Connection
     @Override
     public ClientDetails getRecepient() {
         return mRecepient;
-    }
-
-    protected void setDriver(IChannelDriver driver) {
-        mDriver = driver;
     }
 }

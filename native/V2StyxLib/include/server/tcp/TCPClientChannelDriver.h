@@ -12,16 +12,16 @@
 class TCPClientChannelDriver : public TCPChannelDriver {
 protected:
 	TCPClientDetails* mServerClientDetails;
-	Socket mChannel;
+	Socket mSocket;
 
 public:
 	static const int PSEUDO_CLIENT_ID = 1;
 
-	TCPClientChannelDriver(StyxString address, uint16_t port, bool ssl);
+	TCPClientChannelDriver(StyxString address, uint16_t port);
 	virtual ~TCPClientChannelDriver();
 
 	virtual StyxThread* start(int iounit);
-	virtual void prepareSocket(StyxString socketAddress, uint16_t port, bool ssl) throw(StyxException);
+	virtual void prepareSocket(StyxString socketAddress, uint16_t port) throw(StyxException);
 	virtual bool isConnected();
 	virtual bool isStarted();
 	virtual bool sendMessage(StyxMessage* message, ClientDetails *recipient) throw(StyxException);

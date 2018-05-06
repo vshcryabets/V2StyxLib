@@ -24,12 +24,12 @@ protected:
     ILogListener* mLogListener;
 #endif
 
-	virtual void prepareSocket(StyxString socketAddress, uint16_t port, bool ssl) throw(StyxException) = 0;
+	virtual void prepareSocket(StyxString socketAddress, uint16_t port) throw(StyxException) = 0;
 
 	// get connection timeout in miliseconds
 	virtual size_t getTimeout();
 public:
-	TCPChannelDriver(StyxString address, uint16_t port, bool ssl);
+	TCPChannelDriver(StyxString address, uint16_t port);
 	virtual ~TCPChannelDriver();
 	virtual StyxThread* start(size_t iounit);
 	virtual bool sendMessage(StyxMessage* message, ClientDetails *recipient) throw(StyxException);

@@ -60,7 +60,7 @@ public class ConnectionTest {
                 new DiskStyxDirectory(testDirectory));
         mServer.start();
         mConnection = new Connection();
-        IChannelDriver driver = new TCPClientChannelDriver(localHost, PORT, false);
+        IChannelDriver driver = new TCPClientChannelDriver(localHost, PORT);
         assertTrue(mConnection.connect(driver));
     }
 

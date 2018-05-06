@@ -38,6 +38,7 @@ public class TCPDualLinkServerManager extends TCPServerManager {
             mReverseTransmitter = new TMessageTransmitter(null);
         }
         IChannelDriver driver = client.getDriver();
+        driver.setRMessageHandler(mReverseAnswerProcessor);
         Connection connection = new Connection(credentials, driver,
                 mReverseAnswerProcessor, mReverseTransmitter, client);
         return connection;

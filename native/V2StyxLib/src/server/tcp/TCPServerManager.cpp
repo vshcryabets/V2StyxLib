@@ -6,10 +6,11 @@
  */
 
 #include "server/tcp/TCPServerManager.h"
+#include "server/tcp/TCPServerChannelDriver.h"
 
-TCPServerManager::TCPServerManager(StyxString address, uint16_t port, bool ssl, IVirtualStyxFile* root) :
-	StyxServerManager(root) {
-	// TODO Auto-generated constructor stub
+TCPServerManager::TCPServerManager(StyxString address, uint16_t port, IVirtualStyxFile* root) :
+	StyxServerManager(root, std::vector<IChannelDriver*>()) {
+#warning new TCPServerChannelDriver()) in prev line
 
 }
 

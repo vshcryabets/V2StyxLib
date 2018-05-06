@@ -13,8 +13,8 @@
 
 #include "io/StyxDataReader.h"
 
-TCPClientChannelDriver::TCPClientChannelDriver(StyxString address, uint16_t port, bool ssl)
-	: TCPChannelDriver(address, port, ssl), mServerClientDetails(NULL) {
+TCPClientChannelDriver::TCPClientChannelDriver(StyxString address, uint16_t port)
+	: TCPChannelDriver(address, port), mServerClientDetails(NULL) {
 }
 
 TCPClientChannelDriver::~TCPClientChannelDriver() {
@@ -26,11 +26,11 @@ TCPClientChannelDriver::~TCPClientChannelDriver() {
 
 StyxThread* TCPClientChannelDriver::start(int iounit) {
 #warning TODO move to thread
-	mServerClientDetails = new TCPClientDetails(mChannel, this, iounit, TCPClientChannelDriver::PSEUDO_CLIENT_ID);
+	mServerClientDetails = new TCPClientDetails(mSocket, this, iounit, TCPClientChannelDriver::PSEUDO_CLIENT_ID);
 	return TCPChannelDriver::start(iounit);
 }
 
-void TCPClientChannelDriver::prepareSocket(StyxString socketAddress, uint16_t port, bool ssl) throw(StyxException) {
+void TCPClientChannelDriver::prepareSocket(StyxString socketAddress, uint16_t port) throw(StyxException) {
 	int sockfd = ::socket(AF_INET, SOCK_STREAM, 0);
 	if (sockfd < 0) {
 		  throw StyxException("Can't create socket");
@@ -57,8 +57,7 @@ void TCPClientChannelDriver::prepareSocket(StyxString socketAddress, uint16_t po
 	timeout.tv_sec = timeoutMs / 1000;
 	timeout.tv_usec = (timeoutMs - timeout.tv_sec * 1000) * 1000;
 	::setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, (struct timeval *)&timeout, sizeof(struct timeval));
-
-	mChannel = sockfd;
+	mSocket = sockfd;
 }
 
 bool TCPClientChannelDriver::isConnected() {
@@ -88,7 +87,7 @@ void* TCPClientChannelDriver::run() {
 		while (isWorking) {
 			if (mAcceptorThread->isInterrupted()) break;
 			try {
-				size_t read = buffer.readFromFD(mChannel);
+				size_t read = buffer.readFromFD(mSocket);
 				if (read > 0) {
 					// loop unitl we have unprocessed packets in the input buffer
 					while ( buffer.remainsToRead() > 4 ) {
@@ -103,13 +102,9 @@ void* TCPClientChannelDriver::run() {
 							}
 #endif
 							if ( isMessageTypeTMessage(message->getType()) ) {
-								if ( mTMessageHandler != NULL ) {
-									mTMessageHandler->postPacket(message, mServerClientDetails);
-								}
+								mTMessageHandler->postPacket(message, mServerClientDetails);
 							} else {
-								if ( mRMessageHandler != NULL ) {
-									mRMessageHandler->postPacket(message, mServerClientDetails);
-								}
+								mRMessageHandler->postPacket(message, mServerClientDetails);
 							}
 						} else {
 							break;

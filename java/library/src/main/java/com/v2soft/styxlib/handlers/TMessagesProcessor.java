@@ -42,7 +42,8 @@ public class TMessagesProcessor extends QueueMessagesProcessor {
     private IVirtualStyxFile mRoot;
     protected int mHandledPackets, mErrorPackets, mAnswerPackets;
 
-    public TMessagesProcessor(ConnectionDetails details, IVirtualStyxFile root) {
+    public TMessagesProcessor(String tag, ConnectionDetails details, IVirtualStyxFile root) {
+        super(tag);
         mConnectionDetails = details;
         mRoot = root;
         mHandledPackets = 0;
@@ -119,7 +120,7 @@ public class TMessagesProcessor extends QueueMessagesProcessor {
                     break;
                 default:
                     // TODO handle this
-                    System.out.println("Got message:");
+                    System.out.println("Got unsupported message:");
                     System.out.println(message.toString());
                     break;
             }

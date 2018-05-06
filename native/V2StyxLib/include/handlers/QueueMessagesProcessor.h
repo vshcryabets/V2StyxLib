@@ -22,7 +22,7 @@ protected:
     std::queue<QueueMessageProcessorPair> mQueue;
     StyxThread mThread;
 public:
-    QueueMessagesProcessor();
+    QueueMessagesProcessor(StyxString tag);
 	virtual ~QueueMessagesProcessor();
 
 	virtual void postPacket(StyxMessage *message, ClientDetails *target);

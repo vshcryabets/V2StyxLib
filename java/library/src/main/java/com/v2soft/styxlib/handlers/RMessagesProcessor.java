@@ -18,7 +18,7 @@ public class RMessagesProcessor extends QueueMessagesProcessor implements IMessa
     protected String mTag;
 
     public RMessagesProcessor(String tag) {
-        super();
+        super(tag);
         mTag = tag;
     }
 
@@ -39,7 +39,7 @@ public class RMessagesProcessor extends QueueMessagesProcessor implements IMessa
         final StyxTMessage tMessage = client.getPolls().getTMessage(tag);
         if (tMessage == null) {
             // we didn't send T message with such tag, so ignore this R message
-            throw new StyxException(String.format("Got (%s) unknown R message from client %s\n",
+            throw new StyxException(String.format("RMP(%s) got unknown R message from client %s",
                     mTag,
                     client.toString()));
         }

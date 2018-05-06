@@ -7,7 +7,7 @@
 #include "handlers/RMessagesProcessor.h"
 
 RMessagesProcessor::RMessagesProcessor(StyxString tag)
-	: mTag(tag) {
+	: QueueMessagesProcessor(tag), mTag(tag) {
 }
 
 RMessagesProcessor::~RMessagesProcessor() {
@@ -24,7 +24,7 @@ void RMessagesProcessor::processPacket(StyxMessage *message, ClientDetails *clie
 	StyxTMessage* tMessage = client->getPolls()->getTMessage(tag);
 	if (tMessage == NULL) {
 		// we didn't send T message with such tag, so ignore this R message
-		throw StyxException("Got (%s) unknown R message from client %s\n",
+		throw StyxException("RMP(%s) got unknown R message from client %s",
 				mTag.c_str(),
 				client->toString().c_str());
 	}

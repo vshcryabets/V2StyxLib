@@ -19,9 +19,9 @@ public abstract class QueueMessagesProcessor implements IMessageProcessor, Runna
         public ClientDetails mTransmitter;
     }
 
-    public QueueMessagesProcessor() {
-        mQueue = new LinkedBlockingQueue<Pair>();
-        mThread = new Thread(this, toString());
+    public QueueMessagesProcessor(String tag) {
+        mQueue = new LinkedBlockingQueue<>();
+        mThread = new Thread(this, tag);
         mThread.start();
     }
 

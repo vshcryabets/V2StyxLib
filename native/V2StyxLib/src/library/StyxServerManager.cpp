@@ -15,7 +15,7 @@ StyxServerManager::StyxServerManager(IVirtualStyxFile *root, std::vector<IChanne
 	: mRoot(root) {
 	// TODO inheritance not works in constructor
 	ConnectionDetails details(getProtocol(), getIOUnit());
-    mBalancer = new TMessagesProcessor(details, root);
+    mBalancer = new TMessagesProcessor("serverTH", details, root);
 	for ( std::vector<IChannelDriver*>::iterator it = drivers.begin(); 
 		it != drivers.end(); ++it ) {
 		addDriver(*it);

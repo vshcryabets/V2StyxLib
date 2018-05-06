@@ -15,8 +15,9 @@
 #include "messages/StyxRWriteMessage.h"
 #include "messages/StyxRAuthMessage.h"
 
-TMessagesProcessor::TMessagesProcessor(ConnectionDetails details, IVirtualStyxFile *root)
-	: mConnectionDetails(details), mRoot(root), mHandledPackets(0), mErrorPackets(0), mAnswerPackets(0) {
+TMessagesProcessor::TMessagesProcessor(StyxString tag, ConnectionDetails details, IVirtualStyxFile *root)
+	: QueueMessagesProcessor(tag), mConnectionDetails(details), mRoot(root), mHandledPackets(0), 
+	mErrorPackets(0), mAnswerPackets(0) {
 }
 
 TMessagesProcessor::~TMessagesProcessor() {
@@ -83,9 +84,8 @@ void TMessagesProcessor::processPacket(StyxMessage *message, ClientDetails *targ
 				answer = processRemove(target, (StyxTMessageFID*)message);
 				break;
 			default:
-				// TODO handle this
-				//System.out.println("Got message:");
-				//System.out.println(message.toString());
+#warning TODO handle this
+				printf("Got unsupported message: %s", message->toString().c_str());
 				break;
 		}
 	} catch (StyxErrorMessageException e) {

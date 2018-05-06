@@ -14,7 +14,7 @@ import java.net.InetAddress;
  */
 public class TCPServerManager extends StyxServerManager {
 
-    public TCPServerManager(InetAddress address, int port, boolean ssl, IVirtualStyxFile root) throws IOException {
-        super(root, new IChannelDriver[]{new TCPServerChannelDriver(address, port, ssl)});
+    public TCPServerManager(InetAddress address, int port, IVirtualStyxFile root) throws IOException {
+        super(root, new IChannelDriver[]{new TCPServerChannelDriver(address, port)});
     }
 }

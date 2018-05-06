@@ -21,7 +21,7 @@ protected:
 	bool mInterruptFlag;
 	IRunnable* mRunnable;
 public:
-	StyxThread();
+	StyxThread(StyxString tag);
 	~StyxThread();
 	int tryjoin(size_t dealyMs);
 	bool isAlive();

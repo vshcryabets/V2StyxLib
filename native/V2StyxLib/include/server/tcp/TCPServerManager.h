@@ -12,7 +12,7 @@
 
 class TCPServerManager: public StyxServerManager {
 public:
-	TCPServerManager(StyxString address, uint16_t port, bool ssl, IVirtualStyxFile* root);
+	TCPServerManager(StyxString address, uint16_t port, IVirtualStyxFile* root);
 	virtual ~TCPServerManager();
 };
 

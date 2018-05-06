@@ -28,7 +28,7 @@ protected:
 public:
 	static const size_t DEFAULT_TIMEOUT;
 
-	StyxServerManager(IVirtualStyxFile *root, std::vector<IChannelDriver*> drivers = std::vector<IChannelDriver*>());
+	StyxServerManager(IVirtualStyxFile *root, std::vector<IChannelDriver*> drivers);
 	~StyxServerManager();
 
 	virtual StyxServerManager* addDriver(IChannelDriver* driver) throw(StyxException);

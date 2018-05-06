@@ -6,8 +6,8 @@
 #include "utils/StyxThread.h"
 #include <unistd.h>
 
-StyxThread::StyxThread() : mAlive(false), mInterruptFlag(false) {
-
+StyxThread::StyxThread(StyxString tag) : mAlive(false), mInterruptFlag(false) {
+#warning set thread name from tag
 }
 
 StyxThread::~StyxThread() {

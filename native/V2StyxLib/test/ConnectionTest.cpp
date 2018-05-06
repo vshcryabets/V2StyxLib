@@ -17,7 +17,6 @@ StyxServerManager* startServer() {
 	std::string testDirectory = "./test";
 	StyxServerManager* mServer = new TCPServerManager("127.0.0.1",
 			PORT,
-			false,
 			new DiskStyxDirectory(testDirectory));
 	mServer->start();
 	printf("Server started\n");
@@ -25,10 +24,10 @@ StyxServerManager* startServer() {
 }
 
 void setUp() {
-	printf("Setuo 1\n");
+	printf("Setup 1\n");
 	StyxServerManager* server = startServer();
 	mConnection = new Connection();
-    IChannelDriver* driver = new TCPClientChannelDriver("localhost", PORT, false);
+    IChannelDriver* driver = new TCPClientChannelDriver("localhost", PORT);
     printf("Setup finished\n");
     ASSERT_TRUE(mConnection->connect(driver));
 }

@@ -3,9 +3,9 @@ package com.v2soft.styxlib.tests;
 import com.v2soft.styxlib.Connection;
 import com.v2soft.styxlib.IClient;
 import com.v2soft.styxlib.StyxFile;
-import com.v2soft.styxlib.library.StyxServerManager;
 import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.io.DualStreams;
+import com.v2soft.styxlib.library.StyxServerManager;
 import com.v2soft.styxlib.server.IChannelDriver;
 import com.v2soft.styxlib.server.tcp.TCPClientChannelDriver;
 import com.v2soft.styxlib.server.tcp.TCPServerManager;
@@ -14,7 +14,6 @@ import com.v2soft.styxlib.vfs.MemoryStyxFile;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -63,7 +62,7 @@ public class ClientServerTest {
     public void testMD5() throws IOException, StyxException, InterruptedException, TimeoutException, NoSuchAlgorithmException {
         IClient connection = new Connection();
         IChannelDriver driver = new TCPClientChannelDriver(
-                InetAddress.getByName("127.0.0.1"), PORT, false);
+                InetAddress.getByName("127.0.0.1"), PORT);
         assertTrue(connection.connect(driver));
         checkMD5Hash(connection);
         connection.close();

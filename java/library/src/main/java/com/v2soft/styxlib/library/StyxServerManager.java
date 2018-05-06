@@ -1,6 +1,5 @@
 package com.v2soft.styxlib.library;
 
-import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.handlers.TMessagesProcessor;
 import com.v2soft.styxlib.server.IChannelDriver;
 import com.v2soft.styxlib.types.ConnectionDetails;
@@ -35,7 +34,7 @@ public class StyxServerManager
         mRoot = root;
         // TODO inheritance not works in constructor
         ConnectionDetails details = new ConnectionDetails(getProtocol(), getIOUnit());
-        mBalancer = new TMessagesProcessor(details, root);
+        mBalancer = new TMessagesProcessor("serverTH", details, root);
         mDrivers = new LinkedList<>();
         if (drivers != null) {
             for (IChannelDriver driver : drivers) {

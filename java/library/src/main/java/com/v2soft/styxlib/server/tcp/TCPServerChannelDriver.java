@@ -12,10 +12,8 @@ import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 import java.util.Stack;
 
 /**
@@ -32,19 +30,15 @@ public class TCPServerChannelDriver extends TCPChannelDriver {
     protected Map<SocketChannel, ClientDetails> mClientStatesMap;
     protected int mLastClientId = 1;
 
-    public TCPServerChannelDriver(InetAddress address, int port, boolean ssl) throws IOException {
-        super(address, port, ssl);
-        mNewConnetions = new Stack<SocketChannel>();
-        mReadable = new Stack<SocketChannel>();
-        mClientStatesMap = new HashMap<SocketChannel, ClientDetails>();
+    public TCPServerChannelDriver(InetAddress address, int port) throws IOException {
+        super(address, port);
+        mNewConnetions = new Stack<>();
+        mReadable = new Stack<>();
+        mClientStatesMap = new HashMap<>();
     }
 
-    protected void prepareSocket(InetSocketAddress isa, boolean useSSL) throws IOException {
-        if (useSSL) {
-            throw new RuntimeException("Not implemented");
-        } else {
-            mChannel = ServerSocketChannel.open();
-        }
+    protected void prepareSocket(InetSocketAddress isa) throws IOException {
+        mChannel = ServerSocketChannel.open();
         ServerSocket socket = mChannel.socket();
         socket.bind(isa);
         socket.setReuseAddress(true);

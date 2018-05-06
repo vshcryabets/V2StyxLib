@@ -53,6 +53,7 @@ protected:
     virtual void sendAttachMessage() throw();
     virtual void setDriver(IChannelDriver* driver);
 public:
+#warning TODO simplify contructor
     Connection(Credentials credentials = Credentials(NULL, NULL), IChannelDriver *driver = NULL,
                       RMessagesProcessor *answerProcessor = NULL,
                       TMessageTransmitter *transmitter = NULL,
@@ -60,6 +61,7 @@ public:
     virtual ~Connection();
 
 	virtual void sendVersionMessage() throw(StyxException);
+#warning TODO remove or simplify
 	virtual bool connect() throw(StyxException);
 	virtual bool connect(IChannelDriver *driver) throw(StyxException);
 	virtual bool connect(IChannelDriver *driver, Credentials credentials) throw(StyxException);

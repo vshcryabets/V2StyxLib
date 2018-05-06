@@ -40,7 +40,7 @@ private:
 	StyxMessage* processCreate(ClientDetails* clientDetails, StyxTCreateMessage* msg) throw(StyxErrorMessageException);
 	StyxMessage* processRemove(ClientDetails* clientDetails, StyxTMessageFID* msg) throw(StyxErrorMessageException);
 public:
-	TMessagesProcessor(ConnectionDetails details, IVirtualStyxFile *root);
+	TMessagesProcessor(StyxString tag, ConnectionDetails details, IVirtualStyxFile *root);
 	virtual ~TMessagesProcessor();
 	virtual void addClient(ClientDetails *state);
 	virtual void removeClient(ClientDetails *state);

@@ -7,7 +7,7 @@
 
 #include "handlers/QueueMessagesProcessor.h"
 
-QueueMessagesProcessor::QueueMessagesProcessor() {
+QueueMessagesProcessor::QueueMessagesProcessor(StyxString tag) : mThread(tag) {
 	mThread.startRunnable(this);
 }
 

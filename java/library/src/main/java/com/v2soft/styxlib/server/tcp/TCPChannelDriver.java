@@ -30,19 +30,18 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
     protected InetAddress mAddress;
     protected int mPort;
 
-    public TCPChannelDriver(InetAddress address, int port, boolean ssl) throws IOException {
+    public TCPChannelDriver(InetAddress address, int port) throws IOException {
         mPort = port;
         mAddress = address;
 
         // Bind the server socket to the local host and port
         InetSocketAddress socketAddress = new InetSocketAddress(address, port);
-
-        prepareSocket(socketAddress, ssl);
+        prepareSocket(socketAddress);
         mTransmittedPacketsCount = 0;
         mTransmissionErrorsCount = 0;
     }
 
-    protected abstract void prepareSocket(InetSocketAddress socketAddress, boolean ssl) throws IOException;
+    protected abstract void prepareSocket(InetSocketAddress socketAddress) throws IOException;
 
     protected int getTimeout() {
         return StyxServerManager.DEFAULT_TIMEOUT;
@@ -53,8 +52,14 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
         if ( mAcceptorThread != null ) {
             throw new IllegalStateException("Already started");
         }
+        if (mTMessageHandler == null) {
+            throw new IllegalStateException("mTMessageHandler not ready (is null)");
+        }
+        if (mRMessageHandler == null) {
+            throw new IllegalStateException("mRMessageHandler not ready (is null)");
+        }
         mIOUnit = iounit;
-        mAcceptorThread = new Thread(this, toString());
+        mAcceptorThread = new Thread(this, "TcpDriver");
         mAcceptorThread.start();
         isWorking = true;
         return mAcceptorThread;
@@ -115,12 +120,11 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
      * @throws IOException
      */
     protected boolean readSocket(TCPClientDetails client) throws IOException {
-        int read = 0;
+        int read = -1;
         try {
             read = client.getInputBuffer().readFromChannel(client.getSocket());
         }
         catch (IOException e) {
-            read = -1;
         }
         if ( read == -1 ) {
             return true;
@@ -145,13 +149,9 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
                     mLogListener.onMessageReceived(this, client, message);
                 }
                 if ( message.getType().isTMessage() ) {
-                    if ( mTMessageHandler != null ) {
-                        mTMessageHandler.postPacket(message, client);
-                    }
+                    mTMessageHandler.postPacket(message, client);
                 } else {
-                    if ( mRMessageHandler != null ) {
-                        mRMessageHandler.postPacket(message, client);
-                    }
+                    mRMessageHandler.postPacket(message, client);
                 }
                 return true;
             }

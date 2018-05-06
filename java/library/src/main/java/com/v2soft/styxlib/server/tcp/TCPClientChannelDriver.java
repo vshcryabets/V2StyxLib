@@ -24,24 +24,24 @@ import java.util.Set;
 public class TCPClientChannelDriver extends TCPChannelDriver {
     public static final int PSEUDO_CLIENT_ID = 1;
     protected TCPClientDetails mServerClientDetails;
-    protected SocketChannel mChanel;
+    protected SocketChannel mSocket;
 
-    public TCPClientChannelDriver(InetAddress address, int port, boolean ssl) throws IOException {
-        super(address, port, ssl);
+    public TCPClientChannelDriver(InetAddress address, int port) throws IOException {
+        super(address, port);
     }
 
     @Override
     public Thread start(int iounit) {
         // TODO move to thread
-        mServerClientDetails = new TCPClientDetails(mChanel, this, iounit, PSEUDO_CLIENT_ID);
+        mServerClientDetails = new TCPClientDetails(mSocket, this, iounit, PSEUDO_CLIENT_ID);
         return super.start(iounit);
     }
 
     @Override
-    protected void prepareSocket(InetSocketAddress socketAddress, boolean ssl) throws IOException {
-        mChanel = SocketChannel.open(socketAddress);
-        mChanel.configureBlocking(true);
-        Socket socket = mChanel.socket();
+    protected void prepareSocket(InetSocketAddress socketAddress) throws IOException {
+        mSocket = SocketChannel.open(socketAddress);
+        mSocket.configureBlocking(true);
+        Socket socket = mSocket.socket();
         socket.setSoTimeout(getTimeout());
     }
 
@@ -89,13 +89,9 @@ public class TCPClientChannelDriver extends TCPChannelDriver {
                                     mLogListener.onMessageReceived(this, mServerClientDetails, message);
                                 }
                                 if ( message.getType().isTMessage() ) {
-                                    if ( mTMessageHandler != null ) {
-                                        mTMessageHandler.postPacket(message, mServerClientDetails);
-                                    }
+                                    mTMessageHandler.postPacket(message, mServerClientDetails);
                                 } else {
-                                    if ( mRMessageHandler != null ) {
-                                        mRMessageHandler.postPacket(message, mServerClientDetails);
-                                    }
+                                    mRMessageHandler.postPacket(message, mServerClientDetails);
                                 }
                             } else {
                                 break;
@@ -139,6 +135,6 @@ public class TCPClientChannelDriver extends TCPChannelDriver {
     @Override
     public String toString() {
         return String.format("%s:%s", getClass().getSimpleName(),
-                mChanel.socket().getLocalAddress().toString());
+                mSocket.socket().getLocalAddress().toString());
     }
 }

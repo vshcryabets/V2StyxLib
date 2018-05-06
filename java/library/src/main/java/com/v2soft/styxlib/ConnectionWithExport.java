@@ -1,7 +1,10 @@
 package com.v2soft.styxlib;
 
+import com.v2soft.styxlib.handlers.RMessagesProcessor;
 import com.v2soft.styxlib.handlers.TMessagesProcessor;
 import com.v2soft.styxlib.exceptions.StyxException;
+import com.v2soft.styxlib.server.ClientDetails;
+import com.v2soft.styxlib.server.TMessageTransmitter;
 import com.v2soft.styxlib.types.Credentials;
 import com.v2soft.styxlib.server.IChannelDriver;
 import com.v2soft.styxlib.server.tcp.TCPDualLinkServerManager;
@@ -39,14 +42,15 @@ public class ConnectionWithExport extends Connection {
         mExportedRoot = root;
     }
 
-    @Override
-    public boolean connect(IChannelDriver driver, Credentials credentials) throws IOException, StyxException,
-            InterruptedException, TimeoutException {
-        boolean result = super.connect(driver, credentials);
-        mExportProcessor = new TMessagesProcessor(getConnectionDetails(), mExportedRoot);
+    public boolean connect(IChannelDriver driver, Credentials credentials,
+                           RMessagesProcessor answerProcessor,
+                           TMessageTransmitter transmitter, ClientDetails recepient)
+            throws InterruptedException, StyxException, TimeoutException, IOException {
+        mExportProcessor = new TMessagesProcessor("clientTH", getConnectionDetails(), mExportedRoot);
         driver.setTMessageHandler(mExportProcessor);
-        return result;
+        return super.connect(driver, credentials, answerProcessor, transmitter, recepient);
     }
+
 
     @Override
     public void close() throws IOException {
