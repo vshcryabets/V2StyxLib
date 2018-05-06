@@ -89,10 +89,6 @@ void StyxByteBufferReadable::clear() {
 	mCurrentLimit = mCapacity;
 }
 
-void StyxByteBufferReadable::limit(size_t limit) {
-	mCurrentLimit = limit;
-}
-
 size_t StyxByteBufferReadable::updateBufferLimits() {
 	size_t free = mCapacity - mStoredBytes;
 	if ( free <= 0 ) return 0;

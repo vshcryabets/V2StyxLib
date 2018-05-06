@@ -84,12 +84,6 @@ public class StyxByteBufferReadable implements IStyxBuffer {
         mBuffer.limit(mCurrentLimit);
     }
 
-    @Override
-    public void limit(int limit) {
-        mCurrentLimit = limit;
-        mBuffer.limit(mCurrentLimit);
-    }
-
     private int updateBufferLimits() {
         int free = mCapacity-mStoredBytes;
         if ( free <= 0 ) return 0;

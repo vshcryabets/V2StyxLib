@@ -35,15 +35,11 @@ public class TCPClientDetails extends ClientDetails {
         mOutputWriter = new StyxDataWriter(mOutputBuffer);
     }
 
-    public ByteBuffer getOutputBuffer() {
-        return mOutputBuffer;
-    }
-
     public StyxDataWriter getOutputWriter() {
         return mOutputWriter;
     }
 
-    public SocketChannel getChannel() {
+    public SocketChannel getSocket() {
         return mChannel;
     }
 
@@ -68,5 +64,9 @@ public class TCPClientDetails extends ClientDetails {
         // TODO something wrong, close should in same place where we have opened it.
         mChannel.close();
         mChannel = null;
+    }
+
+    public ByteBuffer getOutputBuffer() {
+        return mOutputBuffer;
     }
 }

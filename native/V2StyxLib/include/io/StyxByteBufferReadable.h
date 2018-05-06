@@ -37,7 +37,6 @@ public:
 	virtual size_t write(uint8_t *buffer, size_t length);
 	virtual uint8_t *getBuffer();
 	virtual void clear();
-	virtual void limit(size_t limit);
 	virtual size_t get(uint8_t *out, size_t length);
 	virtual void moveReadPointerBy(size_t bytes);
 	virtual size_t read(uint8_t *out, size_t length);

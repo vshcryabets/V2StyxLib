@@ -43,7 +43,5 @@ public:
     virtual uint8_t *getBuffer() = 0;
 
     virtual void clear() = 0;
-
-    virtual void limit(size_t limit) = 0;
 };
 #endif

@@ -63,16 +63,11 @@ bool TCPChannelDriver::sendMessage(StyxMessage* message, ClientDetails *recipien
     if ( recipient == NULL ) {
         throw StyxException("Recipient can't be null");
     }
-    // TODO may be we can use buffer in stack?
-    std::vector<uint8_t>* buffer = ((TCPClientDetails*)recipient)->getOutputBuffer();
-    // TODO optimize this line,
-	// no need to create new instance
-    StyxDataWriter writter(buffer);
+	TCPClientDetails* tcpClient = (TCPClientDetails*)recipient;
+#warning there shoud be some synchronization, because we can call send message from different threads? and use single output buffer
 	try {
-		message->writeToBuffer(&writter);
-//            System.out.printf("Limit=%d, %d\n", buffer.limit(), buffer.position());
-		Socket channel = ((TCPClientDetails*) recipient)->getChannel();
-		::send(channel, buffer, writter.getPosition(), 0);
+		message->writeToBuffer(tcpClient->getOutputWritter());
+		::send(tcpClient->getChannel(), tcpClient->getOutputBuffer(), tcpClient->getOutputWritter()->getPosition(), 0);
 		mTransmittedPacketsCount++;
 #ifdef USE_LOGGING
 		if (mLogListener != NULL) {

@@ -25,6 +25,7 @@ TCPClientChannelDriver::~TCPClientChannelDriver() {
 }
 
 StyxThread* TCPClientChannelDriver::start(int iounit) {
+#warning TODO move to thread
 	mServerClientDetails = new TCPClientDetails(mChannel, this, iounit, TCPClientChannelDriver::PSEUDO_CLIENT_ID);
 	return TCPChannelDriver::start(iounit);
 }
@@ -81,6 +82,7 @@ bool TCPClientChannelDriver::sendMessage(StyxMessage* message, ClientDetails *re
 void* TCPClientChannelDriver::run() {
 	try {
 		isWorking = true;
+		#warning TODO we can use buffer and reader from mServerClientDetails
 		StyxByteBufferReadable buffer(mIOUnit * 2);
 		StyxDataReader reader(&buffer);
 		while (isWorking) {

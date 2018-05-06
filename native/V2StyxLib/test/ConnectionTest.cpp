@@ -33,7 +33,7 @@ void setUp() {
     ASSERT_TRUE(mConnection->connect(driver));
 }
 
-TEST(cpp_connection_test, connection_test) {
+TEST(DISABLED_cpp_connection_test, connection_test) {
 	setUp();
     size_t count = 1000;
     uint64_t startTime = getTimestampInMilliseconds();

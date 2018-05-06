@@ -48,6 +48,4 @@ public interface IStyxBuffer {
      * Reset position &amp; limit
      */
     void clear();
-
-    void limit(int limit);
 }

@@ -6,8 +6,6 @@ import com.v2soft.styxlib.io.StyxDataReader;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
-
 /**
  * {@link com.v2soft.styxlib.io.StyxDataReader} test.
  *
@@ -16,11 +14,13 @@ import java.io.IOException;
 public class StyxDataReaderTest {
 
     @Test
-    public void testReadUuint64() throws IOException {
+    public void testReadUint64() {
         StyxByteBufferReadable buffer = new StyxByteBufferReadable(16);
         buffer.write(new byte[]{8, 7, 6, 5, 4, 3, 2, 1}, 0, 8);
+        buffer.write(new byte[]{8, 7, 6, 5, 4, 3, 2, 1}, 0, 8);
         StyxDataReader reader = new StyxDataReader(buffer);
-        Assertions.assertEquals(0x0102030405060708L, reader.readUInt64());
+        Assertions.assertEquals(0x0102030405060708L, reader.readUInt64(), "Wrong read uint64");
+        Assertions.assertNotEquals(0x1102030405060708L, reader.readUInt64(), "Wrong read uint64");
     }
 
 }

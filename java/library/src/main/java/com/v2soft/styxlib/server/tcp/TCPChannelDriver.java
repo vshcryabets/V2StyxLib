@@ -66,12 +66,12 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
             throw new NullPointerException("Recipient can't be null");
         }
         TCPClientDetails client = (TCPClientDetails) recipient;
-        ByteBuffer buffer = client.getOutputBuffer();
         synchronized (client) {
             try {
                 message.writeToBuffer(client.getOutputWriter());
+                ByteBuffer buffer = client.getOutputBuffer();
                 buffer.flip();
-                client.getChannel().write(buffer);
+                client.getSocket().write(buffer);
                 mTransmittedPacketsCount++;
                 if (mLogListener != null) {
                     mLogListener.onMessageTransmited(this, recipient, message);
@@ -117,7 +117,7 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
     protected boolean readSocket(TCPClientDetails client) throws IOException {
         int read = 0;
         try {
-            read = client.getInputBuffer().readFromChannel(client.getChannel());
+            read = client.getInputBuffer().readFromChannel(client.getSocket());
         }
         catch (IOException e) {
             read = -1;

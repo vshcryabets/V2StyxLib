@@ -32,6 +32,7 @@ public class TCPClientChannelDriver extends TCPChannelDriver {
 
     @Override
     public Thread start(int iounit) {
+        // TODO move to thread
         mServerClientDetails = new TCPClientDetails(mChanel, this, iounit, PSEUDO_CLIENT_ID);
         return super.start(iounit);
     }
@@ -46,10 +47,10 @@ public class TCPClientChannelDriver extends TCPChannelDriver {
 
     @Override
     public boolean isConnected() {
-        if ( mServerClientDetails.getChannel() == null ) {
+        if ( mServerClientDetails.getSocket() == null ) {
             return false;
         }
-        return mServerClientDetails.getChannel().isOpen();
+        return mServerClientDetails.getSocket().isOpen();
     }
 
     @Override
@@ -69,13 +70,14 @@ public class TCPClientChannelDriver extends TCPChannelDriver {
     public void run() {
         try {
             isWorking = true;
+            // TODO we can use buffer and reader from mServerClientDetails
             final StyxByteBufferReadable buffer = new StyxByteBufferReadable(mIOUnit*2);
             final StyxDataReader reader = new StyxDataReader(buffer);
             while (isWorking) {
                 if (Thread.interrupted()) break;
                 // read from socket
                 try {
-                    int readed = buffer.readFromChannel(mServerClientDetails.getChannel());
+                    int readed = buffer.readFromChannel(mServerClientDetails.getSocket());
                     if ( readed > 0 ) {
                         // loop unitl we have unprocessed packets in the input buffer
                         while ( buffer.remainsToRead() > 4 ) {
