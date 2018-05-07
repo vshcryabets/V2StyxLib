@@ -95,10 +95,7 @@ public class PacketIOTests {
         };
         MemoryStyxDirectory root = new MemoryStyxDirectory("root");
         root.addFile(md5);
-        mServer = new TCPServerManager(InetAddress.getByName("127.0.0.1"),
-                PORT,
-                false,
-                root);
+        mServer = new TCPServerManager(InetAddress.getLoopbackAddress(), PORT, root);
         mServer.start();
     }
 

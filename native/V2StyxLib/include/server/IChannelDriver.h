@@ -14,7 +14,7 @@ class ILogListener;
 class IChannelDriver : public IMessageTransmitter {
 public:
 	virtual ~IChannelDriver() {};
-    virtual StyxThread* start(size_t iounit) = 0;
+    virtual StyxThread* start(size_t iounit) throw(StyxException) = 0;
     virtual void setTMessageHandler(IMessageProcessor* handler) = 0;
     virtual void setRMessageHandler(IMessageProcessor* handler) = 0;
 #ifdef USE_LOGGING

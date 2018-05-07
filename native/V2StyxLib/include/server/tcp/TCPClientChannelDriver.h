@@ -21,7 +21,7 @@ public:
 	virtual ~TCPClientChannelDriver();
 
 	virtual StyxThread* start(int iounit);
-	virtual void prepareSocket(StyxString socketAddress, uint16_t port) throw(StyxException);
+	virtual void prepareSocket() throw(StyxException);
 	virtual bool isConnected();
 	virtual bool isStarted();
 	virtual bool sendMessage(StyxMessage* message, ClientDetails *recipient) throw(StyxException);

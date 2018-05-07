@@ -7,19 +7,15 @@
 #include "handlers/RMessagesProcessor.h"
 
 RMessagesProcessor::RMessagesProcessor(StyxString tag)
-	: QueueMessagesProcessor(tag), mTag(tag) {
+	: QueueMessagesProcessor(tag) {
 }
 
 RMessagesProcessor::~RMessagesProcessor() {
 	// TODO Auto-generated destructor stub
 }
 
-void RMessagesProcessor::removeClient(ClientDetails *state) {
-	// nothing to do
-}
-
 void RMessagesProcessor::processPacket(StyxMessage *message, ClientDetails *client) throw(StyxException) {
-	mReceivedCount++;
+	mHandledPackets++;
 	StyxTAG tag = message->getTag();
 	StyxTMessage* tMessage = client->getPolls()->getTMessage(tag);
 	if (tMessage == NULL) {
@@ -39,19 +35,8 @@ void RMessagesProcessor::processPacket(StyxMessage *message, ClientDetails *clie
 		e.printStackTrace();
 	}
 	if (message->getType() == Rerror) {
-		mErrorCount++;
+		mErrorPackets++;
 	}
 	client->getPolls()->releaseTag(tag);
 }
 
-size_t RMessagesProcessor::getReceivedPacketsCount() {
-	return mReceivedCount;
-}
-
-size_t RMessagesProcessor::getReceivedErrorPacketsCount() {
-	return mErrorCount;
-}
-
-void RMessagesProcessor::addClient(ClientDetails *state) {
-	// nothing to do
-}

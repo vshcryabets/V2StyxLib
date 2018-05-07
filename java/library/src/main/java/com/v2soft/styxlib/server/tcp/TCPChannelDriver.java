@@ -9,7 +9,6 @@ import com.v2soft.styxlib.server.IChannelDriver;
 
 import java.io.IOException;
 import java.net.InetAddress;
-import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 
 /**
@@ -33,22 +32,18 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
     public TCPChannelDriver(InetAddress address, int port) throws IOException {
         mPort = port;
         mAddress = address;
-
-        // Bind the server socket to the local host and port
-        InetSocketAddress socketAddress = new InetSocketAddress(address, port);
-        prepareSocket(socketAddress);
         mTransmittedPacketsCount = 0;
         mTransmissionErrorsCount = 0;
     }
 
-    protected abstract void prepareSocket(InetSocketAddress socketAddress) throws IOException;
+    public abstract void prepareSocket() throws IOException;
 
     protected int getTimeout() {
         return StyxServerManager.DEFAULT_TIMEOUT;
     }
 
     @Override
-    public Thread start(int iounit) {
+    public Thread start(int iounit) throws IOException {
         if ( mAcceptorThread != null ) {
             throw new IllegalStateException("Already started");
         }
@@ -58,6 +53,7 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
         if (mRMessageHandler == null) {
             throw new IllegalStateException("mRMessageHandler not ready (is null)");
         }
+        prepareSocket();
         mIOUnit = iounit;
         mAcceptorThread = new Thread(this, "TcpDriver");
         mAcceptorThread.start();

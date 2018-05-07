@@ -9,9 +9,8 @@
 #include "io/StyxDataWriter.h"
 #include <sys/socket.h>
 
-TCPChannelDriver::TCPChannelDriver(StyxString address, uint16_t port) {
-    mPort = port;
-    mAddress = address;
+TCPChannelDriver::TCPChannelDriver(StyxString address, uint16_t port) 
+	: mPort(port), mAddress(address) {
     mTransmittedPacketsCount = 0;
     mTransmissionErrorsCount = 0;
 }
@@ -100,7 +99,7 @@ void TCPChannelDriver::close() throw(StyxException) {
 	mAcceptorThread = NULL;
 }
 
-StyxThread* TCPChannelDriver::start(size_t iounit) {
+StyxThread* TCPChannelDriver::start(size_t iounit) throw(StyxException) {
 		if ( mAcceptorThread != NULL ) {
             throw StyxException("Already started");
         }
@@ -110,6 +109,7 @@ StyxThread* TCPChannelDriver::start(size_t iounit) {
 		if (mRMessageHandler == NULL) {
             throw StyxException("mRMessageHandler not ready (is null)");
         }
+		prepareSocket();
         mIOUnit = iounit;
         mAcceptorThread = new StyxThread("TcpDriver");
         mAcceptorThread->startRunnable(this);

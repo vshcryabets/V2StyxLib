@@ -40,14 +40,12 @@ public class TMessagesProcessor extends QueueMessagesProcessor {
     protected ConnectionDetails mConnectionDetails;
     private static final int DEFAULT_PACKET_HEADER_SIZE = 24;
     private IVirtualStyxFile mRoot;
-    protected int mHandledPackets, mErrorPackets, mAnswerPackets;
+    protected int mAnswerPackets;
 
     public TMessagesProcessor(String tag, ConnectionDetails details, IVirtualStyxFile root) {
         super(tag);
         mConnectionDetails = details;
         mRoot = root;
-        mHandledPackets = 0;
-        mErrorPackets = 0;
         mAnswerPackets = 0;
     }
 
@@ -133,16 +131,6 @@ public class TMessagesProcessor extends QueueMessagesProcessor {
             mAnswerPackets++;
             target.getDriver().sendMessage(answer, target);
         }
-    }
-
-    @Override
-    public int getReceivedPacketsCount() {
-        return mHandledPackets;
-    }
-
-    @Override
-    public int getReceivedErrorPacketsCount() {
-        return mErrorPackets;
     }
 
     private StyxMessage processAttach(ClientDetails clientDetails, StyxTAttachMessage msg) {

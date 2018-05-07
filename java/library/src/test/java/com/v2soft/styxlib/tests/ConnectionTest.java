@@ -56,8 +56,7 @@ public class ConnectionTest {
         if (!testDirectory.exists()) {
             testDirectory.mkdirs();
         }
-        mServer = new TCPServerManager(localHost, PORT, false,
-                new DiskStyxDirectory(testDirectory));
+        mServer = new TCPServerManager(localHost, PORT, new DiskStyxDirectory(testDirectory));
         mServer.start();
         mConnection = new Connection();
         IChannelDriver driver = new TCPClientChannelDriver(localHost, PORT);

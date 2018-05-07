@@ -47,10 +47,8 @@ public class TwoWayExportTest {
         MemoryStyxFile md5 = new MD5StyxFile();
         MemoryStyxDirectory root = new MemoryStyxDirectory("root");
         root.addFile(md5);
-        mServer = new TCPDualLinkServerManager(InetAddress.getByName("127.0.0.1"),
-                PORT,
-                false,
-                root);
+        mServer = new TCPDualLinkServerManager(InetAddress.getLoopbackAddress(),
+                PORT, root);
         mServer.start();
     }
 

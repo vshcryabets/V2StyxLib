@@ -24,8 +24,6 @@ class TMessagesProcessor : public QueueMessagesProcessor {
 protected:
 	ConnectionDetails mConnectionDetails;
 	IVirtualStyxFile *mRoot;
-	size_t mHandledPackets;
-	size_t mErrorPackets;
 	size_t mAnswerPackets;
 private:
 	static const size_t DEFAULT_PACKET_HEADER_SIZE = 24;
@@ -45,8 +43,6 @@ public:
 	virtual void addClient(ClientDetails *state);
 	virtual void removeClient(ClientDetails *state);
 	virtual void processPacket(StyxMessage *message, ClientDetails *target) throw(StyxException);
-	virtual size_t getReceivedPacketsCount();
-    virtual size_t getReceivedErrorPacketsCount();
 };
 
 #endif /* INCLUDE_HANDLERS_TMESSAGESPROCESSOR_H_ */

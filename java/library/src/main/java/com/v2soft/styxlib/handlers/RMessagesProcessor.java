@@ -7,34 +7,19 @@ import com.v2soft.styxlib.messages.base.StyxTMessageFID;
 import com.v2soft.styxlib.messages.base.enums.MessageType;
 import com.v2soft.styxlib.server.ClientDetails;
 
-import java.io.IOException;
-
 /**
  * Class that processes RMessages (i.e answer from server).
  * @author V.Shcryabets <a>vshcryabets@gmail.com</a>
  */
 public class RMessagesProcessor extends QueueMessagesProcessor implements IMessageProcessor {
-    protected int mReceivedCount, mErrorCount;
-    protected String mTag;
 
     public RMessagesProcessor(String tag) {
         super(tag);
-        mTag = tag;
     }
 
     @Override
-    public void addClient(ClientDetails state) {
-        // nothing to do
-    }
-
-    @Override
-    public void removeClient(ClientDetails state) {
-        // nothing to do
-    }
-
-    @Override
-    public void processPacket(StyxMessage message, ClientDetails client) throws IOException, StyxException {
-        mReceivedCount++;
+    public void processPacket(StyxMessage message, ClientDetails client) throws StyxException {
+        mHandledPackets++;
         int tag = message.getTag();
         final StyxTMessage tMessage = client.getPolls().getTMessage(tag);
         if (tMessage == null) {
@@ -54,18 +39,8 @@ public class RMessagesProcessor extends QueueMessagesProcessor implements IMessa
             e.printStackTrace();
         }
         if (message.getType() == MessageType.Rerror) {
-            mErrorCount++;
+            mErrorPackets++;
         }
         client.getPolls().releaseTag(tag);
-    }
-
-    @Override
-    public int getReceivedPacketsCount() {
-        return mReceivedCount;
-    }
-
-    @Override
-    public int getReceivedErrorPacketsCount() {
-        return mErrorCount;
     }
 }

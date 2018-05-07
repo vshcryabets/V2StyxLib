@@ -30,15 +30,15 @@ StyxThread* TCPClientChannelDriver::start(int iounit) {
 	return TCPChannelDriver::start(iounit);
 }
 
-void TCPClientChannelDriver::prepareSocket(StyxString socketAddress, uint16_t port) throw(StyxException) {
+void TCPClientChannelDriver::prepareSocket() throw(StyxException) {
 	int sockfd = ::socket(AF_INET, SOCK_STREAM, 0);
 	if (sockfd < 0) {
 		  throw StyxException("Can't create socket");
 	}
 	struct hostent *server;
-	server = ::gethostbyname(socketAddress.c_str());
+	server = ::gethostbyname(mAddress.c_str());
 	if (server == NULL) {
-		throw StyxException("Can't resolve hostname %s", socketAddress.c_str());
+		throw StyxException("Can't resolve hostname %s", mAddress.c_str());
 	}
 	struct sockaddr_in serverAddress;
 	bzero((char *) &serverAddress, sizeof(serverAddress));
@@ -46,7 +46,7 @@ void TCPClientChannelDriver::prepareSocket(StyxString socketAddress, uint16_t po
 	bcopy((char *)server->h_addr,
 	      (char *)&serverAddress.sin_addr.s_addr,
 	      server->h_length);
-	serverAddress.sin_port = htons(port);
+	serverAddress.sin_port = htons(mPort);
 	int connectResult = ::connect(sockfd, (struct sockaddr*)&serverAddress, sizeof(serverAddress));
 	if (connectResult < 0) {
 		throw StyxException("Connect failed %d", errno);

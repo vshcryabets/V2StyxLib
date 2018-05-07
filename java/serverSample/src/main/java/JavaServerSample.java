@@ -67,9 +67,7 @@ public class JavaServerSample {
         MemoryStyxDirectory root = new MemoryStyxDirectory("root");
         root.addFile(md5);
         StyxServerManager mServer = new TCPServerManager(InetAddress.getByName("127.0.0.1"),
-                PORT,
-                false,
-                root);
+                PORT, root);
         Thread[] threads = mServer.start();
         System.out.println("Test server listen on 127.0.0.1:" + PORT);
         for(Thread thread : threads) {

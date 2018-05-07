@@ -18,26 +18,27 @@ protected:
     IMessageProcessor* mRMessageHandler;
     uint32_t mIOUnit;
     bool isWorking;
+#warning rename to mThread
     StyxThread* mAcceptorThread;
 
 #ifdef USE_LOGGING
     ILogListener* mLogListener;
 #endif
 
-	virtual void prepareSocket(StyxString socketAddress, uint16_t port) throw(StyxException) = 0;
 
 	// get connection timeout in miliseconds
 	virtual size_t getTimeout();
 public:
 	TCPChannelDriver(StyxString address, uint16_t port);
 	virtual ~TCPChannelDriver();
-	virtual StyxThread* start(size_t iounit);
+	virtual StyxThread* start(size_t iounit) throw(StyxException);
 	virtual bool sendMessage(StyxMessage* message, ClientDetails *recipient) throw(StyxException);
 	virtual void setTMessageHandler(IMessageProcessor *handler);
 	virtual void setRMessageHandler(IMessageProcessor *handler);
 	virtual void close() throw(StyxException);
 	virtual size_t getTransmittedCount();
 	virtual size_t getErrorsCount();
+	virtual void prepareSocket() throw(StyxException) = 0;
 #ifdef USE_LOGGING
 	virtual void setLogListener(ILogListener *listener);
 #endif

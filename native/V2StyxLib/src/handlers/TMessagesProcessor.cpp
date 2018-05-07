@@ -16,8 +16,7 @@
 #include "messages/StyxRAuthMessage.h"
 
 TMessagesProcessor::TMessagesProcessor(StyxString tag, ConnectionDetails details, IVirtualStyxFile *root)
-	: QueueMessagesProcessor(tag), mConnectionDetails(details), mRoot(root), mHandledPackets(0), 
-	mErrorPackets(0), mAnswerPackets(0) {
+	: QueueMessagesProcessor(tag), mConnectionDetails(details), mRoot(root), mAnswerPackets(0) {
 }
 
 TMessagesProcessor::~TMessagesProcessor() {
@@ -184,13 +183,4 @@ StyxMessage* TMessagesProcessor::processRemove(ClientDetails* clientDetails,
 	StyxTMessageFID* msg) throw(StyxErrorMessageException) {
 	clientDetails->getAssignedFile(msg->getFID())->deleteFile(clientDetails);
 	return new StyxMessage(Rremove, msg->getTag());
-}
-
-
-size_t TMessagesProcessor::getReceivedPacketsCount() {
-	return mHandledPackets;
-}
-
-size_t TMessagesProcessor::getReceivedErrorPacketsCount() {
-	return mErrorPackets;
 }

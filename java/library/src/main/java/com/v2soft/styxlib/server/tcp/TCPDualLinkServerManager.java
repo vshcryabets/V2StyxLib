@@ -23,8 +23,8 @@ public class TCPDualLinkServerManager extends TCPServerManager {
     protected RMessagesProcessor mReverseAnswerProcessor;
     protected TMessageTransmitter mReverseTransmitter;
 
-    public TCPDualLinkServerManager(InetAddress address, int port, boolean ssl, IVirtualStyxFile root) throws IOException {
-        super(address, port, ssl, root);
+    public TCPDualLinkServerManager(InetAddress address, int port, IVirtualStyxFile root) throws IOException {
+        super(address, port, root);
     }
 
     @Override

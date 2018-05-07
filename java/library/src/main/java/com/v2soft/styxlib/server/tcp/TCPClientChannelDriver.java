@@ -31,14 +31,15 @@ public class TCPClientChannelDriver extends TCPChannelDriver {
     }
 
     @Override
-    public Thread start(int iounit) {
+    public Thread start(int iounit) throws IOException {
         // TODO move to thread
         mServerClientDetails = new TCPClientDetails(mSocket, this, iounit, PSEUDO_CLIENT_ID);
         return super.start(iounit);
     }
 
     @Override
-    protected void prepareSocket(InetSocketAddress socketAddress) throws IOException {
+    public void prepareSocket() throws IOException {
+        InetSocketAddress socketAddress = new InetSocketAddress(mAddress, mPort);
         mSocket = SocketChannel.open(socketAddress);
         mSocket.configureBlocking(true);
         Socket socket = mSocket.socket();

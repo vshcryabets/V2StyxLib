@@ -7,7 +7,8 @@
 
 #include "handlers/QueueMessagesProcessor.h"
 
-QueueMessagesProcessor::QueueMessagesProcessor(StyxString tag) : mThread(tag) {
+QueueMessagesProcessor::QueueMessagesProcessor(StyxString tag) : mThread(tag), mTag(tag), mErrorPackets(0),
+	mHandledPackets(0) {
 	mThread.startRunnable(this);
 }
 
@@ -40,3 +41,20 @@ void* QueueMessagesProcessor::run() {
 	}
 	return NULL;
 }
+
+void QueueMessagesProcessor::addClient(ClientDetails *state) {
+	// nothing to do
+}
+
+void QueueMessagesProcessor::removeClient(ClientDetails *state) {
+	// nothing to do
+}
+
+size_t QueueMessagesProcessor::getReceivedPacketsCount() {
+	return mHandledPackets;
+}
+
+size_t QueueMessagesProcessor::getReceivedErrorPacketsCount() {
+	return mErrorPackets;
+}
+

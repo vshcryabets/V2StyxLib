@@ -22,8 +22,6 @@ import java.util.Stack;
  * @author V.Shcryabets (vshcryabets@gmail.com)
  */
 public class TCPServerChannelDriver extends TCPChannelDriver {
-    private static final String TAG = TCPServerChannelDriver.class.getSimpleName();
-
     protected ServerSocketChannel mChannel;
     protected Selector mSelector;
     protected Stack<SocketChannel> mNewConnetions, mReadable;
@@ -37,10 +35,11 @@ public class TCPServerChannelDriver extends TCPChannelDriver {
         mClientStatesMap = new HashMap<>();
     }
 
-    protected void prepareSocket(InetSocketAddress isa) throws IOException {
+    public void prepareSocket() throws IOException {
+        InetSocketAddress socketAddress = new InetSocketAddress(mAddress, mPort);
         mChannel = ServerSocketChannel.open();
         ServerSocket socket = mChannel.socket();
-        socket.bind(isa);
+        socket.bind(socketAddress);
         socket.setReuseAddress(true);
         socket.setSoTimeout(getTimeout());
         mSelector = Selector.open();

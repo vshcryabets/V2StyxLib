@@ -13,6 +13,9 @@ import java.util.concurrent.TimeUnit;
 public abstract class QueueMessagesProcessor implements IMessageProcessor, Runnable {
     protected LinkedBlockingQueue<Pair> mQueue;
     protected Thread mThread;
+    protected int mHandledPackets;
+    protected int mErrorPackets;
+    protected String mTag;
 
     private class Pair {
         public StyxMessage mMessage;
@@ -20,9 +23,22 @@ public abstract class QueueMessagesProcessor implements IMessageProcessor, Runna
     }
 
     public QueueMessagesProcessor(String tag) {
+        mTag = tag;
+        mHandledPackets = 0;
+        mErrorPackets = 0;
         mQueue = new LinkedBlockingQueue<>();
         mThread = new Thread(this, tag);
         mThread.start();
+    }
+
+    @Override
+    public void addClient(ClientDetails state) {
+        // nothing to do
+    }
+
+    @Override
+    public void removeClient(ClientDetails state) {
+        // nothing to do
     }
 
     @Override
@@ -60,4 +76,15 @@ public abstract class QueueMessagesProcessor implements IMessageProcessor, Runna
             }
         }
     }
+
+    @Override
+    public int getReceivedPacketsCount() {
+        return mHandledPackets;
+    }
+
+    @Override
+    public int getReceivedErrorPacketsCount() {
+        return mErrorPackets;
+    }
+
 }
