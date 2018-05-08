@@ -54,8 +54,8 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
         if (mRMessageHandler == null) {
             throw new IllegalStateException("mRMessageHandler not ready (is null)");
         }
-        prepareSocket();
         mIOUnit = iounit;
+        prepareSocket();
         mAcceptorThread = new Thread(this, "TcpDriver");
         mAcceptorThread.start();
         isWorking = true;

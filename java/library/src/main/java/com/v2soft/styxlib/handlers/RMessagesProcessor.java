@@ -24,7 +24,7 @@ public class RMessagesProcessor extends QueueMessagesProcessor implements IMessa
         final StyxTMessage tMessage = client.getPolls().getTMessage(tag);
         if (tMessage == null) {
             // we didn't send T message with such tag, so ignore this R message
-            throw new StyxException(String.format("RMP(%s) got unknown R message from client %s",
+            throw new StyxException(String.format("RMP(%s) got unknown R message from server %s",
                     mTag,
                     client.toString()));
         }

@@ -26,7 +26,9 @@ public class TCPClientDetails extends ClientDetails {
 
     public TCPClientDetails(SocketChannel channel, IChannelDriver driver, int iounit, int id) {
         super(driver, id);
-        if ( channel == null ) throw new NullPointerException("Client channel can't be null");
+        if ( channel == null ) {
+            throw new NullPointerException("Client channel can't be null");
+        }
         mChannel = channel;
         mOutputBuffer = ByteBuffer.allocate(iounit);
         MetricsAndStats.byteBufferAllocation++;

@@ -11,6 +11,9 @@
 TCPClientDetails::TCPClientDetails(Socket socket, IChannelDriver* driver, size_t iounit, int id) 
 	: ClientDetails(driver, id), mChannel(socket), mOutputBuffer(StyxBuffer(iounit)),
 		mOutputWriter(&mOutputBuffer) {
+	if (socket == INVALID_SOCKET) {
+		throw new StyxException("Socket is not ready");
+	}
 }
 
 TCPClientDetails::~TCPClientDetails() {

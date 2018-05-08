@@ -20,7 +20,7 @@ void RMessagesProcessor::processPacket(StyxMessage *message, ClientDetails *clie
 	StyxTMessage* tMessage = client->getPolls()->getTMessage(tag);
 	if (tMessage == NULL) {
 		// we didn't send T message with such tag, so ignore this R message
-		throw StyxException("RMP(%s) got unknown R message from client %s",
+		throw StyxException("RMP(%s) got unknown R message from server %s",
 				mTag.c_str(),
 				client->toString().c_str());
 	}

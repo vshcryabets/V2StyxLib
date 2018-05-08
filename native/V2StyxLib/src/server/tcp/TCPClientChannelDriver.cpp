@@ -24,12 +24,6 @@ TCPClientChannelDriver::~TCPClientChannelDriver() {
 	}
 }
 
-StyxThread* TCPClientChannelDriver::start(int iounit) throw(StyxException){
-#warning TODO move to thread
-	mServerClientDetails = new TCPClientDetails(mSocket, this, iounit, TCPClientChannelDriver::PSEUDO_CLIENT_ID);
-	return TCPChannelDriver::start(iounit);
-}
-
 void TCPClientChannelDriver::prepareSocket() throw(StyxException) {
 	int sockfd = ::socket(AF_INET, SOCK_STREAM, 0);
 	if (sockfd < 0) {
@@ -62,6 +56,7 @@ void TCPClientChannelDriver::prepareSocket() throw(StyxException) {
 		throw StyxException(InternalErrors::DRIVER_CONFIGURE_ERROR);
 	}
 	mSocket = sockfd;
+	mServerClientDetails = new TCPClientDetails(mSocket, this, mIOUnit, TCPClientChannelDriver::PSEUDO_CLIENT_ID);
 }
 
 bool TCPClientChannelDriver::isConnected() {

@@ -31,13 +31,6 @@ public class TCPClientChannelDriver extends TCPChannelDriver {
     }
 
     @Override
-    public Thread start(int iounit) throws StyxException {
-        // TODO move to thread
-        mServerClientDetails = new TCPClientDetails(mSocket, this, iounit, PSEUDO_CLIENT_ID);
-        return super.start(iounit);
-    }
-
-    @Override
     public void prepareSocket() throws StyxException {
         InetSocketAddress socketAddress = new InetSocketAddress(mAddress, mPort);
         try {
@@ -51,6 +44,7 @@ public class TCPClientChannelDriver extends TCPChannelDriver {
         } catch (IOException e) {
             throw new StyxException(StyxException.DRIVER_CONFIGURE_ERROR);
         }
+        mServerClientDetails = new TCPClientDetails(mSocket, this, mIOUnit, PSEUDO_CLIENT_ID);
     }
 
     @Override

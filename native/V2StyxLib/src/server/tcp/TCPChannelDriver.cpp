@@ -109,8 +109,8 @@ StyxThread* TCPChannelDriver::start(size_t iounit) throw(StyxException) {
 		if (mRMessageHandler == NULL) {
             throw StyxException("mRMessageHandler not ready (is null)");
         }
-		prepareSocket();
         mIOUnit = iounit;
+		prepareSocket();
         mAcceptorThread = new StyxThread("TcpDriver");
         mAcceptorThread->startRunnable(this);
         isWorking = true;
