@@ -1,9 +1,5 @@
 #include "gtest/gtest.h"
-#include <unistd.h>
 #include "server/tcp/TCPServerChannelDriver.h"
-#include "server/tcp/TCPClientChannelDriver.h"
-#include "messages/StyxTVersionMessage.h"
-#include "handlers/RMessagesProcessor.h"
 
 TEST(cpp_server_testPrepareSocket_test, rw_test) {
 	try {

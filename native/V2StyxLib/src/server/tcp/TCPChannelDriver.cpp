@@ -10,7 +10,7 @@
 #include <sys/socket.h>
 
 TCPChannelDriver::TCPChannelDriver(StyxString address, uint16_t port) 
-	: mPort(port), mAddress(address) {
+	: mPort(port), mAddress(address), mAcceptorThread(NULL) {
     mTransmittedPacketsCount = 0;
     mTransmissionErrorsCount = 0;
 }

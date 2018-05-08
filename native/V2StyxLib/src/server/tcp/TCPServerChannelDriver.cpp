@@ -14,9 +14,8 @@ TCPServerChannelDriver::TCPServerChannelDriver(StyxString address, uint16_t port
     : TCPChannelDriver(address, port), mSocket(INVALID_SOCKET) {
 }
 
- TCPServerChannelDriver::~TCPServerChannelDriver() {
-
- }
+TCPServerChannelDriver::~TCPServerChannelDriver() {
+}
 
 void TCPServerChannelDriver::prepareSocket() throw(StyxException) {
     int sockfd = ::socket(AF_INET, SOCK_STREAM, 0);
