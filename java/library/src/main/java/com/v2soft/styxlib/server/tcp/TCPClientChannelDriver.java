@@ -1,5 +1,6 @@
 package com.v2soft.styxlib.server.tcp;
 
+import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.io.StyxByteBufferReadable;
 import com.v2soft.styxlib.io.StyxDataReader;
 import com.v2soft.styxlib.messages.base.StyxMessage;
@@ -8,7 +9,6 @@ import com.v2soft.styxlib.server.ClientDetails;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.nio.channels.ClosedByInterruptException;
 import java.nio.channels.SocketChannel;
@@ -31,19 +31,26 @@ public class TCPClientChannelDriver extends TCPChannelDriver {
     }
 
     @Override
-    public Thread start(int iounit) throws IOException {
+    public Thread start(int iounit) throws StyxException {
         // TODO move to thread
         mServerClientDetails = new TCPClientDetails(mSocket, this, iounit, PSEUDO_CLIENT_ID);
         return super.start(iounit);
     }
 
     @Override
-    public void prepareSocket() throws IOException {
+    public void prepareSocket() throws StyxException {
         InetSocketAddress socketAddress = new InetSocketAddress(mAddress, mPort);
-        mSocket = SocketChannel.open(socketAddress);
-        mSocket.configureBlocking(true);
-        Socket socket = mSocket.socket();
-        socket.setSoTimeout(getTimeout());
+        try {
+            mSocket = SocketChannel.open(socketAddress);
+        } catch (IOException e) {
+            throw new StyxException(StyxException.DRIVER_CREATE_ERROR);
+        }
+        try {
+            mSocket.configureBlocking(true);
+            mSocket.socket().setSoTimeout(getTimeout());
+        } catch (IOException e) {
+            throw new StyxException(StyxException.DRIVER_CONFIGURE_ERROR);
+        }
     }
 
     @Override
@@ -135,7 +142,7 @@ public class TCPClientChannelDriver extends TCPChannelDriver {
 
     @Override
     public String toString() {
-        return String.format("%s:%s", getClass().getSimpleName(),
-                mSocket.socket().getLocalAddress().toString());
+        return String.format("%s_%s:%d", getClass().getSimpleName(),
+                mAddress, mPort);
     }
 }

@@ -36,7 +36,7 @@ public:
 	/**
 	 * start server
 	 */
-	virtual std::vector<StyxThread*> start();
+	virtual std::vector<StyxThread*> start() throw(StyxException);
 	/**
 	 * stop server and realease all resources
 	 */

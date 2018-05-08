@@ -1,6 +1,7 @@
 package com.v2soft.styxlib.tests;
 
 import com.v2soft.styxlib.Connection;
+import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.handlers.RMessagesProcessor;
 import com.v2soft.styxlib.messages.StyxTVersionMessage;
 import com.v2soft.styxlib.server.tcp.TCPClientChannelDriver;
@@ -19,7 +20,7 @@ import java.net.InetAddress;
 public class TCPChannelsTests {
 
     @Test
-    public void testServerClientConnect() throws IOException, InterruptedException {
+    public void testServerClientConnect() throws IOException, InterruptedException, StyxException {
         TCPServerChannelDriver server = new TCPServerChannelDriver(InetAddress.getByName("127.0.0.1"), 22345);
         TCPClientChannelDriver client = new TCPClientChannelDriver(InetAddress.getByName("127.0.0.1"), 22345);
         server.setRMessageHandler(new RMessagesProcessor("test1"));

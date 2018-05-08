@@ -1,10 +1,9 @@
 package com.v2soft.styxlib.server;
 
 import com.v2soft.styxlib.ILogListener;
+import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.handlers.IMessageProcessor;
 
-import java.io.Closeable;
-import java.io.IOException;
 import java.util.Collection;
 
 /**
@@ -18,7 +17,7 @@ public interface IChannelDriver extends IMessageTransmitter {
      * @param iounit
      * @return driver thread.
      */
-    Thread start(int iounit) throws IOException;
+    Thread start(int iounit) throws StyxException;
     void setTMessageHandler(IMessageProcessor handler);
     void setRMessageHandler(IMessageProcessor handler);
     void setLogListener(ILogListener listener);

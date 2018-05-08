@@ -50,7 +50,7 @@ public class PacketIOTests {
         mServer.closeAndWait();
     }
 
-    private void startServer() throws IOException {
+    private void startServer() throws IOException, StyxException {
         MemoryStyxFile md5 = new MemoryStyxFile(FILE_NAME){
             protected HashMap<ClientDetails, MessageDigest> mClientsMap = new HashMap<ClientDetails, MessageDigest>();
             @Override

@@ -20,14 +20,8 @@ TCPServerChannelDriver::~TCPServerChannelDriver() {
 void TCPServerChannelDriver::prepareSocket() throw(StyxException) {
     int sockfd = ::socket(AF_INET, SOCK_STREAM, 0);
 	if (sockfd < 0) {
-		  throw StyxException("Can't create socket");
-	}
-    
-    int reuse_addr = 1;
-	::setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, (const char*)&reuse_addr, sizeof(reuse_addr));
-
-    // enable non-blocking mode
-    setNonBlocking(sockfd);
+		  throw StyxException(DRIVER_CREATE_ERROR);
+	}   
 
     struct sockaddr_in serv_addr;
     bzero((char *) &serv_addr, sizeof(serv_addr));
@@ -42,10 +36,18 @@ void TCPServerChannelDriver::prepareSocket() throw(StyxException) {
 #else
 		::close(sockfd);
 #endif
-        throw StyxException("Can't bind socket");
+        throw StyxException(DRIVER_BIND_ERROR);
     }
 #warning set socket timeout
     mSocket = sockfd;
+
+    int reuse_addr = 1;
+	if (::setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, (const char*)&reuse_addr, sizeof(reuse_addr)) != 0) {
+        throw StyxException(DRIVER_CONFIGURE_ERROR);
+    }
+
+    // enable non-blocking mode
+    setNonBlocking(sockfd);
 }
 
 size_t TCPServerChannelDriver::getMaxPendingQueue() {
@@ -131,11 +133,11 @@ void TCPServerChannelDriver::setNonBlocking(Socket socket) {
 	int opts;
 	opts = ::fcntl(socket, F_GETFL);
 	if (opts < 0) {
-		throw StyxException("Can't create socket fcntl(F_GETFL)");
+		throw StyxException(DRIVER_CONFIGURE_ERROR);
 	}
 	opts = (opts | O_NONBLOCK);
 	if (::fcntl(socket, F_SETFL,opts) < 0) {
-		throw StyxException("Can't create socket fcntl(F_SETFL)");
+		throw StyxException(DRIVER_CONFIGURE_ERROR);
 	}
 #endif
 }

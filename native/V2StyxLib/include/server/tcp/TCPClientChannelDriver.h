@@ -20,7 +20,7 @@ public:
 	TCPClientChannelDriver(StyxString address, uint16_t port);
 	virtual ~TCPClientChannelDriver();
 
-	virtual StyxThread* start(int iounit);
+	virtual StyxThread* start(int iounit) throw(StyxException);
 	virtual void prepareSocket() throw(StyxException);
 	virtual bool isConnected();
 	virtual bool isStarted();

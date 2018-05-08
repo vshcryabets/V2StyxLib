@@ -1,5 +1,6 @@
 package com.v2soft.styxlib.server.tcp;
 
+import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.server.ClientDetails;
 
 import java.io.IOException;
@@ -28,22 +29,35 @@ public class TCPServerChannelDriver extends TCPChannelDriver {
     protected Map<SocketChannel, ClientDetails> mClientStatesMap;
     protected int mLastClientId = 1;
 
-    public TCPServerChannelDriver(InetAddress address, int port) throws IOException {
+    public TCPServerChannelDriver(InetAddress address, int port) {
         super(address, port);
         mNewConnetions = new Stack<>();
         mReadable = new Stack<>();
         mClientStatesMap = new HashMap<>();
     }
 
-    public void prepareSocket() throws IOException {
+    @Override
+    public void prepareSocket() throws StyxException {
         InetSocketAddress socketAddress = new InetSocketAddress(mAddress, mPort);
-        mChannel = ServerSocketChannel.open();
+        try {
+            mChannel = ServerSocketChannel.open();
+        } catch (IOException e) {
+            throw new StyxException(StyxException.DRIVER_CREATE_ERROR);
+        }
         ServerSocket socket = mChannel.socket();
-        socket.bind(socketAddress);
-        socket.setReuseAddress(true);
-        socket.setSoTimeout(getTimeout());
-        mSelector = Selector.open();
-        mChannel.configureBlocking(false);
+        try {
+            socket.bind(socketAddress);
+        } catch (IOException e) {
+            throw new StyxException(StyxException.DRIVER_BIND_ERROR);
+        }
+        try {
+            socket.setReuseAddress(true);
+            socket.setSoTimeout(getTimeout());
+            mSelector = Selector.open();
+            mChannel.configureBlocking(false);
+        } catch (IOException e) {
+            throw new StyxException(StyxException.DRIVER_CONFIGURE_ERROR);
+        }
     }
 
     @Override

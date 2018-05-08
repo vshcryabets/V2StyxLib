@@ -46,7 +46,7 @@ public class ClientServerTest {
         mServer.closeAndWait();
     }
 
-    private void startServer() throws IOException {
+    private void startServer() throws IOException, StyxException {
         MemoryStyxFile md5 = new MD5StyxFile();
         MemoryStyxDirectory root = new MemoryStyxDirectory("root");
         root.addFile(md5);

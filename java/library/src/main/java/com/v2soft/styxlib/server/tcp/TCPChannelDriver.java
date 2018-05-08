@@ -1,6 +1,7 @@
 package com.v2soft.styxlib.server.tcp;
 
 import com.v2soft.styxlib.ILogListener;
+import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.handlers.IMessageProcessor;
 import com.v2soft.styxlib.library.StyxServerManager;
 import com.v2soft.styxlib.messages.base.StyxMessage;
@@ -29,21 +30,21 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
     protected InetAddress mAddress;
     protected int mPort;
 
-    public TCPChannelDriver(InetAddress address, int port) throws IOException {
+    public TCPChannelDriver(InetAddress address, int port) {
         mPort = port;
         mAddress = address;
         mTransmittedPacketsCount = 0;
         mTransmissionErrorsCount = 0;
     }
 
-    public abstract void prepareSocket() throws IOException;
+    public abstract void prepareSocket() throws StyxException;
 
     protected int getTimeout() {
         return StyxServerManager.DEFAULT_TIMEOUT;
     }
 
     @Override
-    public Thread start(int iounit) throws IOException {
+    public Thread start(int iounit) throws StyxException {
         if ( mAcceptorThread != null ) {
             throw new IllegalStateException("Already started");
         }

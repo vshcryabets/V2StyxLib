@@ -50,7 +50,7 @@ void StyxServerManager::close() {
 	}
 }
 
-std::vector<StyxThread*> StyxServerManager::start() {
+std::vector<StyxThread*> StyxServerManager::start() throw(StyxException) {
 	size_t count = mDrivers.size();
 	size_t ioUnit = getIOUnit();
 	mDriverThreads.clear();

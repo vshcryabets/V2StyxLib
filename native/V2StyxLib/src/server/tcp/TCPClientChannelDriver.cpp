@@ -24,7 +24,7 @@ TCPClientChannelDriver::~TCPClientChannelDriver() {
 	}
 }
 
-StyxThread* TCPClientChannelDriver::start(int iounit) {
+StyxThread* TCPClientChannelDriver::start(int iounit) throw(StyxException){
 #warning TODO move to thread
 	mServerClientDetails = new TCPClientDetails(mSocket, this, iounit, TCPClientChannelDriver::PSEUDO_CLIENT_ID);
 	return TCPChannelDriver::start(iounit);
@@ -33,11 +33,12 @@ StyxThread* TCPClientChannelDriver::start(int iounit) {
 void TCPClientChannelDriver::prepareSocket() throw(StyxException) {
 	int sockfd = ::socket(AF_INET, SOCK_STREAM, 0);
 	if (sockfd < 0) {
-		  throw StyxException("Can't create socket");
+		throw StyxException(InternalErrors::DRIVER_CREATE_ERROR);
 	}
 	struct hostent *server;
 	server = ::gethostbyname(mAddress.c_str());
 	if (server == NULL) {
+#warning use code here
 		throw StyxException("Can't resolve hostname %s", mAddress.c_str());
 	}
 	struct sockaddr_in serverAddress;
@@ -49,6 +50,7 @@ void TCPClientChannelDriver::prepareSocket() throw(StyxException) {
 	serverAddress.sin_port = htons(mPort);
 	int connectResult = ::connect(sockfd, (struct sockaddr*)&serverAddress, sizeof(serverAddress));
 	if (connectResult < 0) {
+#warning use code here
 		throw StyxException("Connect failed %d", errno);
 	}
 
@@ -56,7 +58,9 @@ void TCPClientChannelDriver::prepareSocket() throw(StyxException) {
 	struct timeval timeout;
 	timeout.tv_sec = timeoutMs / 1000;
 	timeout.tv_usec = (timeoutMs - timeout.tv_sec * 1000) * 1000;
-	::setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, (struct timeval *)&timeout, sizeof(struct timeval));
+	if (::setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, (struct timeval *)&timeout, sizeof(struct timeval)) != 0) {
+		throw StyxException(InternalErrors::DRIVER_CONFIGURE_ERROR);
+	}
 	mSocket = sockfd;
 }
 
@@ -137,5 +141,6 @@ std::vector<ClientDetails*> TCPClientChannelDriver::getClients() {
 }
 
 StyxString TCPClientChannelDriver::toString() {
+#warning add adress and port here
     return StyxString("TCPClientChannelDriver");
 }

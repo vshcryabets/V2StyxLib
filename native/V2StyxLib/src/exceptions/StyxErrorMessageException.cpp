@@ -11,7 +11,8 @@ StyxErrorMessageException::StyxErrorMessageException(StyxRErrorMessage *message)
 	: StyxException(message->getError().c_str()) {
 }
 
-StyxErrorMessageException::StyxErrorMessageException(const char *message, ...) {
+StyxErrorMessageException::StyxErrorMessageException(const char *message, ...) 
+	: StyxException("") {
 	va_list va;
 	va_start(va, message);
 	setMessage(message, va);

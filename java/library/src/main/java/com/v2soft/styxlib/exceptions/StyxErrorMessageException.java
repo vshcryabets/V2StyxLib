@@ -20,13 +20,13 @@ public class StyxErrorMessageException extends StyxException {
         if (rMessage.getType() != MessageType.Rerror)
             return;
         StyxRErrorMessage rError = (StyxRErrorMessage) rMessage;
-        throw new StyxErrorMessageException(rError);
+        throw new StyxErrorMessageException(rError, null);
     }
 
     public static StyxErrorMessageException newInstance(String message) {
         if (message == null)
             throw new NullPointerException("Message is null");
-        return new StyxErrorMessageException(new StyxRErrorMessage(StyxMessage.NOTAG, message));
+        return new StyxErrorMessageException(new StyxRErrorMessage(StyxMessage.NOTAG, message), null);
     }
 
     public static void doException(StyxMessage rMessage, String fileName)
@@ -40,10 +40,6 @@ public class StyxErrorMessageException extends StyxException {
         throw new StyxErrorMessageException(rError, fileName);
     }
 
-
-    private StyxErrorMessageException(StyxRErrorMessage message) {
-        this(message, null);
-    }
 
     private StyxErrorMessageException(StyxRErrorMessage message, String fileName) {
         super(String.format("%s %s", message.getError(), fileName));

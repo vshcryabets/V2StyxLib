@@ -8,14 +8,14 @@
 #include "exceptions/StyxException.h"
 #include <iostream>
 
-StyxException::StyxException(const char *message, ...) {
+StyxException::StyxException(const char *message, ...) : mInternalCode(NONE){
 	va_list arglist;
 	va_start( arglist, message );
 	setMessage(message, arglist);
 	va_end( arglist );
 }
 
-StyxException::StyxException() {
+StyxException::StyxException(InternalErrors code) : mInternalCode(code) {
 	
 }
 
@@ -35,4 +35,8 @@ void StyxException::setMessage(const char *format, va_list arglist) {
 	char buf[4096];
 	vsnprintf(buf, sizeof(buf), format, arglist);
 	this->mMessage = StyxString(buf);
+}
+
+InternalErrors StyxException::getInternalCode() {
+	return mInternalCode;
 }

@@ -1,5 +1,6 @@
 package com.v2soft.styxlib.library;
 
+import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.handlers.TMessagesProcessor;
 import com.v2soft.styxlib.server.IChannelDriver;
 import com.v2soft.styxlib.types.ConnectionDetails;
@@ -57,7 +58,7 @@ public class StyxServerManager
         return this;
     }
 
-    public Thread[] start() throws IOException {
+    public Thread[] start() throws StyxException {
         final int count = mDrivers.size();
         final int ioUnit = getIOUnit();
         mDriverThreads = new Thread[count];
