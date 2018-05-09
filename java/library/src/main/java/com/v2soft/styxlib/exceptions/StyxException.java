@@ -7,6 +7,7 @@ public class StyxException extends Exception {
     public static final int DRIVER_CREATE_ERROR = 0x1000;
     public static final int DRIVER_BIND_ERROR = 0x1001;
     public static final int DRIVER_CONFIGURE_ERROR = 0x1002;
+    public static final int DRIVER_CANT_RESOLVE_NAME = 0x1003;
 
     private int mInternalCode = NONE;
 

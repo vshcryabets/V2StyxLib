@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
+import java.net.UnknownHostException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
@@ -29,7 +30,7 @@ public class TCPServerChannelDriver extends TCPChannelDriver {
     protected Map<SocketChannel, ClientDetails> mClientStatesMap;
     protected int mLastClientId = 1;
 
-    public TCPServerChannelDriver(InetAddress address, int port) {
+    public TCPServerChannelDriver(String address, int port) {
         super(address, port);
         mNewConnetions = new Stack<>();
         mReadable = new Stack<>();
@@ -38,7 +39,13 @@ public class TCPServerChannelDriver extends TCPChannelDriver {
 
     @Override
     public void prepareSocket() throws StyxException {
-        InetSocketAddress socketAddress = new InetSocketAddress(mAddress, mPort);
+        InetAddress address = null;
+        try {
+            address = InetAddress.getByName(mAddress);
+        } catch (UnknownHostException e) {
+            throw new StyxException(StyxException.DRIVER_CANT_RESOLVE_NAME);
+        }
+        InetSocketAddress socketAddress = new InetSocketAddress(address, mPort);
         try {
             mChannel = ServerSocketChannel.open();
         } catch (IOException e) {

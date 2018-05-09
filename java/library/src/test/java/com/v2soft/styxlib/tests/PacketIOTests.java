@@ -18,7 +18,6 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.InetAddress;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
@@ -95,7 +94,7 @@ public class PacketIOTests {
         };
         MemoryStyxDirectory root = new MemoryStyxDirectory("root");
         root.addFile(md5);
-        mServer = new TCPServerManager(InetAddress.getLoopbackAddress(), PORT, root);
+        mServer = new TCPServerManager("127.0.0.1", PORT, root);
         mServer.start();
     }
 
@@ -110,8 +109,7 @@ public class PacketIOTests {
         byte [] remoteHash = new byte[16];
 
         assertTrue(mConnection.connect(
-                new TCPClientChannelDriver(
-                        InetAddress.getByName("localhost"), PORT)));
+                new TCPClientChannelDriver("127.0.0.1", PORT)));
 
         final StyxFile newFile = new StyxFile(mConnection, FILE_NAME);
         OutputStream output = newFile.openForWriteUnbuffered();

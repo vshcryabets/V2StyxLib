@@ -3,10 +3,10 @@ package com.v2soft.styxlib.tests;
 import com.v2soft.styxlib.Connection;
 import com.v2soft.styxlib.IClient;
 import com.v2soft.styxlib.StyxFile;
-import com.v2soft.styxlib.library.StyxServerManager;
 import com.v2soft.styxlib.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.io.StyxFileBufferedInputStream;
+import com.v2soft.styxlib.library.StyxServerManager;
 import com.v2soft.styxlib.messages.base.enums.FileMode;
 import com.v2soft.styxlib.server.ClientDetails;
 import com.v2soft.styxlib.server.IChannelDriver;
@@ -26,7 +26,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.InetAddress;
 import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.TimeoutException;
@@ -45,21 +44,21 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class ConnectionTest {
     private static final int PORT = 10234;
+    private static final String ADDRESS = "127.0.0.1";
     private IClient mConnection;
     private StyxServerManager mServer;
 
     @BeforeEach
     public void setUp() throws Exception {
         MetricsAndStats.reset();
-        InetAddress localHost = InetAddress.getByName("127.0.0.1");
         File testDirectory = new File("./test");
         if (!testDirectory.exists()) {
             testDirectory.mkdirs();
         }
-        mServer = new TCPServerManager(localHost, PORT, new DiskStyxDirectory(testDirectory));
+        mServer = new TCPServerManager(ADDRESS, PORT, new DiskStyxDirectory(testDirectory));
         mServer.start();
         mConnection = new Connection();
-        IChannelDriver driver = new TCPClientChannelDriver(localHost, PORT);
+        IChannelDriver driver = new TCPClientChannelDriver(ADDRESS, PORT);
         assertTrue(mConnection.connect(driver));
     }
 

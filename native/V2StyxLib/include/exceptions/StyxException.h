@@ -15,7 +15,8 @@ enum InternalErrors {
 	// Channel driver
 	DRIVER_CREATE_ERROR = 0x1000,
 	DRIVER_BIND_ERROR,
-	DRIVER_CONFIGURE_ERROR
+	DRIVER_CONFIGURE_ERROR,
+	DRIVER_CANT_RESOLVE_NAME
 };
 
 class StyxException {

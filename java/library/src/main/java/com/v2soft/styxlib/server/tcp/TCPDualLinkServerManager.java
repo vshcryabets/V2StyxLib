@@ -3,14 +3,13 @@ package com.v2soft.styxlib.server.tcp;
 import com.v2soft.styxlib.Connection;
 import com.v2soft.styxlib.IClient;
 import com.v2soft.styxlib.handlers.RMessagesProcessor;
-import com.v2soft.styxlib.server.TMessageTransmitter;
 import com.v2soft.styxlib.server.ClientDetails;
 import com.v2soft.styxlib.server.IChannelDriver;
-import com.v2soft.styxlib.vfs.IVirtualStyxFile;
+import com.v2soft.styxlib.server.TMessageTransmitter;
 import com.v2soft.styxlib.types.Credentials;
+import com.v2soft.styxlib.vfs.IVirtualStyxFile;
 
 import java.io.IOException;
-import java.net.InetAddress;
 
 /**
  * Created by V.Shcryabets on 5/22/14.
@@ -23,7 +22,7 @@ public class TCPDualLinkServerManager extends TCPServerManager {
     protected RMessagesProcessor mReverseAnswerProcessor;
     protected TMessageTransmitter mReverseTransmitter;
 
-    public TCPDualLinkServerManager(InetAddress address, int port, IVirtualStyxFile root) throws IOException {
+    public TCPDualLinkServerManager(String address, int port, IVirtualStyxFile root) throws IOException {
         super(address, port, root);
     }
 

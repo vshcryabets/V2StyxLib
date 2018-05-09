@@ -5,7 +5,6 @@ import com.v2soft.styxlib.server.IChannelDriver;
 import com.v2soft.styxlib.vfs.IVirtualStyxFile;
 
 import java.io.IOException;
-import java.net.InetAddress;
 
 /**
  * Created by V.Shcryabets on 5/22/14.
@@ -14,7 +13,7 @@ import java.net.InetAddress;
  */
 public class TCPServerManager extends StyxServerManager {
 
-    public TCPServerManager(InetAddress address, int port, IVirtualStyxFile root) throws IOException {
+    public TCPServerManager(String address, int port, IVirtualStyxFile root) throws IOException {
         super(root, new IChannelDriver[]{new TCPServerChannelDriver(address, port)});
     }
 }

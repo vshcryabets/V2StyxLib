@@ -132,6 +132,7 @@ extends MemoryStyxFile {
     /**
      * Delete child file
      * @param file file that should be removed from this directory
+     * @return trus if success.
      */
     public boolean deleteFile(IVirtualStyxFile file) {
         return mFiles.remove(file);

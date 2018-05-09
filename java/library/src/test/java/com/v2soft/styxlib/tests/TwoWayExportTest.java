@@ -21,7 +21,6 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.InetAddress;
 import java.nio.charset.Charset;
 import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
@@ -47,7 +46,7 @@ public class TwoWayExportTest {
         MemoryStyxFile md5 = new MD5StyxFile();
         MemoryStyxDirectory root = new MemoryStyxDirectory("root");
         root.addFile(md5);
-        mServer = new TCPDualLinkServerManager(InetAddress.getLoopbackAddress(),
+        mServer = new TCPDualLinkServerManager("127.0.0.1",
                 PORT, root);
         mServer.start();
     }
@@ -69,7 +68,7 @@ public class TwoWayExportTest {
         root.addFile(md5);
         ConnectionWithExport connection = new ConnectionWithExport();
         connection.export(root);
-        IChannelDriver driver = new TCPClientChannelDriver(InetAddress.getByName("127.0.0.1"), PORT);
+        IChannelDriver driver = new TCPClientChannelDriver("127.0.0.1", PORT);
 
         Assertions.assertTrue(connection.connect(driver));
         ClientServerTest.checkMD5Hash(connection);
@@ -99,8 +98,7 @@ public class TwoWayExportTest {
     @Test
     public void testGetClientsFromClient() throws IOException, InterruptedException, TimeoutException, StyxException {
         ConnectionWithExport connection = new ConnectionWithExport();
-        IChannelDriver driver = new TCPClientChannelDriver(
-                InetAddress.getByName("127.0.0.1"), PORT);
+        IChannelDriver driver = new TCPClientChannelDriver("127.0.0.1", PORT);
         Assertions.assertTrue(connection.connect(driver));
         Collection<ClientDetails> clientDetailses = driver.getClients();
         Assertions.assertNotNull(clientDetailses);
@@ -121,13 +119,11 @@ public class TwoWayExportTest {
         Assertions.assertEquals(1, drivers.size());
 
         ConnectionWithExport connection = new ConnectionWithExport();
-        IChannelDriver driver = new TCPClientChannelDriver(
-                InetAddress.getByName("127.0.0.1"), PORT);
+        IChannelDriver driver = new TCPClientChannelDriver("127.0.0.1", PORT);
         Assertions.assertTrue(connection.connect(driver));
 
         ConnectionWithExport connection2 = new ConnectionWithExport();
-        IChannelDriver driver2 = new TCPClientChannelDriver(
-                InetAddress.getByName("127.0.0.1"), PORT);
+        IChannelDriver driver2 = new TCPClientChannelDriver("127.0.0.1", PORT);
         Assertions.assertTrue(connection2.connect(driver2));
 
         Collection<ClientDetails> clientDetailses = drivers.get(0).getClients();
@@ -170,7 +166,7 @@ public class TwoWayExportTest {
         // create clients
         for (int i = 0; i < count; i++) {
             String prefix = "CL" + i;
-            clientDrivers[i] = new TCPClientChannelDriver(InetAddress.getByName("127.0.0.1"), PORT);
+            clientDrivers[i] = new TCPClientChannelDriver("127.0.0.1", PORT);
             clients[i] = new ConnectionWithExport();
             clientDrivers[i].setLogListener(new TestLogListener(prefix));
             String marker = (i == 0 ? messages[count - 1] : messages[i - 1]);

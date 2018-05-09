@@ -32,8 +32,7 @@ void TCPClientChannelDriver::prepareSocket() throw(StyxException) {
 	struct hostent *server;
 	server = ::gethostbyname(mAddress.c_str());
 	if (server == NULL) {
-#warning use code here
-		throw StyxException("Can't resolve hostname %s", mAddress.c_str());
+		throw StyxException(InternalErrors::DRIVER_CANT_RESOLVE_NAME);
 	}
 	struct sockaddr_in serverAddress;
 	bzero((char *) &serverAddress, sizeof(serverAddress));

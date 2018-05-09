@@ -7,7 +7,6 @@ import com.v2soft.styxlib.messages.base.StyxMessage;
 import com.v2soft.styxlib.server.ClientDetails;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketTimeoutException;
 import java.nio.channels.ClosedByInterruptException;
@@ -26,7 +25,7 @@ public class TCPClientChannelDriver extends TCPChannelDriver {
     protected TCPClientDetails mServerClientDetails;
     protected SocketChannel mSocket;
 
-    public TCPClientChannelDriver(InetAddress address, int port) throws IOException {
+    public TCPClientChannelDriver(String address, int port) throws IOException {
         super(address, port);
     }
 

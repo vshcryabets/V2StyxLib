@@ -9,7 +9,6 @@ import com.v2soft.styxlib.server.ClientDetails;
 import com.v2soft.styxlib.server.IChannelDriver;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.nio.ByteBuffer;
 
 /**
@@ -27,10 +26,10 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
     protected int mTransmittedPacketsCount;
     protected int mTransmissionErrorsCount;
     protected ILogListener mLogListener;
-    protected InetAddress mAddress;
+    protected String mAddress;
     protected int mPort;
 
-    public TCPChannelDriver(InetAddress address, int port) {
+    public TCPChannelDriver(String address, int port) {
         mPort = port;
         mAddress = address;
         mTransmittedPacketsCount = 0;

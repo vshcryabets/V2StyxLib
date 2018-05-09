@@ -17,7 +17,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Random;
@@ -34,6 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class ClientServerTest {
     private static final int PORT = 10234;
+    private static final String ADDRESS = "127.0.0.1";
     private StyxServerManager mServer;
 
     @BeforeEach
@@ -50,7 +50,7 @@ public class ClientServerTest {
         MemoryStyxFile md5 = new MD5StyxFile();
         MemoryStyxDirectory root = new MemoryStyxDirectory("root");
         root.addFile(md5);
-        mServer = new TCPServerManager(InetAddress.getLoopbackAddress(), PORT, root);
+        mServer = new TCPServerManager(ADDRESS, PORT, root);
         mServer.start();
     }
 
@@ -58,8 +58,7 @@ public class ClientServerTest {
     @Test
     public void testMD5() throws IOException, StyxException, InterruptedException, TimeoutException, NoSuchAlgorithmException {
         IClient connection = new Connection();
-        IChannelDriver driver = new TCPClientChannelDriver(
-                InetAddress.getByName("127.0.0.1"), PORT);
+        IChannelDriver driver = new TCPClientChannelDriver(ADDRESS, PORT);
         assertTrue(connection.connect(driver));
         checkMD5Hash(connection);
         connection.close();

@@ -1,13 +1,12 @@
-import com.v2soft.styxlib.library.StyxServerManager;
 import com.v2soft.styxlib.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.exceptions.StyxException;
+import com.v2soft.styxlib.library.StyxServerManager;
 import com.v2soft.styxlib.server.ClientDetails;
 import com.v2soft.styxlib.server.tcp.TCPServerManager;
 import com.v2soft.styxlib.vfs.MemoryStyxDirectory;
 import com.v2soft.styxlib.vfs.MemoryStyxFile;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
@@ -66,8 +65,7 @@ public class JavaServerSample {
         };
         MemoryStyxDirectory root = new MemoryStyxDirectory("root");
         root.addFile(md5);
-        StyxServerManager mServer = new TCPServerManager(InetAddress.getByName("127.0.0.1"),
-                PORT, root);
+        StyxServerManager mServer = new TCPServerManager("127.0.0.1", PORT, root);
         Thread[] threads = mServer.start();
         System.out.println("Test server listen on 127.0.0.1:" + PORT);
         for(Thread thread : threads) {
