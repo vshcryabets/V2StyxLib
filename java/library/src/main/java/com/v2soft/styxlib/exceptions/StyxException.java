@@ -8,11 +8,17 @@ public class StyxException extends Exception {
     public static final int DRIVER_BIND_ERROR = 0x1001;
     public static final int DRIVER_CONFIGURE_ERROR = 0x1002;
     public static final int DRIVER_CANT_RESOLVE_NAME = 0x1003;
+    public static final int DRIVER_CLOSE_ERROR = 0x1004;
 
     private int mInternalCode = NONE;
 
     public StyxException(int code) {
         super();
+        mInternalCode = code;
+    }
+
+    public StyxException(int code, String message) {
+        super(message);
         mInternalCode = code;
     }
 

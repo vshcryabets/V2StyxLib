@@ -7,8 +7,16 @@
 
 #include "exceptions/StyxException.h"
 #include <iostream>
+#include <stdio.h>
 
 StyxException::StyxException(const char *message, ...) : mInternalCode(NONE){
+	va_list arglist;
+	va_start( arglist, message );
+	setMessage(message, arglist);
+	va_end( arglist );
+}
+
+StyxException::StyxException(InternalErrors code, const char *message, ...) : mInternalCode(code) {
 	va_list arglist;
 	va_start( arglist, message );
 	setMessage(message, arglist);
