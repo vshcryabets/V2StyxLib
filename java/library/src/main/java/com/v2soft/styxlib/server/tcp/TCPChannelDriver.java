@@ -3,6 +3,7 @@ package com.v2soft.styxlib.server.tcp;
 import com.v2soft.styxlib.ILogListener;
 import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.handlers.IMessageProcessor;
+import com.v2soft.styxlib.io.IStyxDataReader;
 import com.v2soft.styxlib.library.StyxServerManager;
 import com.v2soft.styxlib.messages.base.StyxMessage;
 import com.v2soft.styxlib.server.ClientDetails;
@@ -37,6 +38,7 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
     }
 
     public abstract void prepareSocket() throws StyxException;
+    public abstract void closeSocket() throws StyxException;
 
     protected int getTimeout() {
         return StyxServerManager.DEFAULT_TIMEOUT;
@@ -72,7 +74,7 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
                 message.writeToBuffer(client.getOutputWriter());
                 ByteBuffer buffer = client.getOutputBuffer();
                 buffer.flip();
-                client.getSocket().write(buffer);
+                client.getChannel().write(buffer);
                 mTransmittedPacketsCount++;
                 if (mLogListener != null) {
                     mLogListener.onMessageTransmited(this, recipient, message);
@@ -113,12 +115,13 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
 
     /**
      * Read data from assigned SocketChannel
-     * @throws IOException
+     * @return true if socket was closed or other error happened.
+     * @throws IOException in case of parse error.
      */
     protected boolean readSocket(TCPClientDetails client) throws IOException {
         int read = -1;
         try {
-            read = client.getInputBuffer().readFromChannel(client.getSocket());
+            read = client.getInputBuffer().readFromChannel(client.getChannel());
         }
         catch (IOException e) {
         }
@@ -133,14 +136,15 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
     /**
      * Read income message from specified client.
      * @return true if message was processed
-     * @throws IOException
+     * @throws IOException in case of parse error.
      */
     private boolean process(TCPClientDetails client) throws IOException {
         int inBuffer = client.getInputBuffer().remainsToRead();
         if ( inBuffer > 4 ) {
             long packetSize = client.getInputReader().getUInt32();
             if ( inBuffer >= packetSize ) {
-                final StyxMessage message = StyxMessage.factory(client.getInputReader(), mIOUnit);
+                // whole packet are in input buffer
+                final StyxMessage message = parseMessage(client.getInputReader());
                 if ( mLogListener != null ) {
                     mLogListener.onMessageReceived(this, client, message);
                 }
@@ -153,6 +157,15 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
             }
         }
         return false;
+    }
+
+    /**
+     * Parse message from specified reader.
+     * @param reader reader with buffer.
+     * @return parsed message.
+     */
+    protected StyxMessage parseMessage(IStyxDataReader reader) throws IOException {
+        return StyxMessage.factory(reader, mIOUnit);
     }
 
     @Override

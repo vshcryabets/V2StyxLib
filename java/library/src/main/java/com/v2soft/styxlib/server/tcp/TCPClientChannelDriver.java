@@ -47,11 +47,20 @@ public class TCPClientChannelDriver extends TCPChannelDriver {
     }
 
     @Override
+    public void closeSocket() throws StyxException {
+        try {
+            mSocket.close();
+        } catch (IOException e) {
+            throw new StyxException(StyxException.DRIVER_CLOSE_ERROR);
+        }
+    }
+
+    @Override
     public boolean isConnected() {
-        if ( mServerClientDetails.getSocket() == null ) {
+        if ( mServerClientDetails.getChannel() == null ) {
             return false;
         }
-        return mServerClientDetails.getSocket().isOpen();
+        return mServerClientDetails.getChannel().isOpen();
     }
 
     @Override
@@ -78,7 +87,7 @@ public class TCPClientChannelDriver extends TCPChannelDriver {
                 if (Thread.interrupted()) break;
                 // read from socket
                 try {
-                    int readed = buffer.readFromChannel(mServerClientDetails.getSocket());
+                    int readed = buffer.readFromChannel(mServerClientDetails.getChannel());
                     if ( readed > 0 ) {
                         // loop unitl we have unprocessed packets in the input buffer
                         while ( buffer.remainsToRead() > 4 ) {

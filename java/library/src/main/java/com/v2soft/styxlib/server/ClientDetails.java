@@ -13,6 +13,7 @@ import java.util.HashMap;
  *
  */
 public abstract class ClientDetails {
+    // TODO we can move channel generic here
     protected HashMap<Long, IVirtualStyxFile> mAssignedFiles;
     protected IChannelDriver mDriver;
     protected int mClientId;

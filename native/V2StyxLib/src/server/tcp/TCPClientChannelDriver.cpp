@@ -4,6 +4,7 @@
  */
 #include "server/tcp/TCPClientChannelDriver.h"
 
+#include <unistd.h>
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -12,9 +13,10 @@
 #include <strings.h>
 
 #include "io/StyxDataReader.h"
+#include "exceptions/StyxException.h"
 
 TCPClientChannelDriver::TCPClientChannelDriver(StyxString address, uint16_t port)
-	: TCPChannelDriver(address, port), mServerClientDetails(NULL) {
+	: TCPChannelDriver(address, port), mServerClientDetails(NULL), mSocket(INVALID_SOCKET) {
 }
 
 TCPClientChannelDriver::~TCPClientChannelDriver() {
@@ -27,12 +29,12 @@ TCPClientChannelDriver::~TCPClientChannelDriver() {
 void TCPClientChannelDriver::prepareSocket() throw(StyxException) {
 	int sockfd = ::socket(AF_INET, SOCK_STREAM, 0);
 	if (sockfd < 0) {
-		throw StyxException(InternalErrors::DRIVER_CREATE_ERROR);
+		throw StyxException(DRIVER_CREATE_ERROR);
 	}
 	struct hostent *server;
 	server = ::gethostbyname(mAddress.c_str());
 	if (server == NULL) {
-		throw StyxException(InternalErrors::DRIVER_CANT_RESOLVE_NAME);
+		throw StyxException(DRIVER_CANT_RESOLVE_NAME);
 	}
 	struct sockaddr_in serverAddress;
 	bzero((char *) &serverAddress, sizeof(serverAddress));
@@ -52,7 +54,7 @@ void TCPClientChannelDriver::prepareSocket() throw(StyxException) {
 	timeout.tv_sec = timeoutMs / 1000;
 	timeout.tv_usec = (timeoutMs - timeout.tv_sec * 1000) * 1000;
 	if (::setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, (struct timeval *)&timeout, sizeof(struct timeval)) != 0) {
-		throw StyxException(InternalErrors::DRIVER_CONFIGURE_ERROR);
+		throw StyxException(DRIVER_CONFIGURE_ERROR);
 	}
 	mSocket = sockfd;
 	mServerClientDetails = new TCPClientDetails(mSocket, this, mIOUnit, TCPClientChannelDriver::PSEUDO_CLIENT_ID);
@@ -85,7 +87,7 @@ void* TCPClientChannelDriver::run() {
 		while (isWorking) {
 			if (mAcceptorThread->isInterrupted()) break;
 			try {
-				size_t read = buffer.readFromFD(mSocket);
+				size_t read = buffer.readFromChannel(mSocket);
 				if (read > 0) {
 					// loop unitl we have unprocessed packets in the input buffer
 					while ( buffer.remainsToRead() > 4 ) {
@@ -137,4 +139,14 @@ std::vector<ClientDetails*> TCPClientChannelDriver::getClients() {
 StyxString TCPClientChannelDriver::toString() {
 #warning add adress and port here
     return StyxString("TCPClientChannelDriver");
+}
+
+void TCPClientChannelDriver::closeSocket() throw(StyxException) {
+	if (mSocket == INVALID_SOCKET) {
+		throw StyxException(DRIVER_CLOSE_ERROR);
+	}
+	if (::close(mSocket) != 0) {
+		throw StyxException(DRIVER_CLOSE_ERROR);
+	}
+	mSocket = INVALID_SOCKET;
 }

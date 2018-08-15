@@ -9,6 +9,7 @@
 #define StyxByteBufferReadable_H_
 #include "types.h"
 #include "io/IStyxBuffer.h"
+#include "exceptions/StyxException.h"
 
 class StyxByteBufferReadable : public IStyxBuffer {
 private:
@@ -23,7 +24,7 @@ public:
 	StyxByteBufferReadable(size_t capacity);
 	virtual ~StyxByteBufferReadable();
 	size_t remainsToRead();
-	size_t readFromFD(Socket fd);
+	size_t readFromChannel(Socket fd) throw(StyxException);
 	/**
 	 * Get byte array from buffer, this operation will not move read position pointer
 	 * @param out

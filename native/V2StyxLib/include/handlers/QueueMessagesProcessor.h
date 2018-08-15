@@ -7,6 +7,7 @@
 #define QUEUE_MESSAGESPROCESSOR_H_
 
 #include <queue>
+#include <pthread.h>
 #include "types.h"
 #include "messages/base/StyxMessage.h"
 #include "handlers/IMessageProcessor.h"
@@ -20,6 +21,8 @@ public:
 class QueueMessagesProcessor : public IMessageProcessor, IRunnable {
 protected:
     std::queue<QueueMessageProcessorPair> mQueue;
+    pthread_mutex_t mQueueMutex;
+    pthread_cond_t mQueueCond;
     StyxThread mThread;
     size_t mHandledPackets;
     size_t mErrorPackets;

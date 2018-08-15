@@ -17,12 +17,15 @@ protected:
 	std::queue<Socket> mNewConnetions;
 	std::queue<Socket> mReadable;
 	std::map<Socket, ClientDetails*> mClientStatesMap;
+	size_t mLastClientId = 1;
 
-	void setNonBlocking(Socket socket);
+	void setNonBlocking(Socket socket) throw(StyxException);
+	void processEventsQueue() throw(StyxException);
 public:
 	TCPServerChannelDriver(StyxString address, uint16_t port);
 	virtual ~TCPServerChannelDriver();
 	virtual void prepareSocket() throw(StyxException);
+	virtual void closeSocket() throw(StyxException);
 	virtual bool isConnected();
 	virtual bool isStarted();
 	virtual void* run();

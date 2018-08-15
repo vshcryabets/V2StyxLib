@@ -14,6 +14,7 @@
 #include "messages/StyxRWalkMessage.h"
 #include "messages/StyxRWriteMessage.h"
 #include "messages/StyxRAuthMessage.h"
+#include <stdio.h>
 
 TMessagesProcessor::TMessagesProcessor(StyxString tag, ConnectionDetails details, IVirtualStyxFile *root)
 	: QueueMessagesProcessor(tag), mConnectionDetails(details), mRoot(root), mAnswerPackets(0) {

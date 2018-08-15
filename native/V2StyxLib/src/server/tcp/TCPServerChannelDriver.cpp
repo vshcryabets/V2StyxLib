@@ -3,12 +3,14 @@
  *
  */
 #include "server/tcp/TCPServerChannelDriver.h"
+#include "server/tcp/TCPClientDetails.h"
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netdb.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <strings.h>
 
 TCPServerChannelDriver::TCPServerChannelDriver(StyxString address, uint16_t port) 
     : TCPChannelDriver(address, port), mSocket(INVALID_SOCKET) {
@@ -22,12 +24,17 @@ void TCPServerChannelDriver::prepareSocket() throw(StyxException) {
 	if (sockfd < 0) {
 		  throw StyxException(DRIVER_CREATE_ERROR);
 	}   
+	struct hostent *server;
+	server = ::gethostbyname(mAddress.c_str());
+	if (server == NULL) {
+		throw StyxException(DRIVER_CANT_RESOLVE_NAME);
+	}
 
     struct sockaddr_in serv_addr;
     bzero((char *) &serv_addr, sizeof(serv_addr));
     serv_addr.sin_family = AF_INET;
-#warning INADDR_ANY this is incorrect, we should listen specified socketAddress interface
-    serv_addr.sin_addr.s_addr = INADDR_ANY;
+    bcopy((char *)server->h_addr,
+        (char *)&serv_addr.sin_addr.s_addr, server->h_length);
     serv_addr.sin_port = htons(mPort);
     int result = ::bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr));
     if (result < 0) {
@@ -36,7 +43,8 @@ void TCPServerChannelDriver::prepareSocket() throw(StyxException) {
 #else
 		::close(sockfd);
 #endif
-        throw StyxException(DRIVER_BIND_ERROR);
+        throw StyxException(DRIVER_BIND_ERROR, 
+            "Can't bind socket in TCPServerChannelDriver::prepareSocket() %d", errno);
     }
 #warning set socket timeout
     mSocket = sockfd;
@@ -116,7 +124,7 @@ void* TCPServerChannelDriver::run() {
                     mReadable.push(it->first);
 				}
 			}
-#warning processEventsQueue();
+            processEventsQueue();
         }
     }
     ::close(mSocket);
@@ -124,7 +132,7 @@ void* TCPServerChannelDriver::run() {
     isWorking = false;
 }
 
-void TCPServerChannelDriver::setNonBlocking(Socket socket) {
+void TCPServerChannelDriver::setNonBlocking(Socket socket) throw(StyxException) {
 #ifdef WIN32
 	// If iMode!=0, non-blocking mode is enabled.
 	u_long mode=1;
@@ -140,4 +148,43 @@ void TCPServerChannelDriver::setNonBlocking(Socket socket) {
 		throw StyxException(DRIVER_CONFIGURE_ERROR);
 	}
 #endif
+}
+
+void TCPServerChannelDriver::closeSocket() throw(StyxException) {
+    if (mSocket == INVALID_SOCKET) {
+        throw StyxException(DRIVER_CLOSE_ERROR);
+    }
+    if (::close(mSocket) < 0) {
+        throw StyxException(DRIVER_CLOSE_ERROR);
+    }
+    mSocket = INVALID_SOCKET;
+}
+
+void TCPServerChannelDriver::processEventsQueue() throw(StyxException) {
+    // new connections
+    while (!mNewConnetions.empty()) {
+        Socket channel = mNewConnetions.front();
+        mNewConnetions.pop();
+        setNonBlocking(channel);
+        TCPClientDetails* client = new TCPClientDetails(channel, this,
+                mIOUnit, mLastClientId++);
+        mRMessageHandler->addClient(client);
+        mTMessageHandler->addClient(client);
+        mClientStatesMap[channel] = client;
+    }
+    // new readables
+    while (!mReadable.empty()) {
+        Socket channel = mReadable.front();
+        mReadable.pop();
+        std::map<Socket, ClientDetails*>::iterator it = mClientStatesMap.find(channel);
+        if (it != mClientStatesMap.end()) {
+            if (readSocket((TCPClientDetails*)it->second)) {
+                mTMessageHandler->removeClient(it->second);
+                mRMessageHandler->removeClient(it->second);
+                mClientStatesMap.erase(channel);
+#warning we should move close logic somewhere outside
+                ::close(channel);
+            }
+        }
+    }
 }

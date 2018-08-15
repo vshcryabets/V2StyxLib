@@ -25,7 +25,6 @@ import java.util.Stack;
  */
 public class TCPServerChannelDriver extends TCPChannelDriver {
     protected ServerSocketChannel mChannel;
-    protected Selector mSelector;
     protected Stack<SocketChannel> mNewConnetions, mReadable;
     protected Map<SocketChannel, ClientDetails> mClientStatesMap;
     protected int mLastClientId = 1;
@@ -55,12 +54,13 @@ public class TCPServerChannelDriver extends TCPChannelDriver {
         try {
             socket.bind(socketAddress);
         } catch (IOException e) {
-            throw new StyxException(StyxException.DRIVER_BIND_ERROR);
+            throw new StyxException(StyxException.DRIVER_BIND_ERROR, String.format(
+                    "Can't bind socket in TCPServerChannelDriver::prepareSocket() %s",
+                    e.getMessage()));
         }
         try {
             socket.setReuseAddress(true);
             socket.setSoTimeout(getTimeout());
-            mSelector = Selector.open();
             mChannel.configureBlocking(false);
         } catch (IOException e) {
             throw new StyxException(StyxException.DRIVER_CONFIGURE_ERROR);
@@ -75,26 +75,28 @@ public class TCPServerChannelDriver extends TCPChannelDriver {
     @Override
     public void run() {
         isWorking = true;
+        Selector selector = null;
         try {
-            mChannel.register(mSelector, SelectionKey.OP_ACCEPT);
+            selector = Selector.open();
+            mChannel.register(selector, SelectionKey.OP_ACCEPT);
 
             while ( isWorking ) {
                 try {
-                    if ( !mSelector.isOpen() ) {
+                    if ( !selector.isOpen() ) {
                         break;
                     }
-                    mSelector.select();
-                    if ( !mSelector.isOpen() ) {
+                    selector.select();
+                    if ( !selector.isOpen() ) {
                         break;
                     }
-                    Iterator<SelectionKey> iterator = mSelector.selectedKeys().iterator();
+                    Iterator<SelectionKey> iterator = selector.selectedKeys().iterator();
                     while ( iterator.hasNext() ) {
                         SelectionKey key = iterator.next();
                         iterator.remove();
                         if ( key.isAcceptable() ) {
                             SocketChannel clientChannel = mChannel.accept();
                             clientChannel.configureBlocking(false);
-                            clientChannel.register(mSelector, SelectionKey.OP_READ);
+                            clientChannel.register(selector, SelectionKey.OP_READ);
                             mNewConnetions.push(clientChannel);
                         } else if ( key.isReadable() ) {
                             SocketChannel clientChannel = (SocketChannel) key.channel();
@@ -116,13 +118,15 @@ public class TCPServerChannelDriver extends TCPChannelDriver {
             e.printStackTrace();
         } finally {
             try {
-                mSelector.close();
+                if (selector != null) {
+                    selector.close();
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
             try {
-                mChannel.close();
-            } catch (IOException e) {
+                closeSocket();
+            } catch (StyxException e) {
                 e.printStackTrace();
             }
         }
@@ -130,11 +134,28 @@ public class TCPServerChannelDriver extends TCPChannelDriver {
         isWorking = false;
     }
 
+    private void setNonBlocking(SocketChannel channel) throws IOException {
+        channel.configureBlocking(false);
+    }
+
+    public void closeSocket() throws StyxException {
+        if (mChannel == null) {
+            return;
+        }
+        try {
+            mChannel.close();
+            mChannel = null;
+        } catch (IOException e) {
+            throw new StyxException(StyxException.DRIVER_CLOSE_ERROR);
+        }
+    }
+
     protected void processEventsQueue() throws IOException {
         // new connections
         for (SocketChannel channel : mNewConnetions) {
-            channel.configureBlocking(false);
-            TCPClientDetails client = new TCPClientDetails(channel, this, mIOUnit, mLastClientId++);
+            setNonBlocking(channel);
+            TCPClientDetails client = new TCPClientDetails(channel, this,
+                    mIOUnit, mLastClientId++);
             mRMessageHandler.addClient(client);
             mTMessageHandler.addClient(client);
             mClientStatesMap.put(channel, client);
@@ -142,21 +163,15 @@ public class TCPServerChannelDriver extends TCPChannelDriver {
         mNewConnetions.clear();
         // new readables
         for (SocketChannel channel : mReadable) {
-            final TCPClientDetails state = (TCPClientDetails) mClientStatesMap.get(channel);
-            boolean result = readSocket(state);
-            if ( result ) {
-                removeClient(channel);
+            final TCPClientDetails details = (TCPClientDetails) mClientStatesMap.get(channel);
+            if ( readSocket(details) ) {
+                mTMessageHandler.removeClient(details);
+                mRMessageHandler.removeClient(details);
+                mClientStatesMap.remove(channel);
+                channel.close();
             }
         }
         mReadable.clear();
-    }
-
-    private void removeClient(SocketChannel channel) throws IOException {
-        final ClientDetails clientDetails = mClientStatesMap.get(channel);
-        mTMessageHandler.removeClient(clientDetails);
-        mRMessageHandler.removeClient(clientDetails);
-        mClientStatesMap.remove(channel);
-        channel.close();
     }
 
     @Override

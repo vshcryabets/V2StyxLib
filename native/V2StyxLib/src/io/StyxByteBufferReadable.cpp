@@ -27,7 +27,7 @@ size_t StyxByteBufferReadable::remainsToRead() {
 	return mStoredBytes;
 }
 
-size_t StyxByteBufferReadable::readFromFD(Socket fd) {
+size_t StyxByteBufferReadable::readFromChannel(Socket fd) throw(StyxException) {
 	size_t free = updateBufferLimits();
 	size_t count = ( mWritePosition < mReadPosition ? mReadPosition - mWritePosition : mCapacity - mWritePosition );
 	size_t position = mWritePosition;

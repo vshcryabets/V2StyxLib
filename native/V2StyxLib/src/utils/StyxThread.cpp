@@ -26,7 +26,8 @@ int StyxThread::start(void* (*startPoint) (void *), void *arg) {
 
 int StyxThread::startRunnable(IRunnable* runnable) {
     mRunnable = runnable;
-    return pthread_create(&mThreadId, NULL, &StyxThread::threadIn, this);
+    int result = pthread_create(&mThreadId, NULL, &StyxThread::threadIn, this);
+    return result;
 }
 
 void* StyxThread::threadIn(void *context) {

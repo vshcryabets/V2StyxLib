@@ -20,6 +20,7 @@
 
 class ClientDetails {
 protected:
+	#warning we can move channel template here
 	std::map<StyxFID,IVirtualStyxFile*> mAssignedFiles;
 	IChannelDriver *mDriver;
 	uint32_t mClientId;

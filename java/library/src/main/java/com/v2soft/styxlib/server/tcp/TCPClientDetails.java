@@ -21,8 +21,8 @@ public class TCPClientDetails extends ClientDetails {
     private SocketChannel mChannel;
     private ByteBuffer mOutputBuffer;
     private StyxDataWriter mOutputWriter;
-    protected StyxByteBufferReadable mBuffer;
-    protected StyxDataReader mReader;
+    private StyxByteBufferReadable mInputBuffer;
+    private StyxDataReader mInputReader;
 
     public TCPClientDetails(SocketChannel channel, IChannelDriver driver, int iounit, int id) {
         super(driver, id);
@@ -31,26 +31,26 @@ public class TCPClientDetails extends ClientDetails {
         }
         mChannel = channel;
         mOutputBuffer = ByteBuffer.allocate(iounit);
-        MetricsAndStats.byteBufferAllocation++;
-        mBuffer = new StyxByteBufferReadable(iounit * 2);
-        mReader = new StyxDataReader(mBuffer);
         mOutputWriter = new StyxDataWriter(mOutputBuffer);
+        MetricsAndStats.byteBufferAllocation++;
+        mInputBuffer = new StyxByteBufferReadable(iounit * 2);
+        mInputReader = new StyxDataReader(mInputBuffer);
     }
 
     public StyxDataWriter getOutputWriter() {
         return mOutputWriter;
     }
 
-    public SocketChannel getSocket() {
+    public SocketChannel getChannel() {
         return mChannel;
     }
 
     public StyxByteBufferReadable getInputBuffer() {
-        return mBuffer;
+        return mInputBuffer;
     }
 
     public IStyxDataReader getInputReader() {
-        return mReader;
+        return mInputReader;
     }
 
     @Override

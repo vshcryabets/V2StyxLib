@@ -116,3 +116,55 @@ StyxThread* TCPChannelDriver::start(size_t iounit) throw(StyxException) {
         isWorking = true;
         return mAcceptorThread;
 }
+
+/**
+ * Parse message from specified reader.
+ * @param reader reader with buffer.
+ * @return parsed message.
+ */
+StyxMessage* TCPChannelDriver::parseMessage(IStyxDataReader* reader) throw(StyxException) {
+	return StyxMessage::factory(reader, mIOUnit);
+}
+
+bool TCPChannelDriver::readSocket(TCPClientDetails* client) throw(StyxException) {
+	int32_t read = -1;
+	try {
+		read = client->getInputBuffer()->readFromChannel(client->getChannel());
+	}
+	catch (StyxException e) {
+	}
+	if ( read == -1 ) {
+		return true;
+	} else {
+		while ( process(client) );
+	}
+	return false;
+}
+
+/**
+ * Read income message from specified client.
+ * @return true if message was processed
+ * @throws StyxException in case of parse error.
+ */
+bool TCPChannelDriver::process(TCPClientDetails* client) throw(StyxException) {
+	size_t inBuffer = client->getInputBuffer()->remainsToRead();
+	if ( inBuffer > 4 ) {
+		uint32_t packetSize = client->getInputReader()->getUInt32();
+		if ( inBuffer >= packetSize ) {
+			// whole packet are in input buffer
+			StyxMessage* message = parseMessage(client->getInputReader());
+#ifdef USE_LOGGING
+			if ( mLogListener != null ) {
+				mLogListener.onMessageReceived(this, client, message);
+			}
+#endif
+			if ( isMessageTypeTMessage(message->getType()) ) {
+				mTMessageHandler->postPacket(message, client);
+			} else {
+				mRMessageHandler->postPacket(message, client);
+			}
+			return true;
+		}
+	}
+	return false;
+}

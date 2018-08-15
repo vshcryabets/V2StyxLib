@@ -6,6 +6,7 @@
  */
 
 #include "messages/base/structs/StyxQID.h"
+#include <stdio.h>
 
 const StyxQID StyxQID::EMPTY = StyxQID(QTFILE, 0L, 0L);
 
