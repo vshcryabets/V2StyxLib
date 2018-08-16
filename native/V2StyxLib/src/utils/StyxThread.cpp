@@ -1,10 +1,11 @@
 /*
- * FIDPoll.cpp
+ * StyxThread.cpp
  *
  */
-
 #include "utils/StyxThread.h"
 #include <unistd.h>
+#include "utils/Log.h"
+#include "exceptions/StyxException.h"
 
 StyxThread::StyxThread(StyxString tag) : mAlive(false), mInterruptFlag(false) {
 #warning set thread name from tag
@@ -35,7 +36,12 @@ void* StyxThread::threadIn(void *context) {
     StyxThread* thread = (StyxThread*)context;
     thread->mAlive = true;
     if (thread->mRunnable != NULL) {
-        result = thread->mRunnable->run();
+        try {
+            result = thread->mRunnable->run();
+        } catch (StyxException error) {
+            LogDebug("Got StyxException:\n%d\n%s\n", error.getInternalCode(),
+                error.getMessage().c_str());
+        }
     }
     thread->mAlive = false;
     pthread_exit(result);  

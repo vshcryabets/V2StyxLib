@@ -14,10 +14,12 @@
 #include "messages/StyxRWalkMessage.h"
 #include "messages/StyxRWriteMessage.h"
 #include "messages/StyxRAuthMessage.h"
-#include <stdio.h>
+#include "utils/Log.h"
 
-TMessagesProcessor::TMessagesProcessor(StyxString tag, ConnectionDetails details, IVirtualStyxFile *root)
-	: QueueMessagesProcessor(tag), mConnectionDetails(details), mRoot(root), mAnswerPackets(0) {
+TMessagesProcessor::TMessagesProcessor(StyxString tag, ConnectionDetails details, 
+	IVirtualStyxFile *root)
+	: QueueMessagesProcessor(tag), mConnectionDetails(details), mRoot(root), 
+	mAnswerPackets(0) {
 }
 
 TMessagesProcessor::~TMessagesProcessor() {
@@ -85,7 +87,7 @@ void TMessagesProcessor::processPacket(StyxMessage *message, ClientDetails *targ
 				break;
 			default:
 #warning TODO handle this
-				printf("Got unsupported message: %s", message->toString().c_str());
+				LogDebug("Got unsupported message: %s", message->toString().c_str());
 				break;
 		}
 	} catch (StyxErrorMessageException e) {

@@ -25,30 +25,30 @@ int main(int argc, char **argv) {
         return 1;
     }
 #endif
-	try {
-		string serveraddr = "0.0.0.0";
-		MemoryStyxDirectory root ("root");
-		string protocol = "9P2000";
-		MemoryStyxDirectory s1("server");
-		root.addFile(&s1);
-		s1.addFile(new MemoryStyxFile("players"));
-		MemoryStyxDirectory s2("s2");
-		root.addFile(&s2);
-		s1.addFile(new MemoryStyxFile("testfile1"));
-		s1.addFile(new MemoryStyxFile("testfile2"));
-		s1.addFile(new MemoryStyxFile("testfile3"));
-		s1.addFile(new MemoryStyxFile("testfile11"));
-		s1.addFile(new MemoryStyxFile("testfile21"));
-		s1.addFile(new MemoryStyxFile("testfile31"));
-		s1.addFile(new MemoryStyxFile("testfile12"));
-		s1.addFile(new MemoryStyxFile("testfile22"));
-		s1.addFile(new MemoryStyxFile("testfile32"));
-		s2.addFile(new StdOutFile("out"));
-		StyxServerManager manager(&root);
-		manager.start();
-	} catch (StyxLibraryException *e) {
-		printf("Exception: %s (ac:%d)\n", e->getMessage().c_str(), e->getAdditionalCode());
-	} catch (const char *e) {
-		printf("Exception: %s \n", e);
-	}
+	// try {
+	// 	string serveraddr = "0.0.0.0";
+	// 	MemoryStyxDirectory root ("root");
+	// 	string protocol = "9P2000";
+	// 	MemoryStyxDirectory s1("server");
+	// 	root.addFile(&s1);
+	// 	s1.addFile(new MemoryStyxFile("players"));
+	// 	MemoryStyxDirectory s2("s2");
+	// 	root.addFile(&s2);
+	// 	s1.addFile(new MemoryStyxFile("testfile1"));
+	// 	s1.addFile(new MemoryStyxFile("testfile2"));
+	// 	s1.addFile(new MemoryStyxFile("testfile3"));
+	// 	s1.addFile(new MemoryStyxFile("testfile11"));
+	// 	s1.addFile(new MemoryStyxFile("testfile21"));
+	// 	s1.addFile(new MemoryStyxFile("testfile31"));
+	// 	s1.addFile(new MemoryStyxFile("testfile12"));
+	// 	s1.addFile(new MemoryStyxFile("testfile22"));
+	// 	s1.addFile(new MemoryStyxFile("testfile32"));
+	// 	s2.addFile(new StdOutFile("out"));
+	// 	StyxServerManager manager(&root);
+	// 	manager.start();
+	// } catch (StyxException *e) {
+	// 	printf("Exception: %s (ac:%d)\n", e->getMessage().c_str(), e->getInternalCode());
+	// } catch (const char *e) {
+	// 	printf("Exception: %s \n", e);
+	// }
 }

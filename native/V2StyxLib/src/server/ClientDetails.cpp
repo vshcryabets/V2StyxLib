@@ -13,7 +13,11 @@
 #include <unistd.h>
 #include <sstream>
 
-ClientDetails::ClientDetails(IChannelDriver* driver, uint32_t id) : mCredentials("", "") {
+ClientDetails::ClientDetails(IChannelDriver* driver, uint32_t id) 
+	: mDriver(driver), mClientId(id), mCredentials("", "") {
+	if (mDriver == NULL) {
+		throw StyxException("Driver is null");
+	}
 	mPolls = new Polls();
 }
 

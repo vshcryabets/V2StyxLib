@@ -11,6 +11,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <strings.h>
+#include "utils/Log.h"
 
 TCPServerChannelDriver::TCPServerChannelDriver(StyxString address, uint16_t port) 
     : TCPChannelDriver(address, port), mSocket(INVALID_SOCKET) {
@@ -182,6 +183,7 @@ void TCPServerChannelDriver::processEventsQueue() throw(StyxException) {
                 mTMessageHandler->removeClient(it->second);
                 mRMessageHandler->removeClient(it->second);
                 mClientStatesMap.erase(channel);
+                #warning delete TCPClientDetails
 #warning we should move close logic somewhere outside
                 ::close(channel);
             }

@@ -7,6 +7,7 @@
 #include "messages/StyxTVersionMessage.h"
 #include "handlers/TMessagesProcessor.h"
 #include "handlers/RMessagesProcessor.h"
+#include "utils/Log.h"
 
 TEST(cpp_server_testPrepareSocketWrongPort_test, rw_test) {
 	try {
@@ -60,16 +61,14 @@ public:
 	uint8_t* senddata;
 	uint8_t* recvdata;
 	size_t iounit;
-	bool checks[2];
+	bool messageReceived;
 
 	TestServerChannel(uint8_t* indata, uint8_t* outdata, size_t testDataLength) 
-		: TCPServerChannelDriver("0.0.0.0", 10240) {
+		: TCPServerChannelDriver("0.0.0.0", 10240), testdataSize(testDataLength),
+			senddata(indata), recvdata(outdata) {
 		iounit = 128;
-		senddata = indata;
-		recvdata = outdata;
 		senddata[0] = testDataLength;
-		checks[0] = false;
-		checks[1] = false;
+		messageReceived = false;
 	}
 
 	StyxMessage* parseMessage(IStyxDataReader* reader) throw(StyxException) {
@@ -78,58 +77,63 @@ public:
 			throw StyxException("Something wrong with received data");
 		}
 		reader->read(recvdata, length);
-		checks[0] = true;
+#warning compare received data and transmited		
+		messageReceived = true;
 		return new StyxTVersionMessage(iounit, "testAnswer");
 	}
 };
 
+class TestTMessagesProcessor : public TMessagesProcessor {
+public:
+	bool clientAdded = false;
+	TestTMessagesProcessor(ConnectionDetails details) 
+		: TMessagesProcessor("test1", details, NULL) {
+	};
+	virtual void addClient(ClientDetails *state) {
+		LogDebug("TestTMessagesProcessor client added %p\n", state);
+		clientAdded = true;
+	};
+};
+
 TEST(cpp_server_testSocketReceive, rw_test) {
-	try {
 	uint8_t senddata[] = {0, 0, 0, 0, 1, 2};
 	uint8_t recvdata[sizeof(senddata)];
 
 	TestServerChannel driver(senddata, recvdata, sizeof(senddata));
-	ASSERT_FALSE(driver.checks[0]) << "Wrong check state";
-	ASSERT_FALSE(driver.checks[1]) << "Wrong check state";
-	
-	TMessagesProcessor* tProcessor = new TMessagesProcessor("test1", 
-		ConnectionDetails("test", driver.iounit), NULL);
-	driver.setTMessageHandler(tProcessor);
-			// {
-			// 	@Override
-			// 	public void addClient(ClientDetails clientDetails) {
-			// 		checks[1] = true;
-			// 	}
-			// });
-	driver.setRMessageHandler(new RMessagesProcessor("test2"));
-	driver.start(driver.iounit);
-	::sleep(1);
-	printf("A11\n");
+	try {
+		ASSERT_FALSE(driver.messageReceived) << "Wrong check state";
+		
+		TestTMessagesProcessor* tProcessor = new TestTMessagesProcessor(
+			ConnectionDetails("test", driver.iounit));
+		ASSERT_FALSE(tProcessor->clientAdded) << "Wrong check state";
+		driver.setTMessageHandler(tProcessor);
+		driver.setRMessageHandler(new RMessagesProcessor("test2"));
+		driver.start(driver.iounit);
+		::sleep(1);
 
-	int sockfd = ::socket(AF_INET, SOCK_STREAM, 0);
-	struct hostent *server;
-	server = ::gethostbyname("127.0.0.1");
-	struct sockaddr_in serverAddress;
-	bzero((char *) &serverAddress, sizeof(serverAddress));
-	serverAddress.sin_family = AF_INET;
-	bcopy((char *)server->h_addr,
-	      (char *)&serverAddress.sin_addr.s_addr,
-	      server->h_length);
-	serverAddress.sin_port = htons(10240);
-	int connectResult = ::connect(sockfd, (struct sockaddr*)&serverAddress, sizeof(serverAddress));
-	ASSERT_EQ(0, connectResult) << "Can't connect";
-	ssize_t result = ::write(sockfd, senddata, sizeof(senddata));
-	ASSERT_EQ(sizeof(senddata), result) << "Can't write";
-	::sleep(1);
+		int sockfd = ::socket(AF_INET, SOCK_STREAM, 0);
+		struct hostent *server;
+		server = ::gethostbyname("127.0.0.1");
+		struct sockaddr_in serverAddress;
+		bzero((char *) &serverAddress, sizeof(serverAddress));
+		serverAddress.sin_family = AF_INET;
+		bcopy((char *)server->h_addr,
+			(char *)&serverAddress.sin_addr.s_addr,
+			server->h_length);
+		serverAddress.sin_port = htons(10240);
+		int connectResult = ::connect(sockfd, (struct sockaddr*)&serverAddress, sizeof(serverAddress));
+		ASSERT_EQ(0, connectResult) << "Can't connect";
+		ssize_t result = ::write(sockfd, senddata, sizeof(senddata));
+		ASSERT_EQ(sizeof(senddata), result) << "Can't write";
+		::sleep(1);
 
-	driver.close();
-
-	ASSERT_TRUE(driver.checks[0]) << "No message for TMessageHandler";
-	// ASSERT_TRUE(driver.checks[1]) << "Not called TMessageHandler::addClient";
-	// assertArrayEquals(senddata, recvdata, "Wrong recv data");
+		ASSERT_TRUE(tProcessor->clientAdded) << "Not called TMessageHandler::addClient";
+		ASSERT_TRUE(driver.messageReceived) << "No message for TMessageHandler";
+		// assertArrayEquals(senddata, recvdata, "Wrong recv data");
 	} catch (StyxException err) {
 		printf("StyxException %s %d\n", err.getMessage().c_str(), err.getInternalCode());
 		throw err;
 	}
-
+	driver.closeSocket();
+	driver.close();
 }
