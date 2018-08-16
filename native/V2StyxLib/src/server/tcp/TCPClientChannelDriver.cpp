@@ -85,7 +85,7 @@ void* TCPClientChannelDriver::run() {
 		StyxByteBufferReadable buffer(mIOUnit * 2);
 		StyxDataReader reader(&buffer);
 		while (isWorking) {
-			if (mAcceptorThread->isInterrupted()) break;
+			if (mThread->isInterrupted()) break;
 			try {
 				size_t read = buffer.readFromChannel(mSocket);
 				if (read > 0) {
@@ -127,7 +127,7 @@ void* TCPClientChannelDriver::run() {
 
 void TCPClientChannelDriver::close() throw(StyxException) {
 	TCPChannelDriver::close();
-	mAcceptorThread->cancel();
+	mThread->cancel();
 }
 
 std::vector<ClientDetails*> TCPClientChannelDriver::getClients() {

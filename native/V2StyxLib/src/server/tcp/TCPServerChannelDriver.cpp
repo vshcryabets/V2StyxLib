@@ -91,7 +91,7 @@ void* TCPServerChannelDriver::run() {
 	Socket highsock = mSocket;
     fd_set socks;
     struct timeval timeout;
-    while (isWorking && !mAcceptorThread->isInterrupted()) {
+    while (isWorking && !mThread->isInterrupted()) {
         FD_ZERO(&socks);
         FD_SET(mSocket, &socks);
 

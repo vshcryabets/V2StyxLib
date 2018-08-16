@@ -10,7 +10,7 @@
 #include <sys/socket.h>
 
 TCPChannelDriver::TCPChannelDriver(StyxString address, uint16_t port) 
-	: mPort(port), mAddress(address), mAcceptorThread(NULL) {
+	: mPort(port), mAddress(address), mThread(NULL) {
     mTransmittedPacketsCount = 0;
     mTransmissionErrorsCount = 0;
 }
@@ -87,20 +87,20 @@ bool TCPChannelDriver::sendMessage(StyxMessage* message, ClientDetails *recipien
 
 void TCPChannelDriver::close() throw(StyxException) {
 	isWorking = false;
-	if (mAcceptorThread == NULL) {
+	if (mThread == NULL) {
 		return;
 	}
-	mAcceptorThread->cancel();
-	mAcceptorThread->tryjoin(2000);
-	if ( mAcceptorThread->isAlive() ) {
-		mAcceptorThread->forceCancel();
+	mThread->cancel();
+	mThread->tryjoin(2000);
+	if ( mThread->isAlive() ) {
+		mThread->forceCancel();
 	}
-	delete mAcceptorThread;
-	mAcceptorThread = NULL;
+	delete mThread;
+	mThread = NULL;
 }
 
 StyxThread* TCPChannelDriver::start(size_t iounit) throw(StyxException) {
-		if ( mAcceptorThread != NULL ) {
+		if ( mThread != NULL ) {
             throw StyxException("Already started");
         }
 		if (mTMessageHandler == NULL) {
@@ -111,10 +111,10 @@ StyxThread* TCPChannelDriver::start(size_t iounit) throw(StyxException) {
         }
         mIOUnit = iounit;
 		prepareSocket();
-        mAcceptorThread = new StyxThread("TcpDriver");
-        mAcceptorThread->startRunnable(this);
+        mThread = new StyxThread("TcpDriver");
+        mThread->startRunnable(this);
         isWorking = true;
-        return mAcceptorThread;
+        return mThread;
 }
 
 /**

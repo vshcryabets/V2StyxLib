@@ -19,7 +19,7 @@ import java.nio.ByteBuffer;
  */
 public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
     private static final String TAG = TCPChannelDriver.class.getSimpleName();
-    protected Thread mAcceptorThread;
+    protected Thread mThread;
     protected boolean isWorking;
     protected IMessageProcessor mTMessageHandler;
     protected IMessageProcessor mRMessageHandler;
@@ -46,7 +46,7 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
 
     @Override
     public Thread start(int iounit) throws StyxException {
-        if ( mAcceptorThread != null ) {
+        if ( mThread != null ) {
             throw new IllegalStateException("Already started");
         }
         if (mTMessageHandler == null) {
@@ -57,10 +57,10 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
         }
         mIOUnit = iounit;
         prepareSocket();
-        mAcceptorThread = new Thread(this, "TcpDriver");
-        mAcceptorThread.start();
+        mThread = new Thread(this, "TcpDriver");
+        mThread.start();
         isWorking = true;
-        return mAcceptorThread;
+        return mThread;
     }
 
     @Override
@@ -104,12 +104,12 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
     public void close() {
         isWorking = false;
         try {
-            mAcceptorThread.join(2000);
+            mThread.join(2000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        if ( mAcceptorThread.isAlive() ) {
-            mAcceptorThread.interrupt();
+        if ( mThread.isAlive() ) {
+            mThread.interrupt();
         }
     }
 

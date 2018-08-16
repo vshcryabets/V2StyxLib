@@ -132,7 +132,7 @@ public class TCPClientChannelDriver extends TCPChannelDriver {
     @Override
     public void close() {
         super.close();
-        mAcceptorThread.interrupt();
+        mThread.interrupt();
     }
 
     @Override

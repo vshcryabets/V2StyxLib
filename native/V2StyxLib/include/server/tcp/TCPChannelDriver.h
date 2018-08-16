@@ -19,8 +19,7 @@ protected:
     IMessageProcessor* mRMessageHandler;
     uint32_t mIOUnit;
     bool isWorking;
-#warning rename to mThread
-    StyxThread* mAcceptorThread;
+    StyxThread* mThread;
 
 #ifdef USE_LOGGING
     ILogListener* mLogListener;
