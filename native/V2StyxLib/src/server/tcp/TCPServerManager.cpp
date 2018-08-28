@@ -9,12 +9,11 @@
 #include "server/tcp/TCPServerChannelDriver.h"
 
 TCPServerManager::TCPServerManager(StyxString address, uint16_t port, IVirtualStyxFile* root) :
-	StyxServerManager(root, std::vector<IChannelDriver*>()) {
-#warning new TCPServerChannelDriver()) in prev line
-
+	StyxServerManager(root), mDriver(new TCPServerChannelDriver(address, port)) {
+	addDriver(mDriver);
 }
 
 TCPServerManager::~TCPServerManager() {
-	// TODO Auto-generated destructor stub
+	delete mDriver;
 }
 

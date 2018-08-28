@@ -11,15 +11,10 @@ const StyxString StyxServerManager::PROTOCOL = "9P2000";
 const size_t StyxServerManager::DEFAULT_IOUNIT = 8192;
 const size_t StyxServerManager::DEFAULT_TIMEOUT = 5000;
 
-StyxServerManager::StyxServerManager(IVirtualStyxFile *root, std::vector<IChannelDriver*> drivers)
+StyxServerManager::StyxServerManager(IVirtualStyxFile *root)
 	: mRoot(root) {
-	// TODO inheritance not works in constructor
 	ConnectionDetails details(getProtocol(), getIOUnit());
     mBalancer = new TMessagesProcessor("serverTH", details, root);
-	for ( std::vector<IChannelDriver*>::iterator it = drivers.begin(); 
-		it != drivers.end(); ++it ) {
-		addDriver(*it);
-	}
 }
 
 StyxServerManager::~StyxServerManager() {
@@ -66,12 +61,13 @@ IVirtualStyxFile* StyxServerManager::getRoot() {
 }
 
 StyxServerManager* StyxServerManager::addDriver(IChannelDriver* driver) throw(StyxException) {
-	if (!mDriverThreads.empty()) {
-		// we already called start
-		throw StyxException("Start() already called");
-	}
 	if (driver == NULL) {
-		throw StyxException("Driver is null");
+		return this;
+	}
+	if (!mDriverThreads.empty()) {
+#warning improve this logic, we should have ability to add drivers at any time.
+		// we already called start
+		throw StyxException("Can't add driver after start");
 	}
 	mDrivers.push_back(driver);
 	driver->setTMessageHandler(mBalancer);

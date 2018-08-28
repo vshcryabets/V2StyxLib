@@ -329,10 +329,4 @@ public class ConnectionTest {
         newFile.delete();
         newFile.close();
     }
-
-    @Test
-    @Disabled
-    public void testConnectAsync() {
-        // TODO write test
-    }
 }

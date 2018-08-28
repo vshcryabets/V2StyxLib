@@ -11,9 +11,10 @@ import java.io.IOException;
  *
  * @author V.Shcryabets (vshcryabets@gmail.com)
  */
+// TODO this class looks useless, probably we can remove it
 public class TCPServerManager extends StyxServerManager {
-
-    public TCPServerManager(String address, int port, IVirtualStyxFile root) throws IOException {
-        super(root, new IChannelDriver[]{new TCPServerChannelDriver(address, port)});
+    public TCPServerManager(String address, int port, IVirtualStyxFile root) {
+        super(root);
+        addDriver(new TCPServerChannelDriver(address, port));
     }
 }

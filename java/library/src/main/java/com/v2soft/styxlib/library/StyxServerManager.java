@@ -31,26 +31,22 @@ public class StyxServerManager
     protected IVirtualStyxFile mRoot;
     protected Thread[] mDriverThreads;
 
-    public StyxServerManager(IVirtualStyxFile root, IChannelDriver[] drivers) {
+    public StyxServerManager(IVirtualStyxFile root) {
         mRoot = root;
         // TODO inheritance not works in constructor
         ConnectionDetails details = new ConnectionDetails(getProtocol(), getIOUnit());
         mBalancer = new TMessagesProcessor("serverTH", details, root);
         mDrivers = new LinkedList<>();
-        if (drivers != null) {
-            for (IChannelDriver driver : drivers) {
-                addDriver(driver);
-            }
-        }
     }
 
     public StyxServerManager addDriver(IChannelDriver driver) {
+        if (driver == null) {
+            return this;
+        }
         if (mDriverThreads != null) {
             // we already called start
-            throw new IllegalStateException("Start() already called");
-        }
-        if (driver == null) {
-            throw new NullPointerException("Driver is null");
+            // TODO improve this logic, we should have ability to add drivers at any time.
+            throw new IllegalStateException("Can't add driver after start");
         }
         mDrivers.add(driver);
         driver.setTMessageHandler(mBalancer);
