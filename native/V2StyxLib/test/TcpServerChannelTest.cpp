@@ -85,9 +85,9 @@ public:
 
 class TestTMessagesProcessor : public TMessagesProcessor {
 public:
-	bool clientAdded = false;
+	bool clientAdded;
 	TestTMessagesProcessor(ConnectionDetails details) 
-		: TMessagesProcessor("test1", details, NULL) {
+		: TMessagesProcessor("test1", details, NULL), clientAdded(false) {
 	};
 	virtual void addClient(ClientDetails *state) {
 		LogDebug("TestTMessagesProcessor client added %p\n", state);

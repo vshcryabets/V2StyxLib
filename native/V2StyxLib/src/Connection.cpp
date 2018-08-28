@@ -171,14 +171,17 @@ StyxString Connection::getMountPoint() {
 	return mMountPoint;
 }
 
+#warning remove or simplify
 bool Connection::connect() throw(StyxException) {
 	return connect(mDriver, mCredentials);
 }
 
+#warning remove or simplify
 bool Connection::connect(IChannelDriver *driver) throw(StyxException) {
 	return connect(driver, mCredentials);
 }
 
+#warning remove or simplify
 bool Connection::connect(IChannelDriver *driver, Credentials credentials) throw(StyxException) {
 	if ( mAnswerProcessor == NULL ) {
 		mAnswerProcessor = new RMessagesProcessor("RH" + driver->toString());
@@ -189,8 +192,15 @@ bool Connection::connect(IChannelDriver *driver, Credentials credentials) throw(
 		shouldCloseTransmitter = true;
 	}
 
-	if (!driver->isStarted()) {
-		driver->start(getIOBufSize());
+	if (driver == NULL) {
+		throw StyxException("Channel driver can't be null");
+	}
+	mDriver = driver;
+	if (!mDriver->isStarted()) {
+		mDriver->setRMessageHandler(mAnswerProcessor);
+#warning this temp fix. TMessages shoul be handled in other way.		
+		mDriver->setTMessageHandler(mAnswerProcessor); 
+		mDriver->start(getIOBufSize());
 		isAutoStartDriver = true;
 	}
 
@@ -202,6 +212,7 @@ bool Connection::connect(IChannelDriver *driver, Credentials credentials) throw(
 	return this->connect(driver, credentials, mAnswerProcessor, mTransmitter, mRecepient);
 }
 
+#warning remove or simplify
 bool Connection::connect(IChannelDriver *driver, Credentials credentials,
 		RMessagesProcessor* answerProcessor, TMessageTransmitter* transmitter,
 		ClientDetails* recipient) throw(StyxException) {

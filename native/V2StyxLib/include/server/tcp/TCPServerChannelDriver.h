@@ -17,7 +17,7 @@ protected:
 	std::queue<Socket> mNewConnetions;
 	std::queue<Socket> mReadable;
 	std::map<Socket, ClientDetails*> mClientStatesMap;
-	size_t mLastClientId = 1;
+	size_t mLastClientId;
 
 	void setNonBlocking(Socket socket) throw(StyxException);
 	void processEventsQueue() throw(StyxException);

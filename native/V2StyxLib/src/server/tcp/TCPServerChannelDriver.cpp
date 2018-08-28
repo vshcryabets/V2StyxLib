@@ -14,7 +14,7 @@
 #include "utils/Log.h"
 
 TCPServerChannelDriver::TCPServerChannelDriver(StyxString address, uint16_t port) 
-    : TCPChannelDriver(address, port), mSocket(INVALID_SOCKET) {
+    : TCPChannelDriver(address, port), mSocket(INVALID_SOCKET), mLastClientId(1) {
 }
 
 TCPServerChannelDriver::~TCPServerChannelDriver() {

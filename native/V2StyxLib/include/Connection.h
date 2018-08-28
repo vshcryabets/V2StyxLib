@@ -54,7 +54,7 @@ protected:
     virtual void setDriver(IChannelDriver* driver);
 public:
 #warning TODO simplify contructor
-    Connection(Credentials credentials = Credentials(NULL, NULL), IChannelDriver *driver = NULL,
+    Connection(Credentials credentials = Credentials("", ""), IChannelDriver *driver = NULL,
                       RMessagesProcessor *answerProcessor = NULL,
                       TMessageTransmitter *transmitter = NULL,
                       ClientDetails *recepient = NULL);

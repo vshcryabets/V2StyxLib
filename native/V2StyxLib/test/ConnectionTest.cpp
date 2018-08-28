@@ -24,15 +24,16 @@ StyxServerManager* startServer() {
 }
 
 void setUp() {
-	printf("Setup 1\n");
-	StyxServerManager* server = startServer();
-	mConnection = new Connection();
+    printf("Setup 1\n");
+    StyxServerManager* server = startServer();
+    mConnection = new Connection();
     IChannelDriver* driver = new TCPClientChannelDriver("localhost", PORT);
     printf("Setup finished\n");
     ASSERT_TRUE(mConnection->connect(driver));
 }
 
-TEST(DISABLED_cpp_connection_test, connection_test) {
+TEST(cpp_connection_test, connection_test) {
+    try {
 	setUp();
     size_t count = 1000;
     uint64_t startTime = getTimestampInMilliseconds();
@@ -48,4 +49,8 @@ TEST(DISABLED_cpp_connection_test, connection_test) {
             diff/count
             );
     mConnection->close();
+    } catch (StyxException err) {
+        printf("StyxException %s %d\n", err.getMessage().c_str(), err.getInternalCode());
+		throw err;
+    }
 }
