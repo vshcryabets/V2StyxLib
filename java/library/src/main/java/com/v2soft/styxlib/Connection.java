@@ -18,6 +18,7 @@ import com.v2soft.styxlib.server.IChannelDriver;
 import com.v2soft.styxlib.server.IMessageTransmitter;
 import com.v2soft.styxlib.types.ConnectionDetails;
 import com.v2soft.styxlib.types.Credentials;
+import com.v2soft.styxlib.utils.SyncObject;
 
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
@@ -214,7 +215,7 @@ public class Connection
         return mRoot;
     }
 
-    public IMessageTransmitter getMessenger() {
+    public IMessageTransmitter getTransmitter() {
         return mTransmitter;
     }
 
@@ -246,18 +247,20 @@ public class Connection
         return mAuthQID;
     }
 
-    @Override
-    public ConnectionDetails getConnectionDetails() {
+    protected ConnectionDetails getConnectionDetails() {
         return mDetails;
     }
 
-    public void sendVersionMessage()
+    protected void sendVersionMessage()
             throws InterruptedException, StyxException, IOException, TimeoutException {
+        SyncObject syncObject = new SyncObject();
         // release attached FID
         if (mFID != StyxMessage.NOFID) {
             try {
                 final StyxTMessageFID tClunk = new StyxTMessageFID(MessageType.Tclunk, MessageType.Rclunk, mFID);
+                tClunk.setSyncObject(syncObject);
                 mTransmitter.sendMessage(tClunk, mRecepient);
+                tClunk.waitForAnswer(mTimeout);
             } catch (Exception e) {
                 throw new IOException(e);
             }
@@ -265,6 +268,7 @@ public class Connection
         }
 
         StyxTVersionMessage tVersion = new StyxTVersionMessage(mDetails.getIOUnit(), getProtocol());
+        tVersion.setSyncObject(syncObject);
         mTransmitter.sendMessage(tVersion, mRecepient);
 
         StyxMessage rMessage = tVersion.waitForAnswer(mTimeout);
@@ -274,19 +278,18 @@ public class Connection
         }
         mRecepient.getPolls().getFIDPoll().clean();
         if ((mCredentials.getUserName() != null) && (mCredentials.getPassword() != null)) {
-            sendAuthMessage();
+            sendAuthMessage(syncObject);
         } else {
-            sendAttachMessage();
+            sendAttachMessage(syncObject);
         }
     }
 
-    private void sendAuthMessage()
+    private void sendAuthMessage(SyncObject syncObject)
             throws InterruptedException, StyxException, IOException, TimeoutException {
         mAuthFID = mRecepient.getPolls().getFIDPoll().getFreeItem();
 
-        StyxTAuthMessage tAuth = new StyxTAuthMessage(mAuthFID);
-        tAuth.setUserName(getCredentials().getUserName());
-        tAuth.setMountPoint(getMountPoint());
+        StyxTAuthMessage tAuth = new StyxTAuthMessage(mAuthFID, getCredentials().getUserName(), getMountPoint());
+        tAuth.setSyncObject(syncObject);
         mTransmitter.sendMessage(tAuth, mRecepient);
 
         StyxMessage rMessage = tAuth.waitForAnswer(mTimeout);
@@ -299,15 +302,16 @@ public class Connection
         //        output.writeString(getPassword());
         //        output.flush();
 
-        sendAttachMessage();
+        sendAttachMessage(syncObject);
     }
 
-    private void sendAttachMessage()
+    private void sendAttachMessage(SyncObject syncObject)
             throws InterruptedException, StyxException, TimeoutException, IOException {
         mFID = mRecepient.getPolls().getFIDPoll().getFreeItem();
         StyxTAttachMessage tAttach = new StyxTAttachMessage(getRootFID(), getAuthFID(),
                 getCredentials().getUserName(),
                 getMountPoint());
+        tAttach.setSyncObject(syncObject);
         mTransmitter.sendMessage(tAttach, mRecepient);
 
         StyxMessage rMessage = tAttach.waitForAnswer(mTimeout);
