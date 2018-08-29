@@ -1,12 +1,9 @@
 package com.v2soft.styxlib;
 
-import com.v2soft.styxlib.Connection;
-import com.v2soft.styxlib.IClient;
-import com.v2soft.styxlib.StyxFile;
-import com.v2soft.styxlib.library.StyxServerManager;
 import com.v2soft.styxlib.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.io.StyxFileBufferedInputStream;
+import com.v2soft.styxlib.library.StyxServerManager;
 import com.v2soft.styxlib.messages.base.enums.FileMode;
 import com.v2soft.styxlib.server.ClientDetails;
 import com.v2soft.styxlib.server.IChannelDriver;
@@ -28,7 +25,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetAddress;
-import java.util.Collections;
 import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.TimeoutException;
@@ -49,7 +45,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class ConnectionTest {
     private static Logger log = Logger.getLogger(ConnectionTest.class.getSimpleName());
     private static final int PORT = 10234;
-    private IClient mConnection;
+    private static final String ADDRESS = "127.0.0.1";
+    private Connection mConnection;
     private StyxServerManager mServer;
 
     @BeforeEach
@@ -88,9 +85,9 @@ public class ConnectionTest {
                         //"Received %d messages\n\t" +
                         "Error %d messages\n\t" +
                         "Average time for connection %f ms",
-                mConnection.getMessenger().getTransmittedCount(),
-                mConnection.getMessenger().getErrorsCount(),
-                (float)diff / (float)count
+                mConnection.getTransmitter().getTransmittedCount(),
+                mConnection.getTransmitter().getErrorsCount(),
+                (double)diff / (double)count
         ));
     }
 
@@ -240,9 +237,9 @@ public class ConnectionTest {
         long diff = System.currentTimeMillis() - writeTime;
         System.out.println(String.format("Write done in %d ms", (writeTime - startTime)));
         System.out.println(String.format("Read done in %d ms", diff));
-        System.out.println(String.format("\tTransmited %d messages", mConnection.getMessenger().getTransmittedCount()));
-//        System.out.println(String.format("\tReceived %d messages", mConnection.getMessenger().getReceivedCount()));
-        System.out.println(String.format("\tError %d messages", mConnection.getMessenger().getErrorsCount()));
+        System.out.println(String.format("\tTransmited %d messages", mConnection.getTransmitter().getTransmittedCount()));
+//        System.out.println(String.format("\tReceived %d messages", mConnection.getTransmitter().getReceivedCount()));
+        System.out.println(String.format("\tError %d messages", mConnection.getTransmitter().getErrorsCount()));
         //        System.out.println(String.format("\tAverage time for connection %d ms",diff/count));
     }
 
@@ -283,8 +280,8 @@ public class ConnectionTest {
         Assertions.assertEquals(blockSize * blocksCount, stat[0], "Write and received size not equals");
         System.out.println(String.format("\tServer received %d bytes", stat[0]));
         System.out.println(String.format("\tWrite done in %d ms", writeTimeMs));
-        System.out.println(String.format("\tTransmited %d messages", mConnection.getMessenger().getTransmittedCount()));
-        System.out.println(String.format("\tError %d messages", mConnection.getMessenger().getErrorsCount()));
+        System.out.println(String.format("\tTransmited %d messages", mConnection.getTransmitter().getTransmittedCount()));
+        System.out.println(String.format("\tError %d messages", mConnection.getTransmitter().getErrorsCount()));
         System.out.println(String.format("\tByteBuffer allocations count %d", MetricsAndStats.byteBufferAllocation));
         System.out.println(String.format("\tbyte[] allocations count %d", MetricsAndStats.byteArrayAllocation));
         System.out.println(String.format("\tbyte[] allocations count RRead %d", MetricsAndStats.byteArrayAllocationRRead));

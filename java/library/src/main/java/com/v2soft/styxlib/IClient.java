@@ -18,16 +18,6 @@ import java.util.concurrent.TimeoutException;
  */
 public interface IClient extends Closeable {
     /**
-     * Restart session with server
-     *
-     * @throws InterruptedException
-     * @throws com.v2soft.styxlib.exceptions.StyxException
-     * @throws java.io.IOException
-     * @throws java.util.concurrent.TimeoutException
-     */
-    public void sendVersionMessage()
-            throws InterruptedException, StyxException, IOException, TimeoutException;
-    /**
      * Connect to server with specified parameters
      * @return true if connected
      * @throws java.io.IOException
@@ -58,7 +48,7 @@ public interface IClient extends Closeable {
 
     boolean isConnected();
 
-    IMessageTransmitter getMessenger();
+    IMessageTransmitter getTransmitter();
 
     int getTimeout();
     /**
@@ -66,8 +56,6 @@ public interface IClient extends Closeable {
      * @return FID of root folder
      */
     long getRootFID();
-
-    ConnectionDetails getConnectionDetails();
 
     /**
      *

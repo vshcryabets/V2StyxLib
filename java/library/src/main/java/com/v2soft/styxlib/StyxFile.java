@@ -69,7 +69,7 @@ public class StyxFile implements Closeable {
         if ( !manager.isConnected() )
             throw new IOException("Styx connection wasn't established");
         mClient = manager;
-        mMessenger = mClient.getMessenger();
+        mMessenger = mClient.getTransmitter();
         mRecepient = mClient.getRecepient();
         mTimeout = mClient.getTimeout();
         mPath = path;
