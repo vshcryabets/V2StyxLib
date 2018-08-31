@@ -1,4 +1,4 @@
-package com.v2soft.styxlib.tests;
+package com.v2soft.styxlib;
 
 import com.v2soft.styxlib.Connection;
 import com.v2soft.styxlib.IClient;
@@ -20,6 +20,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
@@ -27,9 +28,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetAddress;
+import java.util.Collections;
 import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.TimeoutException;
+import java.util.logging.Logger;
 import java.util.zip.CRC32;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
@@ -44,6 +47,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author V.Shcriyabets (vshcryabets@gmail.com)
  */
 public class ConnectionTest {
+    private static Logger log = Logger.getLogger(ConnectionTest.class.getSimpleName());
     private static final int PORT = 10234;
     private IClient mConnection;
     private StyxServerManager mServer;
@@ -72,22 +76,21 @@ public class ConnectionTest {
 
     // TVersion & TAttach
     @Test
+    @Tag("dev")
     public void testConnection() throws IOException, StyxException, InterruptedException, TimeoutException {
-        int count = 1000;
+        int count = 100000;
         long startTime = System.currentTimeMillis();
         for (int i = 0; i < count; i++) {
             mConnection.sendVersionMessage();
-//            System.out.println(String.valueOf(i));
         }
         long diff = System.currentTimeMillis() - startTime;
-        System.out.println(String.format("\tTransmited %d messages\n\t" +
+        log.info(String.format("\tTransmited %d messages\n\t" +
                         //"Received %d messages\n\t" +
                         "Error %d messages\n\t" +
-                        "Average time for connection %d ms",
+                        "Average time for connection %f ms",
                 mConnection.getMessenger().getTransmittedCount(),
-//                mConnection.getMessenger().getReceivedCount(),
                 mConnection.getMessenger().getErrorsCount(),
-                diff / count
+                (float)diff / (float)count
         ));
     }
 
