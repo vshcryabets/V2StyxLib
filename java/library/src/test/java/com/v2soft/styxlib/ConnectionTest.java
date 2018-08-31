@@ -1,8 +1,5 @@
 package com.v2soft.styxlib;
 
-import com.v2soft.styxlib.Connection;
-import com.v2soft.styxlib.IClient;
-import com.v2soft.styxlib.StyxFile;
 import com.v2soft.styxlib.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.io.StyxFileBufferedInputStream;
@@ -19,6 +16,7 @@ import com.v2soft.styxlib.vfs.MemoryStyxFile;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
@@ -28,6 +26,7 @@ import java.io.OutputStream;
 import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.TimeoutException;
+import java.util.logging.Logger;
 import java.util.zip.CRC32;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
@@ -42,6 +41,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author V.Shcriyabets (vshcryabets@gmail.com)
  */
 public class ConnectionTest {
+    private static Logger log = Logger.getLogger(ConnectionTest.class.getSimpleName());
     private static final int PORT = 10234;
     private static final String ADDRESS = "127.0.0.1";
     private Connection mConnection;
@@ -69,14 +69,15 @@ public class ConnectionTest {
 
     // TVersion & TAttach
     @Test
+    @Tag("dev")
     public void testConnection() throws IOException, StyxException, InterruptedException, TimeoutException {
-        int count = 1000;
+        int count = 100000;
         long startTime = System.currentTimeMillis();
         for (int i = 0; i < count; i++) {
             mConnection.sendVersionMessage();
         }
         long diff = System.currentTimeMillis() - startTime;
-        System.out.println(String.format("\tTransmited %d messages\n\t" +
+        log.info(String.format("\tTransmited %d messages\n\t" +
                         //"Received %d messages\n\t" +
                         "Error %d messages\n\t" +
                         "Average time for connection %f ms",

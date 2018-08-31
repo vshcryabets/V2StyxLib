@@ -1,9 +1,12 @@
 apply plugin: 'java'
 apply plugin: 'maven'
-apply plugin: 'org.junit.platform.gradle.plugin'
 
-sourceCompatibility = 1.7
+sourceCompatibility = 1.8
 version = '1.1.1'
+tasks.withType(JavaCompile) {
+  options.encoding = "UTF-8"
+}
+
 jar {
     manifest {
         attributes 'Implementation-Title': 'V2StyxLib', 'Implementation-Version': version
@@ -11,18 +14,11 @@ jar {
 }
 
 dependencies {
-    testCompile('org.junit.jupiter:junit-jupiter-api:5.1.1')
-    testRuntime('org.junit.jupiter:junit-jupiter-engine:5.1.1',
-            'org.junit.platform:junit-platform-launcher:1.1.0',
-            'org.junit.platform:junit-platform-runner:1.1.0')
-}
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.2.0'
 
-sourceSets {
-}
-
-junitPlatform {
-    //details 'flat'
-    reportsDir file('build/test-results/junit-platform')
+    testRuntime 'org.junit.jupiter:junit-jupiter-engine:5.2.0'
+    //testRuntime 'org.junit.platform:junit-platform-launcher:1.2.0'
+    //testRuntime 'org.junit.platform:junit-platform-runner:1.2.0'
 }
 
 uploadArchives {
@@ -46,4 +42,16 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
 artifacts {
     archives sourcesJar
     archives javadocJar
+}
+
+test {
+  testLogging.showStandardStreams = true
+  testLogging {
+    events 'PASSED', 'FAILED', 'SKIPPED', 'STARTED'
+  }
+  useJUnitPlatform()
+  maxParallelForks 1
+  options {
+//    setIncludeTags(["dev"] as Set)
+  }
 }
