@@ -25,9 +25,11 @@ public class StyxTMessage extends StyxMessage {
     public void setAnswer(StyxMessage answer)
             throws StyxException {
         if (mWaitSyncObject == null) {
-            throw new NullPointerException(this.getClass().getSimpleName() + " sync is null");
-        }
-        synchronized (mWaitSyncObject) {
+            if (!checkAnswer(answer))
+                throw new StyxWrongMessageException(answer, mRequiredAnswerType);
+            mAnswer = answer;
+//            throw new NullPointerException(this.getClass().getSimpleName() + " sync is null");
+        } else synchronized (mWaitSyncObject) {
             if (!checkAnswer(answer))
                 throw new StyxWrongMessageException(answer, mRequiredAnswerType);
             mAnswer = answer;

@@ -51,7 +51,7 @@ public class Connection
     private StyxQID mAuthQID;
     private StyxQID mQID;
     private long mFID = StyxMessage.NOFID;
-
+    private SyncObject syncObject = new SyncObject();
     protected ClientDetails mRecepient;
     private IChannelDriver mDriver;
     protected ConnectionDetails mDetails;
@@ -208,13 +208,14 @@ public class Connection
         return connect(mDriver, mCredentials);
     }
 
-    public StyxFile getRoot() throws StyxException, InterruptedException, TimeoutException, IOException {
+    public StyxFile getRoot() throws IOException {
         if (mRoot == null) {
             mRoot = new StyxFile(this, mFID);
         }
         return mRoot;
     }
 
+    @Override
     public IMessageTransmitter getTransmitter() {
         return mTransmitter;
     }
@@ -253,14 +254,13 @@ public class Connection
 
     protected void sendVersionMessage()
             throws InterruptedException, StyxException, IOException, TimeoutException {
-        SyncObject syncObject = new SyncObject();
         // release attached FID
         if (mFID != StyxMessage.NOFID) {
             try {
                 final StyxTMessageFID tClunk = new StyxTMessageFID(MessageType.Tclunk, MessageType.Rclunk, mFID);
-                tClunk.setSyncObject(syncObject);
+//                tClunk.setSyncObject(syncObject);
                 mTransmitter.sendMessage(tClunk, mRecepient);
-                tClunk.waitForAnswer(mTimeout);
+//                tClunk.waitForAnswer(mTimeout);
             } catch (Exception e) {
                 throw new IOException(e);
             }
@@ -278,13 +278,13 @@ public class Connection
         }
         mRecepient.getPolls().getFIDPoll().clean();
         if ((mCredentials.getUserName() != null) && (mCredentials.getPassword() != null)) {
-            sendAuthMessage(syncObject);
+            sendAuthMessage();
         } else {
-            sendAttachMessage(syncObject);
+            sendAttachMessage();
         }
     }
 
-    private void sendAuthMessage(SyncObject syncObject)
+    private void sendAuthMessage()
             throws InterruptedException, StyxException, IOException, TimeoutException {
         mAuthFID = mRecepient.getPolls().getFIDPoll().getFreeItem();
 
@@ -302,10 +302,10 @@ public class Connection
         //        output.writeString(getPassword());
         //        output.flush();
 
-        sendAttachMessage(syncObject);
+        sendAttachMessage();
     }
 
-    private void sendAttachMessage(SyncObject syncObject)
+    private void sendAttachMessage()
             throws InterruptedException, StyxException, TimeoutException, IOException {
         mFID = mRecepient.getPolls().getFIDPoll().getFreeItem();
         StyxTAttachMessage tAttach = new StyxTAttachMessage(getRootFID(), getAuthFID(),
