@@ -51,8 +51,7 @@ test {
   }
   useJUnitPlatform()
   maxParallelForks 1
-  //exclude(["**/tests/*"] as List)
-  //options {
-    //setIncludeTags(["development"] as Set)
-  //}
+  options {
+//    setIncludeTags(["dev"] as Set)
+  }
 }
