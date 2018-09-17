@@ -1,10 +1,12 @@
 package com.v2soft.styxlib.server.tcp;
 
+import com.v2soft.styxlib.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.io.StyxByteBufferReadable;
 import com.v2soft.styxlib.io.StyxDataReader;
 import com.v2soft.styxlib.messages.base.StyxMessage;
 import com.v2soft.styxlib.server.ClientDetails;
+import com.v2soft.styxlib.utils.SyncObject;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -14,6 +16,7 @@ import java.nio.channels.SocketChannel;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.TimeoutException;
 
 /**
  * Created by V.Shcryabets on 5/22/14.
@@ -74,6 +77,12 @@ public class TCPClientChannelDriver extends TCPChannelDriver {
             throw new IllegalArgumentException("Wrong recipient");
         }
         return super.sendMessage(message, recipient);
+    }
+
+    @Override
+    public StyxMessage sendMessageAndWaitAnswer(StyxMessage answer, ClientDetails recepient, SyncObject syncObject)
+            throws IOException, InterruptedException, StyxErrorMessageException, TimeoutException {
+        return null;
     }
 
     @Override

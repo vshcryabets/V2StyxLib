@@ -9,6 +9,7 @@ import com.v2soft.styxlib.messages.base.enums.MessageType;
 import com.v2soft.styxlib.server.ClientDetails;
 import com.v2soft.styxlib.server.IMessageTransmitter;
 import com.v2soft.styxlib.utils.MetricsAndStats;
+import com.v2soft.styxlib.utils.SyncObject;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,13 +20,13 @@ import java.io.InputStream;
  *
  */
 public class StyxUnbufferedInputStream extends InputStream {
-    private long mTimeout = Connection.DEFAULT_TIMEOUT;
     private byte[] mSingleByteArray;
     private long mFID;
     private IMessageTransmitter mMessenger;
     private long mFileOffset = 0;
     private int mIOUnitSize;
     protected ClientDetails mRecepient;
+    private SyncObject mSyncObject = new SyncObject(Connection.DEFAULT_TIMEOUT);
 
     public StyxUnbufferedInputStream(long file, IMessageTransmitter messenger, int iounit, ClientDetails recepient) {
         if ( recepient == null ) {
@@ -43,11 +44,11 @@ public class StyxUnbufferedInputStream extends InputStream {
     }
 
     public long getTimeout() {
-        return mTimeout;
+        return mSyncObject.getTimeout();
     }
 
     public void setTimeout(long mTimeout) {
-        this.mTimeout = mTimeout;
+        mSyncObject.setTimeout(mTimeout);
     }
 
     @Override
@@ -59,8 +60,7 @@ public class StyxUnbufferedInputStream extends InputStream {
         try {
             // send Tread
             final StyxTReadMessage tRead = new StyxTReadMessage(mFID, mFileOffset, len);
-            mMessenger.sendMessage(tRead, mRecepient);
-            final StyxMessage rMessage = tRead.waitForAnswer(mTimeout);
+            final StyxMessage rMessage = mMessenger.sendMessageAndWaitAnswer(tRead, mRecepient, mSyncObject);
 
             final StyxRReadMessage rRead = (StyxRReadMessage) rMessage;
             read = rRead.getDataLength();
@@ -89,9 +89,8 @@ public class StyxUnbufferedInputStream extends InputStream {
     public void close() throws IOException {
         // send Tclunk
         final StyxTMessageFID tClunk = new StyxTMessageFID(MessageType.Tclunk, MessageType.Rclunk, mFID);
-        mMessenger.sendMessage(tClunk, mRecepient);
         try {
-            tClunk.waitForAnswer(mTimeout);
+            mMessenger.sendMessageAndWaitAnswer(tClunk, mRecepient, mSyncObject);
         } catch (Exception e) {
             throw new IOException(e);
         }

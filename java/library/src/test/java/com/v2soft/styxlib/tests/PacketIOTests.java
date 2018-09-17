@@ -104,14 +104,14 @@ public class PacketIOTests {
         MessageDigest digest = MessageDigest.getInstance("MD5");
 
 
-        Connection mConnection = new Connection();
+        Connection connection = new Connection.Builder().setDriver(
+                new TCPClientChannelDriver("127.0.0.1", PORT)).build();
         byte[] someData = new byte[1024];
         byte [] remoteHash = new byte[16];
 
-        assertTrue(mConnection.connect(
-                new TCPClientChannelDriver("127.0.0.1", PORT)));
+        assertTrue(connection.connect());
 
-        final StyxFile newFile = new StyxFile(mConnection, FILE_NAME);
+        final StyxFile newFile = new StyxFile(connection, FILE_NAME);
         OutputStream output = newFile.openForWriteUnbuffered();
         InputStream input = newFile.openForReadUnbuffered();
 
@@ -131,7 +131,7 @@ public class PacketIOTests {
 
         output.close();
         input.close();
-        mConnection.close();
+        connection.close();
 
     }
 

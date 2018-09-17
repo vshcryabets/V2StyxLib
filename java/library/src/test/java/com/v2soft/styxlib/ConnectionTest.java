@@ -44,7 +44,7 @@ public class ConnectionTest {
     private static Logger log = Logger.getLogger(ConnectionTest.class.getSimpleName());
     private static final int PORT = 10234;
     private static final String ADDRESS = "127.0.0.1";
-    private IClient mConnection;
+    private Connection mConnection;
     private StyxServerManager mServer;
 
     @BeforeEach
@@ -56,9 +56,8 @@ public class ConnectionTest {
         }
         mServer = new TCPServerManager(ADDRESS, PORT, new DiskStyxDirectory(testDirectory));
         mServer.start();
-        mConnection = new Connection();
-        IChannelDriver driver = new TCPClientChannelDriver(ADDRESS, PORT);
-        assertTrue(mConnection.connect(driver));
+        mConnection = new Connection.Builder().setDriver(new TCPClientChannelDriver(ADDRESS, PORT)).build();
+        assertTrue(mConnection.connect());
     }
 
     @AfterEach
@@ -81,9 +80,9 @@ public class ConnectionTest {
                         //"Received %d messages\n\t" +
                         "Error %d messages\n\t" +
                         "Average time for connection %f ms",
-                mConnection.getMessenger().getTransmittedCount(),
-                mConnection.getMessenger().getErrorsCount(),
-                (float)diff / (float)count
+                mConnection.getTransmitter().getTransmittedCount(),
+                mConnection.getTransmitter().getErrorsCount(),
+                (double)diff / (double)count
         ));
     }
 
@@ -233,9 +232,9 @@ public class ConnectionTest {
         long diff = System.currentTimeMillis() - writeTime;
         System.out.println(String.format("Write done in %d ms", (writeTime - startTime)));
         System.out.println(String.format("Read done in %d ms", diff));
-        System.out.println(String.format("\tTransmited %d messages", mConnection.getMessenger().getTransmittedCount()));
-//        System.out.println(String.format("\tReceived %d messages", mConnection.getMessenger().getReceivedCount()));
-        System.out.println(String.format("\tError %d messages", mConnection.getMessenger().getErrorsCount()));
+        System.out.println(String.format("\tTransmited %d messages", mConnection.getTransmitter().getTransmittedCount()));
+//        System.out.println(String.format("\tReceived %d messages", mConnection.getTransmitter().getReceivedCount()));
+        System.out.println(String.format("\tError %d messages", mConnection.getTransmitter().getErrorsCount()));
         //        System.out.println(String.format("\tAverage time for connection %d ms",diff/count));
     }
 
@@ -276,8 +275,8 @@ public class ConnectionTest {
         Assertions.assertEquals(blockSize * blocksCount, stat[0], "Write and received size not equals");
         System.out.println(String.format("\tServer received %d bytes", stat[0]));
         System.out.println(String.format("\tWrite done in %d ms", writeTimeMs));
-        System.out.println(String.format("\tTransmited %d messages", mConnection.getMessenger().getTransmittedCount()));
-        System.out.println(String.format("\tError %d messages", mConnection.getMessenger().getErrorsCount()));
+        System.out.println(String.format("\tTransmited %d messages", mConnection.getTransmitter().getTransmittedCount()));
+        System.out.println(String.format("\tError %d messages", mConnection.getTransmitter().getErrorsCount()));
         System.out.println(String.format("\tByteBuffer allocations count %d", MetricsAndStats.byteBufferAllocation));
         System.out.println(String.format("\tbyte[] allocations count %d", MetricsAndStats.byteArrayAllocation));
         System.out.println(String.format("\tbyte[] allocations count RRead %d", MetricsAndStats.byteArrayAllocationRRead));

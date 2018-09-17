@@ -13,6 +13,7 @@ public interface IStyxBuffer {
      * @param out output buffer.
      * @param offset offset in out data array.
      * @param length
+     * @return number of bytes read.
      */
     int read(byte[] out, int offset, int length);
     /**

@@ -1,5 +1,6 @@
 package com.v2soft.styxlib;
 
+import com.v2soft.styxlib.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.handlers.RMessagesProcessor;
 import com.v2soft.styxlib.server.TMessageTransmitter;
 import com.v2soft.styxlib.exceptions.StyxException;
@@ -18,6 +19,7 @@ import com.v2soft.styxlib.server.IChannelDriver;
 import com.v2soft.styxlib.server.IMessageTransmitter;
 import com.v2soft.styxlib.types.ConnectionDetails;
 import com.v2soft.styxlib.types.Credentials;
+import com.v2soft.styxlib.utils.SyncObject;
 
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
@@ -50,7 +52,7 @@ public class Connection
     private StyxQID mAuthQID;
     private StyxQID mQID;
     private long mFID = StyxMessage.NOFID;
-
+    private SyncObject syncObject;
     protected ClientDetails mRecepient;
     private IChannelDriver mDriver;
     protected ConnectionDetails mDetails;
@@ -59,27 +61,46 @@ public class Connection
     protected boolean shouldCloseAnswerProcessor = false;
     protected boolean shouldCloseTransmitter = false;
 
-    // TODO remove or simplify
-    public Connection() {
-        this(new Credentials(null, null));
+    public static class Builder {
+        protected Credentials mCredentials = new Credentials("", "");
+        protected IChannelDriver mDriver;
+        protected RMessagesProcessor mAnswerProcessor;
+        protected TMessageTransmitter mTransmitter;
+        protected ClientDetails mClientDetails;
+
+        public void setCredentials(Credentials mCredentials) {
+            this.mCredentials = mCredentials;
+        }
+
+        public Builder setDriver(IChannelDriver mDriver) {
+            this.mDriver = mDriver;
+            return this;
+        }
+
+        public void setAnswerProcessor(RMessagesProcessor mAnswerProcessor) {
+            this.mAnswerProcessor = mAnswerProcessor;
+        }
+
+        public void setTransmitter(TMessageTransmitter mTransmitter) {
+            this.mTransmitter = mTransmitter;
+        }
+
+        public void setmClientDetails(ClientDetails mClientDetails) {
+            this.mClientDetails = mClientDetails;
+        }
+
+        public Connection build() {
+            return new Connection(mCredentials, mDriver, mAnswerProcessor, mTransmitter, mClientDetails);
+        }
     }
 
-    // TODO remove or simplify
-    public Connection(Credentials credentials) {
-        this(credentials, null);
-    }
-
-    // TODO remove or simplify
-    public Connection(Credentials credentials, IChannelDriver driver) {
-        this(credentials, driver, null, null, null);
-    }
-
-    // TODO remove or simplify
+    // TODO hide it?
     public Connection(Credentials credentials,
                       IChannelDriver driver,
                       RMessagesProcessor answerProcessor,
                       TMessageTransmitter transmitter,
                       ClientDetails recepient) {
+        syncObject = new SyncObject(mTimeout);
         mTransmitter = transmitter;
         mRecepient = recepient;
         mAnswerProcessor = answerProcessor;
@@ -87,47 +108,6 @@ public class Connection
         mDetails = new ConnectionDetails(getProtocol(), getIOBufSize());
         mCredentials = credentials;
         isConnected = false;
-    }
-
-    /**
-     * Connect to server with specified parameters
-     *
-     * @param driver      channel driver
-     * @param credentials user credentials
-     * @return true if connected
-     * @throws IOException
-     * @throws StyxException
-     * @throws TimeoutException
-     */
-    // TODO remove or simplify
-    public boolean connect(IChannelDriver driver, Credentials credentials)
-            throws IOException, StyxException, InterruptedException, TimeoutException {
-        if (mAnswerProcessor == null) {
-            mAnswerProcessor = new RMessagesProcessor("RH" + driver.toString());
-            shouldCloseAnswerProcessor = true;
-        }
-        if (mTransmitter == null) {
-            mTransmitter = new TMessageTransmitter(mTransmitterListener);
-            shouldCloseTransmitter = true;
-        }
-
-        if (driver == null) {
-            throw new NullPointerException("Channel driver can't be null");
-        }
-        mDriver = driver;
-        if (!mDriver.isStarted()) {
-            mDriver.setRMessageHandler(mAnswerProcessor);
-            mDriver.setTMessageHandler(mAnswerProcessor); // TODO fixme, this temp fix. TMessages shoul be handled in other way.
-            mDriver.start(getIOBufSize());
-            isAutoStartDriver = true;
-        }
-
-        if (mRecepient == null) {
-            // get first client from driver
-            mRecepient = driver.getClients().iterator().next();
-        }
-
-        return this.connect(driver, credentials, mAnswerProcessor, mTransmitter, mRecepient);
     }
 
     /**
@@ -180,21 +160,6 @@ public class Connection
     /**
      * Connect to server with specified parameters
      *
-     * @param driver channel driver
-     * @return true if connected
-     * @throws IOException
-     * @throws StyxException
-     * @throws TimeoutException
-     */
-    // TODO remove or simplify
-    public boolean connect(IChannelDriver driver)
-            throws IOException, StyxException, InterruptedException, TimeoutException {
-        return connect(driver, mCredentials);
-    }
-
-    /**
-     * Connect to server with specified parameters
-     *
      * @return true if connection was success
      * @throws IOException
      * @throws StyxException
@@ -204,17 +169,44 @@ public class Connection
     // TODO remove or simplify
     public boolean connect()
             throws IOException, StyxException, InterruptedException, TimeoutException {
-        return connect(mDriver, mCredentials);
+        // TODO move to builder
+        if (mDriver == null) {
+            throw new NullPointerException("Channel driver can't be null");
+        }
+        // TODO move to builder
+        if (mAnswerProcessor == null) {
+            mAnswerProcessor = new RMessagesProcessor("RH" + mDriver.toString());
+            shouldCloseAnswerProcessor = true;
+        }
+        // TODO move to builder
+        if (mTransmitter == null) {
+            mTransmitter = new TMessageTransmitter(mTransmitterListener);
+            shouldCloseTransmitter = true;
+        }
+        if (!mDriver.isStarted()) {
+            mDriver.setRMessageHandler(mAnswerProcessor);
+            mDriver.setTMessageHandler(mAnswerProcessor); // TODO fixme, this temp fix. TMessages shoul be handled in other way.
+            mDriver.start(getIOBufSize());
+            isAutoStartDriver = true;
+        }
+
+        if (mRecepient == null) {
+            // get first client from driver
+            mRecepient = mDriver.getClients().iterator().next();
+        }
+
+        return this.connect(mDriver, mCredentials, mAnswerProcessor, mTransmitter, mRecepient);
     }
 
-    public StyxFile getRoot() throws StyxException, InterruptedException, TimeoutException, IOException {
+    public StyxFile getRoot() throws IOException {
         if (mRoot == null) {
             mRoot = new StyxFile(this, mFID);
         }
         return mRoot;
     }
 
-    public IMessageTransmitter getMessenger() {
+    @Override
+    public IMessageTransmitter getTransmitter() {
         return mTransmitter;
     }
 
@@ -246,18 +238,19 @@ public class Connection
         return mAuthQID;
     }
 
-    @Override
-    public ConnectionDetails getConnectionDetails() {
+    protected ConnectionDetails getConnectionDetails() {
         return mDetails;
     }
 
-    public void sendVersionMessage()
+    protected void sendVersionMessage()
             throws InterruptedException, StyxException, IOException, TimeoutException {
         // release attached FID
         if (mFID != StyxMessage.NOFID) {
             try {
                 final StyxTMessageFID tClunk = new StyxTMessageFID(MessageType.Tclunk, MessageType.Rclunk, mFID);
+//                tClunk.setSyncObject(syncObject);
                 mTransmitter.sendMessage(tClunk, mRecepient);
+//                tClunk.waitForAnswer(mTimeout);
             } catch (Exception e) {
                 throw new IOException(e);
             }
@@ -265,9 +258,7 @@ public class Connection
         }
 
         StyxTVersionMessage tVersion = new StyxTVersionMessage(mDetails.getIOUnit(), getProtocol());
-        mTransmitter.sendMessage(tVersion, mRecepient);
-
-        StyxMessage rMessage = tVersion.waitForAnswer(mTimeout);
+        StyxMessage rMessage = mTransmitter.sendMessageAndWaitAnswer(tVersion, mRecepient, syncObject);
         StyxRVersionMessage rVersion = (StyxRVersionMessage) rMessage;
         if (rVersion.getMaxPacketSize() < mDetails.getIOUnit()) {
             mDetails = new ConnectionDetails(getProtocol(), (int) rVersion.getMaxPacketSize());
@@ -281,15 +272,11 @@ public class Connection
     }
 
     private void sendAuthMessage()
-            throws InterruptedException, StyxException, IOException, TimeoutException {
+            throws IOException, InterruptedException, StyxErrorMessageException, TimeoutException {
         mAuthFID = mRecepient.getPolls().getFIDPoll().getFreeItem();
 
-        StyxTAuthMessage tAuth = new StyxTAuthMessage(mAuthFID);
-        tAuth.setUserName(getCredentials().getUserName());
-        tAuth.setMountPoint(getMountPoint());
-        mTransmitter.sendMessage(tAuth, mRecepient);
-
-        StyxMessage rMessage = tAuth.waitForAnswer(mTimeout);
+        StyxTAuthMessage tAuth = new StyxTAuthMessage(mAuthFID, getCredentials().getUserName(), getMountPoint());
+        StyxMessage rMessage = mTransmitter.sendMessageAndWaitAnswer(tAuth, mRecepient, syncObject);
         StyxRAuthMessage rAuth = (StyxRAuthMessage) rMessage;
         mAuthQID = rAuth.getQID();
 
@@ -303,14 +290,12 @@ public class Connection
     }
 
     private void sendAttachMessage()
-            throws InterruptedException, StyxException, TimeoutException, IOException {
+            throws IOException, InterruptedException, StyxErrorMessageException, TimeoutException {
         mFID = mRecepient.getPolls().getFIDPoll().getFreeItem();
         StyxTAttachMessage tAttach = new StyxTAttachMessage(getRootFID(), getAuthFID(),
                 getCredentials().getUserName(),
                 getMountPoint());
-        mTransmitter.sendMessage(tAttach, mRecepient);
-
-        StyxMessage rMessage = tAttach.waitForAnswer(mTimeout);
+        StyxMessage rMessage = mTransmitter.sendMessageAndWaitAnswer(tAttach, mRecepient, syncObject);
         StyxRAttachMessage rAttach = (StyxRAttachMessage) rMessage;
         mQID = rAttach.getQID();
         setAttached(true);
@@ -350,8 +335,9 @@ public class Connection
     //-------------------------------------------------------------------------------------
     // Setters
     //-------------------------------------------------------------------------------------
-    public void setTimeout(int mTimeout) {
-        this.mTimeout = mTimeout;
+    public void setTimeout(int timeout) {
+        mTimeout = timeout;
+        syncObject = new SyncObject(timeout);
     }
 
     public void setAttached(boolean isAttached) {
