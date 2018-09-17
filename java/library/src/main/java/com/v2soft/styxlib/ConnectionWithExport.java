@@ -25,13 +25,22 @@ public class ConnectionWithExport extends Connection {
     protected IVirtualStyxFile mExportedRoot = null;
     protected TMessagesProcessor mExportProcessor;
 
+    public static class Builder extends Connection.Builder {
+        @Override
+        public ConnectionWithExport build() {
+            return new ConnectionWithExport(mCredentials, mDriver, mAnswerProcessor, mTransmitter, mClientDetails);
+        }
 
-    public ConnectionWithExport(Credentials credentials, IChannelDriver driver) {
-        super(credentials, driver);
+        @Override
+        public Builder setDriver(IChannelDriver mDriver) {
+            super.setDriver(mDriver);
+            return this;
+        }
     }
 
-    public ConnectionWithExport() {
-        super();
+    public ConnectionWithExport(Credentials credentials, IChannelDriver driver, RMessagesProcessor answerProcessor,
+                                TMessageTransmitter transmitter, ClientDetails recepient) {
+        super(credentials, driver, answerProcessor, transmitter, recepient);
     }
 
     @Override

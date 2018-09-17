@@ -56,9 +56,8 @@ public class ConnectionTest {
         }
         mServer = new TCPServerManager(ADDRESS, PORT, new DiskStyxDirectory(testDirectory));
         mServer.start();
-        mConnection = new Connection();
-        IChannelDriver driver = new TCPClientChannelDriver(ADDRESS, PORT);
-        assertTrue(mConnection.connect(driver));
+        mConnection = new Connection.Builder().setDriver(new TCPClientChannelDriver(ADDRESS, PORT)).build();
+        assertTrue(mConnection.connect());
     }
 
     @AfterEach

@@ -37,12 +37,12 @@ public class StyxTMessage extends StyxMessage {
         }
     }
 
-    public StyxMessage waitForAnswer(long timeout) throws InterruptedException, TimeoutException,
+    public StyxMessage waitForAnswer() throws InterruptedException, TimeoutException,
             StyxErrorMessageException {
         if ( mAnswer == null) {
             synchronized (mWaitSyncObject) {
                 if ( mAnswer == null) {
-                    mWaitSyncObject.wait(timeout);
+                    mWaitSyncObject.waitForNotify();
                 }
             }
         }

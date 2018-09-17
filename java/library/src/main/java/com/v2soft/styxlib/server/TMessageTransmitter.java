@@ -1,15 +1,19 @@
 package com.v2soft.styxlib.server;
 
+import com.v2soft.styxlib.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.messages.base.StyxMessage;
 import com.v2soft.styxlib.messages.base.StyxTMessage;
 import com.v2soft.styxlib.messages.base.enums.MessageType;
+import com.v2soft.styxlib.utils.SyncObject;
 
 import java.io.IOException;
 import java.net.SocketException;
+import java.util.concurrent.TimeoutException;
 
 /**
  * Created by vshcryabets on 12/8/14.
  */
+// TODO why do we need this class? We can directly use ChannelDriver.
 public class TMessageTransmitter implements IMessageTransmitter {
     public interface Listener {
 	    // TODO pass caller
@@ -22,6 +26,18 @@ public class TMessageTransmitter implements IMessageTransmitter {
 
     public TMessageTransmitter(Listener listener) {
         mListener = listener;
+    }
+
+    @Override
+    public StyxMessage sendMessageAndWaitAnswer(StyxMessage message, ClientDetails recepient, SyncObject syncObject)
+            throws IOException, InterruptedException, StyxErrorMessageException, TimeoutException {
+        if (!message.getType().isTMessage()) {
+            throw new IllegalArgumentException("Can't wait answer for RMassage");
+        }
+        StyxTMessage tMessage = (StyxTMessage) message;
+        tMessage.setSyncObject(syncObject);
+        sendMessage(tMessage, recepient);
+        return tMessage.waitForAnswer();
     }
 
     @Override

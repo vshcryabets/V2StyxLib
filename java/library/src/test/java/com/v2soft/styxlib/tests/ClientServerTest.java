@@ -57,9 +57,8 @@ public class ClientServerTest {
     // TVersion & TAttach
     @Test
     public void testMD5() throws IOException, StyxException, InterruptedException, TimeoutException, NoSuchAlgorithmException {
-        IClient connection = new Connection();
-        IChannelDriver driver = new TCPClientChannelDriver(ADDRESS, PORT);
-        assertTrue(connection.connect(driver));
+        IClient connection = new Connection.Builder().setDriver(new TCPClientChannelDriver(ADDRESS, PORT)).build();
+        assertTrue(connection.connect());
         checkMD5Hash(connection);
         connection.close();
     }

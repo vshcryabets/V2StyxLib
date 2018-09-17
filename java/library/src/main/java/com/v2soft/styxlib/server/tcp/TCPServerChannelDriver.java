@@ -1,7 +1,10 @@
 package com.v2soft.styxlib.server.tcp;
 
+import com.v2soft.styxlib.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.exceptions.StyxException;
+import com.v2soft.styxlib.messages.base.StyxMessage;
 import com.v2soft.styxlib.server.ClientDetails;
+import com.v2soft.styxlib.utils.SyncObject;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -17,6 +20,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Stack;
+import java.util.concurrent.TimeoutException;
 
 /**
  * Created by V.Shcryabets on 5/20/14.
@@ -182,5 +186,11 @@ public class TCPServerChannelDriver extends TCPChannelDriver {
     @Override
     public boolean isConnected() {
         return true;
+    }
+
+    @Override
+    public StyxMessage sendMessageAndWaitAnswer(StyxMessage answer, ClientDetails recepient, SyncObject syncObject)
+            throws IOException, InterruptedException, StyxErrorMessageException, TimeoutException {
+        throw new IOException("Not supported on server side");
     }
 }
