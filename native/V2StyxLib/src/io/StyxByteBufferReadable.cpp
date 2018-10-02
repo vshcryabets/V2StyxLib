@@ -27,15 +27,22 @@ size_t StyxByteBufferReadable::remainsToRead() {
 	return mStoredBytes;
 }
 
-size_t StyxByteBufferReadable::readFromChannel(Socket fd) throw(StyxException) {
+ssize_t StyxByteBufferReadable::readFromChannel(Socket fd) throw(StyxException) {
 	size_t free = updateBufferLimits();
 	size_t count = ( mWritePosition < mReadPosition ? mReadPosition - mWritePosition : mCapacity - mWritePosition );
 	size_t position = mWritePosition;
-	int readed;
+	ssize_t readed;
 #ifdef WIN32
 	readed = ::recv(fd, (char*)(mBuffer+position), count, 0);
 #else
-	readed = ::read(fd, mBuffer+position, count);
+	readed = ::read(fd, mBuffer + position, count);
+	printf("StyxByteBufferReadable::readFromChannel %d\n", readed);
+	if (readed > 0) {
+		for (size_t i =0; i < readed; i++) {
+			printf("%02x ", mBuffer[position + i]);
+		}
+		printf("\n");
+	}
 #endif
 	if ( readed > 0 ) {
 		mStoredBytes += readed;

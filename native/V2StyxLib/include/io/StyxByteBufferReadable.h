@@ -24,7 +24,7 @@ public:
 	StyxByteBufferReadable(size_t capacity);
 	virtual ~StyxByteBufferReadable();
 	size_t remainsToRead();
-	size_t readFromChannel(Socket fd) throw(StyxException);
+	ssize_t readFromChannel(Socket fd) throw(StyxException);
 	/**
 	 * Get byte array from buffer, this operation will not move read position pointer
 	 * @param out

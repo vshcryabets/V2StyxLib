@@ -10,12 +10,10 @@
 
 StyxTMessage::StyxTMessage(MessageTypeEnum type, MessageTypeEnum answer)
 	: StyxMessage(type, StyxMessage::NOTAG),
-	  mRequiredAnswerType(answer){
-	pthread_cond_init(&mWaitCondition, NULL);
+	  mRequiredAnswerType(answer), mWaitSyncObject(NULL){
 }
 
 StyxTMessage::~StyxTMessage() {
-	pthread_cond_destroy(&mWaitCondition);
 }
 
 StyxMessage* StyxTMessage::getAnswer() {
@@ -25,27 +23,32 @@ StyxMessage* StyxTMessage::getAnswer() {
 void StyxTMessage::setAnswer(StyxMessage* answer) throw(StyxException) {
 	if (!checkAnswer(answer))
 		throw StyxWrongMessageException(answer, mRequiredAnswerType);
+#warning set answer should be after mutex locked
 	mAnswer = answer;
-	pthread_cond_signal(&mWaitCondition);
+	if (mWaitSyncObject != NULL) {
+		mWaitSyncObject->notifyAll();
+	}
 }
 
-StyxMessage* StyxTMessage::waitForAnswer(uint32_t timeout) throw(StyxErrorMessageException) {
-	if ( mAnswer == NULL) {
-		struct timespec tm;
-		tm.tv_sec = timeout / 1000;
-		tm.tv_nsec = (timeout - tm.tv_sec * 1000) * 1000000;
-		pthread_cond_timedwait(&mWaitCondition, NULL, &tm);
-	}
+StyxMessage* StyxTMessage::waitForAnswer() 
+	throw(StyxErrorMessageException) 
+{
+	mWaitSyncObject->waitForNotify(&mAnswer);
 	if ( mAnswer == NULL )
-		throw new StyxException("Don't receive answer for %s", this->toString().c_str());
+		throw StyxException("Don't receive answer for %s", this->toString().c_str());
 	if (mAnswer->getType() == Rerror) {
 		StyxErrorMessageException::checkException(mAnswer);
 	}
 	return mAnswer;
 }
 
-bool StyxTMessage::checkAnswer(StyxMessage* answer) {
+bool StyxTMessage::checkAnswer(StyxMessage* answer) 
+{
 	MessageTypeEnum received = answer->getType();
 	return (mRequiredAnswerType == received || received == Rerror);
 }
 
+void StyxTMessage::setSyncObject(SyncObject* syncObject)
+{
+	mWaitSyncObject = syncObject;
+}

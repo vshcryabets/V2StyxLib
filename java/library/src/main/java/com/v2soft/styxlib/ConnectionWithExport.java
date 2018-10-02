@@ -32,8 +32,8 @@ public class ConnectionWithExport extends Connection {
         }
 
         @Override
-        public Builder setDriver(IChannelDriver mDriver) {
-            super.setDriver(mDriver);
+        public Builder setDriver(IChannelDriver driver) {
+            super.setDriver(driver);
             return this;
         }
     }

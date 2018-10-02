@@ -42,7 +42,8 @@ StyxString StyxException::getMessage() {
 void StyxException::setMessage(const char *format, va_list arglist) {
 	char buf[4096];
 	vsnprintf(buf, sizeof(buf), format, arglist);
-	this->mMessage = StyxString(buf);
+	mMessage = StyxString(buf);
+	printf("Generated StyxException %s\n", mMessage.c_str());
 }
 
 InternalErrors StyxException::getInternalCode() {

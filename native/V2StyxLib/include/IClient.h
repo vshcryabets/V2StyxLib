@@ -14,21 +14,6 @@ public:
 	virtual ~IClient() {};
 
 	/**
-	 * Restart session with server
-	 */
-	virtual void sendVersionMessage() throw(StyxException) = 0;
-	/**
-	 * Connect to server with specified parameters
-	 * @return true if connected
-	 */
-	virtual bool connect(IChannelDriver *driver) throw(StyxException) = 0;
-	/**
-	 * Connect to server with specified parameters
-	 * @param credentials user credentials
-	 * @return true if connected
-	 */
-	virtual bool connect(IChannelDriver *driver, Credentials credentials) throw(StyxException) = 0;
-	/**
 	 * Connect to server.
 	 * @return true if connected
 	 * @throws java.io.IOException
@@ -39,7 +24,7 @@ public:
 
 	virtual bool isConnected() = 0;
 
-	virtual IMessageTransmitter *getMessenger() = 0;
+	virtual IMessageTransmitter *getTransmitter() = 0;
 
 	virtual size_t getTimeout() = 0;
 	/**

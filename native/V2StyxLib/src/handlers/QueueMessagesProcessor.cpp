@@ -11,11 +11,13 @@ QueueMessagesProcessor::QueueMessagesProcessor(StyxString tag) :
 	mThread(tag), mTag(tag), mErrorPackets(0), mHandledPackets(0) {
 	pthread_mutex_init(&mQueueMutex, NULL);
 	pthread_cond_init(&mQueueCond, NULL);
+	printf("QueueMessagesProcessor %s init %p\n", mTag.c_str(), &mQueueCond);
 	mThread.startRunnable(this);
 }
 
 QueueMessagesProcessor::~QueueMessagesProcessor() {
 	mThread.forceCancel();
+	printf("QueueMessagesProcessor destroy\n");
 	pthread_cond_destroy(&mQueueCond); 
 	pthread_mutex_destroy(&mQueueMutex);                                                   
 }
@@ -24,6 +26,7 @@ void QueueMessagesProcessor::postPacket(StyxMessage *message, ClientDetails *tar
 	QueueMessageProcessorPair pair;
 	pair.mMessage = message;
 	pair.mTransmitter = target;
+	printf("QueueMessagesProcessor post\n", mTag.c_str());
 	pthread_mutex_lock(&mQueueMutex);
 	mQueue.push(pair);
 	pthread_cond_signal(&mQueueCond);
@@ -42,6 +45,7 @@ void* QueueMessagesProcessor::run() {
 	while (!mThread.isInterrupted()) {
 		pthread_mutex_lock(&mQueueMutex);
 		if (mQueue.size() == 0) {
+			printf("QueueMessagesProcessor %s %p %p\n", mTag.c_str(), &mQueueCond, &mQueueMutex);
 			pthread_cond_wait(&mQueueCond, &mQueueMutex);
 		}
 		while (mQueue.size() > 0) {

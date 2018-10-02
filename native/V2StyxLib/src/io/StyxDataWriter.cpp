@@ -50,13 +50,15 @@ void StyxDataWriter::limit(size_t limit) {
 }
 
 size_t StyxDataWriter::write(const uint8_t* data, size_t count) throw(StyxException){
-	// TODO optimize this logic
+#warning optimize this logic
 //  writeposition maxwriteposition
 	for (size_t i = 0; i < count; i++) {
 		if (mBuffer->size() == mMaxWritePosition) {
 			throw StyxException("Buffer overflow");
 		}
 		mBuffer->push_back(data[i]);
+		printf("%02x ", data[i]);
 	}
+	printf("pushed \n");
 	return count;
 }

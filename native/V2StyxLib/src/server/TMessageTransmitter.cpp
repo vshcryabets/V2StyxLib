@@ -63,3 +63,15 @@ StyxString TMessageTransmitter::toString() {
 	stream << "TMessageTransmitter " <<  std::hex << this;
     return stream.str();
 }
+
+StyxMessage* TMessageTransmitter::sendMessageAndWaitAnswer(StyxMessage *message, ClientDetails *recepient, SyncObject* syncObject) 
+    throw(StyxException)
+{
+    if ( !isMessageTypeTMessage(message->getType()) ) {
+        throw StyxException("Can't wait answer for RMassage");
+    }
+    StyxTMessage* tMessage = (StyxTMessage*) message;
+    tMessage->setSyncObject(syncObject);
+    sendMessage(tMessage, recepient);
+    return tMessage->waitForAnswer();
+}

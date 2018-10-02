@@ -11,6 +11,7 @@ import java.util.concurrent.TimeoutException;
 public class StyxTMessage extends StyxMessage {
     private StyxMessage mAnswer;
     private MessageType mRequiredAnswerType;
+    // TODO remove or simplify
     private SyncObject mWaitSyncObject;
 
     public StyxTMessage(MessageType type, MessageType answer) {
@@ -24,19 +25,17 @@ public class StyxTMessage extends StyxMessage {
 
     public void setAnswer(StyxMessage answer)
             throws StyxException {
-        if (mWaitSyncObject == null) {
-            if (!checkAnswer(answer))
-                throw new StyxWrongMessageException(answer, mRequiredAnswerType);
-            mAnswer = answer;
-//            throw new NullPointerException(this.getClass().getSimpleName() + " sync is null");
-        } else synchronized (mWaitSyncObject) {
-            if (!checkAnswer(answer))
-                throw new StyxWrongMessageException(answer, mRequiredAnswerType);
-            mAnswer = answer;
-            mWaitSyncObject.notifyAll();
+        if (!checkAnswer(answer))
+            throw new StyxWrongMessageException(answer, mRequiredAnswerType);
+        mAnswer = answer;
+        if (mWaitSyncObject != null) {
+            synchronized (mWaitSyncObject) {
+                mWaitSyncObject.notifyAll();
+            }
         }
     }
 
+    // TODO remove or simplify
     public StyxMessage waitForAnswer() throws InterruptedException, TimeoutException,
             StyxErrorMessageException {
         if ( mAnswer == null) {
@@ -59,6 +58,7 @@ public class StyxTMessage extends StyxMessage {
         return (mRequiredAnswerType == received || received == MessageType.Rerror);
     }
 
+    // TODO we can move sync logic out of this class. For example we can have map in the channel driver.
     public void setSyncObject(SyncObject syncObject) {
         mWaitSyncObject = syncObject;
     }

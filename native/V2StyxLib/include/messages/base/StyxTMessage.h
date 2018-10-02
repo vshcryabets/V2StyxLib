@@ -11,14 +11,13 @@
 #include "messages/base/StyxMessage.h"
 #include "exceptions/StyxException.h"
 #include "exceptions/StyxErrorMessageException.h"
-#include <pthread.h>
+#include "utils/SyncObject.h"
 
 class StyxTMessage : public StyxMessage {
 private:
 	MessageTypeEnum mRequiredAnswerType;
     StyxMessage* mAnswer;
-    pthread_cond_t mWaitCondition;
-
+    SyncObject* mWaitSyncObject;
 protected:
     bool checkAnswer(StyxMessage *answer);
 public:
@@ -32,13 +31,9 @@ public:
 	// Setters
 	// =======================================================
 	void setAnswer(StyxMessage* answer) throw(StyxException);
-	// =======================================================
-	// Virtual methods
-	// =======================================================
-	/**
-	 * timeout in milliseconds.
-	 */
-	StyxMessage* waitForAnswer(uint32_t timeout) throw(StyxErrorMessageException);
+#warning we can move sync logic out of this class. For example we can have map in the channel driver.
+	void setSyncObject(SyncObject* syncObject);
+	StyxMessage* waitForAnswer() throw(StyxErrorMessageException);
 };
 
 #endif /* STYX_TMESSAGE_H_ */

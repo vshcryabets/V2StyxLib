@@ -4,7 +4,7 @@ public class SyncObject {
     private long mTimeout;
 
     /**
-     *
+     * Create new instance of {@link SyncObject}.
      */
     public SyncObject(long timeout) {
        mTimeout = timeout;

@@ -14,6 +14,7 @@
 #include "server/TMessageTransmitter.h"
 #include "messages/base/structs/StyxQID.h"
 #include "server/ClientDetails.h"
+#include "utils/SyncObject.h"
 
 /**
  * Styx client connection.
@@ -34,6 +35,7 @@ private:
     StyxFID mFID;
     StyxQID mAuthQID;
     StyxQID mQID;
+    SyncObject mSyncObject;
 
 	void init(RMessagesProcessor *answerProcessor,
             TMessageTransmitter *transmitter,
@@ -49,31 +51,45 @@ protected:
     bool shouldCloseTransmitter;
 
     virtual size_t getIOBufSize();
-    virtual void sendAuthMessage() throw();
-    virtual void sendAttachMessage() throw();
+    virtual ConnectionDetails getConnectionDetails();
+    virtual void sendAuthMessage() throw(StyxException);
+    virtual void sendAttachMessage() throw(StyxException);
     virtual void setDriver(IChannelDriver* driver);
 public:
-#warning TODO simplify contructor
-    Connection(Credentials credentials = Credentials("", ""), IChannelDriver *driver = NULL,
-                      RMessagesProcessor *answerProcessor = NULL,
-                      TMessageTransmitter *transmitter = NULL,
-                      ClientDetails *recepient = NULL);
+
+    class Builder {
+        protected:
+            Credentials mCredentials;
+            IChannelDriver *mDriver;
+            RMessagesProcessor *mAnswerProcessor;
+            TMessageTransmitter *mTransmitter;
+            ClientDetails *mClientDetails;
+        public:
+            Builder();
+            ~Builder();
+            Builder* setCredentials(Credentials credentials);
+            Builder* setDriver(IChannelDriver *driver);
+            Builder* setAnswerProcessor(RMessagesProcessor *answerProcessor);
+            Builder* setTransmitter(TMessageTransmitter *transmitter);
+            Connection* build();
+    };
+#warning hide it?
+    Connection(Credentials credentials, IChannelDriver *driver,
+                      RMessagesProcessor *answerProcessor,
+                      TMessageTransmitter *transmitter,
+                      ClientDetails *recepient);
     virtual ~Connection();
 
-	virtual void sendVersionMessage() throw(StyxException);
 #warning TODO remove or simplify
 	virtual bool connect() throw(StyxException);
-	virtual bool connect(IChannelDriver *driver) throw(StyxException);
-	virtual bool connect(IChannelDriver *driver, Credentials credentials) throw(StyxException);
 	virtual bool connect(IChannelDriver *driver, Credentials credentials,
 			RMessagesProcessor* answerProcessor, TMessageTransmitter* transmitter,
 			ClientDetails* clientDetails) throw(StyxException);
 	virtual bool isConnected();
-	virtual IMessageTransmitter *getMessenger();
+	virtual IMessageTransmitter *getTransmitter();
 	virtual size_t getTimeout();
 	virtual IVirtualStyxFile* getRoot();
 	virtual StyxFID getRootFID();
-	virtual ConnectionDetails getConnectionDetails();
 	virtual ClientDetails *getRecepient();
 	virtual void close() throw(StyxException);
 	virtual StyxString getProtocol();
@@ -81,7 +97,7 @@ public:
 	virtual StyxString getMountPoint();
 	virtual StyxQID getQID();
 	virtual void setAttached(bool isAttached);
-
+    virtual void sendVersionMessage() throw(StyxException);
     virtual void onSocketDisconnected(TMessageTransmitter *caller) ;
     virtual void onTrashReceived(TMessageTransmitter *caller);
 

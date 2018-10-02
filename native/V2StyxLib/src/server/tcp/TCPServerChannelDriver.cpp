@@ -114,6 +114,7 @@ void* TCPServerChannelDriver::run() {
             if (FD_ISSET(mSocket, &socks)) {
 				Socket clientChannel = ::accept(mSocket, NULL, NULL);
 				if ( clientChannel > 0 ) {
+                    printf("TCPServer got client %d\n", clientChannel);
 					setNonBlocking(clientChannel);
 #warning we can add new socket to FD_SET here
                     mNewConnetions.push(clientChannel);
@@ -122,9 +123,11 @@ void* TCPServerChannelDriver::run() {
             for (std::map<Socket, ClientDetails*>::iterator it = mClientStatesMap.begin(); 
                 it != mClientStatesMap.end(); it++ ) {
 				if (FD_ISSET(it->first, &socks)) {
+                    printf("TCPServer got readable %d\n", it->first);
                     mReadable.push(it->first);
 				}
 			}
+            printf("TCPServer processEventsQueue enter\n");
             processEventsQueue();
         }
     }
@@ -179,6 +182,7 @@ void TCPServerChannelDriver::processEventsQueue() throw(StyxException) {
         mReadable.pop();
         std::map<Socket, ClientDetails*>::iterator it = mClientStatesMap.find(channel);
         if (it != mClientStatesMap.end()) {
+            printf("TCPServer find client\n");
             if (readSocket((TCPClientDetails*)it->second)) {
                 mTMessageHandler->removeClient(it->second);
                 mRMessageHandler->removeClient(it->second);

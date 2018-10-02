@@ -30,7 +30,7 @@ import java.util.concurrent.TimeoutException;
  * @author V.Shcryabets <a>vshcryabets@gmail.com</a>
  */
 public class Connection
-        implements IClient {
+        implements IClient, TMessageTransmitter.Listener {
     //---------------------------------------------------------------------------
     // Constants
     //---------------------------------------------------------------------------
@@ -48,18 +48,18 @@ public class Connection
     private boolean isConnected;
     private boolean isAttached;
     private TMessageTransmitter mTransmitter;
-    private long mAuthFID = StyxMessage.NOFID;
+    private long mAuthFID;
     private StyxQID mAuthQID;
     private StyxQID mQID;
-    private long mFID = StyxMessage.NOFID;
+    private long mFID;
     private SyncObject syncObject;
     protected ClientDetails mRecepient;
     private IChannelDriver mDriver;
     protected ConnectionDetails mDetails;
     protected RMessagesProcessor mAnswerProcessor;
-    protected boolean isAutoStartDriver = false;
-    protected boolean shouldCloseAnswerProcessor = false;
-    protected boolean shouldCloseTransmitter = false;
+    protected boolean isAutoStartDriver;
+    protected boolean shouldCloseAnswerProcessor;
+    protected boolean shouldCloseTransmitter;
 
     public static class Builder {
         protected Credentials mCredentials = new Credentials("", "");
@@ -68,25 +68,25 @@ public class Connection
         protected TMessageTransmitter mTransmitter;
         protected ClientDetails mClientDetails;
 
-        public void setCredentials(Credentials mCredentials) {
-            this.mCredentials = mCredentials;
+        public void setCredentials(Credentials credentials) {
+            this.mCredentials = credentials;
         }
 
-        public Builder setDriver(IChannelDriver mDriver) {
-            this.mDriver = mDriver;
+        public Builder setDriver(IChannelDriver driver) {
+            this.mDriver = driver;
             return this;
         }
 
-        public void setAnswerProcessor(RMessagesProcessor mAnswerProcessor) {
-            this.mAnswerProcessor = mAnswerProcessor;
+        public void setAnswerProcessor(RMessagesProcessor processor) {
+            this.mAnswerProcessor = processor;
         }
 
-        public void setTransmitter(TMessageTransmitter mTransmitter) {
-            this.mTransmitter = mTransmitter;
+        public void setTransmitter(TMessageTransmitter transmitter) {
+            this.mTransmitter = transmitter;
         }
 
-        public void setmClientDetails(ClientDetails mClientDetails) {
-            this.mClientDetails = mClientDetails;
+        public void setClientDetails(ClientDetails clientDetails) {
+            this.mClientDetails = clientDetails;
         }
 
         public Connection build() {
@@ -100,6 +100,13 @@ public class Connection
                       RMessagesProcessor answerProcessor,
                       TMessageTransmitter transmitter,
                       ClientDetails recepient) {
+
+        mAuthFID = StyxMessage.NOFID;
+        mFID = StyxMessage.NOFID;
+        isAutoStartDriver = false;
+        shouldCloseAnswerProcessor = false;
+        shouldCloseTransmitter = false;
+
         syncObject = new SyncObject(mTimeout);
         mTransmitter = transmitter;
         mRecepient = recepient;
@@ -180,7 +187,7 @@ public class Connection
         }
         // TODO move to builder
         if (mTransmitter == null) {
-            mTransmitter = new TMessageTransmitter(mTransmitterListener);
+            mTransmitter = new TMessageTransmitter(this);
             shouldCloseTransmitter = true;
         }
         if (!mDriver.isStarted()) {
@@ -248,9 +255,7 @@ public class Connection
         if (mFID != StyxMessage.NOFID) {
             try {
                 final StyxTMessageFID tClunk = new StyxTMessageFID(MessageType.Tclunk, MessageType.Rclunk, mFID);
-//                tClunk.setSyncObject(syncObject);
                 mTransmitter.sendMessage(tClunk, mRecepient);
-//                tClunk.waitForAnswer(mTimeout);
             } catch (Exception e) {
                 throw new IOException(e);
             }
@@ -348,23 +353,21 @@ public class Connection
         return mDriver.isConnected();
     }
 
-    private TMessageTransmitter.Listener mTransmitterListener = new TMessageTransmitter.Listener() {
-        @Override
-        public void onSocketDisconnected(TMessageTransmitter caller) {
-            isConnected = false;
-        }
+    @Override
+    public void onSocketDisconnected(TMessageTransmitter caller) {
+        isConnected = false;
+    }
 
-        @Override
-        public void onTrashReceived(TMessageTransmitter caller) {
-            //something goes wrong, we should restart protocol
-            setAttached(false);
-            try {
-                sendVersionMessage();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+    @Override
+    public void onTrashReceived(TMessageTransmitter caller) {
+        //something goes wrong, we should restart protocol
+        setAttached(false);
+        try {
+            sendVersionMessage();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-    };
+    }
 
     @Override
     public ClientDetails getRecepient() {
