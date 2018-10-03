@@ -40,7 +40,8 @@ void StyxTAttachMessage::writeToBuffer(IStyxDataWriter* output) {
 }
 size_t StyxTAttachMessage::getBinarySize() {
 	size_t res= StyxTMessageFID::getBinarySize()
-		+ 2 + mUserName.length() +
-		+ 2 + mMountPoint.length();
+		+ sizeof(mAuthFID)
+		+ StyxMessage::getUTFSize(mUserName)
+		+ StyxMessage::getUTFSize(mMountPoint);
 	return res;
 }

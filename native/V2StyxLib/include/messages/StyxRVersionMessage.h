@@ -12,7 +12,7 @@
 
 class StyxRVersionMessage : public StyxMessage {
 private:
-	size_t mIOUnit;
+	uint32_t mIOUnit;
 	StyxString mProtocol;
 public:
 	StyxRVersionMessage(size_t iounit, StyxString protocol);

@@ -27,16 +27,17 @@ uint64_t StyxDataReader::readInteger(const size_t bytes) {
 
 uint64_t StyxDataReader::getInteger(const size_t bytes) {
     if ( bytes > getInternalBufferSize() ) {
-    		throw StyxException("Too much bytes to read");
+    		throw StyxException("Too much bytes to read (internal buffer too small)");
     }
     uint64_t result = 0L;
     int shift = 0;
+#warning can we have method that return only one byte? in such case we can remove internal buffer and read bytes one by one
     int readed = mBuffer->get(mInternalBuffer, bytes);
     if ( readed != bytes ) {
     		throw StyxException("Can't read bytes");
     }
     for (size_t i = 0; i < bytes; i++) {
-        long b = (mInternalBuffer[i] & 0xFF);
+        uint64_t b = mInternalBuffer[i];
         if (shift > 0)
             b <<= shift;
         shift += 8;

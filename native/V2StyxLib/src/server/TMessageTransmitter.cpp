@@ -8,7 +8,9 @@
 #include "server/TMessageTransmitter.h"
 #include <sstream>
 
-TMessageTransmitter::TMessageTransmitter(Listener *listener) {
+TMessageTransmitter::TMessageTransmitter(Listener *listener)
+    :mTransmittedCount(0), mErrorCount(0)
+{
     mListener = listener;
 }
 

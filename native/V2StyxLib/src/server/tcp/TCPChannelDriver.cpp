@@ -66,17 +66,9 @@ bool TCPChannelDriver::sendMessage(StyxMessage* message, ClientDetails *recipien
 #warning there shoud be some synchronization, because we can call send message from different threads? and use single output buffer
 	try {
 		message->writeToBuffer(tcpClient->getOutputWritter());
-#warning this looks wrong
-		char* data = (char*)&tcpClient->getOutputBuffer()[0];
-		for (size_t i =0; i <  tcpClient->getOutputWritter()->getPosition(); i++) {
-			printf("%02x ", data[i]);
-		}
-		printf("\n");
+#warning this looks wrong and should be changed
+		char* data = (char*)&*tcpClient->getOutputBuffer()->begin();
 		ssize_t result = ::send(tcpClient->getChannel(), data, tcpClient->getOutputWritter()->getPosition(), 0);
-		printf("TCP transmitted %d\n", result);
-		if (result > 0) {
-
-		}
 		mTransmittedPacketsCount++;
 #ifdef USE_LOGGING
 		if (mLogListener != NULL) {
@@ -157,12 +149,9 @@ bool TCPChannelDriver::readSocket(TCPClientDetails* client) throw(StyxException)
  * @throws StyxException in case of parse error.
  */
 bool TCPChannelDriver::process(TCPClientDetails* client) throw(StyxException) {
-	printf("TCPServer process\n");
 	size_t inBuffer = client->getInputBuffer()->remainsToRead();
-	printf("TCPServer process %d\n", inBuffer);
 	if ( inBuffer > 4 ) {
 		uint32_t packetSize = client->getInputReader()->getUInt32();
-		printf("TCPServer process packetSize %d\n", packetSize);
 		if ( inBuffer >= packetSize ) {
 			// whole packet are in input buffer
 			StyxMessage* message = parseMessage(client->getInputReader());

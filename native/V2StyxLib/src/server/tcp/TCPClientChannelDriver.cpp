@@ -87,6 +87,7 @@ void* TCPClientChannelDriver::run() {
 		while (isWorking) {
 			if (mThread->isInterrupted()) break;
 			try {
+#warning can we remove buffer at all? For example we can try to read 4 bytes from socket/channel, then read data by small portiotion from channel.
 				size_t read = buffer.readFromChannel(mSocket);
 				if (read > 0) {
 					// loop unitl we have unprocessed packets in the input buffer
@@ -94,7 +95,7 @@ void* TCPClientChannelDriver::run() {
 						// try to decode
 						uint32_t packetSize = reader.getUInt32();
 						if ( buffer.remainsToRead() >= packetSize ) {
-							// TODO somebody should release message
+#warning somebody should release message
 							StyxMessage* message = StyxMessage::factory(&reader, mIOUnit);
 #ifdef USE_LOGGING
 							if (mLogListener != NULL) {
@@ -126,8 +127,8 @@ void* TCPClientChannelDriver::run() {
 }
 
 void TCPClientChannelDriver::close() throw(StyxException) {
+	#warning empty
 	TCPChannelDriver::close();
-	mThread->cancel();
 }
 
 std::vector<ClientDetails*> TCPClientChannelDriver::getClients() {

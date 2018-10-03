@@ -9,12 +9,13 @@
 #include "exceptions/StyxException.h"
 #include <pthread.h>
 #include "messages/base/StyxMessage.h"
+#include "utils/Mutex.h"
 
+#warning looks like we can remove this class.
 class SyncObject {
 private:
 	uint64_t mTimeout;
-	pthread_mutex_t mMutex;
-    pthread_cond_t mCond;
+	Condition mCond;
 public:
 	SyncObject(uint64_t timeout);
 	~SyncObject();

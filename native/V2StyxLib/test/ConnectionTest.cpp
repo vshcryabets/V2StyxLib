@@ -45,10 +45,10 @@ TEST(cpp_connection_test, connection_test) {
         uint64_t diff = getTimestampInMilliseconds() - startTime;
         printf("\tTransmited %zu messages\n\t"
                 "Error %zu messages\n\t"
-                "Average time for connection %llu ms",
+                "Average time for connection %f ms\n",
                 mConnection->getTransmitter()->getTransmittedCount(),
                 mConnection->getTransmitter()->getErrorsCount(),
-                diff/count
+                (double)diff/(double)count
                 );
         mConnection->close();
     } catch (StyxException err) {

@@ -7,6 +7,7 @@
 #define INCLUDE_UTILS_MUTEX_H_
 
 #include <pthread.h>
+#include <stdint.h>
 
 class Mutex {
 protected:
@@ -17,6 +18,20 @@ public:
 
 	void lock();
 	void unlock();
+	pthread_mutex_t* getPThreadMutex();
+};
+
+class Condition : public Mutex
+{
+protected:
+	pthread_cond_t mCond;
+public:
+	Condition();
+	~Condition();
+	// void wait();
+	void notifyNoLock();
+	void notifyWithLock();
+	void waitNoLock(uint64_t timeoutMs);
 };
 
 class MutexBlock {

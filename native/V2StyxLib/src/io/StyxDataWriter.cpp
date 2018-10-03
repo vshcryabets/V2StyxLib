@@ -7,7 +7,7 @@
 
 #include "io/StyxDataWriter.h"
 
-StyxDataWriter::StyxDataWriter(std::vector<uint8_t>* buffer)
+StyxDataWriter::StyxDataWriter(StyxBuffer* buffer)
 	: mBuffer(buffer), mMaxWritePosition(0) {
 }
 
@@ -51,14 +51,12 @@ void StyxDataWriter::limit(size_t limit) {
 
 size_t StyxDataWriter::write(const uint8_t* data, size_t count) throw(StyxException){
 #warning optimize this logic
-//  writeposition maxwriteposition
+	//  writeposition maxwriteposition
 	for (size_t i = 0; i < count; i++) {
 		if (mBuffer->size() == mMaxWritePosition) {
-			throw StyxException("Buffer overflow");
+			throw StyxException("Buffer overflow max=%d current=%d", mMaxWritePosition, mBuffer->size());
 		}
 		mBuffer->push_back(data[i]);
-		printf("%02x ", data[i]);
 	}
-	printf("pushed \n");
 	return count;
 }

@@ -36,13 +36,13 @@ ssize_t StyxByteBufferReadable::readFromChannel(Socket fd) throw(StyxException) 
 	readed = ::recv(fd, (char*)(mBuffer+position), count, 0);
 #else
 	readed = ::read(fd, mBuffer + position, count);
-	printf("StyxByteBufferReadable::readFromChannel %d\n", readed);
-	if (readed > 0) {
-		for (size_t i =0; i < readed; i++) {
-			printf("%02x ", mBuffer[position + i]);
-		}
-		printf("\n");
-	}
+	// printf("StyxByteBufferReadable::readFromChannel %d\n", readed);
+	// if (readed > 0) {
+	// 	for (size_t i =0; i < readed; i++) {
+	// 		printf("%02x ", mBuffer[position + i]);
+	// 	}
+	// 	printf("\n");
+	// }
 #endif
 	if ( readed > 0 ) {
 		mStoredBytes += readed;
@@ -107,10 +107,10 @@ size_t StyxByteBufferReadable::updateBufferLimits() {
 
 size_t StyxByteBufferReadable::get(uint8_t* out, size_t length) {
 	if ( out == NULL ) {
-		throw "Out buffer is null";
+		throw StyxException("Output buffer is null");
 	}
 	if ( mStoredBytes < length ) {
-		throw "Too much bytes to read";
+		throw StyxException("Too much bytes to read contains %d, want to read %d", mStoredBytes, length);
 	}
 	if ( mReadPosition >= mCapacity ) {
 		mReadPosition -= mCapacity;

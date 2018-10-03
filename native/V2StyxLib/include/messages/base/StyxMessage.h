@@ -7,9 +7,10 @@
 
 #ifndef STYXMESSAGE_H_
 #define STYXMESSAGE_H_
-#include "./types.h"
-#include "./io/IStyxDataReader.h"
-#include "./io/IStyxDataWriter.h"
+#include "types.h"
+#include "io/IStyxDataReader.h"
+#include "io/IStyxDataWriter.h"
+#include "exceptions/StyxException.h"
 
 class StyxMessage {
 private:
@@ -22,7 +23,7 @@ public:
 	static const size_t BASE_BINARY_SIZE = 7;
 
 	static size_t getUTFSize(StyxString utf);
-	static StyxMessage* factory(IStyxDataReader *buffer, size_t iounit);
+	static StyxMessage* factory(IStyxDataReader *buffer, size_t iounit) throw(StyxException);
 
 	StyxMessage(MessageTypeEnum type, StyxTAG tag);
 	virtual ~StyxMessage();

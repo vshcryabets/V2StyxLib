@@ -29,7 +29,7 @@
 #include <sstream>
 
 size_t StyxMessage::getUTFSize(StyxString utf) {
-	return utf.length();
+	return 2 + utf.length();
 }
 
 StyxMessage::StyxMessage(MessageTypeEnum type, StyxTAG tag) {
@@ -48,10 +48,11 @@ StyxMessage::~StyxMessage() {
  * @return constructed Message object
  * @throws IOException
  */
-StyxMessage* StyxMessage::factory(IStyxDataReader* buffer, size_t io_unit) {
+StyxMessage* StyxMessage::factory(IStyxDataReader* buffer, size_t io_unit) throw(StyxException) 
+{
 	// get common packet data
 	size_t packet_size = buffer->readUInt32();
-	if ( packet_size > io_unit ) throw "Packet size to large";
+	if ( packet_size > io_unit ) throw StyxException("Packet size to large");
 	int type = buffer->readUInt8();
 	uint16_t tag = buffer->readUInt16();
 	// load other data
@@ -61,7 +62,7 @@ StyxMessage* StyxMessage::factory(IStyxDataReader* buffer, size_t io_unit) {
 		result = new StyxTVersionMessage(0, "");
 		break;
 	case Rversion:
-		result = new StyxRVersionMessage(0, NULL);
+		result = new StyxRVersionMessage(0, "");
 		break;
 		//	case Tauth:
 		//		result = new StyxTAuthMessage(NOFID);

@@ -4,33 +4,29 @@
  *  Created on: May 5, 2018
  *      Author: vova
  */
-#include <pthread.h>
 #include "handlers/QueueMessagesProcessor.h"
 
 QueueMessagesProcessor::QueueMessagesProcessor(StyxString tag) : 
-	mThread(tag), mTag(tag), mErrorPackets(0), mHandledPackets(0) {
-	pthread_mutex_init(&mQueueMutex, NULL);
-	pthread_cond_init(&mQueueCond, NULL);
-	printf("QueueMessagesProcessor %s init %p\n", mTag.c_str(), &mQueueCond);
+	mCondition(), mThread(tag), mTag(tag), mErrorPackets(0), mHandledPackets(0) {
+	printf("QueueMessagesProcessor %s init\n", mTag.c_str());
 	mThread.startRunnable(this);
 }
 
 QueueMessagesProcessor::~QueueMessagesProcessor() {
 	mThread.forceCancel();
 	printf("QueueMessagesProcessor destroy\n");
-	pthread_cond_destroy(&mQueueCond); 
-	pthread_mutex_destroy(&mQueueMutex);                                                   
 }
 
 void QueueMessagesProcessor::postPacket(StyxMessage *message, ClientDetails *target) {
 	QueueMessageProcessorPair pair;
 	pair.mMessage = message;
 	pair.mTransmitter = target;
-	printf("QueueMessagesProcessor post\n", mTag.c_str());
-	pthread_mutex_lock(&mQueueMutex);
+#ifdef LOG_MESSAGES_QUEUE
+	printf("QueueMessagesProcessor %s post %s\n", mTag.c_str(), message->toString().c_str());
+#endif
+	MutexBlock block(&mCondition);
 	mQueue.push(pair);
-	pthread_cond_signal(&mQueueCond);
-	pthread_mutex_unlock(&mQueueMutex);
+	mCondition.notifyNoLock();
 }
 
 void QueueMessagesProcessor::close() {
@@ -43,10 +39,10 @@ void* QueueMessagesProcessor::run() {
 	tm.tv_sec = 1;
 	tm.tv_nsec = 0;
 	while (!mThread.isInterrupted()) {
-		pthread_mutex_lock(&mQueueMutex);
+		MutexBlock lock(&mCondition);
 		if (mQueue.size() == 0) {
-			printf("QueueMessagesProcessor %s %p %p\n", mTag.c_str(), &mQueueCond, &mQueueMutex);
-			pthread_cond_wait(&mQueueCond, &mQueueMutex);
+			#warning magic number
+			mCondition.waitNoLock(1000);
 		}
 		while (mQueue.size() > 0) {
 			QueueMessageProcessorPair pair = mQueue.front();
@@ -57,7 +53,6 @@ void* QueueMessagesProcessor::run() {
 				e.printStackTrace();
 			}
 		}
-		pthread_mutex_unlock(&mQueueMutex);
 	}
 	return NULL;
 }

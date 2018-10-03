@@ -68,7 +68,6 @@ void Connection::sendVersionMessage() throw(StyxException) {
     } else {
         sendAttachMessage();
     }
-
 }
 
 size_t Connection::getIOBufSize() {

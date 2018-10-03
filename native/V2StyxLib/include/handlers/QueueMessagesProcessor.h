@@ -21,8 +21,7 @@ public:
 class QueueMessagesProcessor : public IMessageProcessor, IRunnable {
 protected:
     std::queue<QueueMessageProcessorPair> mQueue;
-    pthread_mutex_t mQueueMutex;
-    pthread_cond_t mQueueCond;
+    Condition mCondition;
     StyxThread mThread;
     size_t mHandledPackets;
     size_t mErrorPackets;

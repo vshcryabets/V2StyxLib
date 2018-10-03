@@ -123,11 +123,10 @@ void* TCPServerChannelDriver::run() {
             for (std::map<Socket, ClientDetails*>::iterator it = mClientStatesMap.begin(); 
                 it != mClientStatesMap.end(); it++ ) {
 				if (FD_ISSET(it->first, &socks)) {
-                    printf("TCPServer got readable %d\n", it->first);
+                    // printf("TCPServer got readable %d\n", it->first);
                     mReadable.push(it->first);
 				}
 			}
-            printf("TCPServer processEventsQueue enter\n");
             processEventsQueue();
         }
     }
@@ -182,12 +181,11 @@ void TCPServerChannelDriver::processEventsQueue() throw(StyxException) {
         mReadable.pop();
         std::map<Socket, ClientDetails*>::iterator it = mClientStatesMap.find(channel);
         if (it != mClientStatesMap.end()) {
-            printf("TCPServer find client\n");
             if (readSocket((TCPClientDetails*)it->second)) {
                 mTMessageHandler->removeClient(it->second);
                 mRMessageHandler->removeClient(it->second);
                 mClientStatesMap.erase(channel);
-                #warning delete TCPClientDetails
+#warning delete TCPClientDetails
 #warning we should move close logic somewhere outside
                 ::close(channel);
             }

@@ -10,7 +10,8 @@
 
 StyxTMessage::StyxTMessage(MessageTypeEnum type, MessageTypeEnum answer)
 	: StyxMessage(type, StyxMessage::NOTAG),
-	  mRequiredAnswerType(answer), mWaitSyncObject(NULL){
+	  mRequiredAnswerType(answer), mWaitSyncObject(NULL), mAnswer(NULL)
+{
 }
 
 StyxTMessage::~StyxTMessage() {
@@ -42,6 +43,7 @@ StyxMessage* StyxTMessage::waitForAnswer()
 	return mAnswer;
 }
 
+#warning do we need this method?
 bool StyxTMessage::checkAnswer(StyxMessage* answer) 
 {
 	MessageTypeEnum received = answer->getType();
