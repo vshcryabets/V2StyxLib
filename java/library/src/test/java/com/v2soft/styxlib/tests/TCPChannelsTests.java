@@ -20,8 +20,8 @@ public class TCPChannelsTests {
 
     @Test
     public void testServerClientConnect() throws IOException, InterruptedException, StyxException {
-        TCPServerChannelDriver server = new TCPServerChannelDriver("127.0.0.1", 22345);
-        TCPClientChannelDriver client = new TCPClientChannelDriver("127.0.0.1", 22345);
+        TCPServerChannelDriver server = new TCPServerChannelDriver("127.0.0.1", 22345, "TCT1");
+        TCPClientChannelDriver client = new TCPClientChannelDriver("127.0.0.1", 22345, "TCT2");
         server.setRMessageHandler(new RMessagesProcessor("test1"));
         server.setTMessageHandler(new RMessagesProcessor("test2"));
         server.start(128);

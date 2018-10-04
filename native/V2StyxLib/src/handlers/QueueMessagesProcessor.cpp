@@ -8,13 +8,13 @@
 
 QueueMessagesProcessor::QueueMessagesProcessor(StyxString tag) : 
 	mCondition(), mThread(tag), mTag(tag), mErrorPackets(0), mHandledPackets(0) {
-	printf("QueueMessagesProcessor %s init\n", mTag.c_str());
+	printf("QueueMessagesProcessor init %s\n", mTag.c_str());
 	mThread.startRunnable(this);
 }
 
 QueueMessagesProcessor::~QueueMessagesProcessor() {
 	mThread.forceCancel();
-	printf("QueueMessagesProcessor destroy\n");
+	printf("QueueMessagesProcessor destroy %s\n", mTag.c_str());
 }
 
 void QueueMessagesProcessor::postPacket(StyxMessage *message, ClientDetails *target) {
@@ -32,6 +32,7 @@ void QueueMessagesProcessor::postPacket(StyxMessage *message, ClientDetails *tar
 void QueueMessagesProcessor::close() {
 	mThread.cancel();
 	mThread.join();
+	printf("QueueMessagesProcessor::close %s ok\n", mTag.c_str());
 }
 
 void* QueueMessagesProcessor::run() {

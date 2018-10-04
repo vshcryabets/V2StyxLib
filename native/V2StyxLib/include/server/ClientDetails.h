@@ -17,22 +17,29 @@
 #include "server/IChannelDriver.h"
 #include "utils/Polls.h"
 #include "exceptions/StyxErrorMessageException.h"
+#include "io/StyxDataWriter.h"
+#include "io/StyxDataReader.h"
 
 class ClientDetails {
 protected:
-	#warning we can move channel template here
 	std::map<StyxFID,IVirtualStyxFile*> mAssignedFiles;
 	IChannelDriver *mDriver;
 	uint32_t mClientId;
 	Polls* mPolls; // TODO probably we can move polls here, and remove Polls class
 	Credentials mCredentials;
-
+	StyxBuffer mOutputBuffer;
+	StyxDataWriter mOutputWriter;
+	StyxByteBufferReadable mInputBuffer;
+    StyxDataReader mInputReader;
 public:
-	ClientDetails(IChannelDriver* driver, uint32_t id);
+	ClientDetails(IChannelDriver* driver, uint32_t iounit, uint32_t id);
 	~ClientDetails();
 	void setCredentials(Credentials credentials);
 	Credentials getCredentials();
-
+	StyxDataWriter* getOutputWritter();
+	StyxBuffer* getOutputBuffer();
+	StyxByteBufferReadable* getInputBuffer();
+	IStyxDataReader* getInputReader();
     /**
      * Get polls assigned to this client.
      * @return polls assigned to this client.

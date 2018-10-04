@@ -13,8 +13,10 @@
 #include <unistd.h>
 #include <sstream>
 
-ClientDetails::ClientDetails(IChannelDriver* driver, uint32_t id) 
-	: mDriver(driver), mClientId(id), mCredentials("", "") {
+ClientDetails::ClientDetails(IChannelDriver* driver, uint32_t iounit, uint32_t id) 
+	: mDriver(driver), mClientId(id), mCredentials("", ""),
+	mOutputBuffer(StyxBuffer(iounit)), mOutputWriter(&mOutputBuffer),
+	mInputBuffer(StyxByteBufferReadable(iounit * 2)), mInputReader(StyxDataReader(&mInputBuffer)) {
 	if (mDriver == NULL) {
 		throw StyxException("Driver is null");
 	}
@@ -64,4 +66,20 @@ void ClientDetails::unregisterClosedFile(StyxFID fid) {
 		throw StyxErrorMessageException("Unknown FID (%d)", fid);
 	}
 	mAssignedFiles.erase(it);
-	}
+}
+
+StyxDataWriter* ClientDetails::getOutputWritter() {
+	return &mOutputWriter;
+}
+
+StyxBuffer* ClientDetails::getOutputBuffer() {
+	return &mOutputBuffer;
+}
+
+StyxByteBufferReadable* ClientDetails::getInputBuffer() {
+	return &mInputBuffer;
+}
+
+IStyxDataReader* ClientDetails::getInputReader() {
+	return &mInputReader;
+}

@@ -16,6 +16,8 @@
 // typedef unsigned int uint32_t;
 //typedef long int64_t;
 
+#include "config.h"
+
 #ifdef WIN32
 	#include <winsock2.h>
 	typedef SOCKET Socket;

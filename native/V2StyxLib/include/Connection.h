@@ -100,7 +100,6 @@ public:
     virtual void sendVersionMessage() throw(StyxException);
     virtual void onSocketDisconnected(TMessageTransmitter *caller) ;
     virtual void onTrashReceived(TMessageTransmitter *caller);
-
 };
 
 #endif /* CONNECTION_H_ */

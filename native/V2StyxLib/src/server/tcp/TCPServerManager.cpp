@@ -9,7 +9,7 @@
 #include "server/tcp/TCPServerChannelDriver.h"
 
 TCPServerManager::TCPServerManager(StyxString address, uint16_t port, IVirtualStyxFile* root) :
-	StyxServerManager(root), mDriver(new TCPServerChannelDriver(address, port)) {
+	StyxServerManager(root), mDriver(new TCPServerChannelDriver(address, port, "SRV"+address)) {
 	addDriver(mDriver);
 }
 

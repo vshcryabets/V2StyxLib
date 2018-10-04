@@ -105,7 +105,7 @@ public class PacketIOTests {
 
 
         Connection connection = new Connection.Builder().setDriver(
-                new TCPClientChannelDriver("127.0.0.1", PORT)).build();
+                new TCPClientChannelDriver("127.0.0.1", PORT, "PIOT1")).build();
         byte[] someData = new byte[1024];
         byte [] remoteHash = new byte[16];
 

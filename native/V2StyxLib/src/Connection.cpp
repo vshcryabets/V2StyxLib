@@ -21,7 +21,7 @@ Connection::Connection(Credentials credentials,
 	: mTimeout(DEFAULT_TIMEOUT), mAuthQID(StyxQID::EMPTY), 
 	mQID(StyxQID::EMPTY), mSyncObject(mTimeout), 
 	mCredentials(credentials), mDriver(driver)  {
-
+	printf("A20 %p\n", mDriver);
 	mAuthFID = StyxMessage::NOFID;
 	mFID = StyxMessage::NOFID;
     isAutoStartDriver = false;
@@ -132,12 +132,12 @@ void Connection::close() throw(StyxException) {
 	}
 	if (mTransmitter != NULL) {
 		mTransmitter->close();
-#warning TODO Delete?
+#warning  showul we delete it?
 		mTransmitter = NULL;
 	}
 	if (isAutoStartDriver && mDriver != NULL) {
 		mDriver->close();
-#warning  TODO Delete?
+#warning  showul we delete it?
 		mDriver = NULL;
 	}
 }
@@ -221,6 +221,7 @@ bool Connection::connect(IChannelDriver *driver, Credentials credentials,
         throw StyxException("answerProcessor can't be null");
     }
     mAnswerProcessor = answerProcessor;
+	printf("A10 %p\n", mDriver);
     mDriver->setRMessageHandler(mAnswerProcessor);
 
     mCredentials = credentials;

@@ -67,7 +67,7 @@ public class TwoWayExportTest {
         MemoryStyxDirectory root = new MemoryStyxDirectory("clientroot");
         root.addFile(md5);
         ConnectionWithExport connection = new ConnectionWithExport.Builder()
-                    .setDriver(new TCPClientChannelDriver("127.0.0.1", PORT))
+                    .setDriver(new TCPClientChannelDriver("127.0.0.1", PORT, "TW1"))
                     .build();
         connection.export(root);
 
@@ -98,7 +98,7 @@ public class TwoWayExportTest {
 
     @Test
     public void testGetClientsFromClient() throws IOException, InterruptedException, TimeoutException, StyxException {
-        IChannelDriver driver = new TCPClientChannelDriver("127.0.0.1", PORT);
+        IChannelDriver driver = new TCPClientChannelDriver("127.0.0.1", PORT, "TW1");
         ConnectionWithExport connection = new ConnectionWithExport.Builder().setDriver(driver).build();
         Assertions.assertTrue(connection.connect());
         Collection<ClientDetails> clientDetailses = driver.getClients();
@@ -120,12 +120,12 @@ public class TwoWayExportTest {
         Assertions.assertEquals(1, drivers.size());
 
         ConnectionWithExport connection = new ConnectionWithExport.Builder()
-                .setDriver(new TCPClientChannelDriver("127.0.0.1", PORT))
+                .setDriver(new TCPClientChannelDriver("127.0.0.1", PORT, "TW1"))
                 .build();
         Assertions.assertTrue(connection.connect());
 
         ConnectionWithExport connection2 = new ConnectionWithExport.Builder()
-                .setDriver(new TCPClientChannelDriver("127.0.0.1", PORT))
+                .setDriver(new TCPClientChannelDriver("127.0.0.1", PORT, "TW1"))
                 .build();
         Assertions.assertTrue(connection2.connect());
 
@@ -169,7 +169,7 @@ public class TwoWayExportTest {
         // create clients
         for (int i = 0; i < count; i++) {
             String prefix = "CL" + i;
-            clientDrivers[i] = new TCPClientChannelDriver("127.0.0.1", PORT);
+            clientDrivers[i] = new TCPClientChannelDriver("127.0.0.1", PORT, "TW1");
             clients[i] = new ConnectionWithExport.Builder().setDriver(clientDrivers[i]).build();
             clientDrivers[i].setLogListener(new TestLogListener(prefix));
             String marker = (i == 0 ? messages[count - 1] : messages[i - 1]);

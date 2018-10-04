@@ -11,11 +11,12 @@
 
 static const uint16_t PORT = 10234;
 static Connection* mConnection;
+static StyxServerManager* mServer;
 
 StyxServerManager* startServer() {
 	printf("Try to start server\n");
 	std::string testDirectory = "./test";
-	StyxServerManager* mServer = new TCPServerManager("127.0.0.1",
+	mServer = new TCPServerManager("127.0.0.1",
 			PORT,
 			new DiskStyxDirectory(testDirectory));
 	mServer->start();
@@ -25,9 +26,9 @@ StyxServerManager* startServer() {
 
 void setUp() {
     printf("Setup 1\n");
-    StyxServerManager* server = startServer();
+    startServer();
     Connection::Builder* builder = Connection::Builder()
-        .setDriver(new TCPClientChannelDriver("localhost", PORT));
+        .setDriver(new TCPClientChannelDriver("localhost", PORT, "CL1"));
     mConnection = builder->build();
     printf("Setup finished\n");
     ASSERT_TRUE(mConnection->connect());
@@ -51,6 +52,10 @@ TEST(cpp_connection_test, connection_test) {
                 (double)diff/(double)count
                 );
         mConnection->close();
+        mServer->close();
+
+        delete mConnection;
+        delete mServer;
     } catch (StyxException err) {
         printf("StyxException %s %d\n", err.getMessage().c_str(), err.getInternalCode());
         throw err;

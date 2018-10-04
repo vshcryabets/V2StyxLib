@@ -20,6 +20,7 @@ protected:
     uint32_t mIOUnit;
     bool isWorking;
     StyxThread* mThread;
+	StyxString mTag;
 
 #ifdef USE_LOGGING
     ILogListener* mLogListener;
@@ -38,7 +39,7 @@ protected:
     virtual bool process(TCPClientDetails* client) throw(StyxException);
 
 public:
-	TCPChannelDriver(StyxString address, uint16_t port);
+	TCPChannelDriver(StyxString address, uint16_t port, StyxString tag);
 	virtual ~TCPChannelDriver();
 	virtual StyxThread* start(size_t iounit) throw(StyxException);
 	virtual bool sendMessage(StyxMessage* message, ClientDetails *recipient) throw(StyxException);

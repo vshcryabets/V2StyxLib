@@ -15,8 +15,8 @@
 #include "io/StyxDataReader.h"
 #include "exceptions/StyxException.h"
 
-TCPClientChannelDriver::TCPClientChannelDriver(StyxString address, uint16_t port)
-	: TCPChannelDriver(address, port), mServerClientDetails(NULL), mSocket(INVALID_SOCKET) {
+TCPClientChannelDriver::TCPClientChannelDriver(StyxString address, uint16_t port, StyxString tag)
+	: TCPChannelDriver(address, port, tag), mServerClientDetails(NULL), mSocket(INVALID_SOCKET) {
 }
 
 TCPClientChannelDriver::~TCPClientChannelDriver() {
@@ -48,8 +48,8 @@ void TCPClientChannelDriver::prepareSocket() throw(StyxException) {
 #warning use code here
 		throw StyxException("Connect failed %d", errno);
 	}
-
-	size_t timeoutMs = getTimeout();
+#warning /10
+	size_t timeoutMs = getTimeout() / 10;
 	struct timeval timeout;
 	timeout.tv_sec = timeoutMs / 1000;
 	timeout.tv_usec = (timeoutMs - timeout.tv_sec * 1000) * 1000;
@@ -58,9 +58,14 @@ void TCPClientChannelDriver::prepareSocket() throw(StyxException) {
 	}
 	mSocket = sockfd;
 	mServerClientDetails = new TCPClientDetails(mSocket, this, mIOUnit, TCPClientChannelDriver::PSEUDO_CLIENT_ID);
+	printf("A12 %p %p\n", this, mServerClientDetails);
+#ifdef TCP_LIFECYCLE_LOG
+	printf("TCPClientChannelDriver::prepareSocket ok\n");
+#endif
 }
 
 bool TCPClientChannelDriver::isConnected() {
+	// printf("A11 %p %p\n", this, mServerClientDetails);
 	if (mServerClientDetails->getChannel() == INVALID_SOCKET) {
 		return false;
 	}
@@ -79,6 +84,9 @@ bool TCPClientChannelDriver::sendMessage(StyxMessage* message, ClientDetails *re
 }
 
 void* TCPClientChannelDriver::run() {
+#ifdef TCP_LIFECYCLE_LOG
+	printf("TCPClientChannelDriver::run enter\n");
+#endif
 	try {
 		isWorking = true;
 		#warning TODO we can use buffer and reader from mServerClientDetails
@@ -113,22 +121,22 @@ void* TCPClientChannelDriver::run() {
 					}
 
 				}
+				#warning catch looks useless
 			} catch (StyxException exception) {
 				throw exception;
 			}
 		}
 	} catch (StyxException exception) {
 		mServerClientDetails->disconnect();
+		isWorking = false;
 		throw exception;
 	}
 	mServerClientDetails->disconnect();
 	isWorking = false;
+#ifdef TCP_LIFECYCLE_LOG
+	printf("TCPClientChannelDriver::run exit\n");
+#endif
 	return 0;
-}
-
-void TCPClientChannelDriver::close() throw(StyxException) {
-	#warning empty
-	TCPChannelDriver::close();
 }
 
 std::vector<ClientDetails*> TCPClientChannelDriver::getClients() {
@@ -150,4 +158,7 @@ void TCPClientChannelDriver::closeSocket() throw(StyxException) {
 		throw StyxException(DRIVER_CLOSE_ERROR);
 	}
 	mSocket = INVALID_SOCKET;
+#ifdef TCP_LIFECYCLE_LOG
+	printf("TCPClientChannelDriver::closeSocket ok\n");
+#endif
 }

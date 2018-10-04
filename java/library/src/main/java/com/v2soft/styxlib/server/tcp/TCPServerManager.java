@@ -15,6 +15,6 @@ import java.io.IOException;
 public class TCPServerManager extends StyxServerManager {
     public TCPServerManager(String address, int port, IVirtualStyxFile root) {
         super(root);
-        addDriver(new TCPServerChannelDriver(address, port));
+        addDriver(new TCPServerChannelDriver(address, port, "SRV" + address));
     }
 }

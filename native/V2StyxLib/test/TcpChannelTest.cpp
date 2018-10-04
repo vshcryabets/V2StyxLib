@@ -10,8 +10,8 @@ TEST(DISABLED_cpp_server_client_connect_test, rw_test) {
 	RMessagesProcessor test2("test2");
 	RMessagesProcessor test3("test3");
 	RMessagesProcessor test4("test4");
-	TCPServerChannelDriver server("127.0.0.1", 22345);
-	TCPClientChannelDriver client("127.0.0.1", 22345);
+	TCPServerChannelDriver server("127.0.0.1", 22345, "SRVT1");
+	TCPClientChannelDriver client("127.0.0.1", 22345, "SRVT2");
 	server.setRMessageHandler(&test1);
 	server.setTMessageHandler(&test2);
 	server.start(128);

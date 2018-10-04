@@ -13,8 +13,8 @@
 #include <strings.h>
 #include "utils/Log.h"
 
-TCPServerChannelDriver::TCPServerChannelDriver(StyxString address, uint16_t port) 
-    : TCPChannelDriver(address, port), mSocket(INVALID_SOCKET), mLastClientId(1) {
+TCPServerChannelDriver::TCPServerChannelDriver(StyxString address, uint16_t port, StyxString tag) 
+    : TCPChannelDriver(address, port, tag), mSocket(INVALID_SOCKET), mLastClientId(1) {
 }
 
 TCPServerChannelDriver::~TCPServerChannelDriver() {
@@ -57,6 +57,10 @@ void TCPServerChannelDriver::prepareSocket() throw(StyxException) {
 
     // enable non-blocking mode
     setNonBlocking(sockfd);
+
+#ifdef TCP_LIFECYCLE_LOG
+	printf("TCPServerChannelDriver::prepareSocket ok\n");
+#endif
 }
 
 size_t TCPServerChannelDriver::getMaxPendingQueue() {
@@ -85,6 +89,9 @@ StyxString TCPServerChannelDriver::toString() {
 }
 
 void* TCPServerChannelDriver::run() {
+#ifdef TCP_LIFECYCLE_LOG
+	printf("TCPServerChannelDriver::run enter\n");
+#endif
     isWorking = true;
     ::listen(mSocket, getMaxPendingQueue());
     // Since we start with only one socket, the listening socket, it is the highest socket so far.
@@ -130,9 +137,11 @@ void* TCPServerChannelDriver::run() {
             processEventsQueue();
         }
     }
-    ::close(mSocket);
-    mSocket = INVALID_SOCKET;
+    closeSocket();
     isWorking = false;
+#ifdef TCP_LIFECYCLE_LOG
+	printf("TCPServerChannelDriver::run exit\n");
+#endif
 }
 
 void TCPServerChannelDriver::setNonBlocking(Socket socket) throw(StyxException) {
@@ -161,6 +170,9 @@ void TCPServerChannelDriver::closeSocket() throw(StyxException) {
         throw StyxException(DRIVER_CLOSE_ERROR);
     }
     mSocket = INVALID_SOCKET;
+#ifdef TCP_LIFECYCLE_LOG
+	printf("TCPServerChannelDriver::closeSocket ok\n");
+#endif
 }
 
 void TCPServerChannelDriver::processEventsQueue() throw(StyxException) {

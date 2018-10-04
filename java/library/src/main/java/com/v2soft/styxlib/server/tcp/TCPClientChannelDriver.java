@@ -28,8 +28,8 @@ public class TCPClientChannelDriver extends TCPChannelDriver {
     protected TCPClientDetails mServerClientDetails;
     protected SocketChannel mSocket;
 
-    public TCPClientChannelDriver(String address, int port) throws IOException {
-        super(address, port);
+    public TCPClientChannelDriver(String address, int port, String tag) throws IOException {
+        super(address, port, tag);
     }
 
     @Override
@@ -136,12 +136,6 @@ public class TCPClientChannelDriver extends TCPChannelDriver {
             }
             isWorking = false;
         }
-    }
-
-    @Override
-    public void close() {
-        super.close();
-        mThread.interrupt();
     }
 
     @Override

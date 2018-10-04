@@ -9,8 +9,8 @@
 #include "io/StyxDataWriter.h"
 #include <sys/socket.h>
 
-TCPChannelDriver::TCPChannelDriver(StyxString address, uint16_t port) 
-	: mPort(port), mAddress(address), mThread(NULL) {
+TCPChannelDriver::TCPChannelDriver(StyxString address, uint16_t port, StyxString tag) 
+	: mPort(port), mAddress(address), mThread(NULL), mTag(tag) {
     mTransmittedPacketsCount = 0;
     mTransmissionErrorsCount = 0;
 }
@@ -92,8 +92,11 @@ void TCPChannelDriver::close() throw(StyxException) {
 	if (mThread == NULL) {
 		return;
 	}
+#ifdef TCP_LIFECYCLE_LOG
+	printf("TCPChannelDriver::close %s\n", mTag.c_str());
+#endif
 	mThread->cancel();
-	mThread->tryjoin(2000);
+	int res = mThread->tryjoin(2000);
 	if ( mThread->isAlive() ) {
 		mThread->forceCancel();
 	}
@@ -102,21 +105,24 @@ void TCPChannelDriver::close() throw(StyxException) {
 }
 
 StyxThread* TCPChannelDriver::start(size_t iounit) throw(StyxException) {
-		if ( mThread != NULL ) {
-            throw StyxException("Already started");
-        }
-		if (mTMessageHandler == NULL) {
-            throw StyxException("mTMessageHandler not ready (is null)");
-        }
-		if (mRMessageHandler == NULL) {
-            throw StyxException("mRMessageHandler not ready (is null)");
-        }
-        mIOUnit = iounit;
-		prepareSocket();
-        mThread = new StyxThread("TcpDriver");
-        mThread->startRunnable(this);
-        isWorking = true;
-        return mThread;
+	if ( mThread != NULL ) {
+		throw StyxException("Already started");
+	}
+	if (mTMessageHandler == NULL) {
+		throw StyxException("mTMessageHandler not ready (is null)");
+	}
+	if (mRMessageHandler == NULL) {
+		throw StyxException("mRMessageHandler not ready (is null)");
+	}
+	mIOUnit = iounit;
+	prepareSocket();
+	mThread = new StyxThread("TCD_" + mTag);
+	mThread->startRunnable(this);
+#ifdef TCP_LIFECYCLE_LOG
+	printf("TCPChannelDriver::start %s ok\n", mTag.c_str());
+#endif
+	isWorking = true;
+	return mThread;
 }
 
 /**

@@ -11,7 +11,7 @@
 
 TEST(cpp_server_testPrepareSocketWrongPort_test, rw_test) {
 	try {
-		TCPServerChannelDriver driver("localhost", 1);
+		TCPServerChannelDriver driver("localhost", 1, "SRVT1");
 		driver.prepareSocket();
 		ASSERT_TRUE(0) << "Socket exception should be thrown here";
 	} catch (StyxException err) {
@@ -21,7 +21,7 @@ TEST(cpp_server_testPrepareSocketWrongPort_test, rw_test) {
 
 TEST(cpp_server_testPrepareSocketWrongAddress_test, rw_test) {
 	try {
-		TCPServerChannelDriver driver("github.com", 10240);
+		TCPServerChannelDriver driver("github.com", 10240, "SRVT1");
 		driver.prepareSocket();
 		ASSERT_TRUE(0) << "Socket exception should be thrown here";
 	} catch (StyxException err) {
@@ -31,7 +31,7 @@ TEST(cpp_server_testPrepareSocketWrongAddress_test, rw_test) {
 
 TEST(cpp_server_testPrepareSocketIncorrectAddress_test, rw_test) {
 	try {
-		TCPServerChannelDriver driver("qwewqe", 10240);
+		TCPServerChannelDriver driver("qwewqe", 10240, "SRVT1");
 		driver.prepareSocket();
 		ASSERT_TRUE(0) << "Socket exception should be thrown here";
 	} catch (StyxException err) {
@@ -40,7 +40,7 @@ TEST(cpp_server_testPrepareSocketIncorrectAddress_test, rw_test) {
 }
 
 TEST(cpp_server_testSocketBusy, rw_test) {
-	TCPServerChannelDriver driver("0.0.0.0", 10240);
+	TCPServerChannelDriver driver("0.0.0.0", 10240, "SRVT1");
 	driver.prepareSocket();
 	int test = ::socket(AF_INET, SOCK_STREAM, 0);
 	struct hostent *server = ::gethostbyname("127.0.0.1");
@@ -64,7 +64,7 @@ public:
 	bool messageReceived;
 
 	TestServerChannel(uint8_t* indata, uint8_t* outdata, size_t testDataLength) 
-		: TCPServerChannelDriver("0.0.0.0", 10240), testdataSize(testDataLength),
+		: TCPServerChannelDriver("0.0.0.0", 10240, "SRVT1"), testdataSize(testDataLength),
 			senddata(indata), recvdata(outdata) {
 		iounit = 128;
 		senddata[0] = testDataLength;

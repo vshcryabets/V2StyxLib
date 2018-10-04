@@ -20,6 +20,7 @@ protected:
 	bool mAlive;
 	bool mInterruptFlag;
 	IRunnable* mRunnable;
+	StyxString mTag;
 public:
 	StyxThread(StyxString tag);
 	~StyxThread();
@@ -32,6 +33,7 @@ public:
 	int startRunnable(IRunnable* runnale);
 	int join(void **value_ptr = NULL); 
 	static void* threadIn(void *context);
+	StyxString getTag();
 };
 
 #endif /* INCLUDE_UTILS_STYXTHREAD_H_ */

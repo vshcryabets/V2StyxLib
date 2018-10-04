@@ -34,7 +34,7 @@ public class TCPServerChannelTests {
     @Test
     public void testPrepareSocketWrongPort() {
         try {
-            new TCPServerChannelDriver("localhost", 1).prepareSocket();
+            new TCPServerChannelDriver("localhost", 1, "CT1").prepareSocket();
             assertTrue(false, "Socket exception should be thrown here");
         } catch (StyxException error) {
             assertEquals(StyxException.DRIVER_BIND_ERROR, error.getInternalCode(), "Wrong error code");
@@ -44,7 +44,7 @@ public class TCPServerChannelTests {
     @Test
     public void testPrepareSocketWrongAddress() {
         try {
-            new TCPServerChannelDriver("github.com", 10240).prepareSocket();
+            new TCPServerChannelDriver("github.com", 10240, "CT2").prepareSocket();
             assertTrue(false, "Socket exception should be thrown here");
         } catch (StyxException error) {
             assertEquals(StyxException.DRIVER_BIND_ERROR, error.getInternalCode(), "Wrong error code");
@@ -54,7 +54,7 @@ public class TCPServerChannelTests {
     @Test
     public void testPrepareSocketIncorrectAddress() {
         try {
-            new TCPServerChannelDriver("qwewqe", 10240).prepareSocket();
+            new TCPServerChannelDriver("qwewqe", 10240, "CT3").prepareSocket();
             assertTrue(false, "Socket exception should be thrown here");
         } catch (StyxException error) {
             assertEquals(StyxException.DRIVER_CANT_RESOLVE_NAME, error.getInternalCode(), "Wrong error code");
@@ -63,7 +63,7 @@ public class TCPServerChannelTests {
 
     @Test
     public void testSocketBusy () throws StyxException, InterruptedException, UnknownHostException {
-        TCPServerChannelDriver driver = new TCPServerChannelDriver("0.0.0.0", 10240);
+        TCPServerChannelDriver driver = new TCPServerChannelDriver("0.0.0.0", 10240, "CT4");
         driver.prepareSocket();
         Thread.sleep(2500);
         Socket test = new Socket();
@@ -84,7 +84,7 @@ public class TCPServerChannelTests {
         final int iounit = 128;
         final boolean[] checks = new boolean[10];
 
-        TCPServerChannelDriver driver = new TCPServerChannelDriver("0.0.0.0", 10240){
+        TCPServerChannelDriver driver = new TCPServerChannelDriver("0.0.0.0", 10240, "CT5"){
             @Override
             protected StyxMessage parseMessage(IStyxDataReader reader) throws IOException {
                 long length = reader.getUInt32();

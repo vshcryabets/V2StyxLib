@@ -10,9 +10,7 @@
 #include "io/StyxDataReader.h"
 
 TCPClientDetails::TCPClientDetails(Socket socket, IChannelDriver* driver, size_t iounit, int id) 
-	: ClientDetails(driver, id), mChannel(socket), 
-		mOutputBuffer(StyxBuffer(iounit)), mOutputWriter(&mOutputBuffer),
-		mInputBuffer(StyxByteBufferReadable(iounit * 2)), mInputReader(StyxDataReader(&mInputBuffer)) {
+	: ClientDetails(driver, iounit, id), mChannel(socket) {
 	if (socket == INVALID_SOCKET) {
 		throw new StyxException("Socket is not ready");
 	}
@@ -31,18 +29,3 @@ void TCPClientDetails::disconnect() throw(StyxException) {
 	mChannel = INVALID_SOCKET;
 }
 
-StyxDataWriter* TCPClientDetails::getOutputWritter() {
-	return &mOutputWriter;
-}
-
-StyxBuffer* TCPClientDetails::getOutputBuffer() {
-	return &mOutputBuffer;
-}
-
-StyxByteBufferReadable* TCPClientDetails::getInputBuffer() {
-	return &mInputBuffer;
-}
-
-IStyxDataReader* TCPClientDetails::getInputReader() {
-	return &mInputReader;
-}

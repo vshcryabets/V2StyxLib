@@ -29,12 +29,14 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
     protected ILogListener mLogListener;
     protected String mAddress;
     protected int mPort;
+    protected String mTag;
 
-    public TCPChannelDriver(String address, int port) {
+    public TCPChannelDriver(String address, int port, String tag) {
         mPort = port;
         mAddress = address;
         mTransmittedPacketsCount = 0;
         mTransmissionErrorsCount = 0;
+        mTag = tag;
     }
 
     public abstract void prepareSocket() throws StyxException;
@@ -57,7 +59,7 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
         }
         mIOUnit = iounit;
         prepareSocket();
-        mThread = new Thread(this, "TcpDriver");
+        mThread = new Thread(this, "TCD_" + mTag);
         mThread.start();
         isWorking = true;
         return mThread;

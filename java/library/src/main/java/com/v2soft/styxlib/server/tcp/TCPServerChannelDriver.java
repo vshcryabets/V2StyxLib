@@ -33,8 +33,8 @@ public class TCPServerChannelDriver extends TCPChannelDriver {
     protected Map<SocketChannel, ClientDetails> mClientStatesMap;
     protected int mLastClientId = 1;
 
-    public TCPServerChannelDriver(String address, int port) {
-        super(address, port);
+    public TCPServerChannelDriver(String address, int port, String tag) {
+        super(address, port, tag);
         mNewConnetions = new Stack<>();
         mReadable = new Stack<>();
         mClientStatesMap = new HashMap<>();

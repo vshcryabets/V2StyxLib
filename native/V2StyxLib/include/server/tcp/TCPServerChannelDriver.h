@@ -22,7 +22,7 @@ protected:
 	void setNonBlocking(Socket socket) throw(StyxException);
 	void processEventsQueue() throw(StyxException);
 public:
-	TCPServerChannelDriver(StyxString address, uint16_t port);
+	TCPServerChannelDriver(StyxString address, uint16_t port, StyxString tag);
 	virtual ~TCPServerChannelDriver();
 	virtual void prepareSocket() throw(StyxException);
 	virtual void closeSocket() throw(StyxException);
