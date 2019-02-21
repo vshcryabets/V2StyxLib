@@ -16,23 +16,25 @@ const StyxString Connection::PROTOCOL = StyxString("9P2000");
 Connection::Connection(Credentials credentials,
 				  IChannelDriver* driver,
 				  RMessagesProcessor* answerProcessor,
-				  TMessageTransmitter* transmitter,
+				  TMessageTransmitter transmitter,
 				  ClientDetails* recepient)
 	: mTimeout(DEFAULT_TIMEOUT), mAuthQID(StyxQID::EMPTY), 
 	mQID(StyxQID::EMPTY), mSyncObject(mTimeout), 
-	mCredentials(credentials), mDriver(driver)  {
+	mCredentials(credentials), mDriver(driver), mTransmitter(transmitter), isAutoStartDriver(false)  {
+	if (mDriver == NULL) {
+		throw StyxException("Channel driver can't be null");
+	}
 	printf("A20 %p\n", mDriver);
+	mTransmitter.setListener(this);
 	mAuthFID = StyxMessage::NOFID;
 	mFID = StyxMessage::NOFID;
-    isAutoStartDriver = false;
     shouldCloseAnswerProcessor = false;
-    shouldCloseTransmitter = false;
 
-	mTransmitter = transmitter;
 	mRecepient = recepient;
 	mAnswerProcessor = answerProcessor;
 	mDetails = ConnectionDetails(getProtocol(), getIOBufSize());
 	isConnectedFlag = false;
+	mMountPoint = "/";
 }
 
 Connection::~Connection() {
@@ -49,7 +51,7 @@ void Connection::sendVersionMessage() throw(StyxException) {
     if (mFID != StyxMessage::NOFID) {
         try {
             StyxTMessageFID tClunk(Tclunk, Rclunk, mFID);
-            mTransmitter->sendMessage(&tClunk, mRecepient);
+            mTransmitter.sendMessage(&tClunk, mRecepient);
         } catch (std::exception e) {
             throw e;
         }
@@ -57,12 +59,12 @@ void Connection::sendVersionMessage() throw(StyxException) {
     }
 
     StyxTVersionMessage tVersion(mDetails.getIOUnit(), getProtocol());
-	StyxMessage* rMessage = mTransmitter->sendMessageAndWaitAnswer(&tVersion, mRecepient, &mSyncObject);
+	StyxMessage* rMessage = mTransmitter.sendMessageAndWaitAnswer(&tVersion, mRecepient, &mSyncObject);
 	StyxRVersionMessage* rVersion = (StyxRVersionMessage*) rMessage;
     if (rVersion->getMaxPacketSize() < mDetails.getIOUnit()) {
         mDetails = ConnectionDetails(getProtocol(), rVersion->getMaxPacketSize());
     }
-    mRecepient->getPolls()->getFIDPoll()->clean();
+    mRecepient->getFIDPoll()->clean();
     if ((!mCredentials.getUserName().empty()) && (!mCredentials.getPassword().empty())) {
         sendAuthMessage();
     } else {
@@ -75,12 +77,12 @@ size_t Connection::getIOBufSize() {
 }
 
 void Connection::sendAuthMessage() throw(StyxException) {
-	mAuthFID = mRecepient->getPolls()->getFIDPoll()->getFreeItem();
+	mAuthFID = mRecepient->getFIDPoll()->getFreeItem();
 
 	StyxTAuthMessage tAuth(mAuthFID);
 	tAuth.setUserName(mCredentials.getUserName());
 	tAuth.setMountPoint(mMountPoint);
-	StyxMessage* rMessage = mTransmitter->sendMessageAndWaitAnswer(&tAuth, mRecepient, &mSyncObject);
+	StyxMessage* rMessage = mTransmitter.sendMessageAndWaitAnswer(&tAuth, mRecepient, &mSyncObject);
 	StyxRAuthMessage* rAuth = (StyxRAuthMessage*) rMessage;
 	mAuthQID = rAuth->getQID();
 
@@ -94,11 +96,11 @@ void Connection::sendAuthMessage() throw(StyxException) {
 }
 
 void Connection::sendAttachMessage() throw(StyxException) {
-	mFID = mRecepient->getPolls()->getFIDPoll()->getFreeItem();
+	mFID = mRecepient->getFIDPoll()->getFreeItem();
 	StyxTAttachMessage tAttach(getRootFID(), mAuthFID,
 			mCredentials.getUserName(),
 			mMountPoint);
-	StyxMessage* rMessage = mTransmitter->sendMessageAndWaitAnswer(&tAttach, mRecepient, &mSyncObject);
+	StyxMessage* rMessage = mTransmitter.sendMessageAndWaitAnswer(&tAttach, mRecepient, &mSyncObject);
 	StyxRAttachMessage* rAttach = (StyxRAttachMessage*) rMessage;
 	mQID = rAttach->getQID();
 	isAttached = true;
@@ -130,14 +132,9 @@ void Connection::close() throw(StyxException) {
 		delete mAnswerProcessor;
 		mAnswerProcessor = NULL;
 	}
-	if (mTransmitter != NULL) {
-		mTransmitter->close();
-#warning  showul we delete it?
-		mTransmitter = NULL;
-	}
-	if (isAutoStartDriver && mDriver != NULL) {
+	mTransmitter.close();
+	if (isAutoStartDriver) {
 		mDriver->close();
-#warning  showul we delete it?
 		mDriver = NULL;
 	}
 }
@@ -159,28 +156,18 @@ bool Connection::isConnected() {
 }
 
 IMessageTransmitter *Connection::getTransmitter() {
-	return mTransmitter;
+	return &mTransmitter;
 }
 
 StyxString Connection::getMountPoint() {
 	return mMountPoint;
 }
 
-#warning remove or simplify
 bool Connection::connect() throw(StyxException) {
-#warning move to builder
-	if (mDriver == NULL) {
-		throw StyxException("Channel driver can't be null");
-	}
 #warning move to builder
 	if (mAnswerProcessor == NULL) {
 		mAnswerProcessor = new RMessagesProcessor("RH" + mDriver->toString());
 		shouldCloseAnswerProcessor = true;
-	}
-#warning move to builder
-	if (mTransmitter == NULL) {
-		mTransmitter = new TMessageTransmitter(this);
-		shouldCloseTransmitter = true;
 	}
 	if (!mDriver->isStarted()) {
 		mDriver->setRMessageHandler(mAnswerProcessor);
@@ -194,44 +181,14 @@ bool Connection::connect() throw(StyxException) {
 		// get first client from driver
 		mRecepient = mDriver->getClients().front();
 	}
-
-	return connect(mDriver, mCredentials, mAnswerProcessor, mTransmitter, mRecepient);
-}
-
-#warning remove or simplify
-bool Connection::connect(IChannelDriver *driver, Credentials credentials,
-		RMessagesProcessor* answerProcessor, TMessageTransmitter* transmitter,
-		ClientDetails* recipient) throw(StyxException) {
-    if (recipient == NULL) {
+	if (mRecepient == NULL) {
         throw StyxException("Recipient can't be null");
     }
-    mRecepient = recipient;
 
-    if (transmitter == NULL) {
-        throw StyxException("Transmitter can't be null");
-    }
-    mTransmitter = transmitter;
-
-    if (driver == NULL) {
-        throw StyxException("Channel driver can't be null");
-    }
-    setDriver(driver);
-
-    if (answerProcessor == NULL) {
-        throw StyxException("answerProcessor can't be null");
-    }
-    mAnswerProcessor = answerProcessor;
 	printf("A10 %p\n", mDriver);
-    mDriver->setRMessageHandler(mAnswerProcessor);
-
-    mCredentials = credentials;
-    mMountPoint = "/";
     sendVersionMessage();
-    isConnectedFlag = mDriver->isConnected();
-
-    return isConnectedFlag;
+    return mDriver->isConnected();
 }
-
 
 void Connection::setAttached(bool isAttached) {
 	this->isAttached = isAttached;
@@ -248,21 +205,17 @@ void Connection::onTrashReceived(TMessageTransmitter *caller) {
     }
 }
 
-void Connection::onSocketDisconnected(TMessageTransmitter *caller) {
+void Connection::onChannelDisconnected(TMessageTransmitter *caller) {
 	isConnectedFlag = false;
 }
 
-void Connection::setDriver(IChannelDriver* driver) {
-	mDriver = driver;
-}
-
 Connection::Builder::Builder() : mCredentials("", ""), mDriver(NULL), mAnswerProcessor(NULL),
-	mTransmitter(NULL), mClientDetails(NULL) {
-
+	mTransmitter(), mClientDetails(NULL) 
+{
 }
 
-Connection::Builder::~Builder() {
-
+Connection::Builder::~Builder() 
+{
 }
 
 Connection* Connection::Builder::build() {

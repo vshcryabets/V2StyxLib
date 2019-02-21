@@ -22,7 +22,7 @@ public class TCPDualLinkServerManager extends TCPServerManager {
     protected RMessagesProcessor mReverseAnswerProcessor;
     protected TMessageTransmitter mReverseTransmitter;
 
-    public TCPDualLinkServerManager(String address, int port, IVirtualStyxFile root) throws IOException {
+    public TCPDualLinkServerManager(String address, int port, IVirtualStyxFile root) {
         super(address, port, root);
     }
 
@@ -34,7 +34,7 @@ public class TCPDualLinkServerManager extends TCPServerManager {
     public synchronized  IClient getReverseConnectionForClient(ClientDetails client, Credentials credentials) {
         if ( mReverseAnswerProcessor == null ) {
             mReverseAnswerProcessor = new RMessagesProcessor("RC"+client.toString());
-            mReverseTransmitter = new TMessageTransmitter(null);
+            mReverseTransmitter = new TMessageTransmitter();
         }
         IChannelDriver driver = client.getDriver();
         driver.setRMessageHandler(mReverseAnswerProcessor);

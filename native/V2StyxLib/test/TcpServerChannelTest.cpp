@@ -58,6 +58,7 @@ TEST(cpp_server_testSocketBusy, rw_test) {
 class TestServerChannel : public TCPServerChannelDriver {
 public:
 	size_t testdataSize;
+	size_t recvdataSize;
 	uint8_t* senddata;
 	uint8_t* recvdata;
 	size_t iounit;
@@ -65,7 +66,7 @@ public:
 
 	TestServerChannel(uint8_t* indata, uint8_t* outdata, size_t testDataLength) 
 		: TCPServerChannelDriver("0.0.0.0", 10240, "SRVT1"), testdataSize(testDataLength),
-			senddata(indata), recvdata(outdata) {
+			senddata(indata), recvdata(outdata), recvdataSize(0) {
 		iounit = 128;
 		senddata[0] = testDataLength;
 		messageReceived = false;
@@ -76,8 +77,7 @@ public:
 		if (length != testdataSize) {
 			throw StyxException("Something wrong with received data");
 		}
-		reader->read(recvdata, length);
-#warning compare received data and transmited		
+		recvdataSize = reader->read(recvdata, length);
 		messageReceived = true;
 		return new StyxTVersionMessage(iounit, "testAnswer");
 	}
@@ -98,8 +98,9 @@ public:
 TEST(cpp_server_testSocketReceive, rw_test) {
 	uint8_t senddata[] = {0, 0, 0, 0, 1, 2};
 	uint8_t recvdata[sizeof(senddata)];
+	size_t testDataSize = sizeof(senddata);
 
-	TestServerChannel driver(senddata, recvdata, sizeof(senddata));
+	TestServerChannel driver(senddata, recvdata, testDataSize);
 	try {
 		ASSERT_FALSE(driver.messageReceived) << "Wrong check state";
 		
@@ -123,13 +124,14 @@ TEST(cpp_server_testSocketReceive, rw_test) {
 		serverAddress.sin_port = htons(10240);
 		int connectResult = ::connect(sockfd, (struct sockaddr*)&serverAddress, sizeof(serverAddress));
 		ASSERT_EQ(0, connectResult) << "Can't connect";
-		ssize_t result = ::write(sockfd, senddata, sizeof(senddata));
-		ASSERT_EQ(sizeof(senddata), result) << "Can't write";
+		ssize_t result = ::write(sockfd, senddata, testDataSize);
+		ASSERT_EQ(testDataSize, result) << "Can't write";
 		::sleep(1);
 
 		ASSERT_TRUE(tProcessor->clientAdded) << "Not called TMessageHandler::addClient";
 		ASSERT_TRUE(driver.messageReceived) << "No message for TMessageHandler";
-		// assertArrayEquals(senddata, recvdata, "Wrong recv data");
+		ASSERT_EQ(testDataSize, driver.recvdataSize) << "Received wrong data size";
+		ASSERT_EQ(0, memcmp(recvdata, senddata, testDataSize)) << "Wrong recv data";
 	} catch (StyxException err) {
 		printf("StyxException %s %d\n", err.getMessage().c_str(), err.getInternalCode());
 		throw err;

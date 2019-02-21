@@ -15,17 +15,19 @@
 #include "messages/StyxTCreateMessage.h"
 #include "vfs/IVirtualStyxFile.h"
 #include "server/IChannelDriver.h"
-#include "utils/Polls.h"
 #include "exceptions/StyxErrorMessageException.h"
 #include "io/StyxDataWriter.h"
 #include "io/StyxDataReader.h"
+#include "utils/FIDPoll.h"
 
 class ClientDetails {
 protected:
 	std::map<StyxFID,IVirtualStyxFile*> mAssignedFiles;
 	IChannelDriver *mDriver;
 	uint32_t mClientId;
-	Polls* mPolls; // TODO probably we can move polls here, and remove Polls class
+	std::map<StyxTAG, StyxTMessage*> mMessagesMap;
+    MessageTagPoll mTags;
+    FIDPoll mFids;
 	Credentials mCredentials;
 	StyxBuffer mOutputBuffer;
 	StyxDataWriter mOutputWriter;
@@ -40,20 +42,17 @@ public:
 	StyxBuffer* getOutputBuffer();
 	StyxByteBufferReadable* getInputBuffer();
 	IStyxDataReader* getInputReader();
-    /**
-     * Get polls assigned to this client.
-     * @return polls assigned to this client.
-     */
-    Polls *getPolls();
-
     IVirtualStyxFile* getAssignedFile(StyxFID fid) throw(StyxErrorMessageException);
-
     void unregisterClosedFile(StyxFID fid);
 	void registerOpenedFile(StyxFID fid, IVirtualStyxFile *file);
-
 	IChannelDriver* getDriver();
 	uint32_t getId();
 	virtual StyxString toString();
+	FIDPoll* getFIDPoll();
+    StyxTMessage* findTMessageAndRelease(StyxTAG tag); 
+    void releaseFID(StyxTMessageFID* message);
+	MessageTagPoll* getTagPoll();
+    void putTMessage(StyxTAG tag, StyxTMessage* message);
 };
 
 #endif /* CLIENTSTATE_H_ */

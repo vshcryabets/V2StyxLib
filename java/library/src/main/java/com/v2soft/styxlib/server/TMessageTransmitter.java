@@ -16,15 +16,17 @@ import java.util.concurrent.TimeoutException;
 // TODO why do we need this class? We can directly use ChannelDriver.
 public class TMessageTransmitter implements IMessageTransmitter {
     public interface Listener {
-	    // TODO pass caller
-        void onSocketDisconnected(TMessageTransmitter caller); // TODO why socket?
+        void onChannelDisconnected(TMessageTransmitter caller);
         void onTrashReceived(TMessageTransmitter caller);
     }
 
     protected int mTransmittedCount, mErrorCount;
     protected Listener mListener;
 
-    public TMessageTransmitter(Listener listener) {
+    public TMessageTransmitter() {
+    }
+
+    public void setListener(Listener listener) {
         mListener = listener;
     }
 
@@ -65,7 +67,7 @@ public class TMessageTransmitter implements IMessageTransmitter {
             return true;
         } catch (SocketException e) {
             if ( mListener != null ) {
-                mListener.onSocketDisconnected(this);
+                mListener.onChannelDisconnected(this);
             }
         }
         return false;

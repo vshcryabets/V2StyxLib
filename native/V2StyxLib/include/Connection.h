@@ -30,7 +30,7 @@ private:
     size_t mTimeout;
     bool isConnectedFlag;
     bool isAttached;
-    TMessageTransmitter* mTransmitter;
+    TMessageTransmitter mTransmitter;
     StyxFID mAuthFID;
     StyxFID mFID;
     StyxQID mAuthQID;
@@ -48,13 +48,11 @@ protected:
     RMessagesProcessor* mAnswerProcessor;
     bool isAutoStartDriver;
     bool shouldCloseAnswerProcessor;
-    bool shouldCloseTransmitter;
 
     virtual size_t getIOBufSize();
     virtual ConnectionDetails getConnectionDetails();
     virtual void sendAuthMessage() throw(StyxException);
     virtual void sendAttachMessage() throw(StyxException);
-    virtual void setDriver(IChannelDriver* driver);
 public:
 
     class Builder {
@@ -62,7 +60,7 @@ public:
             Credentials mCredentials;
             IChannelDriver *mDriver;
             RMessagesProcessor *mAnswerProcessor;
-            TMessageTransmitter *mTransmitter;
+            TMessageTransmitter mTransmitter;
             ClientDetails *mClientDetails;
         public:
             Builder();
@@ -73,18 +71,14 @@ public:
             Builder* setTransmitter(TMessageTransmitter *transmitter);
             Connection* build();
     };
-#warning hide it?
+
     Connection(Credentials credentials, IChannelDriver *driver,
                       RMessagesProcessor *answerProcessor,
-                      TMessageTransmitter *transmitter,
+                      TMessageTransmitter transmitter,
                       ClientDetails *recepient);
     virtual ~Connection();
 
-#warning TODO remove or simplify
 	virtual bool connect() throw(StyxException);
-	virtual bool connect(IChannelDriver *driver, Credentials credentials,
-			RMessagesProcessor* answerProcessor, TMessageTransmitter* transmitter,
-			ClientDetails* clientDetails) throw(StyxException);
 	virtual bool isConnected();
 	virtual IMessageTransmitter *getTransmitter();
 	virtual size_t getTimeout();
@@ -98,7 +92,7 @@ public:
 	virtual StyxQID getQID();
 	virtual void setAttached(bool isAttached);
     virtual void sendVersionMessage() throw(StyxException);
-    virtual void onSocketDisconnected(TMessageTransmitter *caller) ;
+    virtual void onChannelDisconnected(TMessageTransmitter *caller) ;
     virtual void onTrashReceived(TMessageTransmitter *caller);
 };
 

@@ -17,17 +17,17 @@ RMessagesProcessor::~RMessagesProcessor() {
 void RMessagesProcessor::processPacket(StyxMessage *message, ClientDetails *client) throw(StyxException) {
 	mHandledPackets++;
 	StyxTAG tag = message->getTag();
-	StyxTMessage* tMessage = client->getPolls()->getTMessage(tag);
+	StyxTMessage* tMessage = client->findTMessageAndRelease(tag);
 	if (tMessage == NULL) {
 		// we didn't send T message with such tag, so ignore this R message
 		throw StyxException("RMP(%s) got unknown R message from server %s",
 				mTag.c_str(),
 				client->toString().c_str());
 	}
-	// TODO i'm not sure that this is proper place for that logic
+	#warning im not sure that this is proper place for that logic
 	if (tMessage->getType() == Tclunk ||
 			tMessage->getType() == Tremove) {
-		client->getPolls()->releaseFID((StyxTMessageFID*) tMessage);
+		client->releaseFID((StyxTMessageFID*) tMessage);
 	}
 	try {
 		tMessage->setAnswer(message);
@@ -37,6 +37,5 @@ void RMessagesProcessor::processPacket(StyxMessage *message, ClientDetails *clie
 	if (message->getType() == Rerror) {
 		mErrorPackets++;
 	}
-	client->getPolls()->releaseTag(tag);
 }
 

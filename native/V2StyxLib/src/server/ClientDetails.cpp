@@ -20,19 +20,13 @@ ClientDetails::ClientDetails(IChannelDriver* driver, uint32_t iounit, uint32_t i
 	if (mDriver == NULL) {
 		throw StyxException("Driver is null");
 	}
-	mPolls = new Polls();
 }
 
 ClientDetails::~ClientDetails() {
-	delete mPolls;
 }
 
 void ClientDetails::registerOpenedFile(StyxFID fid, IVirtualStyxFile* file) {
 	mAssignedFiles.insert(std::pair<StyxFID, IVirtualStyxFile*>(fid, file));
-}
-
-Polls *ClientDetails::getPolls() {
-	return mPolls;
 }
 
 StyxString ClientDetails::toString() {
@@ -82,4 +76,36 @@ StyxByteBufferReadable* ClientDetails::getInputBuffer() {
 
 IStyxDataReader* ClientDetails::getInputReader() {
 	return &mInputReader;
+}
+
+void ClientDetails::releaseFID(StyxTMessageFID* message) 
+{
+	mFids.release(message->getFID());
+}
+
+StyxTMessage* ClientDetails::findTMessageAndRelease(StyxTAG tag) 
+{
+	std::map<StyxTAG, StyxTMessage*>::iterator it = mMessagesMap.find(tag);
+	if (it == mMessagesMap.end()) {
+		return NULL;
+	}
+	StyxTMessage* result = it->second;
+	mMessagesMap.erase(tag);
+	mTags.release(tag);
+	return result;
+}
+
+MessageTagPoll* ClientDetails::getTagPoll() 
+{
+	return &mTags;
+}
+
+void ClientDetails::putTMessage(StyxTAG tag, StyxTMessage* message) 
+{
+	mMessagesMap[tag] = message;
+}
+
+FIDPoll* ClientDetails::getFIDPoll() 
+{
+	return &mFids;
 }

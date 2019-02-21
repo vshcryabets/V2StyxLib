@@ -22,7 +22,7 @@ void QueueMessagesProcessor::postPacket(StyxMessage *message, ClientDetails *tar
 	pair.mMessage = message;
 	pair.mTransmitter = target;
 #ifdef LOG_MESSAGES_QUEUE
-	printf("QueueMessagesProcessor %s post %s\n", mTag.c_str(), message->toString().c_str());
+	printf("QueueMessagesProcessor %s post %p %s\n", mTag.c_str(), message, message->toString().c_str());
 #endif
 	MutexBlock block(&mCondition);
 	mQueue.push(pair);
@@ -49,6 +49,9 @@ void* QueueMessagesProcessor::run() {
 			QueueMessageProcessorPair pair = mQueue.front();
 			mQueue.pop();
 			try {
+#ifdef LOG_MESSAGES_QUEUE
+	printf("QueueMessagesProcessor %s process %p\n", mTag.c_str(), pair.mMessage);
+#endif
 				processPacket(pair.mMessage, pair.mTransmitter);
 			} catch (StyxException e) {
 				e.printStackTrace();

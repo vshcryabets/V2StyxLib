@@ -16,8 +16,7 @@ class TMessageTransmitter : public IMessageTransmitter {
 public:
     class Listener {
     public:
-#warning why socket? channel can be based on other technology
-        virtual void onSocketDisconnected(TMessageTransmitter *caller) = 0;
+        virtual void onChannelDisconnected(TMessageTransmitter *caller) = 0;
         virtual void onTrashReceived(TMessageTransmitter *caller) = 0;
     };
 
@@ -27,11 +26,12 @@ protected:
     Listener *mListener;
 
 public:
-    TMessageTransmitter(Listener *listener);
+    TMessageTransmitter();
 	virtual ~TMessageTransmitter();
-
+    void setListener(Listener* listener);
 	virtual bool sendMessage(StyxMessage *message, ClientDetails *recepient) throw(StyxException);
-    virtual StyxMessage* sendMessageAndWaitAnswer(StyxMessage *message, ClientDetails *recepient, SyncObject* syncObject) throw(StyxException);
+    virtual StyxMessage* sendMessageAndWaitAnswer(StyxMessage *message, ClientDetails *recepient, 
+        SyncObject* syncObject) throw(StyxException);
 	virtual size_t getTransmittedCount();
 	virtual size_t getErrorsCount();
 	virtual void close() throw(StyxException);

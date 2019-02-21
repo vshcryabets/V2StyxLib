@@ -8,14 +8,18 @@
 #include "server/TMessageTransmitter.h"
 #include <sstream>
 
-TMessageTransmitter::TMessageTransmitter(Listener *listener)
+TMessageTransmitter::TMessageTransmitter()
     :mTransmittedCount(0), mErrorCount(0)
 {
-    mListener = listener;
 }
 
 TMessageTransmitter::~TMessageTransmitter() {
     mListener = NULL;
+}
+
+void TMessageTransmitter::setListener(TMessageTransmitter::Listener* listener) 
+{
+    mListener = listener;
 }
 
 bool TMessageTransmitter::sendMessage(StyxMessage *message, ClientDetails *recepient) throw(StyxException) {
@@ -32,17 +36,17 @@ bool TMessageTransmitter::sendMessage(StyxMessage *message, ClientDetails *recep
         // set message tag
         StyxTAG tag = StyxMessage::NOTAG;
         if (message->getType() != Tversion) {
-            tag = recepient->getPolls()->getTagPoll()->getFreeItem();
+            tag = recepient->getTagPoll()->getFreeItem();
         }
         message->setTag(tag);
-        recepient->getPolls()->putTMessage(tag, (StyxTMessage*) message);
+        recepient->putTMessage(tag, (StyxTMessage*) message);
 
         driver->sendMessage(message, recepient);
         mTransmittedCount++;
         return true;
     } catch (StyxException e) {
         if ( mListener != NULL ) {
-            mListener->onSocketDisconnected(this);
+            mListener->onChannelDisconnected(this);
         }
     }
     return false;

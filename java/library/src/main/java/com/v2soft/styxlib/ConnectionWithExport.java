@@ -51,15 +51,14 @@ public class ConnectionWithExport extends Connection {
         mExportedRoot = root;
     }
 
-    public boolean connect(IChannelDriver driver, Credentials credentials,
-                           RMessagesProcessor answerProcessor,
-                           TMessageTransmitter transmitter, ClientDetails recepient)
-            throws InterruptedException, StyxException, TimeoutException, IOException {
-        mExportProcessor = new TMessagesProcessor("clientTH", getConnectionDetails(), mExportedRoot);
-        driver.setTMessageHandler(mExportProcessor);
-        return super.connect(driver, credentials, answerProcessor, transmitter, recepient);
-    }
-
+//    public boolean connect(IChannelDriver driver, Credentials credentials,
+//                           RMessagesProcessor answerProcessor,
+//                           TMessageTransmitter transmitter, ClientDetails recepient)
+//            throws InterruptedException, StyxException, TimeoutException, IOException {
+//        mExportProcessor = new TMessagesProcessor("clientTH", getConnectionDetails(), mExportedRoot);
+//        driver.setTMessageHandler(mExportProcessor);
+//        return super.connect(driver, credentials, answerProcessor, transmitter, recepient);
+//    }
 
     @Override
     public void close() throws IOException {

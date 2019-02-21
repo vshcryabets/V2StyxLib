@@ -7,7 +7,6 @@
 #define INCLUDE_UTILS_SYNCOBJECT_H_
 #include <stdint.h>
 #include "exceptions/StyxException.h"
-#include <pthread.h>
 #include "messages/base/StyxMessage.h"
 #include "utils/Mutex.h"
 
