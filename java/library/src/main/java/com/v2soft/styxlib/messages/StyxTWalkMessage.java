@@ -34,14 +34,14 @@ extends StyxTMessageFID {
         super.load(input);
         mNewFID = input.readUInt32();
         int count = input.readUInt16();
-        mPathElements = new LinkedList<String>();
+        mPathElements = new LinkedList<>();
         for (int i=0; i<count; i++) {
             mPathElements.add(input.readUTFString());
         }
     }
     @Override
     public void writeToBuffer(IStyxDataWriter output)
-            throws UnsupportedEncodingException, IOException {
+            throws IOException {
         super.writeToBuffer(output);
         output.writeUInt32(mNewFID);
         if (mPathElements != null) {
@@ -57,11 +57,15 @@ extends StyxTMessageFID {
     {
         return mNewFID;
     }
+
+    /**
+     * Get request path in "/" separated form.
+     * @return request path.
+     */
     public String getPath()	{
         StringBuilder builder = new StringBuilder();
         for (String string : mPathElements) {
-            builder.append('/');
-            builder.append(string);
+            builder.append('/').append(string);
         }
         return builder.toString();
     }

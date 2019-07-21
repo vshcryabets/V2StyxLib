@@ -8,7 +8,7 @@
 #ifndef STYXRWRITEMESSAGE_H_
 #define STYXRWRITEMESSAGE_H_
 
-#include "StyxMessage.h"
+#include "messages/base/StyxMessage.h"
 
 class StyxRWriteMessage: public StyxMessage {
 private:
@@ -20,7 +20,7 @@ public:
 	// Virtual methods
 	// =======================================================
 	virtual void load(IStyxDataReader *input);
-	virtual size_t writeToBuffer(IStyxDataWriter* output);
+	virtual void writeToBuffer(IStyxDataWriter* output);
 	virtual size_t getBinarySize();
 };
 

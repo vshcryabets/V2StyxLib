@@ -8,20 +8,20 @@
 #ifndef STYXRSTATMESSAGE_H_
 #define STYXRSTATMESSAGE_H_
 
-#include "StyxMessage.h"
-#include "../structs/StyxStat.h"
+#include "messages/base/StyxMessage.h"
+#include "messages/base//structs/StyxStat.h"
 
 class StyxRStatMessage: public StyxMessage {
 private:
 	StyxStat *mStat;
 public:
-	StyxRStatMessage(StyxTAG tag, StyxStat *stat);
+	StyxRStatMessage(StyxTAG tag, StyxStat *stat = NULL);
 	virtual ~StyxRStatMessage();
 	// =======================================================
 	// Virtual methods
 	// =======================================================
 	virtual void load(IStyxDataReader *buffer);
-	virtual size_t writeToBuffer(IStyxDataWriter* output);
+	virtual void writeToBuffer(IStyxDataWriter* output);
 	virtual size_t getBinarySize();
 };
 

@@ -216,10 +216,11 @@ public class StyxMessage {
 
     protected void load(IStyxDataReader buffer) throws IOException {
     }
+
     public void writeToBuffer(IStyxDataWriter output)
             throws IOException {
-        output.clear();
         int packetSize = getBinarySize();
+        output.clear();
         output.limit(packetSize);
         output.writeUInt32(packetSize);
         output.writeUInt8((short) getType().getByte());

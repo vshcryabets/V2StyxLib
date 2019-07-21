@@ -157,17 +157,17 @@ public class MemoryStyxFile implements IVirtualStyxFile {
     }
 
     @Override
-    public StyxQID create(String name, long permissions, int mode)
+    public StyxQID createFile(String name, long permissions, int mode)
             throws StyxErrorMessageException {
-        StyxErrorMessageException.doException(
+        throw StyxErrorMessageException.newInstance(
                 "Can't create file, this is read-only file system.");
-        return null;
     }
 
     @Override
-    public boolean delete(ClientDetails clientDetails) {
+    public void deleteFile(ClientDetails clientDetails)
+            throws StyxErrorMessageException{
         close(clientDetails);
-        return false;
+        throw StyxErrorMessageException.newInstance("Can't delete file, this is read-only file system.");
     }
 
     @Override

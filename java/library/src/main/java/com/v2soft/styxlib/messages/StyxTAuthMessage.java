@@ -17,12 +17,18 @@ public class StyxTAuthMessage extends StyxTMessageFID {
 		super(MessageType.Tauth, MessageType.Rauth, fid);
 	}
 
+	public StyxTAuthMessage(long fid, String userName, String mountPoint) {
+		this(fid);
+		mUserName = userName;
+		mMountPoint = mountPoint;
+	}
+
     @Override
     public void load(IStyxDataReader input)
         throws IOException  {
         super.load(input);
-        setUserName(input.readUTFString());
-        setMountPoint(input.readUTFString());
+        mUserName = input.readUTFString();
+        mMountPoint = input.readUTFString();
     }
 
 	public String getUserName() {
@@ -31,19 +37,10 @@ public class StyxTAuthMessage extends StyxTMessageFID {
 		return mUserName;
 	}
 
-	public void setUserName(String userName) {
-		mUserName = userName;
-	}
-
 	public String getMountPoint() {
 		if (mMountPoint == null)
 			return "";
 		return mMountPoint;
-	}
-
-	public void setMountPoint(String mount_point)
-	{
-		mMountPoint = mount_point;
 	}
 
 	@Override

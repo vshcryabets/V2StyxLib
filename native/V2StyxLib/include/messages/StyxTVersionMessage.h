@@ -8,10 +8,10 @@
 #ifndef STYXTVERSIONMESSAGE_H_
 #define STYXTVERSIONMESSAGE_H_
 #include <string>
-#include "../types.h"
-#include "StyxMessage.h"
+#include "types.h"
+#include "messages/base/StyxTMessage.h"
 
-class StyxTVersionMessage : public StyxMessage {
+class StyxTVersionMessage : public StyxTMessage {
 private:
 	uint32_t mMaxPacketSize;
 	std::string mProtocolVersion;
@@ -19,6 +19,9 @@ public:
 	StyxTVersionMessage(uint32_t maxPacketSize, std::string protocolVersion);
 	~StyxTVersionMessage();
 	virtual void load(IStyxDataReader*);
+	virtual void writeToBuffer(IStyxDataWriter* output);
+	virtual size_t getBinarySize();
+	virtual StyxString toString();
 };
 
 #endif /* STYXTVERSIONMESSAGE_H_ */

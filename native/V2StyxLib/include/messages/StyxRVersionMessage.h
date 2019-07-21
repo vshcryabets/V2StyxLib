@@ -7,21 +7,22 @@
 
 #ifndef STYXRVERSIONMESSAGE_H_
 #define STYXRVERSIONMESSAGE_H_
-#include <string>
-#include "StyxMessage.h"
+#include "messages/base/StyxMessage.h"
+#include "types.h"
 
 class StyxRVersionMessage : public StyxMessage {
 private:
-	size_t mIOUnit;
-	std::string mProtocol;
+	uint32_t mIOUnit;
+	StyxString mProtocol;
 public:
-	StyxRVersionMessage(size_t iounit, std::string protocol);
+	StyxRVersionMessage(size_t iounit, StyxString protocol);
 	virtual ~StyxRVersionMessage();
+	size_t getMaxPacketSize();
 	// =======================================================
 	// Virtual methods
 	// =======================================================
 	virtual void load(IStyxDataReader *buffer);
-	virtual size_t writeToBuffer(IStyxDataWriter* output);
+	virtual void writeToBuffer(IStyxDataWriter* output);
 	virtual size_t getBinarySize();
 };
 

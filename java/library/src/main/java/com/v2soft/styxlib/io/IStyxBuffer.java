@@ -9,31 +9,44 @@ import java.nio.ByteBuffer;
  */
 public interface IStyxBuffer {
     /**
-     * Read byte array from buffer
-     * @param out
-     * @param offset
+     * Read byte array from buffer.
+     * @param out output buffer.
+     * @param offset offset in out data array.
      * @param length
+     * @return number of bytes read.
      */
-    public int read(byte[] out, int offset, int length);
+    int read(byte[] out, int offset, int length);
     /**
-     * Get byte array from buffer, this operation will not move read position pointer
+     * Get byte array from buffer, this operation will not move read position pointer.
      * @param out
-     * @param offset
+     * @param offset offset in out data array.
      * @param length
      */
-    public int get(byte[] out, int offset, int length);
+    int get(byte[] out, int offset, int length);
 
     /**
      * Move read position pointer in buffer.
      * @param bytes
      */
-    public void moveReadPointerBy(int bytes);
+    void moveReadPointerBy(int bytes);
 
-    int write(byte[] testBuffer, int offset, int length);
+    /**
+     * Write data to buffer. Usually this method used for testing purposes.
+     * @param in input data.
+     * @param offset offset in input data array
+     * @param length length of input data
+     * @return
+     */
+    int write(byte[] in, int offset, int length);
 
-    public ByteBuffer getBuffer();
+    /**
+     * Return buffer.
+     * @return
+     */
+    ByteBuffer getBuffer();
 
+    /**
+     * Reset position &amp; limit
+     */
     void clear();
-
-    void limit(int limit);
 }

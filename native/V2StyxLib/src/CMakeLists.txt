@@ -1,0 +1,44 @@
+CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
+
+set(LIBRARY_BASE "${CMAKE_CURRENT_SOURCE_DIR}")
+
+AUX_SOURCE_DIRECTORY( . LIB_SOURCES )
+AUX_SOURCE_DIRECTORY( handlers LIB_SOURCES )
+AUX_SOURCE_DIRECTORY( messages LIB_SOURCES )
+AUX_SOURCE_DIRECTORY( io LIB_SOURCES )
+AUX_SOURCE_DIRECTORY( server LIB_SOURCES )
+AUX_SOURCE_DIRECTORY( server/tcp LIB_SOURCES )
+AUX_SOURCE_DIRECTORY( vfs LIB_SOURCES )
+AUX_SOURCE_DIRECTORY( structs LIB_SOURCES )
+AUX_SOURCE_DIRECTORY( utils LIB_SOURCES )
+
+set(EXCEPTIONS_BASE "${LIBRARY_BASE}/exceptions/")
+list(APPEND LIB_SOURCES
+	${EXCEPTIONS_BASE}/StyxException.cpp
+    ${EXCEPTIONS_BASE}/StyxErrorMessageException.cpp
+    ${EXCEPTIONS_BASE}/StyxWrongMessageException.cpp
+    )
+
+set(MESSAGES_BASE "${LIBRARY_BASE}/messages/base/")
+list(APPEND LIB_SOURCES
+	${MESSAGES_BASE}/StyxMessage.cpp
+    ${MESSAGES_BASE}/StyxTMessage.cpp
+    ${MESSAGES_BASE}/StyxTMessageFID.cpp
+    ${MESSAGES_BASE}/StyxRSingleQIDMessage.cpp
+    )
+
+set(STRUCTS_BASE "${LIBRARY_BASE}/messages/base/structs/")
+list(APPEND LIB_SOURCES
+	${STRUCTS_BASE}/StyxQID.cpp
+    ${STRUCTS_BASE}/StyxStat.cpp
+    )
+
+set(LIB2_BASE "${LIBRARY_BASE}/library/")
+list(APPEND LIB_SOURCES
+	${LIB2_BASE}/StyxServerManager.cpp
+    )
+
+
+ADD_LIBRARY( V2StyxServerLibrary STATIC ${LIB_SOURCES} )
+
+target_link_libraries(V2StyxServerLibrary pthread)

@@ -40,7 +40,7 @@ public class StyxRReadMessage extends StyxMessage {
 
     @Override
     public void writeToBuffer(IStyxDataWriter output)
-            throws UnsupportedEncodingException, IOException {
+            throws IOException {
         super.writeToBuffer(output);
         output.writeUInt32(mDataLength);
         if ( mDataLength > 0 ) {

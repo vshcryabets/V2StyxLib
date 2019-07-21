@@ -2,9 +2,9 @@ package com.v2soft.styxlib.tests;
 
 import com.v2soft.styxlib.Connection;
 import com.v2soft.styxlib.StyxFile;
-import com.v2soft.styxlib.library.StyxServerManager;
 import com.v2soft.styxlib.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.exceptions.StyxException;
+import com.v2soft.styxlib.library.StyxServerManager;
 import com.v2soft.styxlib.server.ClientDetails;
 import com.v2soft.styxlib.server.tcp.TCPClientChannelDriver;
 import com.v2soft.styxlib.server.tcp.TCPServerManager;
@@ -13,13 +13,11 @@ import com.v2soft.styxlib.vfs.MemoryStyxFile;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.InetAddress;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
@@ -51,7 +49,7 @@ public class PacketIOTests {
         mServer.closeAndWait();
     }
 
-    private void startServer() throws IOException {
+    private void startServer() throws IOException, StyxException {
         MemoryStyxFile md5 = new MemoryStyxFile(FILE_NAME){
             protected HashMap<ClientDetails, MessageDigest> mClientsMap = new HashMap<ClientDetails, MessageDigest>();
             @Override
@@ -96,10 +94,7 @@ public class PacketIOTests {
         };
         MemoryStyxDirectory root = new MemoryStyxDirectory("root");
         root.addFile(md5);
-        mServer = new TCPServerManager(InetAddress.getByName("127.0.0.1"),
-                PORT,
-                false,
-                root);
+        mServer = new TCPServerManager("127.0.0.1", PORT, root);
         mServer.start();
     }
 
@@ -109,15 +104,14 @@ public class PacketIOTests {
         MessageDigest digest = MessageDigest.getInstance("MD5");
 
 
-        Connection mConnection = new Connection();
+        Connection connection = new Connection.Builder().setDriver(
+                new TCPClientChannelDriver("127.0.0.1", PORT, "PIOT1")).build();
         byte[] someData = new byte[1024];
         byte [] remoteHash = new byte[16];
 
-        assertTrue(mConnection.connect(
-                new TCPClientChannelDriver(
-                        InetAddress.getByName("localhost"), PORT, false)));
+        assertTrue(connection.connect());
 
-        final StyxFile newFile = new StyxFile(mConnection, FILE_NAME);
+        final StyxFile newFile = new StyxFile(connection, FILE_NAME);
         OutputStream output = newFile.openForWriteUnbuffered();
         InputStream input = newFile.openForReadUnbuffered();
 
@@ -137,7 +131,7 @@ public class PacketIOTests {
 
         output.close();
         input.close();
-        mConnection.close();
+        connection.close();
 
     }
 

@@ -1,8 +1,9 @@
 package com.v2soft.styxlib.library;
 
+import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.handlers.TMessagesProcessor;
 import com.v2soft.styxlib.server.IChannelDriver;
-import com.v2soft.styxlib.library.types.ConnectionDetails;
+import com.v2soft.styxlib.types.ConnectionDetails;
 import com.v2soft.styxlib.vfs.IVirtualStyxFile;
 
 import java.io.Closeable;
@@ -11,6 +12,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
+ * Class that manage drivers.
  * @author V.Shcriyabets (vshcryabets@gmail.com)
  */
 public class StyxServerManager
@@ -31,21 +33,20 @@ public class StyxServerManager
 
     public StyxServerManager(IVirtualStyxFile root) {
         mRoot = root;
+        // TODO inheritance not works in constructor
         ConnectionDetails details = new ConnectionDetails(getProtocol(), getIOUnit());
-        mBalancer = new TMessagesProcessor(details, root);
-        mDrivers = new LinkedList<IChannelDriver>();
-    }
-
-    public StyxServerManager(IVirtualStyxFile root, IChannelDriver [] drivers) {
-        this(root);
-        for (IChannelDriver driver : drivers) {
-            addDriver( driver );
-        }
+        mBalancer = new TMessagesProcessor("serverTH", details, root);
+        mDrivers = new LinkedList<>();
     }
 
     public StyxServerManager addDriver(IChannelDriver driver) {
         if (driver == null) {
-            throw new NullPointerException("Driver is null");
+            return this;
+        }
+        if (mDriverThreads != null) {
+            // we already called start
+            // TODO improve this logic, we should have ability to add drivers at any time.
+            throw new IllegalStateException("Can't add driver after start");
         }
         mDrivers.add(driver);
         driver.setTMessageHandler(mBalancer);
@@ -53,15 +54,21 @@ public class StyxServerManager
         return this;
     }
 
-    public Thread[] start() {
-        int count = mDrivers.size();
+    public Thread[] start() throws StyxException {
+        final int count = mDrivers.size();
+        final int ioUnit = getIOUnit();
         mDriverThreads = new Thread[count];
         for (int i = 0; i < count; i++) {
-            mDriverThreads[i] = mDrivers.get(i).start(getIOUnit());
+            mDriverThreads[i] = mDrivers.get(i).start(ioUnit);
         }
         return mDriverThreads;
     }
 
+    /**
+     * Get supported IO unit size.
+     *
+     * @return supported IO unit size.
+     */
     public int getIOUnit() {
         return DEFAULT_IOUNIT;
     }
@@ -76,11 +83,16 @@ public class StyxServerManager
 
     public void closeAndWait() throws IOException, InterruptedException {
         close();
-        for ( Thread thread : mDriverThreads ) {
+        for (Thread thread : mDriverThreads) {
             thread.join();
         }
     }
 
+    /**
+     * Get supported protocol name.
+     *
+     * @return supported protocol name.
+     */
     public String getProtocol() {
         return PROTOCOL;
     }

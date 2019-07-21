@@ -7,25 +7,25 @@
 
 #ifndef STYXRERRORMESSAGE_H_
 #define STYXRERRORMESSAGE_H_
-#include "StyxMessage.h"
+#include "messages/base/StyxMessage.h"
 #include <string>
 #include "StyxRErrorMessage.h"
-#include "../types.h"
+#include "types.h"
 
 class StyxRErrorMessage : public StyxMessage {
 private:
-	StyxString *mMessage;
+	StyxString mMessage;
 public:
-	StyxRErrorMessage(StyxTAG tag, std::string message);
+	StyxRErrorMessage(StyxTAG tag, StyxString message);
 	StyxRErrorMessage(StyxTAG tag, const char *message);
-//	StyxRErrorMessage(StyxTAG tag, const char *fmt, ...);
 	virtual ~StyxRErrorMessage();
 	// =======================================================
 	// Virtual methods
 	// =======================================================
 	virtual void load(IStyxDataReader *buffer);
-	virtual size_t writeToBuffer(IStyxDataWriter* output);
+	virtual void writeToBuffer(IStyxDataWriter* output);
 	virtual size_t getBinarySize();
+	virtual StyxString getError();
 };
 
 #endif /* STYXRERRORMESSAGE_H_ */

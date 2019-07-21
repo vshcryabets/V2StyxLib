@@ -3,9 +3,9 @@ package com.v2soft.styxlib.tests;
 import com.v2soft.styxlib.Connection;
 import com.v2soft.styxlib.IClient;
 import com.v2soft.styxlib.StyxFile;
-import com.v2soft.styxlib.library.StyxServerManager;
 import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.io.DualStreams;
+import com.v2soft.styxlib.library.StyxServerManager;
 import com.v2soft.styxlib.server.IChannelDriver;
 import com.v2soft.styxlib.server.tcp.TCPClientChannelDriver;
 import com.v2soft.styxlib.server.tcp.TCPServerManager;
@@ -14,11 +14,9 @@ import com.v2soft.styxlib.vfs.MemoryStyxFile;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Random;
@@ -35,6 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class ClientServerTest {
     private static final int PORT = 10234;
+    private static final String ADDRESS = "127.0.0.1";
     private StyxServerManager mServer;
 
     @BeforeEach
@@ -47,24 +46,19 @@ public class ClientServerTest {
         mServer.closeAndWait();
     }
 
-    private void startServer() throws IOException {
+    private void startServer() throws IOException, StyxException {
         MemoryStyxFile md5 = new MD5StyxFile();
         MemoryStyxDirectory root = new MemoryStyxDirectory("root");
         root.addFile(md5);
-        mServer = new TCPServerManager(InetAddress.getByName("127.0.0.1"),
-                PORT,
-                false,
-                root);
+        mServer = new TCPServerManager(ADDRESS, PORT, root);
         mServer.start();
     }
 
     // TVersion & TAttach
     @Test
     public void testMD5() throws IOException, StyxException, InterruptedException, TimeoutException, NoSuchAlgorithmException {
-        IClient connection = new Connection();
-        IChannelDriver driver = new TCPClientChannelDriver(
-                InetAddress.getByName("127.0.0.1"), PORT, false);
-        assertTrue(connection.connect(driver));
+        IClient connection = new Connection.Builder().setDriver(new TCPClientChannelDriver(ADDRESS, PORT, "CST1")).build();
+        assertTrue(connection.connect());
         checkMD5Hash(connection);
         connection.close();
     }

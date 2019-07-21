@@ -70,7 +70,7 @@ public class StyxTAttachMessage extends StyxTMessageFID {
 
     @Override
     public void writeToBuffer(IStyxDataWriter output)
-            throws UnsupportedEncodingException, IOException {
+            throws IOException {
         super.writeToBuffer(output);
         output.writeUInt32(getAuthFID());
         output.writeUTFString(getUserName());

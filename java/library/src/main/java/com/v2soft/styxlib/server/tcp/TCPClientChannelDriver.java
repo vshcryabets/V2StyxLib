@@ -1,20 +1,22 @@
 package com.v2soft.styxlib.server.tcp;
 
+import com.v2soft.styxlib.exceptions.StyxErrorMessageException;
+import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.io.StyxByteBufferReadable;
 import com.v2soft.styxlib.io.StyxDataReader;
 import com.v2soft.styxlib.messages.base.StyxMessage;
 import com.v2soft.styxlib.server.ClientDetails;
+import com.v2soft.styxlib.utils.SyncObject;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.nio.channels.ClosedByInterruptException;
 import java.nio.channels.SocketChannel;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.TimeoutException;
 
 /**
  * Created by V.Shcryabets on 5/22/14.
@@ -24,24 +26,36 @@ import java.util.Set;
 public class TCPClientChannelDriver extends TCPChannelDriver {
     public static final int PSEUDO_CLIENT_ID = 1;
     protected TCPClientDetails mServerClientDetails;
-    protected SocketChannel mChanel;
+    protected SocketChannel mSocket;
 
-    public TCPClientChannelDriver(InetAddress address, int port, boolean ssl) throws IOException {
-        super(address, port, ssl);
+    public TCPClientChannelDriver(String address, int port, String tag) throws IOException {
+        super(address, port, tag);
     }
 
     @Override
-    public Thread start(int iounit) {
-        mServerClientDetails = new TCPClientDetails(mChanel, this, iounit, PSEUDO_CLIENT_ID);
-        return super.start(iounit);
+    public void prepareSocket() throws StyxException {
+        InetSocketAddress socketAddress = new InetSocketAddress(mAddress, mPort);
+        try {
+            mSocket = SocketChannel.open(socketAddress);
+        } catch (IOException e) {
+            throw new StyxException(StyxException.DRIVER_CREATE_ERROR);
+        }
+        try {
+            mSocket.configureBlocking(true);
+            mSocket.socket().setSoTimeout(getTimeout());
+        } catch (IOException e) {
+            throw new StyxException(StyxException.DRIVER_CONFIGURE_ERROR);
+        }
+        mServerClientDetails = new TCPClientDetails(mSocket, this, mIOUnit, PSEUDO_CLIENT_ID);
     }
 
     @Override
-    protected void prepareSocket(InetSocketAddress socketAddress, boolean ssl) throws IOException {
-        mChanel = SocketChannel.open(socketAddress);
-        mChanel.configureBlocking(true);
-        Socket socket = mChanel.socket();
-        socket.setSoTimeout(getTimeout());
+    public void closeSocket() throws StyxException {
+        try {
+            mSocket.close();
+        } catch (IOException e) {
+            throw new StyxException(StyxException.DRIVER_CLOSE_ERROR);
+        }
     }
 
     @Override
@@ -66,9 +80,16 @@ public class TCPClientChannelDriver extends TCPChannelDriver {
     }
 
     @Override
+    public StyxMessage sendMessageAndWaitAnswer(StyxMessage answer, ClientDetails recepient, SyncObject syncObject)
+            throws IOException, InterruptedException, StyxErrorMessageException, TimeoutException {
+        return null;
+    }
+
+    @Override
     public void run() {
         try {
             isWorking = true;
+            // TODO we can use buffer and reader from mServerClientDetails
             final StyxByteBufferReadable buffer = new StyxByteBufferReadable(mIOUnit*2);
             final StyxDataReader reader = new StyxDataReader(buffer);
             while (isWorking) {
@@ -87,13 +108,9 @@ public class TCPClientChannelDriver extends TCPChannelDriver {
                                     mLogListener.onMessageReceived(this, mServerClientDetails, message);
                                 }
                                 if ( message.getType().isTMessage() ) {
-                                    if ( mTMessageHandler != null ) {
-                                        mTMessageHandler.postPacket(message, mServerClientDetails);
-                                    }
+                                    mTMessageHandler.postPacket(message, mServerClientDetails);
                                 } else {
-                                    if ( mRMessageHandler != null ) {
-                                        mRMessageHandler.postPacket(message, mServerClientDetails);
-                                    }
+                                    mRMessageHandler.postPacket(message, mServerClientDetails);
                                 }
                             } else {
                                 break;
@@ -122,12 +139,6 @@ public class TCPClientChannelDriver extends TCPChannelDriver {
     }
 
     @Override
-    public void close() {
-        super.close();
-        mAcceptorThread.interrupt();
-    }
-
-    @Override
     public Collection<ClientDetails> getClients() {
         Set<ClientDetails> result = new HashSet<ClientDetails>();
         result.add(mServerClientDetails);
@@ -136,7 +147,7 @@ public class TCPClientChannelDriver extends TCPChannelDriver {
 
     @Override
     public String toString() {
-        return String.format("%s:%s", getClass().getSimpleName(),
-                mChanel.socket().getLocalAddress().toString());
+        return String.format("%s_%s:%d", getClass().getSimpleName(),
+                mAddress, mPort);
     }
 }

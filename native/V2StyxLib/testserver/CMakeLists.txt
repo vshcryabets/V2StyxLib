@@ -1,10 +1,5 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
 AUX_SOURCE_DIRECTORY( . SOURCES )
-#ADD_LIBRARY(V2StyxServerLibrary STATIC IMPORTED)
-#set_property(TARGET V2StyxServerLibrary PROPERTY
-#                IMPORTED_LOCATION ../V2StyxServerLibrary.a)
-
-
 ADD_EXECUTABLE( V2StyxTestServer ${SOURCES} )
 TARGET_LINK_LIBRARIES(V2StyxTestServer V2StyxServerLibrary)

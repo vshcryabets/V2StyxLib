@@ -1,8 +1,4 @@
 Debug
-*.o
-CMakeCache.txt
-CMakeFiles
-Makefile
 *.cmake
 *.a
 *.dir
@@ -10,3 +6,5 @@ Makefile
 *.sln
 *.suo
 *.sdf
+.settings
+build/

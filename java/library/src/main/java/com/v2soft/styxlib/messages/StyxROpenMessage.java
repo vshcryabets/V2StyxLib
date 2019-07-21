@@ -38,7 +38,7 @@ public class StyxROpenMessage extends StyxRSingleQIDMessage {
 
     @Override
     public void writeToBuffer(IStyxDataWriter output)
-            throws UnsupportedEncodingException, IOException {
+            throws IOException {
         super.writeToBuffer(output);
         output.writeUInt32(mIOUnit);
     }

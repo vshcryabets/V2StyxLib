@@ -1,9 +1,9 @@
 package com.v2soft.styxlib.server;
 
 import com.v2soft.styxlib.ILogListener;
+import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.handlers.IMessageProcessor;
 
-import java.io.Closeable;
 import java.util.Collection;
 
 /**
@@ -11,8 +11,13 @@ import java.util.Collection;
  *
  * @author V.Shcryabets (vshcryabets@gmail.com)
  */
-public interface IChannelDriver extends Closeable, IMessageTransmitter {
-    Thread start(int iounit);
+public interface IChannelDriver extends IMessageTransmitter {
+    /**
+     * Start channel driver thread.
+     * @param iounit
+     * @return driver thread.
+     */
+    Thread start(int iounit) throws StyxException;
     void setTMessageHandler(IMessageProcessor handler);
     void setRMessageHandler(IMessageProcessor handler);
     void setLogListener(ILogListener listener);
@@ -23,7 +28,16 @@ public interface IChannelDriver extends Closeable, IMessageTransmitter {
      */
     Collection<ClientDetails> getClients();
 
+    /**
+     * Is connected to another peer?
+     * @return true if connected to another peer.
+     */
     boolean isConnected();
+
+    /**
+     * Is driver started?
+     * @return true if driver working.
+     */
     boolean isStarted();
 
     IMessageProcessor getTMessageHandler();

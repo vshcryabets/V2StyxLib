@@ -7,7 +7,6 @@ import com.v2soft.styxlib.messages.base.StyxTMessageFID;
 import com.v2soft.styxlib.messages.base.enums.MessageType;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 
 public class StyxTCreateMessage extends StyxTMessageFID {
     private String mName;
@@ -63,7 +62,7 @@ public class StyxTCreateMessage extends StyxTMessageFID {
 
     @Override
     public void writeToBuffer(IStyxDataWriter output)
-            throws UnsupportedEncodingException, IOException {
+            throws IOException {
         super.writeToBuffer(output);
         output.writeUTFString(getName());
         output.writeUInt32(getPermissions());

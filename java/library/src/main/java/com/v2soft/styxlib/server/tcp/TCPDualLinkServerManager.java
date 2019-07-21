@@ -3,14 +3,13 @@ package com.v2soft.styxlib.server.tcp;
 import com.v2soft.styxlib.Connection;
 import com.v2soft.styxlib.IClient;
 import com.v2soft.styxlib.handlers.RMessagesProcessor;
-import com.v2soft.styxlib.handlers.TMessageTransmitter;
 import com.v2soft.styxlib.server.ClientDetails;
 import com.v2soft.styxlib.server.IChannelDriver;
+import com.v2soft.styxlib.server.TMessageTransmitter;
+import com.v2soft.styxlib.types.Credentials;
 import com.v2soft.styxlib.vfs.IVirtualStyxFile;
-import com.v2soft.styxlib.library.types.Credentials;
 
 import java.io.IOException;
-import java.net.InetAddress;
 
 /**
  * Created by V.Shcryabets on 5/22/14.
@@ -23,8 +22,8 @@ public class TCPDualLinkServerManager extends TCPServerManager {
     protected RMessagesProcessor mReverseAnswerProcessor;
     protected TMessageTransmitter mReverseTransmitter;
 
-    public TCPDualLinkServerManager(InetAddress address, int port, boolean ssl, IVirtualStyxFile root) throws IOException {
-        super(address, port, ssl, root);
+    public TCPDualLinkServerManager(String address, int port, IVirtualStyxFile root) {
+        super(address, port, root);
     }
 
     @Override
@@ -35,9 +34,10 @@ public class TCPDualLinkServerManager extends TCPServerManager {
     public synchronized  IClient getReverseConnectionForClient(ClientDetails client, Credentials credentials) {
         if ( mReverseAnswerProcessor == null ) {
             mReverseAnswerProcessor = new RMessagesProcessor("RC"+client.toString());
-            mReverseTransmitter = new TMessageTransmitter(null);
+            mReverseTransmitter = new TMessageTransmitter();
         }
         IChannelDriver driver = client.getDriver();
+        driver.setRMessageHandler(mReverseAnswerProcessor);
         Connection connection = new Connection(credentials, driver,
                 mReverseAnswerProcessor, mReverseTransmitter, client);
         return connection;

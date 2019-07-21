@@ -40,7 +40,7 @@ public class StyxTOpenMessage extends StyxTMessageFID {
 
     @Override
     public void writeToBuffer(IStyxDataWriter output)
-            throws UnsupportedEncodingException, IOException {
+            throws IOException {
         super.writeToBuffer(output);
         output.writeUInt8((short) mMode);
     }

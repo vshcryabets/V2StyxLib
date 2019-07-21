@@ -17,7 +17,7 @@ public class StyxUnbufferedFileOutputStream extends StyxUnbufferedOutputStream {
 
     public StyxUnbufferedFileOutputStream(IClient connection, String filename)
             throws InterruptedException, StyxException, TimeoutException, IOException {
-        super(StyxMessage.NOFID, connection.getMessenger(), connection.getRecepient());
+        super(StyxMessage.NOFID, connection.getTransmitter(), connection.getRecepient());
         mFile = new StyxFile(connection, filename);
         mFID = mFile.getCloneFID();
         mConnection = connection;

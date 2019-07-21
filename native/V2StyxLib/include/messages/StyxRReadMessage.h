@@ -8,21 +8,21 @@
 #ifndef STYXRREADMESSAGE_H_
 #define STYXRREADMESSAGE_H_
 
-#include "StyxMessage.h"
+#include "messages/base/StyxMessage.h"
+#include "types.h"
 
 class StyxRReadMessage: public StyxMessage {
 private:
-	uint8_t *mData;
+	StyxBuffer mData;
 	size_t mDataLength;
-	bool mDelete;
 public:
-	StyxRReadMessage(StyxTAG tag, uint8_t *data, size_t length);
+	StyxRReadMessage(StyxTAG tag, StyxBuffer data, size_t length);
 	virtual ~StyxRReadMessage();
 	// =======================================================
 	// Virtual methods
 	// =======================================================
 	virtual void load(IStyxDataReader *input);
-	virtual size_t writeToBuffer(IStyxDataWriter* output);
+	virtual void writeToBuffer(IStyxDataWriter* output);
 	virtual size_t getBinarySize();
 };
 

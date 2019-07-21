@@ -9,20 +9,26 @@
 #define TYPES_H_
 #include <stdint.h>
 #include <string>
+#include <vector>
+
+// typedef unsigned char uint8_t;
+// typedef unsigned short uint16_t;
+// typedef unsigned int uint32_t;
+//typedef long int64_t;
+
+#include "config.h"
 
 #ifdef WIN32
-#include <winsock2.h>
-typedef SOCKET Socket;
-#define errno WSAGetLastError()
-
+	#include <winsock2.h>
+	typedef SOCKET Socket;
+	#define errno WSAGetLastError()
 #else
-
-#include "errno.h"
-typedef int Socket;
-// Constants
-const int INVALID_SOCKET = -1;
-
+	#include "errno.h"
+	typedef int Socket;
+	// Constants
+	const int INVALID_SOCKET = -1;
 #endif
+
 typedef int64_t Date;
 typedef int64_t int128_t;
 
@@ -56,20 +62,13 @@ enum MessageTypeEnum {
 	Rwstat = 127
 };
 
-enum QIDTypeEnum {
-	QTDIR = 0x80,
-	QTAPPEND = 0x40,
-	QTEXCL = 0x20,
-	QTMOUNT = 0x10,
-	QTAUTH = 0x08,
-	QTFILE = 0x00
-};
+bool isMessageTypeTMessage(int messageType);
 
 enum ModeTypeEnum {
-    OREAD = 0,
-    OWRITE = 1,
-    ORDWR = 2,
-    OEXEC = 3,
+    OREAD = 0x00,
+    OWRITE = 0x01,
+    ORDWR = 0x02,
+    OEXEC = 0x03,
     OTRUNC = 0x10
 };
 
@@ -84,11 +83,32 @@ enum FileModeEnum {
 };
 
 typedef uint8_t MessageType;
-typedef uint8_t QIDType;
 typedef uint32_t StyxFID;
 typedef uint16_t StyxTAG;
 typedef std::string StyxString;
+typedef std::vector<uint8_t> StyxBuffer;
 typedef ModeTypeEnum StyxMode;
 
+class Credentials {
+protected:
+    StyxString mUserName;
+    StyxString mPassword;
+public:
+    Credentials(StyxString username, StyxString password);
+	~Credentials();
+	StyxString getUserName();
+	StyxString getPassword();
+};
+
+class ConnectionDetails {
+protected:
+    StyxString mProtocol;
+    size_t mIOUnit;
+public:
+    ConnectionDetails();
+    ConnectionDetails(StyxString protocol, size_t iounit);
+    StyxString getProtocol();
+    size_t getIOUnit();
+};
 
 #endif /* TYPES_H_ */

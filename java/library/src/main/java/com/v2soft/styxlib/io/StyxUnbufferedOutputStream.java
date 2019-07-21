@@ -9,6 +9,7 @@ import com.v2soft.styxlib.messages.base.enums.MessageType;
 import com.v2soft.styxlib.server.ClientDetails;
 import com.v2soft.styxlib.server.IMessageTransmitter;
 import com.v2soft.styxlib.utils.MetricsAndStats;
+import com.v2soft.styxlib.utils.SyncObject;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -19,7 +20,7 @@ import java.io.OutputStream;
  *
  */
 public class StyxUnbufferedOutputStream extends OutputStream {
-    protected long mTimeout = Connection.DEFAULT_TIMEOUT;
+    private SyncObject mSyncObject = new SyncObject(Connection.DEFAULT_TIMEOUT);
     protected byte[] mSingleByteArray;
     protected long mFID;
     protected IMessageTransmitter mMessenger;
@@ -49,8 +50,7 @@ public class StyxUnbufferedOutputStream extends OutputStream {
         try {
             final StyxTWriteMessage tWrite =
                     new StyxTWriteMessage(mFID, mFileOffset, data, dataOffset, dataLength);
-            mMessenger.sendMessage(tWrite, mRecipient);
-            final StyxMessage rMessage = tWrite.waitForAnswer(mTimeout);
+            final StyxMessage rMessage = mMessenger.sendMessageAndWaitAnswer(tWrite, mRecipient, mSyncObject);
             final StyxRWriteMessage rWrite = (StyxRWriteMessage) rMessage;
             mFileOffset += rWrite.getCount();
         } catch (Exception e) {
@@ -63,11 +63,11 @@ public class StyxUnbufferedOutputStream extends OutputStream {
         write(mSingleByteArray);
     }
     public long getTimeout() {
-        return mTimeout;
+        return mSyncObject.getTimeout();
     }
 
-    public void setTimeout(long mTimeout) {
-        this.mTimeout = mTimeout;
+    public void setTimeout(long timeout) {
+        mSyncObject.setTimeout(timeout);
     }
 
     @Override
@@ -75,9 +75,8 @@ public class StyxUnbufferedOutputStream extends OutputStream {
         super.close();
         // send Tclunk
         final StyxTMessageFID tClunk = new StyxTMessageFID(MessageType.Tclunk, MessageType.Rclunk, mFID);
-        mMessenger.sendMessage(tClunk, mRecipient);
         try {
-            tClunk.waitForAnswer(mTimeout);
+            mMessenger.sendMessageAndWaitAnswer(tClunk, mRecipient, mSyncObject);
         } catch (Exception e) {
             throw new IOException(e);
         }

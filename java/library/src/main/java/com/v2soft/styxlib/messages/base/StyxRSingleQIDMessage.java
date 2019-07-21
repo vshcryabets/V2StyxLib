@@ -37,7 +37,7 @@ public class StyxRSingleQIDMessage extends StyxMessage {
 
     @Override
     public void writeToBuffer(IStyxDataWriter output)
-            throws UnsupportedEncodingException, IOException {
+            throws IOException {
         super.writeToBuffer(output);
         getQID().writeBinaryTo(output);
     }

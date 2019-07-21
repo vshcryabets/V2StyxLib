@@ -8,22 +8,21 @@
 #ifndef STYXTWSTATMESSAGE_H_
 #define STYXTWSTATMESSAGE_H_
 
-#include "StyxMessage.h"
-#include "../structs/StyxStat.h"
+#include "messages/base/StyxTMessageFID.h"
+#include "messages/base/structs/StyxStat.h"
 
-class StyxTWStatMessage: public StyxMessage {
+class StyxTWStatMessage: public StyxTMessageFID {
 private:
-	StyxFID mFID;
 	StyxStat *mStat;
 	bool mDelete;
 public:
-	StyxTWStatMessage(StyxFID fid, StyxStat *stat);
+	StyxTWStatMessage(StyxFID fid, StyxStat *stat, bool deleteStat);
 	~StyxTWStatMessage();
 	// =======================================================
 	// Virtual methods
 	// =======================================================
 	virtual void load(IStyxDataReader *input);
-	virtual size_t writeToBuffer(IStyxDataWriter* output);
+	virtual void writeToBuffer(IStyxDataWriter* output);
 	virtual size_t getBinarySize();
 };
 

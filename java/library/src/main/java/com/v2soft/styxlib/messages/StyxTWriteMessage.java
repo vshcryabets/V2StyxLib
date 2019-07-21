@@ -9,7 +9,6 @@ import com.v2soft.styxlib.messages.base.enums.MessageType;
 import com.v2soft.styxlib.utils.MetricsAndStats;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 
 public class StyxTWriteMessage extends StyxTMessageFID {
     private long mOffset;
@@ -40,7 +39,7 @@ public class StyxTWriteMessage extends StyxTMessageFID {
     }
     @Override
     public void writeToBuffer(IStyxDataWriter output)
-            throws UnsupportedEncodingException, IOException {
+            throws IOException {
         super.writeToBuffer(output);
         output.writeUInt64(mOffset);
         output.writeUInt32(mDataLength);

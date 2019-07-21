@@ -1,8 +1,11 @@
 package com.v2soft.styxlib;
 
+import com.v2soft.styxlib.handlers.RMessagesProcessor;
 import com.v2soft.styxlib.handlers.TMessagesProcessor;
 import com.v2soft.styxlib.exceptions.StyxException;
-import com.v2soft.styxlib.library.types.Credentials;
+import com.v2soft.styxlib.server.ClientDetails;
+import com.v2soft.styxlib.server.TMessageTransmitter;
+import com.v2soft.styxlib.types.Credentials;
 import com.v2soft.styxlib.server.IChannelDriver;
 import com.v2soft.styxlib.server.tcp.TCPDualLinkServerManager;
 import com.v2soft.styxlib.vfs.IVirtualStyxFile;
@@ -22,13 +25,22 @@ public class ConnectionWithExport extends Connection {
     protected IVirtualStyxFile mExportedRoot = null;
     protected TMessagesProcessor mExportProcessor;
 
+    public static class Builder extends Connection.Builder {
+        @Override
+        public ConnectionWithExport build() {
+            return new ConnectionWithExport(mCredentials, mDriver, mAnswerProcessor, mTransmitter, mClientDetails);
+        }
 
-    public ConnectionWithExport(Credentials credentials, IChannelDriver driver) {
-        super(credentials, driver);
+        @Override
+        public Builder setDriver(IChannelDriver driver) {
+            super.setDriver(driver);
+            return this;
+        }
     }
 
-    public ConnectionWithExport() {
-        super();
+    public ConnectionWithExport(Credentials credentials, IChannelDriver driver, RMessagesProcessor answerProcessor,
+                                TMessageTransmitter transmitter, ClientDetails recepient) {
+        super(credentials, driver, answerProcessor, transmitter, recepient);
     }
 
     @Override
@@ -39,14 +51,14 @@ public class ConnectionWithExport extends Connection {
         mExportedRoot = root;
     }
 
-    @Override
-    public boolean connect(IChannelDriver driver, Credentials credentials) throws IOException, StyxException,
-            InterruptedException, TimeoutException {
-        boolean result = super.connect(driver, credentials);
-        mExportProcessor = new TMessagesProcessor(getConnectionDetails(), mExportedRoot);
-        driver.setTMessageHandler(mExportProcessor);
-        return result;
-    }
+//    public boolean connect(IChannelDriver driver, Credentials credentials,
+//                           RMessagesProcessor answerProcessor,
+//                           TMessageTransmitter transmitter, ClientDetails recepient)
+//            throws InterruptedException, StyxException, TimeoutException, IOException {
+//        mExportProcessor = new TMessagesProcessor("clientTH", getConnectionDetails(), mExportedRoot);
+//        driver.setTMessageHandler(mExportProcessor);
+//        return super.connect(driver, credentials, answerProcessor, transmitter, recepient);
+//    }
 
     @Override
     public void close() throws IOException {

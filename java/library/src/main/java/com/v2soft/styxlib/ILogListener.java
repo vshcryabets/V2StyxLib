@@ -10,7 +10,7 @@ import com.v2soft.styxlib.server.IChannelDriver;
  * @author V.Shcryabets (vshcryabets@gmail.com)
  */
 public interface ILogListener {
-    public void onMessageReceived(IChannelDriver driver, ClientDetails clientDetails, StyxMessage message);
-    public void onMessageTransmited(IChannelDriver driver, ClientDetails clientDetails, StyxMessage message);
-    public void onException(IChannelDriver driver, Throwable err);
+    void onMessageReceived(IChannelDriver driver, ClientDetails clientDetails, StyxMessage message);
+    void onMessageTransmited(IChannelDriver driver, ClientDetails clientDetails, StyxMessage message);
+    void onException(IChannelDriver driver, Throwable err);
 }
