@@ -40,15 +40,14 @@ public class MD5StyxFile extends MemoryStyxFile {
         super.close(clientDetails);
     }
     @Override
-    public int write(ClientDetails clientDetails, byte[] data, long offset)
-            throws StyxErrorMessageException {
+    public int write(ClientDetails clientDetails, byte[] data, long inFileOffset) {
         if ( mClientsMap.containsKey(clientDetails) ) {
             mClientsMap.get(clientDetails).update(data, 0, data.length);
         }
-        return super.write(clientDetails, data, offset);
+        return data.length;
     }
     @Override
-    public long read(ClientDetails clientDetails, byte[] outbuffer, long offset, long count)
+    public long read(ClientDetails clientDetails, byte[] outbuffer, long inFileOffset, long count)
             throws StyxErrorMessageException {
         if ( mClientsMap.containsKey(clientDetails) ) {
             byte[] digest = mClientsMap.get(clientDetails).digest();
@@ -59,6 +58,6 @@ public class MD5StyxFile extends MemoryStyxFile {
                 return digest.length;
             }
         }
-        return super.read(clientDetails, outbuffer, offset, count);
+        return super.read(clientDetails, outbuffer, inFileOffset, count);
     }
 }

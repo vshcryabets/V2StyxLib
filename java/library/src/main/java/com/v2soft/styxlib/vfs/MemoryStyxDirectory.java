@@ -82,14 +82,14 @@ extends MemoryStyxFile {
     }
 
     @Override
-    public long read(ClientDetails clientDetails, byte[] outbuffer, long offset, long count) throws StyxErrorMessageException {
+    public long read(ClientDetails clientDetails, byte[] outbuffer, long inFileOffset, long count) throws StyxErrorMessageException {
         if ( !mBuffersMap.containsKey(clientDetails)) {
             StyxErrorMessageException.newInstance("This file isn't open");
         }
         final ByteBuffer buffer = mBuffersMap.get(clientDetails);
         int boffset = buffer.limit();
-        if ( offset > boffset ) return 0;
-        buffer.position((int) offset);
+        if ( inFileOffset > boffset ) return 0;
+        buffer.position((int) inFileOffset);
         int bleft = buffer.remaining();
         if ( count > bleft ) {
             count = bleft;
@@ -116,7 +116,7 @@ extends MemoryStyxFile {
     }
 
     @Override
-    public int write(ClientDetails clientDetails, byte[] data, long offset)
+    public int write(ClientDetails clientDetails, byte[] data, long inFileOffset)
             throws StyxErrorMessageException {
         throw StyxErrorMessageException.newInstance("Can't write to directory");
     }

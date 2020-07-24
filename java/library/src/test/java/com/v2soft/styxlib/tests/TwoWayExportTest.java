@@ -241,7 +241,7 @@ public class TwoWayExportTest {
 
         @Override
         public int write(ClientDetails clientDetails, final byte[] data,
-                         long offset) throws StyxErrorMessageException {
+                         long inFileOffset) throws StyxErrorMessageException {
             String message = new String(data, mCharset);
             System.out.println(String.format("%d SERVER GOT %s", System.currentTimeMillis(), message));
             mQueue.offer(message);
@@ -316,7 +316,7 @@ public class TwoWayExportTest {
 
         @Override
         public int write(ClientDetails clientDetails, byte[] data,
-                         long offset) throws StyxErrorMessageException {
+                         long inFileOffset) throws StyxErrorMessageException {
             String message = new String(data, mCharset);
             System.out.println(String.format("%s GOT %s", mPrefix, message));
             if (mMarker.equals(message)) {

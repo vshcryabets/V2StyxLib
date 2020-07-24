@@ -74,7 +74,7 @@ void Condition::waitNoLock(uint64_t timeout)
 	tm.tv_sec = mts.tv_sec;
 	tm.tv_nsec = mts.tv_nsec;
 #else
-	clock_gettime(CLOCK_REALTIME, &ts);
+	clock_gettime(CLOCK_REALTIME, &tm);
 #endif
 	tm.tv_sec += timeout / 1000;
 	tm.tv_nsec += (timeout - (timeout / 1000) * 1000) * 1000000;

@@ -1,0 +1,59 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+
+        {
+            "type": "cppdbg",
+            "request": "launch",
+            "name": "T1",
+            "program": "${workspaceFolder}/build/out/testserver/V2StyxTestServer",
+            "cwd": "${workspaceRoot}/build/out/testserver/",
+            "logging": { "trace": true, "traceResponse": true },
+            "linux" : {
+                "MIMode": "gdb",
+                "miDebuggerPath": "/usr/bin/gdb"
+             },
+             "osx": {
+                "MIMode": "lldb"
+             },
+             "windows": {
+                "MIMode": "gdb",
+                "miDebuggerPath": "C:\\MinGw\\bin\\gdb.exe"
+             }
+        },
+        {
+            "type": "cppdbg",
+            "request": "launch",
+            "name": "T2 V2StyxLib_test",
+            "program": "${workspaceFolder}/build/V2StyxLib_test",
+            "cwd": "${workspaceRoot}",
+            "logging": { "trace": true, "traceResponse": true },
+            "linux" : {
+                "MIMode": "gdb",
+                "miDebuggerPath": "/usr/bin/gdb"
+             },
+             "osx": {
+                "MIMode": "lldb"
+             },
+             "windows": {
+                "MIMode": "gdb",
+                "miDebuggerPath": "C:\\MinGw\\bin\\gdb.exe"
+             }
+        },
+        {
+            "name": "(lldb) V2StyxTestServer",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/out/testserver/V2StyxTestServer",
+            "args": [],
+            "stopAtEntry": true,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "lldb"
+        }
+    ]
+}

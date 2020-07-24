@@ -46,7 +46,7 @@ public class ClientServerTest {
         mServer.closeAndWait();
     }
 
-    private void startServer() throws IOException, StyxException {
+    private void startServer() throws StyxException {
         MemoryStyxFile md5 = new MD5StyxFile();
         MemoryStyxDirectory root = new MemoryStyxDirectory("root");
         root.addFile(md5);
@@ -56,14 +56,18 @@ public class ClientServerTest {
 
     // TVersion & TAttach
     @Test
-    public void testMD5() throws IOException, StyxException, InterruptedException, TimeoutException, NoSuchAlgorithmException {
-        IClient connection = new Connection.Builder().setDriver(new TCPClientChannelDriver(ADDRESS, PORT, "CST1")).build();
+    public void testMD5() throws IOException, StyxException, InterruptedException, TimeoutException,
+            NoSuchAlgorithmException {
+        IClient connection = new Connection.Builder()
+                .setDriver(new TCPClientChannelDriver(ADDRESS, PORT, "CST1"))
+                .build();
         assertTrue(connection.connect());
         checkMD5Hash(connection);
         connection.close();
     }
 
-    protected static void checkMD5Hash(IClient connection) throws NoSuchAlgorithmException, InterruptedException, StyxException, TimeoutException, IOException {
+    protected static void checkMD5Hash(IClient connection) throws NoSuchAlgorithmException,
+            InterruptedException, StyxException, TimeoutException, IOException {
         Random random = new Random();
         byte[] someData = new byte[1024];
         random.nextBytes(someData);

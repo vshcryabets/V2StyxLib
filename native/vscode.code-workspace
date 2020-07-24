@@ -1,0 +1,67 @@
+{
+	"folders": [
+		{
+			"path": "/Users/mrco/Documents/git/mcus/ESP8266/ModbusSDM630",
+			"name": "ModbusSDM630"
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"__bit_reference": "cpp",
+			"__split_buffer": "cpp",
+			"__tree": "cpp",
+			"bitset": "cpp",
+			"initializer_list": "cpp",
+			"iterator": "cpp",
+			"map": "cpp",
+			"set": "cpp",
+			"string": "cpp",
+			"string_view": "cpp",
+			"vector": "cpp",
+			"__config": "cpp",
+			"__nullptr": "cpp",
+			"cstddef": "cpp",
+			"exception": "cpp",
+			"new": "cpp",
+			"stdexcept": "cpp",
+			"type_traits": "cpp",
+			"typeinfo": "cpp",
+			"algorithm": "cpp",
+			"utility": "cpp",
+			"atomic": "cpp",
+			"ios": "cpp",
+			"system_error": "cpp",
+			"__hash_table": "cpp",
+			"deque": "cpp",
+			"forward_list": "cpp",
+			"list": "cpp",
+			"unordered_map": "cpp",
+			"unordered_set": "cpp",
+			"fstream": "cpp",
+			"locale": "cpp",
+			"__locale": "cpp",
+			"__functional_03": "cpp",
+			"functional": "cpp",
+			"chrono": "cpp",
+			"istream": "cpp",
+			"tuple": "cpp",
+			"sstream": "cpp",
+			"streambuf": "cpp",
+			"ostream": "cpp",
+			"memory": "cpp",
+			"queue": "cpp",
+			"__functional_base": "cpp",
+			"hashtable": "cpp",
+			"__functional_base_03": "cpp",
+			"__tuple": "cpp",
+			"limits": "cpp",
+			"ratio": "cpp",
+			"__mutex_base": "cpp",
+			"__string": "cpp"
+		},
+		"terminal.integrated.env.osx": {
+			"PATH": "/Users/mrco/.platformio/penv/bin:/Users/mrco/.platformio/penv:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin",
+			"PLATFORMIO_CALLER": "vscode"
+		}
+	}
+}

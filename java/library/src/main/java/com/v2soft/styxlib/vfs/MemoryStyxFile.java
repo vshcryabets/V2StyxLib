@@ -109,12 +109,12 @@ public class MemoryStyxFile implements IVirtualStyxFile {
     }
 
     public int write(ClientDetails clientDetails, byte[] data,
-                     long offset) throws StyxErrorMessageException {
+                     long inFileOffset) throws StyxErrorMessageException {
         return 0;
     }
 
     @Override
-    public long read(ClientDetails clientDetails, byte[] outbuffer, long offset,
+    public long read(ClientDetails clientDetails, byte[] outbuffer, long inFileOffset,
                      long count) throws StyxErrorMessageException {
         return 0;
     }

@@ -7,6 +7,7 @@
 #include "messages/StyxRVersionMessage.h"
 #include "messages/StyxTAttachMessage.h"
 #include "messages/StyxRAttachMessage.h"
+#include "stdio.h"
 
 const size_t Connection::DEFAULT_TIMEOUT = 10000;
 const size_t Connection::DEFAULT_IOUNIT = 8192;

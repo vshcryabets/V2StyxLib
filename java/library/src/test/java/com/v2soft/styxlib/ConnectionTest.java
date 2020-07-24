@@ -247,7 +247,7 @@ public class ConnectionTest {
         final long[] stat = new long[1];
         ((DiskStyxDirectory) mServer.getRoot()).addFile(new MemoryStyxFile(filename) {
             @Override
-            public int write(ClientDetails clientDetails, byte[] data, long offset)
+            public int write(ClientDetails clientDetails, byte[] data, long inFileOffset)
                     throws StyxErrorMessageException {
                 stat[0] += data.length;
                 return data.length;

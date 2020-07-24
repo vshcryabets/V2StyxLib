@@ -50,20 +50,20 @@ public:
 	virtual void close(ClientDetails *client) = 0;
 	/**
 	 * Read from file
-	 * @param offset offset from begining of the file
+	 * @param inFileOffset offset from begining of the file
 	 * @param count number of bytes to read
 	 * @return number of bytes that was read into the buffer
 	 */
-	virtual size_t read(ClientDetails *client, uint8_t* buffer, uint64_t offset, size_t count) = 0;
+	virtual size_t read(ClientDetails *client, uint8_t* buffer, uint64_t inFileOffset, size_t count) = 0;
 	virtual IVirtualStyxFile* walk(std::vector<StyxString> *pathElements, std::vector<StyxQID> *qids) = 0;
 	/**
 	 * Write data to file
 	 * @param client
 	 * @param data
-	 * @param offset
-	 * @return
+	 * @param inFileOffset offset from begining of the file
+	 * @return return the number of bytes written.
 	 */
-	virtual size_t write(ClientDetails *client, uint8_t* data, uint64_t offset, size_t count) = 0;
+	virtual size_t write(ClientDetails *client, uint8_t* data, uint64_t inFileOffset, size_t count) = 0;
 
  	/**
      * Will be fired when client connect to this server

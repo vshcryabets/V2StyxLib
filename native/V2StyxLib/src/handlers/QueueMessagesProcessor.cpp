@@ -5,6 +5,7 @@
  *      Author: vova
  */
 #include "handlers/QueueMessagesProcessor.h"
+#include "stdio.h"
 
 QueueMessagesProcessor::QueueMessagesProcessor(StyxString tag) : 
 	mCondition(), mThread(tag), mTag(tag), mErrorPackets(0), mHandledPackets(0) {

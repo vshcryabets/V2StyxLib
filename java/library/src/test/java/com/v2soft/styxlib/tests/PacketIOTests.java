@@ -69,16 +69,16 @@ public class PacketIOTests {
                 super.close(client);
             }
             @Override
-            public int write(ClientDetails client, byte[] data, long offset)
+            public int write(ClientDetails client, byte[] data, long inFileOffset)
                     throws StyxErrorMessageException {
                 if ( mClientsMap.containsKey(client) ) {
                     mClientsMap.get(client).reset();
                     mClientsMap.get(client).update(data);
                 }
-                return super.write(client, data, offset);
+                return super.write(client, data, inFileOffset);
             }
             @Override
-            public long read(ClientDetails client, byte[] outbuffer, long offset, long count)
+            public long read(ClientDetails client, byte[] outbuffer, long inFileOffset, long count)
                     throws StyxErrorMessageException {
                 if ( mClientsMap.containsKey(client) ) {
                     byte[] digest = mClientsMap.get(client).digest();
@@ -89,7 +89,7 @@ public class PacketIOTests {
                         return digest.length;
                     }
                 }
-                return super.read(client, outbuffer, offset, count);
+                return super.read(client, outbuffer, inFileOffset, count);
             }
         };
         MemoryStyxDirectory root = new MemoryStyxDirectory("root");

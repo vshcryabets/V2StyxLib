@@ -8,6 +8,7 @@
 #ifndef StyxByteBufferReadable_H_
 #define StyxByteBufferReadable_H_
 #include "types.h"
+#include <unistd.h>
 #include "io/IStyxBuffer.h"
 #include "exceptions/StyxException.h"
 

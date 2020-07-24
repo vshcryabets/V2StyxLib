@@ -94,12 +94,12 @@ public class DiskStyxFile extends MemoryStyxFile {
     }
 
     @Override
-    public int write(ClientDetails clientDetails, byte[] data, long offset)
+    public int write(ClientDetails clientDetails, byte[] data, long inFileOffset)
             throws StyxErrorMessageException {
         if ( mFilesMap.containsKey(clientDetails)) {
             final RandomAccessFile rf = mFilesMap.get(clientDetails);
             try {
-                rf.seek(offset);
+                rf.seek(inFileOffset);
                 rf.write(data);
             } catch (IOException e) {
                 throw StyxErrorMessageException.newInstance(e.toString());
@@ -111,12 +111,12 @@ public class DiskStyxFile extends MemoryStyxFile {
     }
 
     @Override
-    public long read(ClientDetails clientDetails, byte[] outbuffer, long offset, long count)
+    public long read(ClientDetails clientDetails, byte[] outbuffer, long inFileOffset, long count)
             throws StyxErrorMessageException {
         if ( mFilesMap.containsKey(clientDetails)) {
             final RandomAccessFile rf = mFilesMap.get(clientDetails);
             try {
-                rf.seek(offset);
+                rf.seek(inFileOffset);
                 return rf.read(outbuffer, 0, (int) count);
             } catch (IOException e) {
                 throw StyxErrorMessageException.newInstance(e.toString());
