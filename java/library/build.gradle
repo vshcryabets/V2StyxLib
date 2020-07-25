@@ -1,7 +1,7 @@
 apply plugin: 'java'
 apply plugin: 'maven'
 
-sourceCompatibility = 1.8
+sourceCompatibility = JavaVersion.VERSION_1_8
 version = '1.1.1'
 tasks.withType(JavaCompile) {
   options.encoding = "UTF-8"
@@ -14,9 +14,9 @@ jar {
 }
 
 dependencies {
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.2.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.2'
 
-    testRuntime 'org.junit.jupiter:junit-jupiter-engine:5.2.0'
+    testRuntime 'org.junit.jupiter:junit-jupiter-engine:5.6.2'
     //testRuntime 'org.junit.platform:junit-platform-launcher:1.2.0'
     //testRuntime 'org.junit.platform:junit-platform-runner:1.2.0'
 }
