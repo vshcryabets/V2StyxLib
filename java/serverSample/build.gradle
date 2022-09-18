@@ -15,5 +15,5 @@ repositories {
 
 
 dependencies {
-    compile project(":library")
+    project(":library")
 }
