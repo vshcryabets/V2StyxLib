@@ -1,5 +1,6 @@
 package com.v2soft.styxlib.io;
 
+import com.v2soft.styxlib.l5.io.IStyxDataReader;
 import com.v2soft.styxlib.utils.MetricsAndStats;
 
 import java.io.FilterInputStream;

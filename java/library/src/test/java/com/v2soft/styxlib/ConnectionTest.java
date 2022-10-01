@@ -1,20 +1,20 @@
 package com.v2soft.styxlib;
 
-import com.v2soft.styxlib.Connection;
-import com.v2soft.styxlib.IClient;
-import com.v2soft.styxlib.StyxFile;
+import com.v2soft.styxlib.l5.Connection;
+import com.v2soft.styxlib.l5.IClient;
+import com.v2soft.styxlib.l6.StyxFile;
 import com.v2soft.styxlib.library.StyxServerManager;
 import com.v2soft.styxlib.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.exceptions.StyxException;
-import com.v2soft.styxlib.io.StyxFileBufferedInputStream;
-import com.v2soft.styxlib.messages.base.enums.FileMode;
+import com.v2soft.styxlib.l6.io.StyxFileBufferedInputStream;
+import com.v2soft.styxlib.l5.enums.FileMode;
 import com.v2soft.styxlib.server.ClientDetails;
 import com.v2soft.styxlib.server.IChannelDriver;
 import com.v2soft.styxlib.server.tcp.TCPClientChannelDriver;
 import com.v2soft.styxlib.server.tcp.TCPServerManager;
 import com.v2soft.styxlib.utils.MetricsAndStats;
-import com.v2soft.styxlib.vfs.DiskStyxDirectory;
-import com.v2soft.styxlib.vfs.MemoryStyxFile;
+import com.v2soft.styxlib.l6.vfs.DiskStyxDirectory;
+import com.v2soft.styxlib.l6.vfs.MemoryStyxFile;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -28,7 +28,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetAddress;
-import java.util.Collections;
 import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.TimeoutException;

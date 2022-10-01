@@ -1,9 +1,9 @@
 package com.v2soft.styxlib.server.tcp;
 
-import com.v2soft.styxlib.io.IStyxDataReader;
-import com.v2soft.styxlib.io.StyxByteBufferReadable;
-import com.v2soft.styxlib.io.StyxDataReader;
-import com.v2soft.styxlib.io.StyxDataWriter;
+import com.v2soft.styxlib.l5.io.IStyxDataReader;
+import com.v2soft.styxlib.l5.io.StyxByteBufferReadable;
+import com.v2soft.styxlib.l5.io.StyxDataReader;
+import com.v2soft.styxlib.l5.io.StyxDataWriter;
 import com.v2soft.styxlib.server.ClientDetails;
 import com.v2soft.styxlib.server.IChannelDriver;
 import com.v2soft.styxlib.utils.MetricsAndStats;

@@ -7,9 +7,7 @@ public class StyxException extends Exception {
     public StyxException() {
         super();
     }
-
     public StyxException(String message) {
         super(message);
     }
-
 }

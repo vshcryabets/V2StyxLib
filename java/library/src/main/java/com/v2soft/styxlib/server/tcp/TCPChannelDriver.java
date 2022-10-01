@@ -1,10 +1,10 @@
 package com.v2soft.styxlib.server.tcp;
 
 import com.v2soft.styxlib.ILogListener;
+import com.v2soft.styxlib.l5.serializtion.MessagesFactory;
 import com.v2soft.styxlib.library.StyxServerManager;
 import com.v2soft.styxlib.handlers.IMessageProcessor;
-import com.v2soft.styxlib.io.StyxDataWriter;
-import com.v2soft.styxlib.messages.base.StyxMessage;
+import com.v2soft.styxlib.l5.messages.base.StyxMessage;
 import com.v2soft.styxlib.server.ClientDetails;
 import com.v2soft.styxlib.server.IChannelDriver;
 
@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
-import java.nio.channels.SocketChannel;
 
 /**
  * Created by V.Shcryabets on 5/20/14.
@@ -31,6 +30,7 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
     protected ILogListener mLogListener;
     protected InetAddress mAddress;
     protected int mPort;
+    protected MessagesFactory messagesFactory;
 
     public TCPChannelDriver(InetAddress address, int port, boolean ssl) throws IOException {
         mPort = port;
@@ -42,6 +42,7 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
         prepareSocket(socketAddress, ssl);
         mTransmittedPacketsCount = 0;
         mTransmissionErrorsCount = 0;
+        messagesFactory = new MessagesFactory();
     }
 
     protected abstract void prepareSocket(InetSocketAddress socketAddress, boolean ssl) throws IOException;
@@ -140,7 +141,7 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
         if ( inBuffer > 4 ) {
             long packetSize = client.getInputReader().getUInt32();
             if ( inBuffer >= packetSize ) {
-                final StyxMessage message = StyxMessage.factory(client.getInputReader(), mIOUnit);
+                final StyxMessage message = messagesFactory.factory(client.getInputReader(), mIOUnit);
                 if ( mLogListener != null ) {
                     mLogListener.onMessageReceived(this, client, message);
                 }

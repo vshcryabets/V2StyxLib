@@ -1,7 +1,7 @@
 package com.v2soft.styxlib.utils;
 
-import com.v2soft.styxlib.messages.base.StyxTMessage;
-import com.v2soft.styxlib.messages.base.StyxTMessageFID;
+import com.v2soft.styxlib.l5.messages.base.StyxTMessage;
+import com.v2soft.styxlib.l5.messages.base.StyxTMessageFID;
 
 import java.util.HashMap;
 import java.util.Map;

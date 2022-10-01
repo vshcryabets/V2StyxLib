@@ -1,8 +1,7 @@
 package com.v2soft.styxlib.exceptions;
 
-import com.v2soft.styxlib.messages.base.StyxMessage;
-import com.v2soft.styxlib.messages.base.enums.MessageType;
-
+import com.v2soft.styxlib.l5.messages.base.StyxMessage;
+import com.v2soft.styxlib.l5.enums.MessageType;
 
 public class StyxWrongMessageException extends StyxException {
 
