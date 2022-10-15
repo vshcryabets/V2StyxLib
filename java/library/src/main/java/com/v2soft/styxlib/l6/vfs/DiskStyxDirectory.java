@@ -1,7 +1,7 @@
 package com.v2soft.styxlib.l6.vfs;
 
 import com.v2soft.styxlib.exceptions.StyxErrorMessageException;
-import com.v2soft.styxlib.l5.io.StyxDataWriter;
+import com.v2soft.styxlib.l5.serialization.ByteBufferWritter;
 import com.v2soft.styxlib.l5.enums.FileMode;
 import com.v2soft.styxlib.l5.enums.ModeType;
 import com.v2soft.styxlib.l5.enums.QIDType;
@@ -106,7 +106,7 @@ extends DiskStyxFile {
             final ByteBuffer buffer = ByteBuffer.allocate(size);
             MetricsAndStats.byteBufferAllocation++;
             for (StyxStat state : stats) {
-                state.writeBinaryTo(new StyxDataWriter(buffer));
+                state.writeBinaryTo(new ByteBufferWritter(buffer));
             }
             mBuffersMap.put(clientDetails, buffer);
             return true;

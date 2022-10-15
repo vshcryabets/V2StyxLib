@@ -1,4 +1,4 @@
-package com.v2soft.styxlib.l5.serializtion;
+package com.v2soft.styxlib.l5.serialization;
 
 import java.io.UnsupportedEncodingException;
 

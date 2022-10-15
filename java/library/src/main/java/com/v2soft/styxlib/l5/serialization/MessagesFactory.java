@@ -1,8 +1,7 @@
-package com.v2soft.styxlib.l5.serializtion;
+package com.v2soft.styxlib.l5.serialization;
 
 import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.l5.enums.ModeType;
-import com.v2soft.styxlib.l5.io.IStyxDataReader;
 import com.v2soft.styxlib.l5.messages.*;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
 import com.v2soft.styxlib.l5.messages.base.StyxTMessageFID;

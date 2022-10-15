@@ -1,7 +1,9 @@
 package com.v2soft.styxlib.server.tcp;
 
 import com.v2soft.styxlib.ILogListener;
-import com.v2soft.styxlib.l5.serializtion.MessagesFactory;
+import com.v2soft.styxlib.l5.serialization.MessageSerializer;
+import com.v2soft.styxlib.l5.serialization.MessageSerializerImpl;
+import com.v2soft.styxlib.l5.serialization.MessagesFactory;
 import com.v2soft.styxlib.library.StyxServerManager;
 import com.v2soft.styxlib.handlers.IMessageProcessor;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
@@ -31,6 +33,7 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
     protected InetAddress mAddress;
     protected int mPort;
     protected MessagesFactory messagesFactory;
+    protected MessageSerializer serializer;
 
     public TCPChannelDriver(InetAddress address, int port, boolean ssl) throws IOException {
         mPort = port;
@@ -43,6 +46,7 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
         mTransmittedPacketsCount = 0;
         mTransmissionErrorsCount = 0;
         messagesFactory = new MessagesFactory();
+        serializer = new MessageSerializerImpl();
     }
 
     protected abstract void prepareSocket(InetSocketAddress socketAddress, boolean ssl) throws IOException;
@@ -72,7 +76,8 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
         ByteBuffer buffer = client.getOutputBuffer();
         synchronized (client) {
             try {
-                message.writeToBuffer(client.getOutputWriter());
+                serializer.serialize(message, client.getOutputWriter());
+//                message.writeToBuffer(client.getOutputWriter());
                 buffer.flip();
                 client.getChannel().write(buffer);
                 mTransmittedPacketsCount++;

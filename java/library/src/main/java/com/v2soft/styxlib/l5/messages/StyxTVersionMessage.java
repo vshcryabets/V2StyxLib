@@ -1,11 +1,10 @@
 package com.v2soft.styxlib.l5.messages;
 
-import com.v2soft.styxlib.l5.io.IStyxDataReader;
-import com.v2soft.styxlib.l5.io.IStyxDataWriter;
-import com.v2soft.styxlib.l5.messages.base.StyxMessage;
+import com.v2soft.styxlib.l5.serialization.IStyxDataReader;
+import com.v2soft.styxlib.l5.serialization.BufferWritter;
 import com.v2soft.styxlib.l5.messages.base.StyxTMessage;
 import com.v2soft.styxlib.l5.enums.MessageType;
-import com.v2soft.styxlib.l5.serializtion.UTF;
+import com.v2soft.styxlib.l5.serialization.UTF;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -54,14 +53,6 @@ public class StyxTVersionMessage extends StyxTMessage {
 	public int getBinarySize() {
 		return super.getBinarySize() + 4
 			+ UTF.getUTFSize(getProtocolVersion());
-	}
-
-	@Override
-	public void writeToBuffer(IStyxDataWriter output)
-	        throws UnsupportedEncodingException, IOException {
-	    super.writeToBuffer(output);
-        output.writeUInt32(getMaxPacketSize());
-        output.writeUTFString(getProtocolVersion());
 	}
 
 	@Override

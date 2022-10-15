@@ -1,4 +1,4 @@
-package com.v2soft.styxlib.l5.io;
+package com.v2soft.styxlib.l5.serialization;
 
 import java.io.IOException;
 

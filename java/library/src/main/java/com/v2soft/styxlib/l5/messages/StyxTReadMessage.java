@@ -1,7 +1,7 @@
 package com.v2soft.styxlib.l5.messages;
 
-import com.v2soft.styxlib.l5.io.IStyxDataReader;
-import com.v2soft.styxlib.l5.io.IStyxDataWriter;
+import com.v2soft.styxlib.l5.serialization.IStyxDataReader;
+import com.v2soft.styxlib.l5.serialization.BufferWritter;
 import com.v2soft.styxlib.l5.messages.base.StyxTMessageFID;
 import com.v2soft.styxlib.l5.enums.MessageType;
 
@@ -49,14 +49,6 @@ public class StyxTReadMessage extends StyxTMessageFID {
 	@Override
 	public int getBinarySize() {
 		return super.getBinarySize() + 8 + 4;
-	}
-
-	@Override
-	public void writeToBuffer(IStyxDataWriter output)
-	        throws UnsupportedEncodingException, IOException {
-	    super.writeToBuffer(output);
-        output.writeUInt64(mOffset);
-        output.writeUInt32(mCount);
 	}
 
 	@Override

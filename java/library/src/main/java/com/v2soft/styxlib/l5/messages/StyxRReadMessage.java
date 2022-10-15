@@ -1,8 +1,8 @@
 package com.v2soft.styxlib.l5.messages;
 
 import com.v2soft.styxlib.Config;
-import com.v2soft.styxlib.l5.io.IStyxDataReader;
-import com.v2soft.styxlib.l5.io.IStyxDataWriter;
+import com.v2soft.styxlib.l5.serialization.IStyxDataReader;
+import com.v2soft.styxlib.l5.serialization.BufferWritter;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
 import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.utils.MetricsAndStats;
@@ -36,16 +36,6 @@ public class StyxRReadMessage extends StyxMessage {
     public int getBinarySize() {
         return super.getBinarySize() + 4
                 + mDataLength;
-    }
-
-    @Override
-    public void writeToBuffer(IStyxDataWriter output)
-            throws UnsupportedEncodingException, IOException {
-        super.writeToBuffer(output);
-        output.writeUInt32(mDataLength);
-        if ( mDataLength > 0 ) {
-            output.write(mData, 0, mDataLength);
-        }
     }
 
     @Override

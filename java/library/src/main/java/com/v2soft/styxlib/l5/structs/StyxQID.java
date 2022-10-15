@@ -1,7 +1,7 @@
 package com.v2soft.styxlib.l5.structs;
 
-import com.v2soft.styxlib.l5.io.IStyxDataReader;
-import com.v2soft.styxlib.l5.io.IStyxDataWriter;
+import com.v2soft.styxlib.l5.serialization.IStyxDataReader;
+import com.v2soft.styxlib.l5.serialization.BufferWritter;
 import com.v2soft.styxlib.l5.enums.QIDType;
 
 import java.io.IOException;
@@ -43,7 +43,7 @@ public class StyxQID {
 	public void setVersion(long version){mVersion = version;}
 	public void setPath(long path){mPath = path;}
 
-	public void writeBinaryTo(IStyxDataWriter output) throws IOException {
+	public void writeBinaryTo(BufferWritter output) throws IOException {
         output.writeUInt8((short) getType().getByte());
         output.writeUInt32(getVersion());
         output.writeUInt64(getPath());

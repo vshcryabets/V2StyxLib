@@ -1,8 +1,8 @@
 package com.v2soft.styxlib.l5.messages;
 
 import com.v2soft.styxlib.Config;
-import com.v2soft.styxlib.l5.io.IStyxDataReader;
-import com.v2soft.styxlib.l5.io.IStyxDataWriter;
+import com.v2soft.styxlib.l5.serialization.IStyxDataReader;
+import com.v2soft.styxlib.l5.serialization.BufferWritter;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
 import com.v2soft.styxlib.l5.messages.base.StyxTMessageFID;
 import com.v2soft.styxlib.l5.enums.MessageType;
@@ -37,14 +37,6 @@ public class StyxTWriteMessage extends StyxTMessageFID {
         mData = new byte[mDataLength];
         MetricsAndStats.byteArrayAllocationTWrite++;
         input.read(mData, 0, mDataLength);
-    }
-    @Override
-    public void writeToBuffer(IStyxDataWriter output)
-            throws UnsupportedEncodingException, IOException {
-        super.writeToBuffer(output);
-        output.writeUInt64(mOffset);
-        output.writeUInt32(mDataLength);
-        output.write(mData, mDataOffset, mDataLength);
     }
 
     @Override
@@ -81,4 +73,8 @@ public class StyxTWriteMessage extends StyxTMessageFID {
     // Setters
     // ===========================================================================
     public void setData(byte [] data) {mData = data;}
+
+    public int getDataOffset() {
+        return mDataOffset;
+    }
 }

@@ -1,5 +1,6 @@
-package com.v2soft.styxlib.l5.io;
+package com.v2soft.styxlib.l5.serialization;
 
+import com.v2soft.styxlib.l5.io.IStyxBuffer;
 import com.v2soft.styxlib.utils.MetricsAndStats;
 
 import java.io.UnsupportedEncodingException;
@@ -44,7 +45,7 @@ public class StyxDataReader implements IStyxDataReader {
         byte[] bytes = new byte[count];
         MetricsAndStats.byteArrayAllocationIo++;
         read(bytes, 0, count);
-        return new String(bytes, StyxDataWriter.sUTFCharset);
+        return new String(bytes, ByteBufferWritter.sUTFCharset);
     }
     @Override
     public short readUInt8() {return (short) (readInteger(1)&0XFF);}

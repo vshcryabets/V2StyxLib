@@ -1,7 +1,7 @@
 package com.v2soft.styxlib.server.tcp;
 
 import com.v2soft.styxlib.l5.io.StyxByteBufferReadable;
-import com.v2soft.styxlib.l5.io.StyxDataReader;
+import com.v2soft.styxlib.l5.serialization.StyxDataReader;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
 import com.v2soft.styxlib.server.ClientDetails;
 

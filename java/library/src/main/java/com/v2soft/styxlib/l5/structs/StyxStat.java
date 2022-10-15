@@ -1,9 +1,8 @@
 package com.v2soft.styxlib.l5.structs;
 
-import com.v2soft.styxlib.l5.io.IStyxDataReader;
-import com.v2soft.styxlib.l5.io.IStyxDataWriter;
-import com.v2soft.styxlib.l5.messages.base.StyxMessage;
-import com.v2soft.styxlib.l5.serializtion.UTF;
+import com.v2soft.styxlib.l5.serialization.IStyxDataReader;
+import com.v2soft.styxlib.l5.serialization.BufferWritter;
+import com.v2soft.styxlib.l5.serialization.UTF;
 
 import java.io.IOException;
 import java.util.Date;
@@ -200,7 +199,7 @@ public class StyxStat {
         mModificationUser = modificationUser;
     }
 
-    public void writeBinaryTo(IStyxDataWriter output) throws IOException {
+    public void writeBinaryTo(BufferWritter output) throws IOException {
         output.writeUInt16(getSize() - 2); // TODO -2??? what does it mean?
         output.writeUInt16(mType);
         output.writeUInt32(mDev);

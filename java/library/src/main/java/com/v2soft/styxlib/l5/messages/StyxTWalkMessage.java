@@ -1,10 +1,9 @@
 package com.v2soft.styxlib.l5.messages;
 
-import com.v2soft.styxlib.l5.serializtion.UTF;
+import com.v2soft.styxlib.l5.serialization.UTF;
 import com.v2soft.styxlib.l6.StyxFile;
-import com.v2soft.styxlib.l5.io.IStyxDataReader;
-import com.v2soft.styxlib.l5.io.IStyxDataWriter;
-import com.v2soft.styxlib.l5.messages.base.StyxMessage;
+import com.v2soft.styxlib.l5.serialization.IStyxDataReader;
+import com.v2soft.styxlib.l5.serialization.BufferWritter;
 import com.v2soft.styxlib.l5.messages.base.StyxTMessageFID;
 import com.v2soft.styxlib.l5.enums.MessageType;
 
@@ -38,19 +37,6 @@ extends StyxTMessageFID {
         mPathElements = new LinkedList<String>();
         for (int i=0; i<count; i++) {
             mPathElements.add(input.readUTFString());
-        }
-    }
-    @Override
-    public void writeToBuffer(IStyxDataWriter output)
-            throws UnsupportedEncodingException, IOException {
-        super.writeToBuffer(output);
-        output.writeUInt32(mNewFID);
-        if (mPathElements != null) {
-            output.writeUInt16(mPathElements.size());
-            for (String pathElement : mPathElements)
-                output.writeUTFString(pathElement);
-        } else {
-            output.writeUInt16(0);
         }
     }
 

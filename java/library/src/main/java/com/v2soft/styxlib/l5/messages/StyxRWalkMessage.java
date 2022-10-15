@@ -1,7 +1,7 @@
 package com.v2soft.styxlib.l5.messages;
 
-import com.v2soft.styxlib.l5.io.IStyxDataReader;
-import com.v2soft.styxlib.l5.io.IStyxDataWriter;
+import com.v2soft.styxlib.l5.serialization.IStyxDataReader;
+import com.v2soft.styxlib.l5.serialization.BufferWritter;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
 import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.l5.structs.StyxQID;
@@ -73,18 +73,6 @@ public class StyxRWalkMessage extends StyxMessage {
 			+ getQIDListLength() * StyxQID.CONTENT_SIZE;
 
 		return size;
-	}
-
-	@Override
-	public void writeToBuffer(IStyxDataWriter output)
-	        throws UnsupportedEncodingException, IOException {
-	    super.writeToBuffer(output);
-		output.writeUInt16(getQIDListLength());
-		if (mQIDList != null)
-		{
-			for (StyxQID qid : mQIDList)
-				qid.writeBinaryTo(output);
-		}
 	}
 
 	@Override

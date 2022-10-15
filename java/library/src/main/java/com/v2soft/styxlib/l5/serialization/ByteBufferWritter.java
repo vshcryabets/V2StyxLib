@@ -1,6 +1,5 @@
-package com.v2soft.styxlib.l5.io;
+package com.v2soft.styxlib.l5.serialization;
 
-import com.v2soft.styxlib.l5.io.IStyxDataWriter;
 import com.v2soft.styxlib.utils.MetricsAndStats;
 
 import java.io.UnsupportedEncodingException;
@@ -8,20 +7,16 @@ import java.nio.BufferOverflowException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 
-public class StyxDataWriter implements IStyxDataWriter {
+public class ByteBufferWritter implements BufferWritter {
     private static final int sDataBufferSize = 16;
     protected static final Charset sUTFCharset = Charset.forName("utf-8");
     private byte[] mInternalBuffer;
     protected ByteBuffer mBuffer;
 
-    public StyxDataWriter(ByteBuffer buffer) {
+    public ByteBufferWritter(ByteBuffer buffer) {
         mInternalBuffer = new byte[sDataBufferSize];
         MetricsAndStats.byteArrayAllocationIo++;
         mBuffer = buffer;
-    }
-
-    public void write(byte[] data) {
-        write(data, 0, data.length);
     }
 
     @Override
@@ -63,7 +58,7 @@ public class StyxDataWriter implements IStyxDataWriter {
     public void writeUTFString(String string) throws UnsupportedEncodingException {
         byte[] data = string.getBytes(sUTFCharset);
         writeUInt16(data.length);
-        write(data);
+        write(data, 0, data.length);
     }
 
     @Override
@@ -81,17 +76,8 @@ public class StyxDataWriter implements IStyxDataWriter {
     }
 
     @Override
-    public void clear() {
+    public void prepareFor(int dataSize) {
         mBuffer.clear();
-    }
-
-    @Override
-    public void limit(int limit) {
-        mBuffer.limit(limit);
-    }
-
-    @Override
-    public ByteBuffer getBuffer() {
-        return mBuffer;
+        mBuffer.limit(dataSize);
     }
 }
