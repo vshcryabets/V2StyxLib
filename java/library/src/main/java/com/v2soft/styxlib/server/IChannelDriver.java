@@ -1,6 +1,5 @@
 package com.v2soft.styxlib.server;
 
-import com.v2soft.styxlib.ILogListener;
 import com.v2soft.styxlib.handlers.IMessageProcessor;
 
 import java.io.Closeable;
@@ -15,7 +14,6 @@ public interface IChannelDriver extends Closeable, IMessageTransmitter {
     Thread start(int iounit);
     void setTMessageHandler(IMessageProcessor handler);
     void setRMessageHandler(IMessageProcessor handler);
-    void setLogListener(ILogListener listener);
 
     /**
      * Get all active clients.

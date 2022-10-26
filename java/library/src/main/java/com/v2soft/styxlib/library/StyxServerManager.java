@@ -3,7 +3,7 @@ package com.v2soft.styxlib.library;
 import com.v2soft.styxlib.handlers.TMessagesProcessor;
 import com.v2soft.styxlib.server.IChannelDriver;
 import com.v2soft.styxlib.library.types.ConnectionDetails;
-import com.v2soft.styxlib.vfs.IVirtualStyxFile;
+import com.v2soft.styxlib.l6.vfs.IVirtualStyxFile;
 
 import java.io.Closeable;
 import java.io.IOException;
