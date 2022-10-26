@@ -1,8 +1,8 @@
 package com.v2soft.styxlib.handlers;
 
-import com.v2soft.styxlib.messages.base.StyxMessage;
-import com.v2soft.styxlib.messages.base.StyxTMessage;
-import com.v2soft.styxlib.messages.base.enums.MessageType;
+import com.v2soft.styxlib.l5.messages.base.StyxMessage;
+import com.v2soft.styxlib.l5.messages.base.StyxTMessage;
+import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.server.ClientDetails;
 import com.v2soft.styxlib.server.IChannelDriver;
 import com.v2soft.styxlib.server.IMessageTransmitter;

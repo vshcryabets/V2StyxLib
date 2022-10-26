@@ -1,8 +1,8 @@
 package com.v2soft.styxlib.server.tcp;
 
-import com.v2soft.styxlib.io.StyxByteBufferReadable;
-import com.v2soft.styxlib.io.StyxDataReader;
-import com.v2soft.styxlib.messages.base.StyxMessage;
+import com.v2soft.styxlib.l5.io.StyxByteBufferReadable;
+import com.v2soft.styxlib.l5.serialization.StyxDataReader;
+import com.v2soft.styxlib.l5.messages.base.StyxMessage;
 import com.v2soft.styxlib.server.ClientDetails;
 
 import java.io.IOException;
@@ -82,10 +82,7 @@ public class TCPClientChannelDriver extends TCPChannelDriver {
                             // try to decode
                             final long packetSize = reader.getUInt32();
                             if ( buffer.remainsToRead() >= packetSize ) {
-                                final StyxMessage message = StyxMessage.factory(reader, mIOUnit);
-                                if (mLogListener != null) {
-                                    mLogListener.onMessageReceived(this, mServerClientDetails, message);
-                                }
+                                final StyxMessage message = messagesFactory.factory(reader, mIOUnit);
                                 if ( message.getType().isTMessage() ) {
                                     if ( mTMessageHandler != null ) {
                                         mTMessageHandler.postPacket(message, mServerClientDetails);

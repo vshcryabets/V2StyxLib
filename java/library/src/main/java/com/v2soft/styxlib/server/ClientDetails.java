@@ -3,7 +3,7 @@ package com.v2soft.styxlib.server;
 import com.v2soft.styxlib.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.library.types.Credentials;
 import com.v2soft.styxlib.utils.Polls;
-import com.v2soft.styxlib.vfs.IVirtualStyxFile;
+import com.v2soft.styxlib.l6.vfs.IVirtualStyxFile;
 
 import java.util.HashMap;
 
@@ -50,8 +50,7 @@ public abstract class ClientDetails {
 
     public IVirtualStyxFile getAssignedFile(long fid) throws StyxErrorMessageException {
         if ( !mAssignedFiles.containsKey(fid) ) {
-            StyxErrorMessageException.doException(
-                    String.format("Unknown FID (%d)", fid));
+            throw StyxErrorMessageException.newInstance(String.format("Unknown FID (%d)", fid));
         }
         return mAssignedFiles.get(fid);
     }
