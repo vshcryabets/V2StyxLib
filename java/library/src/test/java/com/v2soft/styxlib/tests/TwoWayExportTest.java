@@ -346,7 +346,7 @@ public class TwoWayExportTest {
                 try {
                     sendMessage();
                 } catch (IOException e) {
-                    StyxErrorMessageException.doException(e.toString());
+                    throw StyxErrorMessageException.newInstance(e.toString());
                 }
             }
             return data.length;

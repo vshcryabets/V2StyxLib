@@ -83,9 +83,6 @@ public class TCPClientChannelDriver extends TCPChannelDriver {
                             final long packetSize = reader.getUInt32();
                             if ( buffer.remainsToRead() >= packetSize ) {
                                 final StyxMessage message = messagesFactory.factory(reader, mIOUnit);
-                                if (mLogListener != null) {
-                                    mLogListener.onMessageReceived(this, mServerClientDetails, message);
-                                }
                                 if ( message.getType().isTMessage() ) {
                                     if ( mTMessageHandler != null ) {
                                         mTMessageHandler.postPacket(message, mServerClientDetails);

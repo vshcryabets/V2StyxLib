@@ -200,8 +200,7 @@ public class TMessagesProcessor extends QueueMessagesProcessor implements IMessa
             return new StyxROpenMessage(msg.getTag(), file.getQID(),
                     mConnectionDetails.getIOUnit() - DEFAULT_PACKET_HEADER_SIZE, false );
         } else {
-            StyxErrorMessageException.doException("Not supported mode for specified file");
-            return null;
+            throw StyxErrorMessageException.newInstance("Not supported mode for specified file");
         }
     }
 

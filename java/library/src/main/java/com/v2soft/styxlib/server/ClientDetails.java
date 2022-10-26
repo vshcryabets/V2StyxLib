@@ -50,8 +50,7 @@ public abstract class ClientDetails {
 
     public IVirtualStyxFile getAssignedFile(long fid) throws StyxErrorMessageException {
         if ( !mAssignedFiles.containsKey(fid) ) {
-            StyxErrorMessageException.doException(
-                    String.format("Unknown FID (%d)", fid));
+            throw StyxErrorMessageException.newInstance(String.format("Unknown FID (%d)", fid));
         }
         return mAssignedFiles.get(fid);
     }

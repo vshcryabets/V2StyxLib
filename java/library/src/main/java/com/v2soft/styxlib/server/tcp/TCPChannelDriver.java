@@ -1,6 +1,5 @@
 package com.v2soft.styxlib.server.tcp;
 
-import com.v2soft.styxlib.ILogListener;
 import com.v2soft.styxlib.l5.serialization.MessageSerializer;
 import com.v2soft.styxlib.l5.serialization.MessageSerializerImpl;
 import com.v2soft.styxlib.l5.serialization.MessagesFactory;
@@ -29,7 +28,6 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
     protected int mIOUnit;
     protected int mTransmittedPacketsCount;
     protected int mTransmissionErrorsCount;
-    protected ILogListener mLogListener;
     protected InetAddress mAddress;
     protected int mPort;
     protected MessagesFactory messagesFactory;
@@ -81,14 +79,8 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
                 buffer.flip();
                 client.getChannel().write(buffer);
                 mTransmittedPacketsCount++;
-                if (mLogListener != null) {
-                    mLogListener.onMessageTransmited(this, recipient, message);
-                }
                 return true;
             } catch (IOException e) {
-                if (mLogListener != null) {
-                    mLogListener.onException(this, e);
-                }
                 mTransmissionErrorsCount++;
             }
         }
@@ -147,9 +139,6 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
             long packetSize = client.getInputReader().getUInt32();
             if ( inBuffer >= packetSize ) {
                 final StyxMessage message = messagesFactory.factory(client.getInputReader(), mIOUnit);
-                if ( mLogListener != null ) {
-                    mLogListener.onMessageReceived(this, client, message);
-                }
                 if ( message.getType().isTMessage() ) {
                     if ( mTMessageHandler != null ) {
                         mTMessageHandler.postPacket(message, client);
@@ -177,11 +166,6 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
     @Override
     public int getErrorsCount() {
         return mTransmissionErrorsCount;
-    }
-
-    @Override
-    public void setLogListener(ILogListener listener) {
-        mLogListener = listener;
     }
 
     @Override
