@@ -9,15 +9,11 @@ import java.util.concurrent.TimeoutException;
 
 public class StyxTMessage extends StyxMessage {
     private StyxMessage mAnswer;
-    private MessageType mRequiredAnswerType;
+    private final MessageType mRequiredAnswerType;
 
     public StyxTMessage(MessageType type, MessageType answer) {
         super(type, NOTAG);
         mRequiredAnswerType = answer;
-    }
-
-    public StyxMessage getAnswer() {
-        return mAnswer;
     }
 
     public void setAnswer(StyxMessage answer)

@@ -1,14 +1,12 @@
 package com.v2soft.styxlib.l5.messages;
 
 import com.v2soft.styxlib.Config;
-import com.v2soft.styxlib.l5.serialization.IStyxDataReader;
-import com.v2soft.styxlib.l5.serialization.BufferWritter;
-import com.v2soft.styxlib.l5.messages.base.StyxMessage;
 import com.v2soft.styxlib.l5.enums.MessageType;
+import com.v2soft.styxlib.l5.messages.base.StyxMessage;
+import com.v2soft.styxlib.l5.serialization.IStyxDataReader;
 import com.v2soft.styxlib.utils.MetricsAndStats;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 
 public class StyxRReadMessage extends StyxMessage {
     private byte[] mData;

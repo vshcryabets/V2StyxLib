@@ -1,13 +1,11 @@
 package com.v2soft.styxlib.l5.messages;
 
-import com.v2soft.styxlib.l5.serialization.IStyxDataReader;
-import com.v2soft.styxlib.l5.serialization.BufferWritter;
-import com.v2soft.styxlib.l5.messages.base.StyxMessage;
 import com.v2soft.styxlib.l5.enums.MessageType;
+import com.v2soft.styxlib.l5.messages.base.StyxMessage;
+import com.v2soft.styxlib.l5.serialization.IStyxDataReader;
 import com.v2soft.styxlib.l5.serialization.UTF;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 
 public class StyxRVersionMessage extends StyxMessage {
 	private long mMaxPacketSize;
@@ -22,28 +20,18 @@ public class StyxRVersionMessage extends StyxMessage {
     @Override
     public void load(IStyxDataReader input)
         throws IOException  {
-        setMaxPacketSize(input.readUInt32());
-        setProtocolVersion(input.readUTFString());
+		mMaxPacketSize = input.readUInt32();
+		mProtocolVersion = input.readUTFString();
     }
 
     // TODO should max packet size be long? or int?
 	public long getMaxPacketSize() {return mMaxPacketSize;}
-
-	public void setMaxPacketSize(long max_packet_size)
-	{
-		mMaxPacketSize = max_packet_size;
-	}
 
 	public String getProtocolVersion()
 	{
 		if (mProtocolVersion == null)
 			return "";
 		return mProtocolVersion;
-	}
-
-	public void setProtocolVersion(String protocol_version)
-	{
-		mProtocolVersion = protocol_version;
 	}
 
 	@Override

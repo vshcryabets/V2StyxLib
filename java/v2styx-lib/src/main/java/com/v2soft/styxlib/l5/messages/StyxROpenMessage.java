@@ -1,13 +1,11 @@
 package com.v2soft.styxlib.l5.messages;
 
-import com.v2soft.styxlib.l5.serialization.IStyxDataReader;
-import com.v2soft.styxlib.l5.serialization.BufferWritter;
-import com.v2soft.styxlib.l5.messages.base.StyxRSingleQIDMessage;
 import com.v2soft.styxlib.l5.enums.MessageType;
+import com.v2soft.styxlib.l5.messages.base.StyxRSingleQIDMessage;
+import com.v2soft.styxlib.l5.serialization.IStyxDataReader;
 import com.v2soft.styxlib.l5.structs.StyxQID;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 
 public class StyxROpenMessage extends StyxRSingleQIDMessage {
     private long mIOUnit;
@@ -25,10 +23,6 @@ public class StyxROpenMessage extends StyxRSingleQIDMessage {
 
     public long getIOUnit() {
         return mIOUnit;
-    }
-
-    public void setIOUnit(long iounit) {
-        mIOUnit = iounit;
     }
 
     @Override

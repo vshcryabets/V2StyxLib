@@ -39,7 +39,7 @@ public class MessagesFactory {
                 result = new StyxRVersionMessage(0, null);
                 break;
             case Tauth:
-                result = new StyxTAuthMessage(StyxMessage.NOFID);
+                result = new StyxTAuthMessage(StyxMessage.NOFID, "", "");
                 break;
             case Tflush:
                 result = new StyxTFlushMessage(StyxMessage.NOTAG);

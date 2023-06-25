@@ -270,9 +270,7 @@ public class Connection
             throws InterruptedException, StyxException, IOException, TimeoutException {
         mAuthFID = mRecepient.getPolls().getFIDPoll().getFreeItem();
 
-        StyxTAuthMessage tAuth = new StyxTAuthMessage(mAuthFID);
-        tAuth.setUserName(getCredentials().getUserName());
-        tAuth.setMountPoint(getMountPoint());
+        StyxTAuthMessage tAuth = new StyxTAuthMessage(mAuthFID, getCredentials().getUserName(), getMountPoint());
         mTransmitter.sendMessage(tAuth, mRecepient);
 
         StyxMessage rMessage = tAuth.waitForAnswer(mTimeout);

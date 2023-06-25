@@ -1,9 +1,8 @@
 package com.v2soft.styxlib.l5.messages;
 
-import com.v2soft.styxlib.l5.serialization.IStyxDataReader;
-import com.v2soft.styxlib.l5.serialization.BufferWritter;
-import com.v2soft.styxlib.l5.messages.base.StyxTMessageFID;
 import com.v2soft.styxlib.l5.enums.MessageType;
+import com.v2soft.styxlib.l5.messages.base.StyxTMessageFID;
+import com.v2soft.styxlib.l5.serialization.IStyxDataReader;
 import com.v2soft.styxlib.l5.structs.StyxStat;
 
 import java.io.IOException;

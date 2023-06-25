@@ -1,14 +1,12 @@
 package com.v2soft.styxlib.l5.messages;
 
+import com.v2soft.styxlib.l5.enums.MessageType;
+import com.v2soft.styxlib.l5.messages.base.StyxTMessageFID;
+import com.v2soft.styxlib.l5.serialization.IStyxDataReader;
 import com.v2soft.styxlib.l5.serialization.UTF;
 import com.v2soft.styxlib.l6.StyxFile;
-import com.v2soft.styxlib.l5.serialization.IStyxDataReader;
-import com.v2soft.styxlib.l5.serialization.BufferWritter;
-import com.v2soft.styxlib.l5.messages.base.StyxTMessageFID;
-import com.v2soft.styxlib.l5.enums.MessageType;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -53,7 +51,7 @@ extends StyxTMessageFID {
         return builder.toString();
     }
 
-    public void setPath(String path) {
+    private void setPath(String path) {
         if (path == null) {
             throw new NullPointerException("Path is null");
         }

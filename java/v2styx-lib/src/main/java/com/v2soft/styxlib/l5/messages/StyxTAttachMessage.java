@@ -1,13 +1,11 @@
 package com.v2soft.styxlib.l5.messages;
 
-import com.v2soft.styxlib.l5.serialization.IStyxDataReader;
-import com.v2soft.styxlib.l5.serialization.BufferWritter;
-import com.v2soft.styxlib.l5.messages.base.StyxTMessageFID;
 import com.v2soft.styxlib.l5.enums.MessageType;
+import com.v2soft.styxlib.l5.messages.base.StyxTMessageFID;
+import com.v2soft.styxlib.l5.serialization.IStyxDataReader;
 import com.v2soft.styxlib.l5.serialization.UTF;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 
 public class StyxTAttachMessage extends StyxTMessageFID {
     private long mAuthFID;
@@ -25,17 +23,13 @@ public class StyxTAttachMessage extends StyxTMessageFID {
     public void load(IStyxDataReader input)
             throws IOException {
         super.load(input);
-        setAuthFID(input.readUInt32());
-        setUserName(input.readUTFString());
-        setMountPoint(input.readUTFString());
+        mAuthFID = input.readUInt32();
+        mUserName = input.readUTFString();
+        mMountPoint =  input.readUTFString();
     }
 
     public long getAuthFID() {
         return mAuthFID;
-    }
-
-    public void setAuthFID(long afid) {
-        mAuthFID = afid;
     }
 
     public String getUserName() {
@@ -45,19 +39,11 @@ public class StyxTAttachMessage extends StyxTMessageFID {
         return mUserName;
     }
 
-    public void setUserName(String user_name) {
-        mUserName = user_name;
-    }
-
     public String getMountPoint() {
         if (mMountPoint == null) {
             return "";
         }
         return mMountPoint;
-    }
-
-    public void setMountPoint(String mount_point) {
-        mMountPoint = mount_point;
     }
 
     @Override

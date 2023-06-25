@@ -1,13 +1,11 @@
 package com.v2soft.styxlib.l5.messages;
 
-import com.v2soft.styxlib.l5.serialization.IStyxDataReader;
-import com.v2soft.styxlib.l5.serialization.BufferWritter;
-import com.v2soft.styxlib.l5.messages.base.StyxTMessageFID;
 import com.v2soft.styxlib.l5.enums.MessageType;
+import com.v2soft.styxlib.l5.messages.base.StyxTMessageFID;
+import com.v2soft.styxlib.l5.serialization.IStyxDataReader;
 import com.v2soft.styxlib.l5.serialization.UTF;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 
 public class StyxTCreateMessage extends StyxTMessageFID {
     private String mName;
@@ -36,24 +34,12 @@ public class StyxTCreateMessage extends StyxTMessageFID {
         return mName;
     }
 
-    public void setName(String name)
-    {
-        mName = name;
-    }
-
     public long getPermissions()
     {
         return mPermissions;
     }
 
-    public void setPermissions(long permissions)
-    {
-        mPermissions = permissions;
-    }
-
     public int getMode(){return mMode;}
-
-    public void setMode(int mode){mMode = mode;}
 
     @Override
     public int getBinarySize() {

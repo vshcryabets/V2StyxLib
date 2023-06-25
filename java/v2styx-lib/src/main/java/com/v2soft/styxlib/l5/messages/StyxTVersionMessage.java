@@ -1,13 +1,11 @@
 package com.v2soft.styxlib.l5.messages;
 
-import com.v2soft.styxlib.l5.serialization.IStyxDataReader;
-import com.v2soft.styxlib.l5.serialization.BufferWritter;
-import com.v2soft.styxlib.l5.messages.base.StyxTMessage;
 import com.v2soft.styxlib.l5.enums.MessageType;
+import com.v2soft.styxlib.l5.messages.base.StyxTMessage;
+import com.v2soft.styxlib.l5.serialization.IStyxDataReader;
 import com.v2soft.styxlib.l5.serialization.UTF;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 
 public class StyxTVersionMessage extends StyxTMessage {
 	private long mMaxPacketSize;
@@ -23,8 +21,8 @@ public class StyxTVersionMessage extends StyxTMessage {
     public void load(IStyxDataReader input)
         throws IOException {
         super.load(input);
-        setMaxPacketSize(input.readUInt32());
-        setProtocolVersion(input.readUTFString());
+		mMaxPacketSize = input.readUInt32();
+		mProtocolVersion = input.readUTFString();
     }
 
 	public long getMaxPacketSize()
@@ -32,21 +30,11 @@ public class StyxTVersionMessage extends StyxTMessage {
 		return mMaxPacketSize;
 	}
 
-	public void setMaxPacketSize(long max_pocket_size)
-	{
-		mMaxPacketSize = max_pocket_size;
-	}
-
 	public String getProtocolVersion()
 	{
 		if (mProtocolVersion == null)
 			return "";
 		return mProtocolVersion;
-	}
-
-	public void setProtocolVersion(String protocol_version)
-	{
-		mProtocolVersion = protocol_version;
 	}
 
 	@Override

@@ -1,12 +1,10 @@
 package com.v2soft.styxlib.l5.messages;
 
-import com.v2soft.styxlib.l5.serialization.IStyxDataReader;
-import com.v2soft.styxlib.l5.serialization.BufferWritter;
-import com.v2soft.styxlib.l5.messages.base.StyxTMessageFID;
 import com.v2soft.styxlib.l5.enums.MessageType;
+import com.v2soft.styxlib.l5.messages.base.StyxTMessageFID;
+import com.v2soft.styxlib.l5.serialization.IStyxDataReader;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 
 public class StyxTOpenMessage extends StyxTMessageFID {
     private int mMode;
@@ -26,11 +24,6 @@ public class StyxTOpenMessage extends StyxTMessageFID {
     public int getMode()
     {
         return mMode;
-    }
-
-    public void setMode(int mode)
-    {
-        mMode = mode;
     }
 
     @Override

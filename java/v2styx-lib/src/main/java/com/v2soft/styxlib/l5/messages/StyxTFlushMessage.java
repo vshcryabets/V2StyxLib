@@ -1,12 +1,10 @@
 package com.v2soft.styxlib.l5.messages;
 
-import com.v2soft.styxlib.l5.serialization.IStyxDataReader;
-import com.v2soft.styxlib.l5.serialization.BufferWritter;
-import com.v2soft.styxlib.l5.messages.base.StyxTMessage;
 import com.v2soft.styxlib.l5.enums.MessageType;
+import com.v2soft.styxlib.l5.messages.base.StyxTMessage;
+import com.v2soft.styxlib.l5.serialization.IStyxDataReader;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 
 public class StyxTFlushMessage extends StyxTMessage {
 	private int mOldTag;
@@ -24,7 +22,6 @@ public class StyxTFlushMessage extends StyxTMessage {
     }
 
 	public int getOldTag(){return mOldTag;}
-	public void setOldTag(int oldTag){mOldTag = oldTag;}
 
 	@Override
 	public int getBinarySize() {

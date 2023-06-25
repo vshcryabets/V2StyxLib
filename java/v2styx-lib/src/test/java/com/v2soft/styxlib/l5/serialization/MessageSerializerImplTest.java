@@ -12,11 +12,11 @@ public class MessageSerializerImplTest {
 
     @Test
     public void testSerializationTMessages() throws IOException {
-        MessageSerializerImpl serializer = new MessageSerializerImpl();
+        MessageSerializer serializer = new MessageSerializerImpl();
         ByteBuffer buffer = ByteBuffer.allocate(8192);
         BufferWritter outputBuffer = new ByteBufferWritter(buffer);
         serializer.serialize(new StyxTVersionMessage(128, "9P2000"), outputBuffer);
-        byte data[] = new byte[buffer.limit()];
+        byte[] data = new byte[buffer.limit()];
         buffer.position(0);
         buffer.get(data);
         Assertions.assertArrayEquals(new byte[]{19, 0, 0, 0,
