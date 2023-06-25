@@ -21,7 +21,7 @@ repositories {
 }
 
 dependencies {
-    implementation(project(":library"))
+    implementation(project(":v2styx-lib"))
 }
 
 application {

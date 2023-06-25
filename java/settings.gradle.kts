@@ -1,4 +1,8 @@
 rootProject.name = "V2StyxLib-JVM"
 
-include("library", "serverSample")
-
+arrayOf(
+    "v2styx-lib",
+    "v2styx-server-sample"
+).forEach {
+    include(it)
+}
