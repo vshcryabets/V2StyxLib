@@ -1,12 +1,17 @@
 plugins {
-    `java`
-    kotlin("jvm") version "1.5.31"
+    java
+    kotlin("jvm")
     application
 }
 
+kotlin {
+    jvmToolchain(Versions.jvmLevel)
+}
+
 java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(Versions.jvmLevel))
+    }
 }
 
 val version = "1.0.0"
