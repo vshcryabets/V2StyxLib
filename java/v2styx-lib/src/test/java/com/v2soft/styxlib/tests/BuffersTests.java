@@ -1,6 +1,6 @@
 package com.v2soft.styxlib.tests;
 
-import com.v2soft.styxlib.l5.io.StyxByteBufferReadable;
+import com.v2soft.styxlib.l5.io.impl.BufferImpl;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -19,7 +19,7 @@ public class BuffersTests {
     public void testBufferRead() throws IOException {
         Random random = new Random();
         int maxSize = 8192;
-        StyxByteBufferReadable readableBuffer = new StyxByteBufferReadable(maxSize);
+        BufferImpl readableBuffer = new BufferImpl(maxSize);
         byte[] testBuffer = new byte[maxSize];
         byte[] readBuffer = new byte[maxSize];
         random.nextBytes(testBuffer);

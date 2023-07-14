@@ -2,7 +2,7 @@ package com.v2soft.styxlib.l5.messages;
 
 import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.l5.messages.base.StyxTMessage;
-import com.v2soft.styxlib.l5.serialization.IStyxDataReader;
+import com.v2soft.styxlib.l5.serialization.BufferReader;
 import com.v2soft.styxlib.l5.serialization.UTF;
 
 import java.io.IOException;
@@ -18,7 +18,7 @@ public class StyxTVersionMessage extends StyxTMessage {
 	}
 
     @Override
-    public void load(IStyxDataReader input)
+    public void load(BufferReader input)
         throws IOException {
         super.load(input);
 		mMaxPacketSize = input.readUInt32();

@@ -2,6 +2,8 @@ package com.v2soft.styxlib.l5.serialization;
 
 import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.l5.messages.StyxTVersionMessage;
+import com.v2soft.styxlib.l5.serialization.impl.BufferWritterImpl;
+import com.v2soft.styxlib.l5.serialization.impl.MessageSerializerImpl;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -14,7 +16,7 @@ public class MessageSerializerImplTest {
     public void testSerializationTMessages() throws IOException {
         MessageSerializer serializer = new MessageSerializerImpl();
         ByteBuffer buffer = ByteBuffer.allocate(8192);
-        BufferWritter outputBuffer = new ByteBufferWritter(buffer);
+        BufferWritter outputBuffer = new BufferWritterImpl(buffer);
         serializer.serialize(new StyxTVersionMessage(128, "9P2000"), outputBuffer);
         byte[] data = new byte[buffer.limit()];
         buffer.position(0);

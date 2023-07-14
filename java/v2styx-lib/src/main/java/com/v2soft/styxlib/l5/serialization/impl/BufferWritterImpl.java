@@ -1,5 +1,6 @@
-package com.v2soft.styxlib.l5.serialization;
+package com.v2soft.styxlib.l5.serialization.impl;
 
+import com.v2soft.styxlib.l5.serialization.BufferWritter;
 import com.v2soft.styxlib.utils.MetricsAndStats;
 
 import java.io.UnsupportedEncodingException;
@@ -7,13 +8,13 @@ import java.nio.BufferOverflowException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 
-public class ByteBufferWritter implements BufferWritter {
+public class BufferWritterImpl implements BufferWritter {
     private static final int sDataBufferSize = 16;
     protected static final Charset sUTFCharset = Charset.forName("utf-8");
     private byte[] mInternalBuffer;
     protected ByteBuffer mBuffer;
 
-    public ByteBufferWritter(ByteBuffer buffer) {
+    public BufferWritterImpl(ByteBuffer buffer) {
         mInternalBuffer = new byte[sDataBufferSize];
         MetricsAndStats.byteArrayAllocationIo++;
         mBuffer = buffer;
@@ -76,8 +77,8 @@ public class ByteBufferWritter implements BufferWritter {
     }
 
     @Override
-    public void prepareFor(int dataSize) {
+    public void prepareBuffer(int bufferSize) {
         mBuffer.clear();
-        mBuffer.limit(dataSize);
+        mBuffer.limit(bufferSize);
     }
 }

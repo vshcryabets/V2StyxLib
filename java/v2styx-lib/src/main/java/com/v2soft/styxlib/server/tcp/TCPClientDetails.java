@@ -1,9 +1,13 @@
 package com.v2soft.styxlib.server.tcp;
 
-import com.v2soft.styxlib.l5.serialization.IStyxDataReader;
-import com.v2soft.styxlib.l5.io.StyxByteBufferReadable;
-import com.v2soft.styxlib.l5.serialization.StyxDataReader;
-import com.v2soft.styxlib.l5.serialization.ByteBufferWritter;
+import com.v2soft.styxlib.l5.io.Buffer;
+import com.v2soft.styxlib.l5.io.BufferLoader;
+import com.v2soft.styxlib.l5.io.InChannel;
+import com.v2soft.styxlib.l5.io.impl.BufferImpl;
+import com.v2soft.styxlib.l5.serialization.BufferReader;
+import com.v2soft.styxlib.l5.serialization.BufferWritter;
+import com.v2soft.styxlib.l5.serialization.impl.BufferReaderImpl;
+import com.v2soft.styxlib.l5.serialization.impl.BufferWritterImpl;
 import com.v2soft.styxlib.server.ClientDetails;
 import com.v2soft.styxlib.server.IChannelDriver;
 import com.v2soft.styxlib.utils.MetricsAndStats;
@@ -18,54 +22,69 @@ import java.nio.channels.SocketChannel;
  * @author V.Shcryabets (vshcryabets@gmail.com)
  */
 public class TCPClientDetails extends ClientDetails {
-    private SocketChannel mChannel;
-    private ByteBuffer mOutputBuffer;
-    private ByteBufferWritter mOutputWriter;
-    protected StyxByteBufferReadable mBuffer;
-    protected StyxDataReader mReader;
+    private SocketChannel mTcpChannel;
+    private final ByteBuffer mOutputBuffer;
+    private final BufferWritter mOutputWriter;
+    protected Buffer mBuffer;
+    protected BufferLoader mBufferLoader;
+    protected BufferReaderImpl mReader;
+    protected InChannel mChannel;
 
     public TCPClientDetails(SocketChannel channel, IChannelDriver driver, int iounit, int id) {
         super(driver, id);
         if ( channel == null ) throw new NullPointerException("Client channel can't be null");
-        mChannel = channel;
+        mTcpChannel = channel;
+        mChannel = dst -> mTcpChannel.read(dst);
+
         mOutputBuffer = ByteBuffer.allocate(iounit);
         MetricsAndStats.byteBufferAllocation++;
-        mBuffer = new StyxByteBufferReadable(iounit * 2);
-        mReader = new StyxDataReader(mBuffer);
-        mOutputWriter = new ByteBufferWritter(mOutputBuffer);
+        BufferImpl impl = new BufferImpl(iounit * 2);
+        mBuffer = impl;
+        mBufferLoader = impl;
+        mReader = new BufferReaderImpl(mBuffer);
+        mOutputWriter = new BufferWritterImpl(mOutputBuffer);
     }
 
-    public ByteBuffer getOutputBuffer() {
-        return mOutputBuffer;
-    }
-
-    public ByteBufferWritter getOutputWriter() {
+    public BufferWritter getOutputWriter() {
         return mOutputWriter;
     }
 
-    public SocketChannel getChannel() {
+    public InChannel getChannel() {
         return mChannel;
     }
 
-    public StyxByteBufferReadable getInputBuffer() {
-        return mBuffer;
+    public BufferLoader getBufferLoader() {
+        return mBufferLoader;
     }
 
-    public IStyxDataReader getInputReader() {
+    public BufferReader getInputReader() {
         return mReader;
     }
 
     @Override
     public String toString() {
         try {
-            return String.format("%s:%d", mChannel.getRemoteAddress().toString(), mId);
+            return String.format("%s:%d", mTcpChannel.getRemoteAddress().toString(), mId);
         } catch (IOException e) {
             return super.toString();
         }
     }
 
     public void disconnect() throws IOException {
-        mChannel.close();
-        mChannel = null;
+        mTcpChannel.close();
+        mTcpChannel = null;
+    }
+
+    public SocketChannel getTcpChannel() {
+        return mTcpChannel;
+    }
+
+    public Buffer getBuffer() {
+        return mBuffer;
+    }
+
+    public void sendOutputBuffer() throws IOException {
+        mOutputBuffer.flip();
+        mTcpChannel.write(mOutputBuffer);
     }
 }

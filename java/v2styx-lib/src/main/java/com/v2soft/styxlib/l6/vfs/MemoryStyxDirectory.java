@@ -2,7 +2,7 @@ package com.v2soft.styxlib.l6.vfs;
 
 import com.v2soft.styxlib.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.l5.serialization.BufferWritter;
-import com.v2soft.styxlib.l5.serialization.ByteBufferWritter;
+import com.v2soft.styxlib.l5.serialization.impl.BufferWritterImpl;
 import com.v2soft.styxlib.l5.enums.FileMode;
 import com.v2soft.styxlib.l5.enums.ModeType;
 import com.v2soft.styxlib.l5.enums.QIDType;
@@ -72,7 +72,7 @@ extends MemoryStyxFile {
             // allocate buffer
             ByteBuffer buffer = ByteBuffer.allocate(size);
             MetricsAndStats.byteBufferAllocation++;
-            BufferWritter writer = new ByteBufferWritter(buffer);
+            BufferWritter writer = new BufferWritterImpl(buffer);
             for (StyxStat state : stats) {
                 state.writeBinaryTo(writer);
             }

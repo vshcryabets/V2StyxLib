@@ -1,7 +1,7 @@
 package com.v2soft.styxlib.l5.messages.base;
 
 import com.v2soft.styxlib.l5.enums.MessageType;
-import com.v2soft.styxlib.l5.serialization.IStyxDataReader;
+import com.v2soft.styxlib.l5.serialization.BufferReader;
 import com.v2soft.styxlib.l5.structs.StyxQID;
 
 import java.io.IOException;
@@ -35,7 +35,7 @@ public class StyxRSingleQIDMessage extends StyxMessage {
     }
 
     @Override
-    public void load(IStyxDataReader buffer) throws IOException {
+    public void load(BufferReader buffer) throws IOException {
         super.load(buffer);
         mQID = new StyxQID(buffer);
     }

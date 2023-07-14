@@ -2,7 +2,7 @@ package com.v2soft.styxlib.l5.serialization;
 
 import java.io.IOException;
 
-public interface IStyxDataReader {
+public interface BufferReader {
     short readUInt8() throws IOException;
     int readUInt16() throws IOException;
     long readUInt32() throws IOException;

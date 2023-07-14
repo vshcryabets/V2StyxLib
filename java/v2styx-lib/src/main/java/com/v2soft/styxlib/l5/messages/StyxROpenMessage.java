@@ -2,7 +2,7 @@ package com.v2soft.styxlib.l5.messages;
 
 import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.l5.messages.base.StyxRSingleQIDMessage;
-import com.v2soft.styxlib.l5.serialization.IStyxDataReader;
+import com.v2soft.styxlib.l5.serialization.BufferReader;
 import com.v2soft.styxlib.l5.structs.StyxQID;
 
 import java.io.IOException;
@@ -16,7 +16,7 @@ public class StyxROpenMessage extends StyxRSingleQIDMessage {
     }
 
     @Override
-    public void load(IStyxDataReader stream) throws IOException {
+    public void load(BufferReader stream) throws IOException {
         super.load(stream);
         mIOUnit = stream.readUInt32();
     }

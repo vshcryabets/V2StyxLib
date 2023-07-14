@@ -1,9 +1,11 @@
-package com.v2soft.styxlib.l5.serialization;
+package com.v2soft.styxlib.l5.serialization.impl;
 
 import com.v2soft.styxlib.l5.messages.*;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
 import com.v2soft.styxlib.l5.messages.base.StyxRSingleQIDMessage;
 import com.v2soft.styxlib.l5.messages.base.StyxTMessageFID;
+import com.v2soft.styxlib.l5.serialization.BufferWritter;
+import com.v2soft.styxlib.l5.serialization.MessageSerializer;
 import com.v2soft.styxlib.l5.structs.StyxQID;
 
 import java.io.IOException;
@@ -12,7 +14,7 @@ public class MessageSerializerImpl implements MessageSerializer {
     @Override
     public void serialize(StyxMessage message, BufferWritter output) throws IOException {
         int packetSize = message.getBinarySize();
-        output.prepareFor(packetSize);
+        output.prepareBuffer(packetSize);
         output.writeUInt32(packetSize);
         output.writeUInt8((short) message.getType().getByte());
         output.writeUInt16(message.getTag());

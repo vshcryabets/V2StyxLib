@@ -1,6 +1,6 @@
 package com.v2soft.styxlib.io;
 
-import com.v2soft.styxlib.l5.serialization.IStyxDataReader;
+import com.v2soft.styxlib.l5.serialization.BufferReader;
 import com.v2soft.styxlib.utils.MetricsAndStats;
 
 import java.io.FilterInputStream;
@@ -10,7 +10,7 @@ import java.nio.charset.Charset;
 
 public class StyxDataInputStream
     extends FilterInputStream
-    implements IStyxDataReader {
+    implements BufferReader {
     // ==================================================
     // Constants
     // ==================================================

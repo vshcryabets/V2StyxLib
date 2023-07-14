@@ -10,5 +10,5 @@ public interface BufferWritter {
     void writeUTFString(String string) throws IOException;
     int write(byte[] data, int offset, int count);
     // clean output and prepare to receieve data
-    void prepareFor(int dataSize);
+    void prepareBuffer(int bufferSize);
 }

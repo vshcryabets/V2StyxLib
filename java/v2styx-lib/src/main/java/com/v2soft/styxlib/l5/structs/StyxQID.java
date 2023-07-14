@@ -1,6 +1,6 @@
 package com.v2soft.styxlib.l5.structs;
 
-import com.v2soft.styxlib.l5.serialization.IStyxDataReader;
+import com.v2soft.styxlib.l5.serialization.BufferReader;
 import com.v2soft.styxlib.l5.serialization.BufferWritter;
 import com.v2soft.styxlib.l5.enums.QIDType;
 
@@ -25,7 +25,7 @@ public class StyxQID {
 		mPath = path;
 	}
 
-    public StyxQID(IStyxDataReader input) throws IOException {
+    public StyxQID(BufferReader input) throws IOException {
         mType = QIDType.factory(input.readUInt8());
         mVersion = input.readUInt32();
         mPath = input.readUInt64();

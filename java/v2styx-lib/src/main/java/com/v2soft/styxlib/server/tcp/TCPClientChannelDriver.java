@@ -1,7 +1,8 @@
 package com.v2soft.styxlib.server.tcp;
 
-import com.v2soft.styxlib.l5.io.StyxByteBufferReadable;
-import com.v2soft.styxlib.l5.serialization.StyxDataReader;
+import com.v2soft.styxlib.l5.io.impl.BufferImpl;
+import com.v2soft.styxlib.l5.serialization.BufferReader;
+import com.v2soft.styxlib.l5.serialization.impl.BufferReaderImpl;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
 import com.v2soft.styxlib.server.ClientDetails;
 
@@ -49,7 +50,7 @@ public class TCPClientChannelDriver extends TCPChannelDriver {
         if ( mServerClientDetails.getChannel() == null ) {
             return false;
         }
-        return mServerClientDetails.getChannel().isOpen();
+        return mServerClientDetails.getTcpChannel().isOpen();
     }
 
     @Override
@@ -69,13 +70,13 @@ public class TCPClientChannelDriver extends TCPChannelDriver {
     public void run() {
         try {
             isWorking = true;
-            final StyxByteBufferReadable buffer = new StyxByteBufferReadable(mIOUnit*2);
-            final StyxDataReader reader = new StyxDataReader(buffer);
+            final BufferImpl buffer = new BufferImpl(mIOUnit*2);
+            final BufferReader reader = new BufferReaderImpl(buffer);
             while (isWorking) {
                 if (Thread.interrupted()) break;
                 // read from socket
                 try {
-                    int readed = buffer.readFromChannel(mServerClientDetails.getChannel());
+                    int readed = buffer.readFromChannelToBuffer(mServerClientDetails.getChannel());
                     if ( readed > 0 ) {
                         // loop unitl we have unprocessed packets in the input buffer
                         while ( buffer.remainsToRead() > 4 ) {

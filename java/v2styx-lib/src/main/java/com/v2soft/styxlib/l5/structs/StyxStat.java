@@ -1,6 +1,6 @@
 package com.v2soft.styxlib.l5.structs;
 
-import com.v2soft.styxlib.l5.serialization.IStyxDataReader;
+import com.v2soft.styxlib.l5.serialization.BufferReader;
 import com.v2soft.styxlib.l5.serialization.BufferWritter;
 import com.v2soft.styxlib.l5.serialization.UTF;
 
@@ -51,7 +51,7 @@ public class StyxStat {
         mModificationUser = modificationUser;
     }
 
-    public StyxStat(IStyxDataReader input) throws IOException {
+    public StyxStat(BufferReader input) throws IOException {
         int size = input.readUInt16(); // skip size bytes
         mType = input.readUInt16();
         mDev = input.readUInt32();
