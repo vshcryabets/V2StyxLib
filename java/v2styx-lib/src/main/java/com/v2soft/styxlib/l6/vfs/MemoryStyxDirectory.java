@@ -31,7 +31,7 @@ extends MemoryStyxFile {
 
     public MemoryStyxDirectory(String name) {
         super(name);
-        mQID.setType(QIDType.QTDIR);
+        mQID = new StyxQID(QIDType.QTDIR, 0, mName.hashCode());
         mFiles = new LinkedList<IVirtualStyxFile>();
         mBuffersMap = new HashMap<ClientDetails, ByteBuffer>();
     }

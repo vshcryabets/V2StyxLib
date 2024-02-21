@@ -1,9 +1,5 @@
 package com.v2soft.styxlib.l5.io;
 
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.channels.SocketChannel;
-
 /**
  * Created by V.Shcryabets on 4/4/14.
  *

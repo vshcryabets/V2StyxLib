@@ -2,7 +2,8 @@ package com.v2soft.styxlib.tests;
 
 import com.v2soft.styxlib.l5.Connection;
 import com.v2soft.styxlib.l6.StyxFile;
-import com.v2soft.styxlib.library.StyxServerManager;
+import com.v2soft.styxlib.library.types.impl.CredentialsImpl;
+import com.v2soft.styxlib.server.StyxServerManager;
 import com.v2soft.styxlib.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.server.ClientDetails;
@@ -108,13 +109,13 @@ public class PacketIOTests {
         MessageDigest digest = MessageDigest.getInstance("MD5");
 
 
-        Connection mConnection = new Connection();
+        Connection mConnection = new Connection(new CredentialsImpl("user", ""),
+                new TCPClientChannelDriver(
+                        InetAddress.getByName("localhost"), PORT, false));
         byte[] someData = new byte[1024];
         byte [] remoteHash = new byte[16];
 
-        assertTrue(mConnection.connect(
-                new TCPClientChannelDriver(
-                        InetAddress.getByName("localhost"), PORT, false)));
+        assertTrue(mConnection.connect());
 
         final StyxFile newFile = new StyxFile(mConnection, FILE_NAME);
         OutputStream output = newFile.openForWriteUnbuffered();

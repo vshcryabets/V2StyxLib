@@ -3,7 +3,7 @@ package com.v2soft.styxlib.server.tcp;
 import com.v2soft.styxlib.l5.serialization.MessageSerializer;
 import com.v2soft.styxlib.l5.serialization.impl.MessageSerializerImpl;
 import com.v2soft.styxlib.l5.serialization.MessagesFactory;
-import com.v2soft.styxlib.library.StyxServerManager;
+import com.v2soft.styxlib.server.StyxServerManager;
 import com.v2soft.styxlib.handlers.IMessageProcessor;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
 import com.v2soft.styxlib.server.ClientDetails;
@@ -12,7 +12,6 @@ import com.v2soft.styxlib.server.IChannelDriver;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.nio.ByteBuffer;
 
 /**
  * Created by V.Shcryabets on 5/20/14.

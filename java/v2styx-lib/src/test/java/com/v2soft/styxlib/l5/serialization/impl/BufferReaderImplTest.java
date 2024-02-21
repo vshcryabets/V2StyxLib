@@ -1,12 +1,11 @@
 package com.v2soft.styxlib.l5.serialization.impl;
 
-import com.v2soft.styxlib.l5.io.Buffer;
 import com.v2soft.styxlib.l5.io.impl.BufferImpl;
 import org.junit.jupiter.api.Test;
 
 import java.io.UnsupportedEncodingException;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class BufferReaderImplTest {
 

@@ -34,7 +34,7 @@ extends DiskStyxFile {
 
     public DiskStyxDirectory(File directory) throws IOException {
         super(directory);
-        mQID.setType(QIDType.QTDIR);
+        mQID = new StyxQID(QIDType.QTDIR, 0, mName.hashCode());
         mFiles = new Vector<IVirtualStyxFile>();
         mDirectoryFiles = new ArrayList<IVirtualStyxFile>();
         mBuffersMap = new HashMap<ClientDetails, ByteBuffer>();

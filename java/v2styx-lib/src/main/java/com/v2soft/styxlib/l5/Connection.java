@@ -15,6 +15,7 @@ import com.v2soft.styxlib.l5.messages.base.StyxTMessageFID;
 import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.l5.structs.StyxQID;
 import com.v2soft.styxlib.l6.StyxFile;
+import com.v2soft.styxlib.library.types.impl.CredentialsImpl;
 import com.v2soft.styxlib.server.ClientDetails;
 import com.v2soft.styxlib.server.IChannelDriver;
 import com.v2soft.styxlib.server.IMessageTransmitter;
@@ -53,20 +54,12 @@ public class Connection
     private long mFID = StyxMessage.NOFID;
 
     protected ClientDetails mRecepient;
-    private IChannelDriver mDriver;
+    protected IChannelDriver mDriver;
     protected ConnectionDetails mDetails;
     protected RMessagesProcessor mAnswerProcessor;
     protected boolean isAutoStartDriver = false;
     protected boolean shouldCloseAnswerProcessor = false;
     protected boolean shouldCloseTransmitter = false;
-
-    public Connection() {
-        this(new Credentials(null, null));
-    }
-
-    public Connection(Credentials credentials) {
-        this(credentials, null);
-    }
 
     public Connection(Credentials credentials, IChannelDriver driver) {
         this(credentials, driver, null, null, null);
@@ -77,6 +70,12 @@ public class Connection
                       RMessagesProcessor answerProcessor,
                       TMessageTransmitter transmitter,
                       ClientDetails recepient) {
+        if (driver == null) {
+            throw new NullPointerException("Channel driver can't be null");
+        }
+        if (credentials == null) {
+            throw new NullPointerException("Credentials can't be null");
+        }
         mTransmitter = transmitter;
         mRecepient = recepient;
         mAnswerProcessor = answerProcessor;
@@ -88,17 +87,15 @@ public class Connection
     /**
      * Connect to server with specified parameters
      *
-     * @param driver      channel driver
-     * @param credentials user credentials
      * @return true if connected
      * @throws IOException
      * @throws StyxException
      * @throws TimeoutException
      */
-    public boolean connect(IChannelDriver driver, Credentials credentials)
+    public boolean connect()
             throws IOException, StyxException, InterruptedException, TimeoutException {
         if ( mAnswerProcessor == null ) {
-            mAnswerProcessor = new RMessagesProcessor("RH" + driver.toString());
+            mAnswerProcessor = new RMessagesProcessor("RH" + mDriver.toString());
             shouldCloseAnswerProcessor = true;
         }
         if ( mTransmitter == null ) {
@@ -106,30 +103,27 @@ public class Connection
             shouldCloseTransmitter = true;
         }
 
-        if (!driver.isStarted()) {
-            driver.start(getIOBufSize());
+        if (!mDriver.isStarted()) {
+            mDriver.start(getIOBufSize());
             isAutoStartDriver = true;
         }
 
         if (mRecepient == null) {
             // get first client from driver
-            mRecepient = driver.getClients().iterator().next();
+            mRecepient = mDriver.getClients().iterator().next();
         }
 
-        return this.connect(driver, credentials, mAnswerProcessor, mTransmitter, mRecepient);
+        return this.connect(mAnswerProcessor, mTransmitter, mRecepient);
     }
 
     /**
      * Connect to server with specified parameters
-     *
-     * @param driver      channel driver
-     * @param credentials user credentials
      * @return true if connected
      * @throws IOException
      * @throws StyxException
      * @throws TimeoutException
      */
-    public boolean connect(IChannelDriver driver, Credentials credentials, RMessagesProcessor answerProcessor,
+    public boolean connect(RMessagesProcessor answerProcessor,
                            TMessageTransmitter transmitter, ClientDetails recepient)
             throws IOException, StyxException, InterruptedException, TimeoutException {
 
@@ -142,58 +136,19 @@ public class Connection
             throw new NullPointerException("transmitter can't be null");
         }
         mTransmitter = transmitter;
-
-        if (driver == null) {
-            throw new NullPointerException("Channel driver can't be null");
-        }
-        setDriver(driver);
-
         if ( answerProcessor == null ) {
             throw new NullPointerException("answerProcessor can't be null");
         }
         mAnswerProcessor = answerProcessor;
-        driver.setRMessageHandler(mAnswerProcessor);
+        mDriver.setRMessageHandler(mAnswerProcessor);
 
-        if (credentials == null) {
-            throw new NullPointerException("Credentials can't be null");
-        }
-        mCredentials = credentials;
         mMountPoint = "/";
         sendVersionMessage();
-        isConnected = driver.isConnected();
-
-        return driver.isConnected();
+        isConnected = mDriver.isConnected();
+        return mDriver.isConnected();
     }
 
-    /**
-     * Connect to server with specified parameters
-     *
-     * @param driver channel driver
-     * @return true if connected
-     * @throws IOException
-     * @throws StyxException
-     * @throws TimeoutException
-     */
-    public boolean connect(IChannelDriver driver)
-            throws IOException, StyxException, InterruptedException, TimeoutException {
-        return connect(driver, mCredentials);
-    }
-
-    /**
-     * Connect to server with specified parameters
-     *
-     * @return true if connection was success
-     * @throws IOException
-     * @throws StyxException
-     * @throws InterruptedException
-     * @throws TimeoutException
-     */
-    public boolean connect()
-            throws IOException, StyxException, InterruptedException, TimeoutException {
-        return connect(mDriver, mCredentials);
-    }
-
-    public StyxFile getRoot() throws StyxException, InterruptedException, TimeoutException, IOException {
+    public StyxFile getRoot() throws IOException {
         if (mRoot == null) {
             mRoot = new StyxFile(this, mFID);
         }
@@ -310,9 +265,8 @@ public class Connection
             mTransmitter.close();
             mTransmitter = null;
         }
-        if (isAutoStartDriver && mDriver != null) {
+        if (isAutoStartDriver) {
             mDriver.close();
-            mDriver = null;
         }
     }
 
@@ -367,9 +321,5 @@ public class Connection
     @Override
     public ClientDetails getRecepient() {
         return mRecepient;
-    }
-
-    protected void setDriver(IChannelDriver driver) {
-        mDriver = driver;
     }
 }

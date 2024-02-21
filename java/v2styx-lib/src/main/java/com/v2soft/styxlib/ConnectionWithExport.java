@@ -28,10 +28,6 @@ public class ConnectionWithExport extends Connection {
         super(credentials, driver);
     }
 
-    public ConnectionWithExport() {
-        super();
-    }
-
     @Override
     public String getProtocol() {
         return TCPDualLinkServerManager.PROTOCOL;
@@ -41,11 +37,11 @@ public class ConnectionWithExport extends Connection {
     }
 
     @Override
-    public boolean connect(IChannelDriver driver, Credentials credentials) throws IOException, StyxException,
+    public boolean connect() throws IOException, StyxException,
             InterruptedException, TimeoutException {
-        boolean result = super.connect(driver, credentials);
+        boolean result = super.connect();
         mExportProcessor = new TMessagesProcessor(getConnectionDetails(), mExportedRoot);
-        driver.setTMessageHandler(mExportProcessor);
+        mDriver.setTMessageHandler(mExportProcessor);
         return result;
     }
 

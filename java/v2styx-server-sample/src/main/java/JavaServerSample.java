@@ -1,7 +1,7 @@
 
 import com.v2soft.styxlib.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.exceptions.StyxException;
-import com.v2soft.styxlib.library.StyxServerManager;
+import com.v2soft.styxlib.server.StyxServerManager;
 import com.v2soft.styxlib.server.ClientDetails;
 import com.v2soft.styxlib.server.tcp.TCPServerManager;
 import com.v2soft.styxlib.l6.vfs.MemoryStyxDirectory;

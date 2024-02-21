@@ -3,7 +3,8 @@ package com.v2soft.styxlib.tests;
 import com.v2soft.styxlib.l5.Connection;
 import com.v2soft.styxlib.l5.IClient;
 import com.v2soft.styxlib.l6.StyxFile;
-import com.v2soft.styxlib.library.StyxServerManager;
+import com.v2soft.styxlib.library.types.impl.CredentialsImpl;
+import com.v2soft.styxlib.server.StyxServerManager;
 import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.l6.io.DualStreams;
 import com.v2soft.styxlib.server.IChannelDriver;
@@ -60,10 +61,11 @@ public class ClientServerTest {
     // TVersion & TAttach
     @Test
     public void testMD5() throws IOException, StyxException, InterruptedException, TimeoutException, NoSuchAlgorithmException {
-        IClient connection = new Connection();
-        IChannelDriver driver = new TCPClientChannelDriver(
-                InetAddress.getByName("127.0.0.1"), PORT, false);
-        assertTrue(connection.connect(driver));
+        IClient connection = new Connection(
+                new CredentialsImpl("user", null),
+                new TCPClientChannelDriver(
+                        InetAddress.getByName("127.0.0.1"), PORT, false));
+        assertTrue(connection.connect());
         checkMD5Hash(connection);
         connection.close();
     }

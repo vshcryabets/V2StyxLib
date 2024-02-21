@@ -23,6 +23,7 @@ import com.v2soft.styxlib.l5.messages.base.StyxMessage;
 import com.v2soft.styxlib.l5.messages.base.StyxTMessageFID;
 import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.l5.structs.StyxQID;
+import com.v2soft.styxlib.library.types.impl.CredentialsImpl;
 import com.v2soft.styxlib.server.ClientDetails;
 import com.v2soft.styxlib.library.types.ConnectionDetails;
 import com.v2soft.styxlib.utils.MetricsAndStats;
@@ -142,7 +143,7 @@ public class TMessagesProcessor extends QueueMessagesProcessor implements IMessa
     }
 
     private StyxRAttachMessage processAttach(ClientDetails clientDetails, StyxTAttachMessage msg) {
-        Credentials credentials = new Credentials(msg.getUserName(), null);
+        Credentials credentials = new CredentialsImpl(msg.getUserName(), null);
         clientDetails.setCredentials(credentials);
         String mountPoint = msg.getMountPoint();
         IVirtualStyxFile root = mRoot; // TODO .getDirectory(mountPoint); there should be some logic with mountPoint?
@@ -152,7 +153,7 @@ public class TMessagesProcessor extends QueueMessagesProcessor implements IMessa
     }
 
     private StyxMessage processAuth(ClientDetails clientDetails, StyxTAuthMessage msg) {
-        Credentials credentials = new Credentials(msg.getUserName(), null);
+        Credentials credentials = new CredentialsImpl(msg.getUserName(), null);
         clientDetails.setCredentials(credentials);
         // TODO handle auth packet
         return new StyxRAuthMessage(msg.getTag(), StyxQID.EMPTY);

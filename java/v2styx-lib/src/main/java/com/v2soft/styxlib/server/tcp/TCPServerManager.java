@@ -1,6 +1,6 @@
 package com.v2soft.styxlib.server.tcp;
 
-import com.v2soft.styxlib.library.StyxServerManager;
+import com.v2soft.styxlib.server.StyxServerManager;
 import com.v2soft.styxlib.server.IChannelDriver;
 import com.v2soft.styxlib.l6.vfs.IVirtualStyxFile;
 

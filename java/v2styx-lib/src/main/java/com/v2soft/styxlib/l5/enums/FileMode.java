@@ -34,7 +34,7 @@ public enum FileMode {
         return mode & PERMISSION_BITMASK;
     }
 
-    private long mMode;
+    private final long mMode;
 
     FileMode(long mode) {
         mMode = mode;

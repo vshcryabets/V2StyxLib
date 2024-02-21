@@ -6,7 +6,7 @@ import com.v2soft.styxlib.l6.StyxFile;
 import com.v2soft.styxlib.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.l6.io.StyxUnbufferedFileOutputStream;
-import com.v2soft.styxlib.library.types.Credentials;
+import com.v2soft.styxlib.library.types.impl.CredentialsImpl;
 import com.v2soft.styxlib.server.ClientDetails;
 import com.v2soft.styxlib.server.IChannelDriver;
 import com.v2soft.styxlib.server.tcp.TCPClientChannelDriver;
@@ -73,11 +73,14 @@ public class TwoWayExportTest {
         MemoryStyxFile md5 = new MD5StyxFile();
         MemoryStyxDirectory root = new MemoryStyxDirectory("clientroot");
         root.addFile(md5);
-        ConnectionWithExport connection = new ConnectionWithExport();
-        connection.export(root);
         IChannelDriver driver = new TCPClientChannelDriver(InetAddress.getByName("127.0.0.1"), PORT, false);
+        ConnectionWithExport connection = new ConnectionWithExport(
+                new CredentialsImpl("user",""),
+                driver
+        );
+        connection.export(root);
 
-        Assertions.assertTrue(connection.connect(driver));
+        Assertions.assertTrue(connection.connect());
         ClientServerTest.checkMD5Hash(connection);
         ClientServerTest.checkMD5Hash(connection);
         ClientServerTest.checkMD5Hash(connection);
@@ -86,7 +89,7 @@ public class TwoWayExportTest {
         Collection<ClientDetails> clientDetailses = drivers.get(0).getClients();
         ClientDetails clientDetails = clientDetailses.iterator().next();
         IClient reverseConnection = mServer.getReverseConnectionForClient(clientDetails,
-                new Credentials(null, null));
+                new CredentialsImpl(null, null));
         Assertions.assertNotNull(reverseConnection, "Can't retrieve reverse connection to client");
         reverseConnection.connect();
         ClientServerTest.checkMD5Hash(reverseConnection);
@@ -104,11 +107,12 @@ public class TwoWayExportTest {
 
     @Test
     public void testGetClientsFromClient() throws IOException, InterruptedException, TimeoutException, StyxException {
-        ConnectionWithExport connection = new ConnectionWithExport();
         IChannelDriver driver = new TCPClientChannelDriver(
                 InetAddress.getByName("127.0.0.1"), PORT,
                 false);
-        Assertions.assertTrue(connection.connect(driver));
+        ConnectionWithExport connection = new ConnectionWithExport(new CredentialsImpl("user",""),
+                driver);
+        Assertions.assertTrue(connection.connect());
         Collection<ClientDetails> clientDetailses = driver.getClients();
         Assertions.assertNotNull(clientDetailses);
         Assertions.assertEquals(1, clientDetailses.size());
@@ -127,17 +131,17 @@ public class TwoWayExportTest {
         Assertions.assertNotNull(drivers);
         Assertions.assertEquals(1, drivers.size());
 
-        ConnectionWithExport connection = new ConnectionWithExport();
         IChannelDriver driver = new TCPClientChannelDriver(
                 InetAddress.getByName("127.0.0.1"), PORT,
                 false);
-        Assertions.assertTrue(connection.connect(driver));
+        ConnectionWithExport connection = new ConnectionWithExport(new CredentialsImpl("user", ""), driver);
+        Assertions.assertTrue(connection.connect());
 
-        ConnectionWithExport connection2 = new ConnectionWithExport();
         IChannelDriver driver2 = new TCPClientChannelDriver(
                 InetAddress.getByName("127.0.0.1"), PORT,
                 false);
-        Assertions.assertTrue(connection2.connect(driver2));
+        ConnectionWithExport connection2 = new ConnectionWithExport(new CredentialsImpl("user", ""), driver2);
+        Assertions.assertTrue(connection2.connect());
 
         Collection<ClientDetails> clientDetailses = drivers.get(0).getClients();
         Assertions.assertNotNull(clientDetailses);
@@ -160,13 +164,12 @@ public class TwoWayExportTest {
     public void testChat() throws IOException, InterruptedException, TimeoutException, StyxException {
         int count = 5;
         final AtomicInteger syncObject = new AtomicInteger(0);
-//        mServer.getDrivers().get(0).setLogListener(new TestLogListener("\tSRV"));
 
-        String messages[] = new String[count];
-        ConnectionWithExport clients[] = new ConnectionWithExport[count];
-        IChannelDriver clientDrivers[] = new TCPClientChannelDriver[count];
-        ChatStyxFile clientFiles[] = new ChatStyxFile[count];
-        final OutputStream outputs[] = new OutputStream[count];
+        String[] messages = new String[count];
+        ConnectionWithExport[] clients = new ConnectionWithExport[count];
+        IChannelDriver[] clientDrivers = new TCPClientChannelDriver[count];
+        ChatStyxFile[] clientFiles = new ChatStyxFile[count];
+        final OutputStream[] outputs = new OutputStream[count];
 
         // prepare server chat file
         MemoryStyxFile chatServer = new ChatServerFile(outputs);
@@ -180,15 +183,15 @@ public class TwoWayExportTest {
         for (int i = 0; i < count; i++) {
             String prefix = "CL" + i;
             clientDrivers[i] = new TCPClientChannelDriver(InetAddress.getByName("127.0.0.1"), PORT, false);
-            clients[i] = new ConnectionWithExport();
+            clients[i] = new ConnectionWithExport(new CredentialsImpl("user", ""), clientDrivers[i]);
 //            clientDrivers[i].setLogListener(new TestLogListener(prefix));
             String marker = (i == 0 ? messages[count - 1] : messages[i - 1]);
             clientFiles[i] = new ChatStyxFile("chat", messages[i], marker, (i == 0 ? syncObject : null), prefix);
             MemoryStyxDirectory root = new MemoryStyxDirectory("clientroot");
             root.addFile(clientFiles[i]);
             clients[i].export(root);
-            Assertions.assertTrue(clients[i].connect(clientDrivers[i]));
-            clientFiles[i].attachToserver(clients[i]);
+            Assertions.assertTrue(clients[i].connect());
+            clientFiles[i].attachToServer(clients[i]);
         }
 
         // prepare server
@@ -196,7 +199,8 @@ public class TwoWayExportTest {
         Collection<ClientDetails> clientDetails = drivers.get(0).getClients();
         int pos = 0;
         for (ClientDetails details : clientDetails) {
-            IClient reverseConnection = mServer.getReverseConnectionForClient(details, new Credentials(null, null));
+            IClient reverseConnection = mServer.getReverseConnectionForClient(details,
+                    new CredentialsImpl(null, null));
             Assertions.assertNotNull(reverseConnection,"Can't retrieve reverse connection to client");
             reverseConnection.connect();
             // get chat file for client
@@ -318,7 +322,7 @@ public class TwoWayExportTest {
             mPrefix = prefix;
         }
 
-        public void attachToserver(IClient client) throws InterruptedException, StyxException, TimeoutException,
+        public void attachToServer(IClient client) throws InterruptedException, StyxException, TimeoutException,
                 IOException {
             mFile = new StyxFile(client, "/chat");
             mOut = mFile.openForWriteUnbuffered();

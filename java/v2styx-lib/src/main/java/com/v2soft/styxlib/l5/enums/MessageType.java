@@ -6,7 +6,7 @@ public enum MessageType {
     Tcreate(114), Rcreate(115), Tread(116), Rread(117), Twrite(118), Rwrite(119), Tclunk(120),
     Rclunk(121), Tremove(122), Rremove(123), Tstat(124), Rstat(125), Twstat(126), Rwstat(127);
 
-    private int mByte;
+    private final int mByte;
 
     public static MessageType factory(int b) {
         MessageType[] messages = MessageType.values();

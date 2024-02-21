@@ -11,7 +11,7 @@ import java.io.IOException;
  * @author V.Shcryabets (vshcryabets@gmail.com)
  */
 public interface IMessageTransmitter extends Closeable {
-    boolean sendMessage(StyxMessage answer, ClientDetails recepient) throws IOException;
+    boolean sendMessage(StyxMessage answer, ClientDetails recipient) throws IOException;
     int getTransmittedCount();
     int getErrorsCount();
 }

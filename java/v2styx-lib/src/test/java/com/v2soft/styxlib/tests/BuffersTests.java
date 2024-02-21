@@ -11,7 +11,7 @@ import java.util.Random;
 /**
  * Styx buffers tests.
  *
- * @author V.Shcriyabets (vshcryabets@gmail.com)
+ * @author V.Shcriabets (vshcryabets@gmail.com)
  */
 public class BuffersTests {
 

@@ -3,7 +3,8 @@ package com.v2soft.styxlib;
 import com.v2soft.styxlib.l5.Connection;
 import com.v2soft.styxlib.l5.IClient;
 import com.v2soft.styxlib.l6.StyxFile;
-import com.v2soft.styxlib.library.StyxServerManager;
+import com.v2soft.styxlib.library.types.impl.CredentialsImpl;
+import com.v2soft.styxlib.server.StyxServerManager;
 import com.v2soft.styxlib.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.l6.io.StyxFileBufferedInputStream;
@@ -62,9 +63,9 @@ public class ConnectionTest {
         mServer = new TCPServerManager(localHost, PORT, false,
                 new DiskStyxDirectory(testDirectory));
         mServer.start();
-        mConnection = new Connection();
         IChannelDriver driver = new TCPClientChannelDriver(localHost, PORT, false);
-        assertTrue(mConnection.connect(driver));
+        mConnection = new Connection(new CredentialsImpl("user", ""), driver);
+        assertTrue(mConnection.connect());
     }
 
     @AfterEach

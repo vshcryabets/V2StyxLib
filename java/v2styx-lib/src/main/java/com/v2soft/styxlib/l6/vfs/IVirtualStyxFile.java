@@ -19,23 +19,23 @@ public interface IVirtualStyxFile {
     /**
      * @return unic ID of the file
      */
-    public StyxQID getQID();
+    StyxQID getQID();
 
-    public StyxStat getStat();
+    StyxStat getStat();
     /**
      * @return file access mode
      */
-    public int getMode();
+    int getMode();
     /**
      * @return file name
      */
-    public String getName();
-    public Date getAccessTime();
-    public Date getModificationTime();
-    public long getLength();
-    public String getOwnerName();
-    public String getGroupName();
-    public String getModificationUser();
+    String getName();
+    Date getAccessTime();
+    Date getModificationTime();
+    long getLength();
+    String getOwnerName();
+    String getGroupName();
+    String getModificationUser();
     /**
      * Open file
      * @param mode The mode argument specifies the access mode in which the file is to be opened.
@@ -50,19 +50,19 @@ public interface IVirtualStyxFile {
      * @throws IOException
      * @return true if file was successfully opened
      */
-    public boolean open(ClientDetails clientDetails, int mode) throws IOException;
+    boolean open(ClientDetails clientDetails, int mode) throws IOException;
     /**
      * Close file
      */
-    public void close(ClientDetails clientDetails);
+    void close(ClientDetails clientDetails);
     /**
      * Read from file
      * @param offset offset from begining of the file
      * @param count number of bytes to read
      * @return number of bytes that was readed into the buffer
      */
-    public long read(ClientDetails clientDetails, byte[] buffer, long offset, long count) throws StyxErrorMessageException;
-    public IVirtualStyxFile walk(Iterator<String> pathElements, List<StyxQID> qids)
+    long read(ClientDetails clientDetails, byte[] buffer, long offset, long count) throws StyxErrorMessageException;
+    IVirtualStyxFile walk(Iterator<String> pathElements, List<StyxQID> qids)
             throws StyxErrorMessageException;
     /**
      * Writes data to file at the position offset.
@@ -71,7 +71,7 @@ public interface IVirtualStyxFile {
      * @return return the number of bytes written
      * @throws StyxErrorMessageException
      */
-    public int write(ClientDetails clientDetails, byte[] data, long offset) throws StyxErrorMessageException;
+    int write(ClientDetails clientDetails, byte[] data, long offset) throws StyxErrorMessageException;
     /**
      * Will be fired when client close connection to this server
      * @param client client information
@@ -91,16 +91,15 @@ public interface IVirtualStyxFile {
      * @param mode create mode
      * @return QID of new file
      */
-    public StyxQID create(String name, long permissions, int mode)
+    StyxQID create(String name, long permissions, int mode)
             throws StyxErrorMessageException;
     /**
      * Delete this file
      */
-    public boolean delete(ClientDetails clientDetails);
+    boolean delete(ClientDetails clientDetails);
 
     /**
      * Release all resources.
      */
-    public void release() throws IOException;
-
+    void release() throws IOException;
 }

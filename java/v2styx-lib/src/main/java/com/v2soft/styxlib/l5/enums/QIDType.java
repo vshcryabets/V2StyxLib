@@ -11,7 +11,7 @@ public enum QIDType {
 	QTLINK(0x01),
 	QTFILE(0x00);
 
-	private int mByte;
+	private final int mByte;
 
 	public static QIDType factory(int b)
 	{
