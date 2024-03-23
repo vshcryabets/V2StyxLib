@@ -1,45 +1,36 @@
 package com.v2soft.styxlib;
 
-import com.v2soft.styxlib.l5.Connection;
-import com.v2soft.styxlib.l5.IClient;
-import com.v2soft.styxlib.l6.StyxFile;
-import com.v2soft.styxlib.library.types.impl.CredentialsImpl;
-import com.v2soft.styxlib.server.StyxServerManager;
 import com.v2soft.styxlib.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.exceptions.StyxException;
-import com.v2soft.styxlib.l6.io.StyxFileBufferedInputStream;
+import com.v2soft.styxlib.l5.Connection;
+import com.v2soft.styxlib.l5.IClient;
 import com.v2soft.styxlib.l5.enums.FileMode;
-import com.v2soft.styxlib.server.ClientDetails;
-import com.v2soft.styxlib.server.IChannelDriver;
-import com.v2soft.styxlib.server.tcp.TCPClientChannelDriver;
-import com.v2soft.styxlib.server.tcp.TCPServerManager;
-import com.v2soft.styxlib.utils.MetricsAndStats;
+import com.v2soft.styxlib.l6.StyxFile;
+import com.v2soft.styxlib.l6.io.StyxFileBufferedInputStream;
 import com.v2soft.styxlib.l6.vfs.DiskStyxDirectory;
 import com.v2soft.styxlib.l6.vfs.MemoryStyxFile;
-
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
+import com.v2soft.styxlib.library.types.impl.CredentialsImpl;
+import com.v2soft.styxlib.server.ClientDetails;
+import com.v2soft.styxlib.server.IChannelDriver;
+import com.v2soft.styxlib.server.StyxServerManager;
+import com.v2soft.styxlib.server.tcp.TCPClientChannelDriver;
+import com.v2soft.styxlib.server.tcp.TCPServerChannelDriver;
+import com.v2soft.styxlib.utils.MetricsAndStats;
+import org.junit.jupiter.api.*;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetAddress;
+import java.util.Arrays;
 import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Logger;
 import java.util.zip.CRC32;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Client JUnit tests
@@ -60,8 +51,10 @@ public class ConnectionTest {
         if (!testDirectory.exists()) {
             testDirectory.mkdirs();
         }
-        mServer = new TCPServerManager(localHost, PORT, false,
-                new DiskStyxDirectory(testDirectory));
+        mServer = new StyxServerManager(
+                new DiskStyxDirectory(testDirectory),
+                Arrays.asList(new TCPServerChannelDriver(
+                        localHost, PORT, false)));
         mServer.start();
         IChannelDriver driver = new TCPClientChannelDriver(localHost, PORT, false);
         mConnection = new Connection(new CredentialsImpl("user", ""), driver);
@@ -78,11 +71,14 @@ public class ConnectionTest {
     @Test
     @Tag("dev")
     public void testConnection() throws IOException, StyxException, InterruptedException, TimeoutException {
-        int count = 100000;
+        int count = 1000;
+        mConnection.getMessenger().clearStatisitcis();
         long startTime = System.currentTimeMillis();
         for (int i = 0; i < count; i++) {
             mConnection.sendVersionMessage();
         }
+        assertEquals(count * 4, mConnection.getMessenger().getTransmittedCount());
+        assertEquals(0, mConnection.getMessenger().getErrorsCount());
         long diff = System.currentTimeMillis() - startTime;
         log.info(String.format("\tTransmited %d messages\n\t" +
                         //"Received %d messages\n\t" +

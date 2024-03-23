@@ -10,13 +10,7 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-import java.util.Stack;
+import java.util.*;
 
 /**
  * Created by V.Shcryabets on 5/20/14.
@@ -153,5 +147,10 @@ public class TCPServerChannelDriver extends TCPChannelDriver {
     @Override
     public boolean isConnected() {
         return true;
+    }
+
+    @Override
+    public void clearStatisitcis() {
+
     }
 }

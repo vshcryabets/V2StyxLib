@@ -1,26 +1,19 @@
 package com.v2soft.styxlib.l5;
 
+import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.handlers.RMessagesProcessor;
 import com.v2soft.styxlib.handlers.TMessageTransmitter;
-import com.v2soft.styxlib.exceptions.StyxException;
-import com.v2soft.styxlib.l5.IClient;
-import com.v2soft.styxlib.l5.messages.StyxRAttachMessage;
-import com.v2soft.styxlib.l5.messages.StyxRAuthMessage;
-import com.v2soft.styxlib.l5.messages.StyxRVersionMessage;
-import com.v2soft.styxlib.l5.messages.StyxTAttachMessage;
-import com.v2soft.styxlib.l5.messages.StyxTAuthMessage;
-import com.v2soft.styxlib.l5.messages.StyxTVersionMessage;
+import com.v2soft.styxlib.l5.enums.MessageType;
+import com.v2soft.styxlib.l5.messages.*;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
 import com.v2soft.styxlib.l5.messages.base.StyxTMessageFID;
-import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.l5.structs.StyxQID;
 import com.v2soft.styxlib.l6.StyxFile;
-import com.v2soft.styxlib.library.types.impl.CredentialsImpl;
+import com.v2soft.styxlib.library.types.ConnectionDetails;
+import com.v2soft.styxlib.library.types.Credentials;
 import com.v2soft.styxlib.server.ClientDetails;
 import com.v2soft.styxlib.server.IChannelDriver;
 import com.v2soft.styxlib.server.IMessageTransmitter;
-import com.v2soft.styxlib.library.types.ConnectionDetails;
-import com.v2soft.styxlib.library.types.Credentials;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -46,7 +39,7 @@ public class Connection
     protected Credentials mCredentials;
     private String mMountPoint;
     private int mTimeout = DEFAULT_TIMEOUT;
-    private boolean isConnected, isAttached;
+    private boolean isAttached;
     private TMessageTransmitter mTransmitter;
     private long mAuthFID = StyxMessage.NOFID;
     private StyxQID mAuthQID;
@@ -82,7 +75,6 @@ public class Connection
         mDriver = driver;
         mDetails = new ConnectionDetails(getProtocol(), getIOBufSize());
         mCredentials = credentials;
-        isConnected = false;
     }
     /**
      * Connect to server with specified parameters
@@ -144,7 +136,7 @@ public class Connection
 
         mMountPoint = "/";
         sendVersionMessage();
-        isConnected = mDriver.isConnected();
+        mDriver.isConnected();
         return mDriver.isConnected();
     }
 
@@ -205,12 +197,12 @@ public class Connection
             mFID = StyxMessage.NOFID;
         }
 
-        StyxTVersionMessage tVersion = new StyxTVersionMessage(mDetails.getIOUnit(), getProtocol());
+        StyxTVersionMessage tVersion = new StyxTVersionMessage(mDetails.ioUnit(), getProtocol());
         mTransmitter.sendMessage(tVersion, mRecepient);
 
         StyxMessage rMessage = tVersion.waitForAnswer(mTimeout);
         StyxRVersionMessage rVersion = (StyxRVersionMessage) rMessage;
-        if (rVersion.getMaxPacketSize() < mDetails.getIOUnit()) {
+        if (rVersion.getMaxPacketSize() < mDetails.ioUnit()) {
             mDetails = new ConnectionDetails(getProtocol(), (int) rVersion.getMaxPacketSize());
         }
         mRecepient.getPolls().getFIDPoll().clean();
@@ -302,8 +294,7 @@ public class Connection
 
     private TMessageTransmitter.Listener mTransmitterListener = new TMessageTransmitter.Listener() {
         @Override
-        public void onSocketDisconnected() {
-            isConnected = false;
+        public void onLostConnection() {
         }
 
         @Override

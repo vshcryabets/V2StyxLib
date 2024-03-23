@@ -1,33 +1,17 @@
 package com.v2soft.styxlib.handlers;
 
 import com.v2soft.styxlib.exceptions.StyxErrorMessageException;
-import com.v2soft.styxlib.library.types.Credentials;
-import com.v2soft.styxlib.l5.messages.StyxRAttachMessage;
-import com.v2soft.styxlib.l5.messages.StyxRAuthMessage;
-import com.v2soft.styxlib.l5.messages.StyxRErrorMessage;
-import com.v2soft.styxlib.l5.messages.StyxROpenMessage;
-import com.v2soft.styxlib.l5.messages.StyxRReadMessage;
-import com.v2soft.styxlib.l5.messages.StyxRStatMessage;
-import com.v2soft.styxlib.l5.messages.StyxRVersionMessage;
-import com.v2soft.styxlib.l5.messages.StyxRWalkMessage;
-import com.v2soft.styxlib.l5.messages.StyxRWriteMessage;
-import com.v2soft.styxlib.l5.messages.StyxTAttachMessage;
-import com.v2soft.styxlib.l5.messages.StyxTAuthMessage;
-import com.v2soft.styxlib.l5.messages.StyxTCreateMessage;
-import com.v2soft.styxlib.l5.messages.StyxTOpenMessage;
-import com.v2soft.styxlib.l5.messages.StyxTReadMessage;
-import com.v2soft.styxlib.l5.messages.StyxTWStatMessage;
-import com.v2soft.styxlib.l5.messages.StyxTWalkMessage;
-import com.v2soft.styxlib.l5.messages.StyxTWriteMessage;
+import com.v2soft.styxlib.l5.enums.MessageType;
+import com.v2soft.styxlib.l5.messages.*;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
 import com.v2soft.styxlib.l5.messages.base.StyxTMessageFID;
-import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.l5.structs.StyxQID;
+import com.v2soft.styxlib.l6.vfs.IVirtualStyxFile;
+import com.v2soft.styxlib.library.types.ConnectionDetails;
+import com.v2soft.styxlib.library.types.Credentials;
 import com.v2soft.styxlib.library.types.impl.CredentialsImpl;
 import com.v2soft.styxlib.server.ClientDetails;
-import com.v2soft.styxlib.library.types.ConnectionDetails;
 import com.v2soft.styxlib.utils.MetricsAndStats;
-import com.v2soft.styxlib.l6.vfs.IVirtualStyxFile;
 
 import java.io.IOException;
 import java.util.LinkedList;
@@ -75,7 +59,7 @@ public class TMessagesProcessor extends QueueMessagesProcessor implements IMessa
         try {
             switch (message.getType()) {
                 case Tversion:
-                    answer = new StyxRVersionMessage(mConnectionDetails.getIOUnit(), mConnectionDetails.getProtocol());
+                    answer = new StyxRVersionMessage(mConnectionDetails.ioUnit(), mConnectionDetails.protocol());
                     break;
                 case Tattach:
                     answer = processAttach(target, (StyxTAttachMessage)message);
@@ -199,7 +183,7 @@ public class TMessagesProcessor extends QueueMessagesProcessor implements IMessa
         IVirtualStyxFile file = clientDetails.getAssignedFile(fid);
         if ( file.open(clientDetails, msg.getMode()) ) {
             return new StyxROpenMessage(msg.getTag(), file.getQID(),
-                    mConnectionDetails.getIOUnit() - DEFAULT_PACKET_HEADER_SIZE, false );
+                    mConnectionDetails.ioUnit() - DEFAULT_PACKET_HEADER_SIZE, false);
         } else {
             throw StyxErrorMessageException.newInstance("Not supported mode for specified file");
         }
@@ -226,7 +210,7 @@ public class TMessagesProcessor extends QueueMessagesProcessor implements IMessa
             throws StyxErrorMessageException {
         final IVirtualStyxFile file = clientDetails.getAssignedFile(msg.getFID());
         StyxQID qid = file.create(msg.getName(), msg.getPermissions(), msg.getMode());
-        return new StyxROpenMessage(msg.getTag(), qid, mConnectionDetails.getIOUnit(), true);
+        return new StyxROpenMessage(msg.getTag(), qid, mConnectionDetails.ioUnit(), true);
     }
 
     private StyxMessage processWStat(StyxTWStatMessage msg) {
@@ -249,7 +233,7 @@ public class TMessagesProcessor extends QueueMessagesProcessor implements IMessa
      * @throws StyxErrorMessageException
      */
     private StyxMessage processRead(ClientDetails clientDetails, StyxTReadMessage msg) throws StyxErrorMessageException {
-        if ( msg.getCount() > mConnectionDetails.getIOUnit() ) {
+        if (msg.getCount() > mConnectionDetails.ioUnit()) {
             return new StyxRErrorMessage(msg.getTag(), "IOUnit overflow");
         }
         long fid = msg.getFID();
