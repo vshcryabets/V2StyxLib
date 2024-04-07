@@ -1,9 +1,9 @@
 package com.v2soft.styxlib.server;
 
 import com.v2soft.styxlib.exceptions.StyxErrorMessageException;
+import com.v2soft.styxlib.l6.vfs.IVirtualStyxFile;
 import com.v2soft.styxlib.library.types.Credentials;
 import com.v2soft.styxlib.utils.Polls;
-import com.v2soft.styxlib.l6.vfs.IVirtualStyxFile;
 
 import java.util.HashMap;
 
@@ -14,7 +14,7 @@ import java.util.HashMap;
  */
 public abstract class ClientDetails {
     protected HashMap<Long, IVirtualStyxFile> mAssignedFiles;
-    protected IChannelDriver mDriver;
+    protected IChannelDriver mDriver; // TODO move to map
     protected int mId;
     protected Polls mPolls;
     protected Credentials mCredentials;

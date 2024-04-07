@@ -23,42 +23,28 @@ public class StyxServerManager
     //---------------------------------------------------------------------------
     // Class fields
     //---------------------------------------------------------------------------
-    protected List<IChannelDriver> mDrivers;
-    protected TMessagesProcessor mBalancer;
-    protected IVirtualStyxFile mRoot;
+    protected final List<IChannelDriver> mDrivers;
+    protected final TMessagesProcessor mBalancer;
+    protected final IVirtualStyxFile mRoot;
     protected Thread[] mDriverThreads;
 
-    public StyxServerManager(IVirtualStyxFile root) {
+    public StyxServerManager(IVirtualStyxFile root, List<IChannelDriver> drivers) {
         mRoot = root;
         ConnectionDetails details = new ConnectionDetails(getProtocol(), getIOUnit());
         mBalancer = new TMessagesProcessor(details, root);
-        mDrivers = new LinkedList<IChannelDriver>();
-    }
-
-    public StyxServerManager(IVirtualStyxFile root, IChannelDriver [] drivers) {
-        this(root);
-        for (IChannelDriver driver : drivers) {
-            addDriver( driver );
+        mDrivers = drivers;
+        for (var driver : mDrivers) {
+            driver.setTMessageHandler(mBalancer);
+            driver.setRMessageHandler(mBalancer);
         }
     }
 
-    public StyxServerManager addDriver(IChannelDriver driver) {
-        if (driver == null) {
-            throw new NullPointerException("Driver is null");
-        }
-        mDrivers.add(driver);
-        driver.setTMessageHandler(mBalancer);
-        driver.setRMessageHandler(mBalancer);
-        return this;
-    }
-
-    public Thread[] start() {
+    public void start() {
         int count = mDrivers.size();
         mDriverThreads = new Thread[count];
         for (int i = 0; i < count; i++) {
             mDriverThreads[i] = mDrivers.get(i).start(getIOUnit());
         }
-        return mDriverThreads;
     }
 
     public int getIOUnit() {
@@ -68,16 +54,14 @@ public class StyxServerManager
     @Override
     public void close() throws IOException {
         mBalancer.close();
-        for (IChannelDriver driver : mDrivers) {
+        for (var driver : mDrivers) {
             driver.close();
         }
     }
 
     public void closeAndWait() throws IOException, InterruptedException {
         close();
-        for ( Thread thread : mDriverThreads ) {
-            thread.join();
-        }
+        joinThreads();
     }
 
     public String getProtocol() {
@@ -96,5 +80,11 @@ public class StyxServerManager
     //-------------------------------------------------------------------------------------
     public List<IChannelDriver> getDrivers() {
         return mDrivers;
+    }
+
+    public void joinThreads() throws InterruptedException {
+        for (var thread : mDriverThreads) {
+            thread.join();
+        }
     }
 }

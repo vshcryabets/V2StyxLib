@@ -1,8 +1,8 @@
 package com.v2soft.styxlib.handlers;
 
+import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
 import com.v2soft.styxlib.l5.messages.base.StyxTMessage;
-import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.server.ClientDetails;
 import com.v2soft.styxlib.server.IChannelDriver;
 import com.v2soft.styxlib.server.IMessageTransmitter;
@@ -15,7 +15,7 @@ import java.net.SocketException;
  */
 public class TMessageTransmitter implements IMessageTransmitter {
     public interface Listener {
-        void onSocketDisconnected(); // TODO why socket?
+        void onLostConnection();
         void onTrashReceived();
     }
 
@@ -51,7 +51,7 @@ public class TMessageTransmitter implements IMessageTransmitter {
             return true;
         } catch (SocketException e) {
             if ( mListener != null ) {
-                mListener.onSocketDisconnected();
+                mListener.onLostConnection();
             }
         }
         return false;
@@ -65,6 +65,12 @@ public class TMessageTransmitter implements IMessageTransmitter {
     @Override
     public int getErrorsCount() {
         return mErrorCount;
+    }
+
+    @Override
+    public void clearStatisitcis() {
+        mTransmittedCount = 0;
+        mErrorCount = 0;
     }
 
     @Override

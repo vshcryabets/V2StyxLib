@@ -1,29 +1,27 @@
-
 import com.v2soft.styxlib.exceptions.StyxErrorMessageException;
-import com.v2soft.styxlib.exceptions.StyxException;
-import com.v2soft.styxlib.server.StyxServerManager;
-import com.v2soft.styxlib.server.ClientDetails;
-import com.v2soft.styxlib.server.tcp.TCPServerManager;
 import com.v2soft.styxlib.l6.vfs.MemoryStyxDirectory;
 import com.v2soft.styxlib.l6.vfs.MemoryStyxFile;
+import com.v2soft.styxlib.server.ClientDetails;
+import com.v2soft.styxlib.server.StyxServerManager;
+import com.v2soft.styxlib.server.tcp.TCPServerChannelDriver;
 
 import java.io.IOException;
 import java.net.InetAddress;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 import java.util.HashMap;
-import java.util.concurrent.TimeoutException;
 
 /**
  * Java server that calculate MD5 digest.
  * @author V.Shcriyabets (vshcryabets@gmail.com)
  *
  */
-public class JavaServerSample {
+public class MD5ServerSample {
     private static final int PORT = 10234;
     private static final String FILE_NAME = "md5file";
 
-    public static void main(String[] args) throws IOException, StyxException, InterruptedException, TimeoutException {
+    public static void main(String[] args) throws IOException, InterruptedException {
         MemoryStyxFile md5 = new MemoryStyxFile(FILE_NAME){
             protected HashMap<ClientDetails, MessageDigest> mClientsMap = new HashMap<ClientDetails, MessageDigest>();
             @Override
@@ -67,14 +65,14 @@ public class JavaServerSample {
         };
         MemoryStyxDirectory root = new MemoryStyxDirectory("root");
         root.addFile(md5);
-        StyxServerManager mServer = new TCPServerManager(InetAddress.getByName("127.0.0.1"),
-                PORT,
-                false,
-                root);
-        Thread[] threads = mServer.start();
+        StyxServerManager mServer = new StyxServerManager(
+                root,
+                Arrays.asList(new TCPServerChannelDriver(
+                        InetAddress.getByName("127.0.0.1"),
+                        PORT,
+                        false)));
+        mServer.start();
         System.out.println("Test server listen on 127.0.0.1:" + PORT);
-        for(Thread thread : threads) {
-            thread.join();
-        }
+        mServer.joinThreads();
     }
 }

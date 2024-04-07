@@ -14,4 +14,6 @@ public interface IMessageTransmitter extends Closeable {
     boolean sendMessage(StyxMessage answer, ClientDetails recipient) throws IOException;
     int getTransmittedCount();
     int getErrorsCount();
+
+    void clearStatisitcis();
 }
