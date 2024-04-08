@@ -3,6 +3,7 @@ package com.v2soft.styxlib.io;
 import com.v2soft.styxlib.l5.serialization.BufferReader;
 import com.v2soft.styxlib.utils.MetricsAndStats;
 
+import java.io.EOFException;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,7 +33,13 @@ public class StyxDataInputStream
         if ( bytes > sDataBufferSize ) throw new IllegalArgumentException("Too much bytes to read");
         long result = 0L;
         int shift = 0;
-        read(mDataBuffer, 0, bytes);
+        var read = read(mDataBuffer, 0, bytes);
+        if (read <= 0 ) {
+            throw new EOFException();
+        }
+        if (read < bytes) {
+            throw new IOException("Can't read " + bytes + " bytes from stream");
+        }
         for (int i=0; i<bytes; i++) {
             long b = (mDataBuffer[i]&0xFF);
             if (shift > 0)

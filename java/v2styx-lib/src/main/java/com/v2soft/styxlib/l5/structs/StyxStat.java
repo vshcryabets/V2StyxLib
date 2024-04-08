@@ -8,8 +8,18 @@ import java.io.IOException;
 import java.util.Date;
 
 public class StyxStat {
-    public static final StyxStat EMPTY = new StyxStat((short)0, 0, null,
-            0, null, null, 0, null, null, null, null);
+    public static final StyxStat EMPTY = new StyxStat(
+            (short)0,
+            0,
+            null,
+            0,
+            null,
+            null,
+            0,
+            null,
+            null,
+            null,
+            null);
 
     private int mType; //for kernel use
     private long mDev; //for kernel use
@@ -52,7 +62,9 @@ public class StyxStat {
     }
 
     public StyxStat(BufferReader input) throws IOException {
+        // TODO move to factory
         int size = input.readUInt16(); // skip size bytes
+        // TODO check size
         mType = input.readUInt16();
         mDev = input.readUInt32();
         mQID = new StyxQID(input);
@@ -80,19 +92,9 @@ public class StyxStat {
         return mType;
     }
 
-    public void setType(int type)
-    {
-        mType = type;
-    }
-
     public long getDev()
     {
         return mDev;
-    }
-
-    public void setDev(long dev)
-    {
-        mDev = dev;
     }
 
     public StyxQID getQID()
@@ -100,11 +102,6 @@ public class StyxStat {
         if (mQID == null)
             return StyxQID.EMPTY;
         return mQID;
-    }
-
-    public void setQID(StyxQID qid)
-    {
-        mQID = qid;
     }
 
     public long getMode()
@@ -124,21 +121,11 @@ public class StyxStat {
         return mAccessTime;
     }
 
-    public void setAccessTime(Date accessTime)
-    {
-        mAccessTime = accessTime;
-    }
-
     public Date getModificationTime()
     {
         if (mModificationTime == null)
             return IntToDate(0); // TODO ???
         return mModificationTime;
-    }
-
-    public void setModificationTime(Date modificationTime)
-    {
-        mModificationTime = modificationTime;
     }
 
     public long getLength()
@@ -170,11 +157,6 @@ public class StyxStat {
         return mUserName;
     }
 
-    public void setUserName(String userName)
-    {
-        mUserName = userName;
-    }
-
     public String getGroupName()
     {
         if (mGroupName == null)
@@ -182,21 +164,11 @@ public class StyxStat {
         return mGroupName;
     }
 
-    public void setGroupName(String groupName)
-    {
-        mGroupName = groupName;
-    }
-
     public String getModificationUser()
     {
         if (mModificationUser == null)
             return "";
         return mModificationUser;
-    }
-
-    public void setModificationUser(String modificationUser)
-    {
-        mModificationUser = modificationUser;
     }
 
     public void writeBinaryTo(BufferWritter output) throws IOException {
@@ -224,5 +196,4 @@ public class StyxStat {
                 getLength(), getName(), getUserName(), getGroupName(),
                 getModificationUser());
     }
-
 }

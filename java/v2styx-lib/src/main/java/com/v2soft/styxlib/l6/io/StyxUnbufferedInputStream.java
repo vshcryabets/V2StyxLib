@@ -20,21 +20,23 @@ import java.io.InputStream;
  */
 public class StyxUnbufferedInputStream extends InputStream {
     private long mTimeout = Connection.DEFAULT_TIMEOUT;
-    private byte[] mSingleByteArray;
+    private byte[] mSingleByteArray = new byte[1];
     private long mFID;
     private IMessageTransmitter mMessenger;
     private long mFileOffset = 0;
     private int mIOUnitSize;
     protected ClientDetails mRecepient;
 
-    public StyxUnbufferedInputStream(long file, IMessageTransmitter messenger, int iounit, ClientDetails recepient) {
+    public StyxUnbufferedInputStream(long file,
+                                     IMessageTransmitter messenger,
+                                     int iounit,
+                                     ClientDetails recepient) {
         if ( recepient == null ) {
             throw new NullPointerException("recepient is null");
         }
         if ( messenger == null ) {
             throw new NullPointerException("messenger is null");
         }
-        mSingleByteArray = new byte[1];
         MetricsAndStats.byteArrayAllocationIo++;
         mRecepient = recepient;
         mIOUnitSize = iounit;

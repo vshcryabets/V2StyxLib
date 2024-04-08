@@ -26,8 +26,8 @@ public class StyxTMessage extends StyxMessage {
         }
     }
 
-    public synchronized StyxMessage waitForAnswer(long timeout) throws InterruptedException, TimeoutException,
-            StyxErrorMessageException {
+    public synchronized StyxMessage waitForAnswer(long timeout)
+            throws TimeoutException, StyxErrorMessageException, InterruptedException {
         if ( mAnswer == null)
             wait(timeout);
         if ( mAnswer == null )

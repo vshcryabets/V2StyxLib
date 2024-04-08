@@ -48,9 +48,9 @@ public class StyxConsoleClient {
             //StyxFile file = connection.openFile(".");
 
             StyxFile rootDir = connection.getRoot();
-            var files = rootDir.listFiles();
+            var files = rootDir.listStat();
             for (var it : files) {
-                System.out.println("File: " + it.getName() + " " + it.getPath() + " " + it.getUserName());
+                System.out.println("File: " + it.getName() + " " + it.getGroupName() + " " + it.getUserName());
             }
             ;
             connection.close();

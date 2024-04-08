@@ -146,8 +146,8 @@ public class ConnectionTest {
         dirAA.create(FileMode.PERMISSION_BITMASK | FileMode.Directory.getMode());
         dirAB.create(FileMode.PERMISSION_BITMASK | FileMode.Directory.getMode());
         // test other way to create file (with specified parent)
-        final StyxFile dirBA = new StyxFile(mConnection, nameBA, dirB);
-        final StyxFile dirBB = new StyxFile(mConnection, nameBB, dirB);
+        final StyxFile dirBA = new StyxFile(mConnection, nameBA, dirB.getFID());
+        final StyxFile dirBB = new StyxFile(mConnection, nameBB, dirB.getFID());
         dirBA.create(FileMode.PERMISSION_BITMASK | FileMode.Directory.getMode());
         dirBB.create(FileMode.PERMISSION_BITMASK | FileMode.Directory.getMode());
 
