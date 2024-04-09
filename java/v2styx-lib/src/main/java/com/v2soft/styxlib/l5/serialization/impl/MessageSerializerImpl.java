@@ -5,12 +5,14 @@ import com.v2soft.styxlib.l5.messages.base.StyxMessage;
 import com.v2soft.styxlib.l5.messages.base.StyxRSingleQIDMessage;
 import com.v2soft.styxlib.l5.messages.base.StyxTMessageFID;
 import com.v2soft.styxlib.l5.serialization.BufferWritter;
-import com.v2soft.styxlib.l5.serialization.MessageSerializer;
+import com.v2soft.styxlib.l5.serialization.DataSerializer;
 import com.v2soft.styxlib.l5.structs.StyxQID;
+import com.v2soft.styxlib.l5.structs.StyxStat;
 
 import java.io.IOException;
+import java.util.Date;
 
-public class MessageSerializerImpl implements MessageSerializer {
+public class MessageSerializerImpl implements DataSerializer {
     @Override
     public void serialize(StyxMessage message, BufferWritter output) throws IOException {
         int packetSize = message.getBinarySize();
@@ -73,7 +75,7 @@ public class MessageSerializerImpl implements MessageSerializer {
             case Twstat:
                 StyxTWStatMessage twStatMessage = (StyxTWStatMessage) message;
                 output.writeUInt16(twStatMessage.getStat().getSize());
-                twStatMessage.getStat().writeBinaryTo(output);
+                serializeStat(twStatMessage.getStat(), output);
                 break;
             case Tflush:
                 StyxTFlushMessage tFlushMessage = (StyxTFlushMessage) message;
@@ -120,7 +122,7 @@ public class MessageSerializerImpl implements MessageSerializer {
             case Rstat:
                 StyxRStatMessage rStatMessage = (StyxRStatMessage) message;
                 output.writeUInt16(rStatMessage.getStat().getSize());
-                rStatMessage.getStat().writeBinaryTo(output);
+                serializeStat(rStatMessage.getStat(), output);
                 break;
             case Ropen:
                 StyxROpenMessage rOpenMessage = (StyxROpenMessage) message;
@@ -133,5 +135,29 @@ public class MessageSerializerImpl implements MessageSerializer {
                     qid.writeBinaryTo(output);
                 break;
         }
+    }
+
+    private long DateToInt(Date date) {
+        if (date == null)
+            return 0;
+        return date.getTime() / 1000;
+    }
+
+    @Override
+    public void serializeStat(StyxStat stat, BufferWritter output)
+            throws IOException {
+        int size = stat.getSize();
+        output.writeUInt16(size - 2); // TODO -2??? what does it mean?
+        output.writeUInt16(stat.getType());
+        output.writeUInt32(stat.getDev());
+        stat.getQID().writeBinaryTo(output);
+        output.writeUInt32(stat.getMode());
+        output.writeUInt32(DateToInt(stat.getAccessTime()));
+        output.writeUInt32(DateToInt(stat.getModificationTime()));
+        output.writeUInt64(stat.getLength());
+        output.writeUTFString(stat.getName());
+        output.writeUTFString(stat.getUserName());
+        output.writeUTFString(stat.getGroupName());
+        output.writeUTFString(stat.getModificationUser());
     }
 }

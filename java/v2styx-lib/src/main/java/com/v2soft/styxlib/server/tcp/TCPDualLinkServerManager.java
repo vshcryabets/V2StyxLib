@@ -11,8 +11,7 @@ import com.v2soft.styxlib.server.IChannelDriver;
 import com.v2soft.styxlib.server.StyxServerManager;
 
 import java.io.IOException;
-import java.net.InetAddress;
-import java.util.Arrays;
+import java.util.List;
 
 /**
  * Created by V.Shcryabets on 5/22/14.
@@ -25,10 +24,10 @@ public class TCPDualLinkServerManager extends StyxServerManager {
     protected RMessagesProcessor mReverseAnswerProcessor;
     protected TMessageTransmitter mReverseTransmitter;
 
-    public TCPDualLinkServerManager(InetAddress address, int port, boolean ssl, IVirtualStyxFile root) throws IOException {
-        super(root,
-                Arrays.asList(new TCPServerChannelDriver(
-                        address, port, ssl)));
+    public TCPDualLinkServerManager(IVirtualStyxFile root,
+                                    List<IChannelDriver> drivers)
+            throws IOException {
+        super(root, drivers);
     }
 
     @Override

@@ -51,13 +51,13 @@ public class ConnectionTest {
         if (!testDirectory.exists()) {
             testDirectory.mkdirs();
         }
+        var serverDriver = new TCPServerChannelDriver(localHost, PORT, false);
         mServer = new StyxServerManager(
-                new DiskStyxDirectory(testDirectory),
-                Arrays.asList(new TCPServerChannelDriver(
-                        localHost, PORT, false)));
+                new DiskStyxDirectory(testDirectory, serverDriver.getSerializer()),
+                Arrays.asList(serverDriver));
         mServer.start();
-        IChannelDriver driver = new TCPClientChannelDriver(localHost, PORT, false);
-        mConnection = new Connection(new CredentialsImpl("user", ""), driver);
+        var clientDriver = new TCPClientChannelDriver(localHost, PORT, false);
+        mConnection = new Connection(new CredentialsImpl("user", ""), clientDriver);
         assertTrue(mConnection.connect());
     }
 

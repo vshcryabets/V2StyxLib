@@ -38,13 +38,6 @@ public class StyxStat {
         return new Date(date * 1000L);
     }
 
-    public static long DateToInt(Date date)
-    {
-        if (date == null)
-            return 0;
-        return date.getTime() / 1000;
-    }
-
     public StyxStat(short type, int dev, StyxQID qid, int mode, Date accessTime,
             Date modificationTime, long length, String name, String userName,
             String groupName, String modificationUser) {
@@ -171,20 +164,6 @@ public class StyxStat {
         return mModificationUser;
     }
 
-    public void writeBinaryTo(BufferWritter output) throws IOException {
-        output.writeUInt16(getSize() - 2); // TODO -2??? what does it mean?
-        output.writeUInt16(mType);
-        output.writeUInt32(mDev);
-        mQID.writeBinaryTo(output);
-        output.writeUInt32(mMode);
-        output.writeUInt32(DateToInt(mAccessTime));
-        output.writeUInt32(DateToInt(mModificationTime));
-        output.writeUInt64(mLength);
-        output.writeUTFString(mName);
-        output.writeUTFString(mUserName);
-        output.writeUTFString(mGroupName);
-        output.writeUTFString(mModificationUser);
-    }
     @Override
     public String toString() {
         return String.format("(Type: %d; Dev: %d; QID: %s; Mode: %d;"

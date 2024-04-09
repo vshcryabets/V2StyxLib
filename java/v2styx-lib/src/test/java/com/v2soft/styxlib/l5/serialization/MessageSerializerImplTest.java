@@ -14,7 +14,7 @@ public class MessageSerializerImplTest {
 
     @Test
     public void testSerializationTMessages() throws IOException {
-        MessageSerializer serializer = new MessageSerializerImpl();
+        DataSerializer serializer = new MessageSerializerImpl();
         ByteBuffer buffer = ByteBuffer.allocate(8192);
         BufferWritter outputBuffer = new BufferWritterImpl(buffer);
         serializer.serialize(new StyxTVersionMessage(128, "9P2000"), outputBuffer);

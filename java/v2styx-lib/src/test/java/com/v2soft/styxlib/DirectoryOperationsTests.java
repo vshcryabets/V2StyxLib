@@ -40,10 +40,10 @@ public class DirectoryOperationsTests {
         MetricsAndStats.reset();
         var localHost = InetAddress.getByName("127.0.0.1");
         var testDirectory = new File("./");
+        var serverDriver = new TCPServerChannelDriver(localHost, PORT, false);
         mServer = new StyxServerManager(
-                new DiskStyxDirectory(testDirectory),
-                Collections.singletonList(new TCPServerChannelDriver(
-                        localHost, PORT, false)));
+                new DiskStyxDirectory(testDirectory, serverDriver.getSerializer()),
+                Collections.singletonList(serverDriver));
         mServer.start();
         var driver = new TCPClientChannelDriver(localHost, PORT, false);
         mConnection = new Connection(new CredentialsImpl("user", ""), driver);
