@@ -147,7 +147,7 @@ public class MessageSerializerImpl implements DataSerializer {
     public void serializeStat(StyxStat stat, BufferWritter output)
             throws IOException {
         int size = stat.getSize();
-        output.writeUInt16(size - 2); // TODO -2??? what does it mean?
+        output.writeUInt16(size - 2); // total size except first 2 bytes with size
         output.writeUInt16(stat.getType());
         output.writeUInt32(stat.getDev());
         stat.getQID().writeBinaryTo(output);

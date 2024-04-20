@@ -38,9 +38,17 @@ public class StyxStat {
         return new Date(date * 1000L);
     }
 
-    public StyxStat(short type, int dev, StyxQID qid, int mode, Date accessTime,
-            Date modificationTime, long length, String name, String userName,
-            String groupName, String modificationUser) {
+    public StyxStat(short type,
+                    int dev,
+                    StyxQID qid,
+                    int mode,
+                    Date accessTime,
+                    Date modificationTime,
+                    long length,
+                    String name,
+                    String userName,
+                    String groupName,
+                    String modificationUser) {
         mType = type;
         mDev = dev;
         mQID = qid;
