@@ -130,9 +130,7 @@ public class StyxFile implements Closeable {
             var is = new StyxFileBufferedInputStream(mMessenger, tempFID, iounit, mRecepient);
             var sis = new StyxDataInputStream(is);
             while (true) {
-                StyxStat stat = new StyxStat(sis);
-                System.out.println(stat);
-                stats.add(stat);
+                stats.add(new StyxStat(sis));
             }
         } catch (EOFException e) {
             // That's ok

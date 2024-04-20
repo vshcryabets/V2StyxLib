@@ -1,4 +1,5 @@
 import com.v2soft.styxlib.exceptions.StyxErrorMessageException;
+import com.v2soft.styxlib.l5.serialization.impl.MessageSerializerImpl;
 import com.v2soft.styxlib.l6.vfs.MemoryStyxDirectory;
 import com.v2soft.styxlib.l6.vfs.MemoryStyxFile;
 import com.v2soft.styxlib.server.ClientDetails;
@@ -63,14 +64,15 @@ public class MD5ServerSample {
                 return super.read(client, outbuffer, offset, count);
             }
         };
-        MemoryStyxDirectory root = new MemoryStyxDirectory("root");
+        var driver = new TCPServerChannelDriver(
+                InetAddress.getByName("127.0.0.1"),
+                PORT,
+                false);
+        MemoryStyxDirectory root = new MemoryStyxDirectory("root", driver.getSerializer());
         root.addFile(md5);
         StyxServerManager mServer = new StyxServerManager(
                 root,
-                Arrays.asList(new TCPServerChannelDriver(
-                        InetAddress.getByName("127.0.0.1"),
-                        PORT,
-                        false)));
+                Arrays.asList(driver));
         mServer.start();
         System.out.println("Test server listen on 127.0.0.1:" + PORT);
         mServer.joinThreads();
