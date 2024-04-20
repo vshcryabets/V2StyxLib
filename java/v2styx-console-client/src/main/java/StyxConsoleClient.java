@@ -44,15 +44,11 @@ public class StyxConsoleClient {
             var connection = new Connection(new CredentialsImpl("user", ""), driver);
             connection.connect();
             // list files
-            // TODO
-            //StyxFile file = connection.openFile(".");
-
             StyxFile rootDir = connection.getRoot();
             var files = rootDir.listStat();
             for (var it : files) {
                 System.out.println("File: " + it.getName() + " " + it.getGroupName() + " " + it.getUserName());
             }
-            ;
             connection.close();
         } catch (Exception err) {
             err.printStackTrace();
