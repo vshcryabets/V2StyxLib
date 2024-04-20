@@ -18,14 +18,14 @@ public class StyxFileBufferedInputStream extends InputStream {
     private CBufferedInputStream mBufferedInput;
     /**
      * @param messenger
-     * @param file styx file id.
+     * @param fid styx file id.
      * @param iounit maximal block size.
      */
     public StyxFileBufferedInputStream(IMessageTransmitter messenger,
-            long file,
+            long fid,
             int iounit,
             ClientDetails recepient) {
-        mUnbufferedInput = new StyxUnbufferedInputStream(file, messenger, iounit, recepient);
+        mUnbufferedInput = new StyxUnbufferedInputStream(fid, messenger, iounit, recepient);
         mBufferedInput = new CBufferedInputStream(mUnbufferedInput, iounit);
     }
 

@@ -2,6 +2,7 @@ package com.v2soft.styxlib.l6.vfs;
 
 import com.v2soft.styxlib.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.l5.serialization.BufferWritter;
+import com.v2soft.styxlib.l5.serialization.DataSerializer;
 import com.v2soft.styxlib.l5.serialization.impl.BufferWritterImpl;
 import com.v2soft.styxlib.l5.enums.FileMode;
 import com.v2soft.styxlib.l5.enums.ModeType;
@@ -26,12 +27,14 @@ import java.util.Map;
  */
 public class MemoryStyxDirectory
 extends MemoryStyxFile {
+    private final DataSerializer mSerializer;
     private Map<ClientDetails, ByteBuffer> mBuffersMap;
     private List<IVirtualStyxFile> mFiles;
 
-    public MemoryStyxDirectory(String name) {
+    public MemoryStyxDirectory(String name, DataSerializer serializer) {
         super(name);
         mQID = new StyxQID(QIDType.QTDIR, 0, mName.hashCode());
+        mSerializer = serializer;
         mFiles = new LinkedList<IVirtualStyxFile>();
         mBuffersMap = new HashMap<ClientDetails, ByteBuffer>();
     }
@@ -74,7 +77,7 @@ extends MemoryStyxFile {
             MetricsAndStats.byteBufferAllocation++;
             BufferWritter writer = new BufferWritterImpl(buffer);
             for (StyxStat state : stats) {
-                state.writeBinaryTo(writer);
+                mSerializer.serializeStat(state, writer);
             }
             mBuffersMap.put(clientDetails, buffer);
         }

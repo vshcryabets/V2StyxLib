@@ -30,7 +30,7 @@ public class StyxServerManager
 
     public StyxServerManager(IVirtualStyxFile root, List<IChannelDriver> drivers) {
         mRoot = root;
-        ConnectionDetails details = new ConnectionDetails(getProtocol(), getIOUnit());
+        var details = new ConnectionDetails(getProtocol(), getIOUnit());
         mBalancer = new TMessagesProcessor(details, root);
         mDrivers = drivers;
         for (var driver : mDrivers) {

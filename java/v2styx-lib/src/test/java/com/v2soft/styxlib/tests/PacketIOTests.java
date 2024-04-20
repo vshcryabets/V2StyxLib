@@ -92,12 +92,13 @@ public class PacketIOTests {
                 return super.read(client, outbuffer, offset, count);
             }
         };
-        MemoryStyxDirectory root = new MemoryStyxDirectory("root");
+        var localHost = InetAddress.getByName("127.0.0.1");
+        var serverDriver = new TCPServerChannelDriver(localHost, PORT, false);
+        var root = new MemoryStyxDirectory("root", serverDriver.getSerializer());
         root.addFile(md5);
         mServer = new StyxServerManager(
                 root,
-                Arrays.asList(new TCPServerChannelDriver(
-                        InetAddress.getByName("127.0.0.1"), PORT, false)));
+                Arrays.asList(serverDriver));
         mServer.start();
     }
 

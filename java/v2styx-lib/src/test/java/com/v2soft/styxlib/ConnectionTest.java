@@ -51,13 +51,13 @@ public class ConnectionTest {
         if (!testDirectory.exists()) {
             testDirectory.mkdirs();
         }
+        var serverDriver = new TCPServerChannelDriver(localHost, PORT, false);
         mServer = new StyxServerManager(
-                new DiskStyxDirectory(testDirectory),
-                Arrays.asList(new TCPServerChannelDriver(
-                        localHost, PORT, false)));
+                new DiskStyxDirectory(testDirectory, serverDriver.getSerializer()),
+                Arrays.asList(serverDriver));
         mServer.start();
-        IChannelDriver driver = new TCPClientChannelDriver(localHost, PORT, false);
-        mConnection = new Connection(new CredentialsImpl("user", ""), driver);
+        var clientDriver = new TCPClientChannelDriver(localHost, PORT, false);
+        mConnection = new Connection(new CredentialsImpl("user", ""), clientDriver);
         assertTrue(mConnection.connect());
     }
 
@@ -146,8 +146,8 @@ public class ConnectionTest {
         dirAA.create(FileMode.PERMISSION_BITMASK | FileMode.Directory.getMode());
         dirAB.create(FileMode.PERMISSION_BITMASK | FileMode.Directory.getMode());
         // test other way to create file (with specified parent)
-        final StyxFile dirBA = new StyxFile(mConnection, nameBA, dirB);
-        final StyxFile dirBB = new StyxFile(mConnection, nameBB, dirB);
+        final StyxFile dirBA = new StyxFile(mConnection, nameBA, dirB.getFID());
+        final StyxFile dirBB = new StyxFile(mConnection, nameBB, dirB.getFID());
         dirBA.create(FileMode.PERMISSION_BITMASK | FileMode.Directory.getMode());
         dirBB.create(FileMode.PERMISSION_BITMASK | FileMode.Directory.getMode());
 

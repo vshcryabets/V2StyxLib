@@ -45,13 +45,14 @@ public class ClientServerTest {
     }
 
     private void startServer() throws IOException {
-        MemoryStyxFile md5 = new MD5StyxFile();
-        MemoryStyxDirectory root = new MemoryStyxDirectory("root");
+        var md5 = new MD5StyxFile();
+        var localHost = InetAddress.getByName("127.0.0.1");
+        var serverDriver = new TCPServerChannelDriver(localHost, PORT, false);
+        var root = new MemoryStyxDirectory("root", serverDriver.getSerializer());
         root.addFile(md5);
         mServer = new StyxServerManager(
                 root,
-                Arrays.asList(new TCPServerChannelDriver(
-                        InetAddress.getByName("127.0.0.1"), PORT, false)));
+                Arrays.asList(serverDriver));
         mServer.start();
     }
 

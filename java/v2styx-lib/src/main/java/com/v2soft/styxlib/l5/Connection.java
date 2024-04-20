@@ -142,7 +142,7 @@ public class Connection
 
     public StyxFile getRoot() throws IOException {
         if (mRoot == null) {
-            mRoot = new StyxFile(this, mFID);
+            mRoot = new StyxFile(this, "");
         }
         return mRoot;
     }

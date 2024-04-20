@@ -18,15 +18,16 @@ import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Logger;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Client JUnit tests
- *
- * @author V.Shcriyabets (vshcryabets@gmail.com)
+ * @author V.Shcriabets (vshcryabets@gmail.com)
  */
 public class DirectoryOperationsTests {
     private static Logger log = Logger.getLogger(DirectoryOperationsTests.class.getSimpleName());
@@ -37,14 +38,14 @@ public class DirectoryOperationsTests {
     @BeforeEach
     public void setUp() throws Exception {
         MetricsAndStats.reset();
-        InetAddress localHost = InetAddress.getByName("127.0.0.1");
-        File testDirectory = new File("./");
+        var localHost = InetAddress.getByName("127.0.0.1");
+        var testDirectory = new File("./");
+        var serverDriver = new TCPServerChannelDriver(localHost, PORT, false);
         mServer = new StyxServerManager(
-                new DiskStyxDirectory(testDirectory),
-                Arrays.asList(new TCPServerChannelDriver(
-                        localHost, PORT, false)));
+                new DiskStyxDirectory(testDirectory, serverDriver.getSerializer()),
+                Collections.singletonList(serverDriver));
         mServer.start();
-        IChannelDriver driver = new TCPClientChannelDriver(localHost, PORT, false);
+        var driver = new TCPClientChannelDriver(localHost, PORT, false);
         mConnection = new Connection(new CredentialsImpl("user", ""), driver);
         assertTrue(mConnection.connect());
     }
@@ -56,10 +57,12 @@ public class DirectoryOperationsTests {
     }
 
     @Test
-    public void testListFilesInRootDir() throws IOException, StyxException, InterruptedException, TimeoutException {
-        StyxFile rootDir = mConnection.getRoot();
-        var files = rootDir.listFiles();
-        assertTrue(files.length > 0);
+    public void testListFilesInRootDir()
+            throws IOException, StyxException, InterruptedException, TimeoutException {
+        var rootDir = mConnection.getRoot();
+        var files = rootDir.list(null);
+        assertFalse(files.isEmpty());
+        var fileStats = rootDir.listStat();
+        assertFalse(fileStats.isEmpty());
     }
-
 }

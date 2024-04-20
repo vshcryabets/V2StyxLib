@@ -1,6 +1,7 @@
 package com.v2soft.styxlib.l6.vfs;
 
 import com.v2soft.styxlib.exceptions.StyxErrorMessageException;
+import com.v2soft.styxlib.l5.serialization.DataSerializer;
 import com.v2soft.styxlib.l5.serialization.impl.BufferWritterImpl;
 import com.v2soft.styxlib.l5.enums.FileMode;
 import com.v2soft.styxlib.l5.enums.ModeType;
@@ -31,10 +32,12 @@ extends DiskStyxFile {
     private Map<ClientDetails, ByteBuffer> mBuffersMap;
     protected Vector<IVirtualStyxFile> mFiles;
     protected List<IVirtualStyxFile> mDirectoryFiles;
+    private DataSerializer mSerializer;
 
-    public DiskStyxDirectory(File directory) throws IOException {
+    public DiskStyxDirectory(File directory, DataSerializer serializer) throws IOException {
         super(directory);
         mQID = new StyxQID(QIDType.QTDIR, 0, mName.hashCode());
+        mSerializer = serializer;
         mFiles = new Vector<IVirtualStyxFile>();
         mDirectoryFiles = new ArrayList<IVirtualStyxFile>();
         mBuffersMap = new HashMap<ClientDetails, ByteBuffer>();
@@ -63,7 +66,7 @@ extends DiskStyxFile {
                     DiskStyxFile styxFile;
                     try {
                         if ( file.isDirectory() ) {
-                            styxFile = new DiskStyxDirectory(file);
+                            styxFile = new DiskStyxDirectory(file, mSerializer);
                         } else {
                             styxFile = new DiskStyxFile(file);
                         }
@@ -106,7 +109,7 @@ extends DiskStyxFile {
             final ByteBuffer buffer = ByteBuffer.allocate(size);
             MetricsAndStats.byteBufferAllocation++;
             for (StyxStat state : stats) {
-                state.writeBinaryTo(new BufferWritterImpl(buffer));
+                mSerializer.serializeStat(state, new BufferWritterImpl(buffer));
             }
             mBuffersMap.put(clientDetails, buffer);
             return true;
@@ -176,7 +179,7 @@ extends DiskStyxFile {
                 if ( !newFile.mkdir() ) {
                     throw StyxErrorMessageException.newInstance("Can't create directory, unknown error.");
                 }
-                DiskStyxDirectory file = new DiskStyxDirectory(newFile);
+                DiskStyxDirectory file = new DiskStyxDirectory(newFile, mSerializer);
                 return file.getQID();
             } else {
                 // create file

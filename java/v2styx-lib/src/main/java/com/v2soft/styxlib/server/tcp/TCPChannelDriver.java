@@ -1,6 +1,6 @@
 package com.v2soft.styxlib.server.tcp;
 
-import com.v2soft.styxlib.l5.serialization.MessageSerializer;
+import com.v2soft.styxlib.l5.serialization.DataSerializer;
 import com.v2soft.styxlib.l5.serialization.impl.MessageSerializerImpl;
 import com.v2soft.styxlib.l5.serialization.MessagesFactory;
 import com.v2soft.styxlib.server.StyxServerManager;
@@ -29,9 +29,11 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
     protected InetAddress mAddress;
     protected int mPort;
     protected MessagesFactory messagesFactory;
-    protected MessageSerializer serializer;
+    protected DataSerializer serializer;
 
-    public TCPChannelDriver(InetAddress address, int port, boolean ssl) throws IOException {
+    public TCPChannelDriver(InetAddress address,
+                            int port,
+                            boolean ssl) throws IOException {
         mPort = port;
         mAddress = address;
 
@@ -180,5 +182,9 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
 
     public int getPort() {
         return mPort;
+    }
+
+    public DataSerializer getSerializer() {
+        return serializer;
     }
 }
