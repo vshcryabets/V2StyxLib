@@ -26,11 +26,6 @@ public class StyxRWriteMessage extends StyxMessage {
 	}
 
 	@Override
-	public int getBinarySize() {
-		return super.getBinarySize() + 4;
-	}
-
-	@Override
     public String toString() {
 		return String.format("%s\nCount: %d", super.toString(), mCount);
 	}

@@ -35,12 +35,6 @@ public class StyxRVersionMessage extends StyxMessage {
 	}
 
 	@Override
-	public int getBinarySize() {
-		return super.getBinarySize() + 4
-			+ UTF.getUTFSize(getProtocolVersion());
-	}
-
-	@Override
 	public String toString() {
         return String.format("%s\nMaxPocketSize: %d;\nProtocolVersion: %s",
                 super.toString(),

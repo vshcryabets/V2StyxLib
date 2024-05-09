@@ -15,8 +15,7 @@ public class StyxTWriteMessage extends StyxTMessageFID {
     private int mDataOffset;
     private int mDataLength;
 
-    public StyxTWriteMessage(long fid, long offset, byte [] data, int dataOffset, int dataLength)
-            throws IOException {
+    public StyxTWriteMessage(long fid, long offset, byte [] data, int dataOffset, int dataLength) {
         super(MessageType.Twrite, MessageType.Rwrite, fid);
         mOffset = offset;
         mData = data;
@@ -57,11 +56,6 @@ public class StyxTWriteMessage extends StyxTMessageFID {
             return new byte[0];
         }
         return mData;
-    }
-    @Override
-    public int getBinarySize() {
-        return super.getBinarySize() + 12
-                + mDataLength;
     }
 
     public int getDataLength() {

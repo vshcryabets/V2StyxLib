@@ -10,15 +10,15 @@ public class StyxStat {
     public static final StyxStat EMPTY = new StyxStat(
             (short)0,
             0,
-            null,
+            StyxQID.EMPTY,
             0,
-            null,
-            null,
+            new Date(),
+            new Date(),
             0,
-            null,
-            null,
-            null,
-            null);
+            "",
+            "",
+            "",
+            "");
 
     private int mType; //for kernel use
     private long mDev; //for kernel use

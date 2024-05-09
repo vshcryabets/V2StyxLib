@@ -31,12 +31,6 @@ public class StyxRReadMessage extends StyxMessage {
     public int getDataLength() {return mDataLength;}
 
     @Override
-    public int getBinarySize() {
-        return super.getBinarySize() + 4
-                + mDataLength;
-    }
-
-    @Override
     public String toString() {
         if ( Config.LOG_DATA_FIELDS ) {
             return String.format("%s\nData Length:%d\nData: %s",

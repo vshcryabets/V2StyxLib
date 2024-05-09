@@ -35,11 +35,6 @@ public class StyxTReadMessage extends StyxTMessageFID {
 	}
 
 	@Override
-	public int getBinarySize() {
-		return super.getBinarySize() + 8 + 4;
-	}
-
-	@Override
     public String toString() {
 	    return String.format("%s\nOffset: %d\nCount: %d",
 				super.toString(), getOffset(), getCount());

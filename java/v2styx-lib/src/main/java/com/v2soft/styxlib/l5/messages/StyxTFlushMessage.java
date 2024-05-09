@@ -24,11 +24,6 @@ public class StyxTFlushMessage extends StyxTMessage {
 	public int getOldTag(){return mOldTag;}
 
 	@Override
-	public int getBinarySize() {
-		return super.getBinarySize() + 2;
-	}
-
-	@Override
     public String toString() {
 		return String.format("%s\nTag: %d", super.toString(), getOldTag());
 	}

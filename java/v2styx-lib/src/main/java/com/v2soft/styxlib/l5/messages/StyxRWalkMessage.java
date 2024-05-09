@@ -27,19 +27,6 @@ public class StyxRWalkMessage extends StyxMessage {
             mQIDList.add(new StyxQID(input));
     }
 
-//	public boolean add(StyxQID qid) {
-//		if (mQIDList == null)
-//			mQIDList = new LinkedList<StyxQID>();
-//		return mQIDList.add(qid);
-//	}
-//
-//	public boolean remove(StyxQID qid)
-//	{
-//		if (mQIDList == null)
-//			mQIDList = new ArrayList<StyxQID>();
-//		return mQIDList.remove(qid);
-//	}
-
 	public Iterable<StyxQID> getQIDIterable()
 	{
 		return mQIDList;
@@ -50,14 +37,6 @@ public class StyxRWalkMessage extends StyxMessage {
 		if (mQIDList == null)
 			return 0;
 		return mQIDList.size();
-	}
-
-	@Override
-	public int getBinarySize() {
-		int size = super.getBinarySize() + 2
-			+ getQIDListLength() * StyxQID.CONTENT_SIZE;
-
-		return size;
 	}
 
 	@Override

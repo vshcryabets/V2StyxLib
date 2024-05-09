@@ -78,18 +78,6 @@ extends StyxTMessageFID {
     }
 
     @Override
-    public int getBinarySize() {
-        int size = super.getBinarySize() + 4 + 2;
-        if (mPathElements != null)
-        {
-            for (String pathElement : mPathElements)
-                size += UTF.getUTFSize(pathElement);
-        }
-
-        return size;
-    }
-
-    @Override
     public String toString() {
         return String.format("%s\nNewFID: %d\nNumber of walks:%d\nPath: %s",
                 super.toString(), mNewFID, mPathElements.size(), getPath());

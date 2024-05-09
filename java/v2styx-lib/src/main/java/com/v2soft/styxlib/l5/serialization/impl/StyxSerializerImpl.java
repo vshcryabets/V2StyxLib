@@ -29,6 +29,31 @@ public class StyxSerializerImpl implements IDataSerializer {
                 size += 2 + 2 + UTF.getUTFSize(attachMessage.getUserName()) +
                         UTF.getUTFSize(attachMessage.getMountPoint());
             }
+            case Twalk -> {
+                var walkMessage = (StyxTWalkMessage)message;
+                size += 4 + 2;
+                for (var pathElement : walkMessage.getPathElements())
+                    size += UTF.getUTFSize(pathElement);
+            }
+            case Topen -> size++;
+            case Tcreate -> {
+                var createMessage = (StyxTCreateMessage)message;
+                size += 5 + UTF.getUTFSize(createMessage.getName());
+            }
+            case Twstat -> size += ((StyxTWStatMessage)message).getStat().getSize();
+            case Twrite -> size += 12 + ((StyxTWriteMessage)message).getDataLength();
+            case Tread -> size += 8 + 4;
+            case Rwrite -> size += 4;
+            case Rstat -> size += 2 + ((StyxRStatMessage)message).getStat().getSize();
+            case Rread -> size += 4 + ((StyxRReadMessage)message).getDataLength();
+            case Tflush -> size += 2;
+            case Ropen -> size += 4;
+            case Tversion -> size += 4 + UTF.getUTFSize(((StyxTVersionMessage)message).getProtocolVersion());
+            case Rversion -> size += 4 + UTF.getUTFSize(((StyxRVersionMessage)message).getProtocolVersion());
+            case Rwalk -> {
+                var walkMessage = (StyxRWalkMessage)message;
+                size += 2 + walkMessage.getQIDListLength() * StyxQID.CONTENT_SIZE;
+            }
         }
         return size;
     }

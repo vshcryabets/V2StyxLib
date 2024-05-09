@@ -27,11 +27,6 @@ public class StyxTOpenMessage extends StyxTMessageFID {
     }
 
     @Override
-    public int getBinarySize() {
-        return super.getBinarySize() + 1;
-    }
-
-    @Override
     public String toString() {
         return String.format("%s\nMode: %d",
                 super.toString(), mMode);

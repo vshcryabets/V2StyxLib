@@ -42,12 +42,6 @@ public class StyxTCreateMessage extends StyxTMessageFID {
     public int getMode(){return mMode;}
 
     @Override
-    public int getBinarySize() {
-        return super.getBinarySize() + 5
-                + UTF.getUTFSize(getName());
-    }
-
-    @Override
     public String toString() {
         return String.format("%s\nName: %s\nPermissions: %d\nMode: %d",
                 super.toString(), getName(), getPermissions(), mMode);

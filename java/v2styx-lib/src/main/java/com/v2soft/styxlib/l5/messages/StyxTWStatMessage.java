@@ -27,12 +27,6 @@ public class StyxTWStatMessage extends StyxTMessageFID {
     }
 
     @Override
-    public int getBinarySize() {
-        return super.getBinarySize()
-                + mStat.getSize();
-    }
-
-    @Override
     public String toString() {
         return String.format("%s\nStat: %s",
                 super.toString(), getStat().toString());
