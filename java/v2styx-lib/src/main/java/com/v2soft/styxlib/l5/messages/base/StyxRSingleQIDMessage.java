@@ -1,7 +1,7 @@
 package com.v2soft.styxlib.l5.messages.base;
 
 import com.v2soft.styxlib.l5.enums.MessageType;
-import com.v2soft.styxlib.l5.serialization.BufferReader;
+import com.v2soft.styxlib.l5.serialization.IBufferReader;
 import com.v2soft.styxlib.l5.structs.StyxQID;
 
 import java.io.IOException;
@@ -25,17 +25,12 @@ public class StyxRSingleQIDMessage extends StyxMessage {
     }
 
     @Override
-    public int getBinarySize() {
-        return super.getBinarySize() + StyxQID.CONTENT_SIZE;
-    }
-
-    @Override
     public String toString() {
         return String.format("%s\tQID: %s", super.toString(), getQID().toString());
     }
 
     @Override
-    public void load(BufferReader buffer) throws IOException {
+    public void load(IBufferReader buffer) throws IOException {
         super.load(buffer);
         mQID = new StyxQID(buffer);
     }

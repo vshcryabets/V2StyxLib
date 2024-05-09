@@ -1,6 +1,7 @@
 package com.v2soft.styxlib.server;
 
 import com.v2soft.styxlib.handlers.IMessageProcessor;
+import com.v2soft.styxlib.handlers.IMessageTransmitter;
 
 import java.io.Closeable;
 import java.util.Collection;

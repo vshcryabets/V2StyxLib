@@ -1,26 +1,19 @@
 package com.v2soft.styxlib.io;
 
-import com.v2soft.styxlib.l5.serialization.BufferReader;
+import com.v2soft.styxlib.l5.serialization.IBufferReader;
 import com.v2soft.styxlib.utils.MetricsAndStats;
 
 import java.io.EOFException;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 public class StyxDataInputStream
     extends FilterInputStream
-    implements BufferReader {
-    // ==================================================
-    // Constants
-    // ==================================================
+    implements IBufferReader {
     private static final int sDataBufferSize = 16;
-    private static final Charset sUTFCharset = Charset.forName("utf-8");
-    // ==================================================
-    // Class fields
-    // ==================================================
-    private byte [] mDataBuffer;
+    private final byte [] mDataBuffer;
 
     public StyxDataInputStream(InputStream in) {
         super(in);
@@ -74,6 +67,6 @@ public class StyxDataInputStream
         byte[] bytes = new byte[count];
         MetricsAndStats.byteArrayAllocationIo++;
         read(bytes, 0, count);
-        return new String(bytes, "utf-8");
+        return new String(bytes, StandardCharsets.UTF_8);
     }
 }

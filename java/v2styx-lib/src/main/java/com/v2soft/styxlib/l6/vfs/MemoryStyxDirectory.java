@@ -1,8 +1,8 @@
 package com.v2soft.styxlib.l6.vfs;
 
 import com.v2soft.styxlib.exceptions.StyxErrorMessageException;
-import com.v2soft.styxlib.l5.serialization.BufferWritter;
-import com.v2soft.styxlib.l5.serialization.DataSerializer;
+import com.v2soft.styxlib.l5.serialization.IBufferWritter;
+import com.v2soft.styxlib.l5.serialization.IDataSerializer;
 import com.v2soft.styxlib.l5.serialization.impl.BufferWritterImpl;
 import com.v2soft.styxlib.l5.enums.FileMode;
 import com.v2soft.styxlib.l5.enums.ModeType;
@@ -27,11 +27,11 @@ import java.util.Map;
  */
 public class MemoryStyxDirectory
 extends MemoryStyxFile {
-    private final DataSerializer mSerializer;
+    private final IDataSerializer mSerializer;
     private Map<ClientDetails, ByteBuffer> mBuffersMap;
     private List<IVirtualStyxFile> mFiles;
 
-    public MemoryStyxDirectory(String name, DataSerializer serializer) {
+    public MemoryStyxDirectory(String name, IDataSerializer serializer) {
         super(name);
         mQID = new StyxQID(QIDType.QTDIR, 0, mName.hashCode());
         mSerializer = serializer;
@@ -75,7 +75,7 @@ extends MemoryStyxFile {
             // allocate buffer
             ByteBuffer buffer = ByteBuffer.allocate(size);
             MetricsAndStats.byteBufferAllocation++;
-            BufferWritter writer = new BufferWritterImpl(buffer);
+            IBufferWritter writer = new BufferWritterImpl(buffer);
             for (StyxStat state : stats) {
                 mSerializer.serializeStat(state, writer);
             }

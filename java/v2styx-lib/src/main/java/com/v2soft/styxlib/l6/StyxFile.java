@@ -23,7 +23,7 @@ import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.l5.enums.ModeType;
 import com.v2soft.styxlib.l5.structs.StyxStat;
 import com.v2soft.styxlib.server.ClientDetails;
-import com.v2soft.styxlib.server.IMessageTransmitter;
+import com.v2soft.styxlib.handlers.IMessageTransmitter;
 
 import java.io.*;
 import java.util.ArrayList;

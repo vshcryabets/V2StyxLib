@@ -19,5 +19,4 @@ allprojects {
 
 plugins {
   kotlin("jvm") version Versions.kotlin apply false
-//  id("org.jetbrains.compose") version Versions.compose apply false
 }

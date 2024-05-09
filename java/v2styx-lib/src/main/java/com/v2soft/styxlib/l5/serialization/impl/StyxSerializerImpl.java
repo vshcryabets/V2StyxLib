@@ -4,18 +4,38 @@ import com.v2soft.styxlib.l5.messages.*;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
 import com.v2soft.styxlib.l5.messages.base.StyxRSingleQIDMessage;
 import com.v2soft.styxlib.l5.messages.base.StyxTMessageFID;
-import com.v2soft.styxlib.l5.serialization.BufferWritter;
-import com.v2soft.styxlib.l5.serialization.DataSerializer;
+import com.v2soft.styxlib.l5.serialization.IBufferWritter;
+import com.v2soft.styxlib.l5.serialization.IDataSerializer;
+import com.v2soft.styxlib.l5.serialization.UTF;
 import com.v2soft.styxlib.l5.structs.StyxQID;
 import com.v2soft.styxlib.l5.structs.StyxStat;
 
 import java.io.IOException;
 import java.util.Date;
 
-public class MessageSerializerImpl implements DataSerializer {
+public class StyxSerializerImpl implements IDataSerializer {
+    protected int getMessageSize(StyxMessage message) {
+        var size = StyxMessage.BASE_BINARY_SIZE;
+        if (message instanceof StyxTMessageFID) {
+            size += 4;
+        }
+        if (message instanceof StyxRSingleQIDMessage) {
+            size += StyxQID.CONTENT_SIZE;
+        }
+        switch (message.getType()) {
+            case Rerror -> size += UTF.getUTFSize(((StyxRErrorMessage)message).getError());
+            case Tattach -> {
+                var attachMessage = (StyxTAttachMessage)message;
+                size += 2 + 2 + UTF.getUTFSize(attachMessage.getUserName()) +
+                        UTF.getUTFSize(attachMessage.getMountPoint());
+            }
+        }
+        return size;
+    }
+
     @Override
-    public void serialize(StyxMessage message, BufferWritter output) throws IOException {
-        int packetSize = message.getBinarySize();
+    public void serialize(StyxMessage message, IBufferWritter output) throws IOException {
+        int packetSize = getMessageSize(message);
         output.prepareBuffer(packetSize);
         output.writeUInt32(packetSize);
         output.writeUInt8((short) message.getType().getByte());
@@ -28,7 +48,7 @@ public class MessageSerializerImpl implements DataSerializer {
 
     }
 
-    private void serializeTMessage(StyxMessage message, BufferWritter output) throws IOException {
+    private void serializeTMessage(StyxMessage message, IBufferWritter output) throws IOException {
         if (message instanceof StyxTMessageFID) {
             StyxTMessageFID msg = (StyxTMessageFID) message;
             output.writeUInt32(msg.getFID());
@@ -94,7 +114,7 @@ public class MessageSerializerImpl implements DataSerializer {
         }
     }
 
-    private void serializeRMessage(StyxMessage message, BufferWritter output) throws IOException {
+    private void serializeRMessage(StyxMessage message, IBufferWritter output) throws IOException {
         if (message instanceof StyxRSingleQIDMessage) {
             StyxRSingleQIDMessage msg = (StyxRSingleQIDMessage) message;
             msg.getQID().writeBinaryTo(output);
@@ -144,7 +164,7 @@ public class MessageSerializerImpl implements DataSerializer {
     }
 
     @Override
-    public void serializeStat(StyxStat stat, BufferWritter output)
+    public void serializeStat(StyxStat stat, IBufferWritter output)
             throws IOException {
         int size = stat.getSize();
         output.writeUInt16(size - 2); // total size except first 2 bytes with size

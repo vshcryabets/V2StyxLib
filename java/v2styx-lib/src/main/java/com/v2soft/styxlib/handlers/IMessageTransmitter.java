@@ -1,6 +1,7 @@
-package com.v2soft.styxlib.server;
+package com.v2soft.styxlib.handlers;
 
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
+import com.v2soft.styxlib.server.ClientDetails;
 
 import java.io.Closeable;
 import java.io.IOException;

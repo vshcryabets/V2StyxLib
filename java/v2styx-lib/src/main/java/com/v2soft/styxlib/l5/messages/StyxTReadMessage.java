@@ -2,7 +2,7 @@ package com.v2soft.styxlib.l5.messages;
 
 import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.l5.messages.base.StyxTMessageFID;
-import com.v2soft.styxlib.l5.serialization.BufferReader;
+import com.v2soft.styxlib.l5.serialization.IBufferReader;
 
 import java.io.IOException;
 
@@ -17,7 +17,7 @@ public class StyxTReadMessage extends StyxTMessageFID {
 	}
 
     @Override
-    public void load(BufferReader input)
+    public void load(IBufferReader input)
         throws IOException  {
         super.load(input);
         mOffset = input.readUInt64();

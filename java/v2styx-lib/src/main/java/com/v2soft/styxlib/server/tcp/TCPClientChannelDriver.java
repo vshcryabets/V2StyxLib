@@ -2,7 +2,7 @@ package com.v2soft.styxlib.server.tcp;
 
 import com.v2soft.styxlib.l5.io.impl.BufferImpl;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
-import com.v2soft.styxlib.l5.serialization.BufferReader;
+import com.v2soft.styxlib.l5.serialization.IBufferReader;
 import com.v2soft.styxlib.l5.serialization.impl.BufferReaderImpl;
 import com.v2soft.styxlib.server.ClientDetails;
 
@@ -76,7 +76,7 @@ public class TCPClientChannelDriver extends TCPChannelDriver {
         try {
             isWorking = true;
             final BufferImpl buffer = new BufferImpl(mIOUnit*2);
-            final BufferReader reader = new BufferReaderImpl(buffer);
+            final IBufferReader reader = new BufferReaderImpl(buffer);
             while (isWorking) {
                 if (Thread.interrupted()) break;
                 // read from socket

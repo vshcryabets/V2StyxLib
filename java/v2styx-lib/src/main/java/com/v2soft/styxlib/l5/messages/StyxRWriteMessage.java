@@ -2,7 +2,7 @@ package com.v2soft.styxlib.l5.messages;
 
 import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
-import com.v2soft.styxlib.l5.serialization.BufferReader;
+import com.v2soft.styxlib.l5.serialization.IBufferReader;
 
 import java.io.IOException;
 
@@ -15,7 +15,7 @@ public class StyxRWriteMessage extends StyxMessage {
 	}
 
     @Override
-    public void load(BufferReader input)
+    public void load(IBufferReader input)
         throws IOException  {
         mCount = input.readUInt32();
     }

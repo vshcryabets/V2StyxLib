@@ -1,8 +1,7 @@
 package com.v2soft.styxlib.l6.io;
 
-import com.v2soft.styxlib.l6.io.StyxUnbufferedInputStream;
 import com.v2soft.styxlib.server.ClientDetails;
-import com.v2soft.styxlib.server.IMessageTransmitter;
+import com.v2soft.styxlib.handlers.IMessageTransmitter;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;

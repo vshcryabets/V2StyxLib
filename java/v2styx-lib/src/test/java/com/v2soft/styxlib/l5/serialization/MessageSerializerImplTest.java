@@ -5,7 +5,7 @@ import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.l5.enums.QIDType;
 import com.v2soft.styxlib.l5.messages.StyxTVersionMessage;
 import com.v2soft.styxlib.l5.serialization.impl.BufferWritterImpl;
-import com.v2soft.styxlib.l5.serialization.impl.MessageSerializerImpl;
+import com.v2soft.styxlib.l5.serialization.impl.StyxSerializerImpl;
 import com.v2soft.styxlib.l5.structs.StyxQID;
 import com.v2soft.styxlib.l5.structs.StyxStat;
 import org.junit.jupiter.api.Assertions;
@@ -19,7 +19,7 @@ public class MessageSerializerImplTest {
 
     @Test
     public void testSerializationTMessages() throws IOException {
-        var serializer = new MessageSerializerImpl();
+        var serializer = new StyxSerializerImpl();
         var buffer = ByteBuffer.allocate(8192);
         var outputBuffer = new BufferWritterImpl(buffer);
         serializer.serialize(new StyxTVersionMessage(128, "9P2000"), outputBuffer);
@@ -38,7 +38,7 @@ public class MessageSerializerImplTest {
 
     @Test
     public void testSerializationStyxStat() throws IOException {
-        var serializer = new MessageSerializerImpl();
+        var serializer = new StyxSerializerImpl();
         var buffer = ByteBuffer.allocate(8192);
         var outputBuffer = new BufferWritterImpl(buffer);
         var fileName = "filename";

@@ -17,7 +17,7 @@ public class MessagesFactory {
      * @return constructed Message object
      * @throws IOException in case of parse error.
      */
-    public StyxMessage factory(BufferReader buffer, int io_unit)
+    public StyxMessage factory(IBufferReader buffer, int io_unit)
             throws IOException {
         // get common packet data
         long packet_size = buffer.readUInt32();

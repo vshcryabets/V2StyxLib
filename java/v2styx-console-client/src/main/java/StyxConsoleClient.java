@@ -15,6 +15,8 @@ public class StyxConsoleClient {
     private static Logger log = Logger.getLogger(StyxConsoleClient.class.getSimpleName());
 
     public static void main(String[] args) {
+        // server samnples
+        // diod -f -n -l 0.0.0.0:10563 -e ~/temp/
         System.out.println("V2StyxLib-JVM console client");
         var host = "";
         var port = 0;

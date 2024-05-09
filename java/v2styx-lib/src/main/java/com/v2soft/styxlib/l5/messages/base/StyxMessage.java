@@ -1,16 +1,13 @@
 package com.v2soft.styxlib.l5.messages.base;
 
-import com.v2soft.styxlib.l5.serialization.BufferReader;
+import com.v2soft.styxlib.l5.serialization.IBufferReader;
 import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.utils.MetricsAndStats;
 
 import java.io.IOException;
 
 public class StyxMessage {
-    // ========================================================
-    // Constants
-    // ========================================================
-    private static final int BASE_BINARY_SIZE = 7;
+    public static final int BASE_BINARY_SIZE = 7;
     public static final int NOTAG  =      0xFFFF;
     public static final long NOFID = 0xFFFFFFFFL;
     // ========================================================
@@ -52,11 +49,7 @@ public class StyxMessage {
         mTag = (tag & 0xFFFF);
     }
 
-    public int getBinarySize(){
-        return BASE_BINARY_SIZE;
-    }
-
-    public void load(BufferReader buffer) throws IOException {
+    public void load(IBufferReader buffer) throws IOException {
     }
 
     @Override

@@ -2,7 +2,7 @@ package com.v2soft.styxlib.l5.messages;
 
 import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
-import com.v2soft.styxlib.l5.serialization.BufferReader;
+import com.v2soft.styxlib.l5.serialization.IBufferReader;
 import com.v2soft.styxlib.l5.structs.StyxStat;
 
 import java.io.IOException;
@@ -20,7 +20,7 @@ public class StyxRStatMessage extends StyxMessage {
     }
 
     @Override
-    public void load(BufferReader input) throws IOException {
+    public void load(IBufferReader input) throws IOException {
         super.load(input);
         input.readUInt16();
         mStat = new StyxStat(input);

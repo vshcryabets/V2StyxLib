@@ -2,7 +2,7 @@ package com.v2soft.styxlib.l5.messages;
 
 import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.l5.messages.base.StyxTMessageFID;
-import com.v2soft.styxlib.l5.serialization.BufferReader;
+import com.v2soft.styxlib.l5.serialization.IBufferReader;
 import com.v2soft.styxlib.l5.serialization.UTF;
 import com.v2soft.styxlib.l6.StyxFile;
 
@@ -28,7 +28,7 @@ extends StyxTMessageFID {
     }
 
     @Override
-    public void load(BufferReader input) throws IOException  {
+    public void load(IBufferReader input) throws IOException  {
         super.load(input);
         mNewFID = input.readUInt32();
         int count = input.readUInt16();
