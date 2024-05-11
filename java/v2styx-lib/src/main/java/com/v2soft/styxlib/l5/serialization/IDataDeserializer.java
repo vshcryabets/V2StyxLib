@@ -6,6 +6,6 @@ import com.v2soft.styxlib.l5.structs.StyxStat;
 import java.io.IOException;
 
 public interface IDataDeserializer {
-    StyxMessage deserializeMessage(IBufferReader input) throws IOException;
-    StyxStat deserializeState(IBufferReader input) throws IOException;
+    StyxMessage deserializeMessage(IBufferReader input, int io_unit) throws IOException;
+    StyxStat deserializeStat(IBufferReader input) throws IOException;
 }

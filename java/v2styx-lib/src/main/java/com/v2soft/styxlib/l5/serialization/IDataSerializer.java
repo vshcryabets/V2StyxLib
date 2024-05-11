@@ -6,6 +6,8 @@ import com.v2soft.styxlib.l5.structs.StyxStat;
 import java.io.IOException;
 
 public interface IDataSerializer {
+    public static final int BASE_BINARY_SIZE = 7;
+
     void serialize(StyxMessage message, IBufferWritter output) throws IOException;
 
     void serializeStat(StyxStat stat, IBufferWritter output) throws IOException;

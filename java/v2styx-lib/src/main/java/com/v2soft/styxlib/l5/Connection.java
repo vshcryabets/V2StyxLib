@@ -202,8 +202,8 @@ public class Connection
 
         StyxMessage rMessage = tVersion.waitForAnswer(mTimeout);
         StyxRVersionMessage rVersion = (StyxRVersionMessage) rMessage;
-        if (rVersion.getMaxPacketSize() < mDetails.ioUnit()) {
-            mDetails = new ConnectionDetails(getProtocol(), (int) rVersion.getMaxPacketSize());
+        if (rVersion.maxPacketSize < mDetails.ioUnit()) {
+            mDetails = new ConnectionDetails(getProtocol(), (int) rVersion.maxPacketSize);
         }
         mRecepient.getPolls().getFIDPoll().clean();
         if ((mCredentials.getUserName() != null) && (mCredentials.getPassword() != null)) {

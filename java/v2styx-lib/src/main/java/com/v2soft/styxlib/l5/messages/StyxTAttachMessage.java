@@ -8,24 +8,15 @@ import com.v2soft.styxlib.l5.serialization.UTF;
 import java.io.IOException;
 
 public class StyxTAttachMessage extends StyxTMessageFID {
-    private long mAuthFID;
-    private String mUserName;
-    private String mMountPoint;
+    private final long mAuthFID;
+    private final String mUserName;
+    private final String mMountPoint;
 
     public StyxTAttachMessage(long fid, long afid, String username, String mountpoint) {
         super(MessageType.Tattach, MessageType.Rattach, fid);
         mAuthFID = afid;
         mUserName = username;
         mMountPoint = mountpoint;
-    }
-
-    @Override
-    public void load(IBufferReader input)
-            throws IOException {
-        super.load(input);
-        mAuthFID = input.readUInt32();
-        mUserName = input.readUTFString();
-        mMountPoint =  input.readUTFString();
     }
 
     public long getAuthFID() {

@@ -8,9 +8,9 @@ import com.v2soft.styxlib.l5.serialization.UTF;
 import java.io.IOException;
 
 public class StyxTCreateMessage extends StyxTMessageFID {
-    private String mName;
-    private long mPermissions;
-    private int mMode;
+    private final String mName;
+    private final long mPermissions;
+    private final int mMode;
 
     public StyxTCreateMessage(long fid, String name, long permissions, int mode) {
         super(MessageType.Tcreate, MessageType.Rcreate, fid);
@@ -19,18 +19,8 @@ public class StyxTCreateMessage extends StyxTMessageFID {
         mMode = mode;
     }
 
-    @Override
-    public void load(IBufferReader input) throws IOException {
-        super.load(input);
-        mName = input.readUTFString();
-        mPermissions = input.readUInt32();
-        mMode = input.readUInt8();
-    }
-
     public String getName()
     {
-        if (mName == null)
-            return "";
         return mName;
     }
 

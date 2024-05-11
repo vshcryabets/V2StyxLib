@@ -7,14 +7,11 @@ import com.v2soft.styxlib.utils.MetricsAndStats;
 import java.io.IOException;
 
 public class StyxMessage {
-    public static final int BASE_BINARY_SIZE = 7;
     public static final int NOTAG  =      0xFFFF;
     public static final long NOFID = 0xFFFFFFFFL;
-    // ========================================================
-    // Class fields
-    // ========================================================
+
     private int mTag;
-    private MessageType mType;
+    private final MessageType mType;
 
     public StyxMessage(MessageType type, int tag) {
         MetricsAndStats.newStyxMessage++;
@@ -47,9 +44,6 @@ public class StyxMessage {
 
     public void setTag(int tag){
         mTag = (tag & 0xFFFF);
-    }
-
-    public void load(IBufferReader buffer) throws IOException {
     }
 
     @Override

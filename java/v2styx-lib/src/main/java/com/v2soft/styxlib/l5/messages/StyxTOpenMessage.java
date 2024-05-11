@@ -14,13 +14,6 @@ public class StyxTOpenMessage extends StyxTMessageFID {
         mMode = mode;
     }
 
-    @Override
-    public void load(IBufferReader input)
-            throws IOException  {
-        super.load(input);
-        mMode = input.readUInt8();
-    }
-
     public int getMode()
     {
         return mMode;

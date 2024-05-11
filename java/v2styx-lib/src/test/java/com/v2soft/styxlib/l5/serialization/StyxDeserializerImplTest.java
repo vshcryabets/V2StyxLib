@@ -35,7 +35,7 @@ public class StyxDeserializerImplTest {
         buffer.write(dataBuffer, 0, dataBuffer.length);
         var bufferReader = new BufferReaderImpl(buffer);
         var deserializer = new StyxDeserializerImpl();
-        var stat = deserializer.deserializeState(bufferReader);
+        var stat = deserializer.deserializeStat(bufferReader);
         Assertions.assertNotNull(stat);
 
     }

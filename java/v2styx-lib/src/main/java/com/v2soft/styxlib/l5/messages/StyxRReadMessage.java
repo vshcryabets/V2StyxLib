@@ -9,23 +9,13 @@ import com.v2soft.styxlib.utils.MetricsAndStats;
 import java.io.IOException;
 
 public class StyxRReadMessage extends StyxMessage {
-    private byte[] mData;
-    private int mDataLength;
+    private final byte[] mData;
+    private final int mDataLength;
 
     public StyxRReadMessage(int tag, byte[] data, int length) {
         super(MessageType.Rread, tag);
         mData = data;
         mDataLength = length;
-    }
-
-    @Override
-    public void load(IBufferReader input)
-            throws IOException  {
-        super.load(input);
-        mDataLength = (int)input.readUInt32();
-        MetricsAndStats.byteArrayAllocationRRead++;
-        mData = new byte[mDataLength];
-        input.read(mData, 0, mDataLength);
     }
 
     public int getDataLength() {return mDataLength;}

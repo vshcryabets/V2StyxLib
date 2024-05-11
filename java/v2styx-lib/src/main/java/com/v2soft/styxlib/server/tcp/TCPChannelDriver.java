@@ -1,8 +1,9 @@
 package com.v2soft.styxlib.server.tcp;
 
+import com.v2soft.styxlib.l5.serialization.IDataDeserializer;
 import com.v2soft.styxlib.l5.serialization.IDataSerializer;
+import com.v2soft.styxlib.l5.serialization.impl.StyxDeserializerImpl;
 import com.v2soft.styxlib.l5.serialization.impl.StyxSerializerImpl;
-import com.v2soft.styxlib.l5.serialization.MessagesFactory;
 import com.v2soft.styxlib.server.StyxServerManager;
 import com.v2soft.styxlib.handlers.IMessageProcessor;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
@@ -28,7 +29,7 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
     protected int mTransmissionErrorsCount;
     protected InetAddress mAddress;
     protected int mPort;
-    protected MessagesFactory messagesFactory;
+    protected IDataDeserializer deserializer;
     protected IDataSerializer serializer;
 
     public TCPChannelDriver(InetAddress address,
@@ -43,7 +44,7 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
         prepareSocket(socketAddress, ssl);
         mTransmittedPacketsCount = 0;
         mTransmissionErrorsCount = 0;
-        messagesFactory = new MessagesFactory();
+        deserializer = new StyxDeserializerImpl();
         serializer = new StyxSerializerImpl();
     }
 
@@ -135,7 +136,7 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
         if ( inBuffer > 4 ) {
             long packetSize = client.getInputReader().getUInt32();
             if ( inBuffer >= packetSize ) {
-                final StyxMessage message = messagesFactory.factory(client.getInputReader(), mIOUnit);
+                final StyxMessage message = deserializer.deserializeMessage(client.getInputReader(), mIOUnit);
                 if ( message.getType().isTMessage() ) {
                     if ( mTMessageHandler != null ) {
                         mTMessageHandler.postPacket(message, client);

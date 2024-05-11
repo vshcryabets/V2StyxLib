@@ -8,22 +8,14 @@ import com.v2soft.styxlib.l5.serialization.UTF;
 import java.io.IOException;
 
 public class StyxTVersionMessage extends StyxTMessage {
-	private long mMaxPacketSize;
-	private String mProtocolVersion;
+	private final long mMaxPacketSize;
+	private final String mProtocolVersion;
 
 	public StyxTVersionMessage(long maxPacketSize, String protocolVersion) {
         super(MessageType.Tversion, MessageType.Rversion);
 		mMaxPacketSize = maxPacketSize;
 		mProtocolVersion = protocolVersion;
 	}
-
-    @Override
-    public void load(IBufferReader input)
-        throws IOException {
-        super.load(input);
-		mMaxPacketSize = input.readUInt32();
-		mProtocolVersion = input.readUTFString();
-    }
 
 	public long getMaxPacketSize()
 	{

@@ -52,7 +52,7 @@ public class StyxUnbufferedOutputStream extends OutputStream {
             mMessenger.sendMessage(tWrite, mRecipient);
             final StyxMessage rMessage = tWrite.waitForAnswer(mTimeout);
             final StyxRWriteMessage rWrite = (StyxRWriteMessage) rMessage;
-            mFileOffset += rWrite.getCount();
+            mFileOffset += rWrite.count;
         } catch (Exception e) {
             throw new IOException(e);
         }

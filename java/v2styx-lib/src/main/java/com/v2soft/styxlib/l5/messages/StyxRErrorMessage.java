@@ -15,11 +15,6 @@ public class StyxRErrorMessage extends StyxMessage {
 		mError = error;
 	}
 
-    @Override
-    public void load(IBufferReader input)
-        throws IOException  {
-        setError(input.readUTFString());
-    }
 	public String getError() {
 		return mError;
 	}

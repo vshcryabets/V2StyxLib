@@ -18,13 +18,6 @@ public class StyxTMessageFID extends StyxTMessage {
     }
 
     @Override
-    public void load(IBufferReader input)
-            throws IOException  {
-        super.load(input);
-        mFID = input.readUInt32();
-    }
-
-    @Override
     public String toString() {
         String result = super.toString();
         return String.format("%s\tFID: %d", result, getFID());
