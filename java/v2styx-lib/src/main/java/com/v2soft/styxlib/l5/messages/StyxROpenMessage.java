@@ -10,7 +10,10 @@ import java.io.IOException;
 public class StyxROpenMessage extends StyxRSingleQIDMessage {
     private long mIOUnit;
 
-    public StyxROpenMessage(int tag, StyxQID qid, long iounit, boolean create) {
+    public StyxROpenMessage(int tag,
+                            StyxQID qid,
+                            long iounit,
+                            boolean create) {
         super(( create ? MessageType.Rcreate : MessageType.Ropen ), tag, qid);
         mIOUnit = iounit;
     }

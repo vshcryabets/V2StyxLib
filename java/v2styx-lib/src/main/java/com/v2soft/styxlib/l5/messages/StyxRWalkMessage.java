@@ -22,7 +22,7 @@ public class StyxRWalkMessage extends StyxMessage {
         throws IOException  {
         int count = input.readUInt16();
 
-        mQIDList = new LinkedList<StyxQID>();
+        mQIDList = new LinkedList<>();
         for (int i=0; i<count; i++)
             mQIDList.add(new StyxQID(input));
     }
