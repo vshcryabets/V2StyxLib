@@ -49,6 +49,12 @@ class StyxSerializerImplTest {
                         "user",
                         "mountpoint")));
 
+        assertEquals(IDataSerializer.BASE_BINARY_SIZE + 4 + 6 + 3,
+                serializer.getMessageSize(new StyxTAuthMessage(
+                        1,
+                        "user",
+                        "/")));
+
         assertEquals(IDataSerializer.BASE_BINARY_SIZE + 4 + 4 + 2 + 3 + 3 + 3,
                 serializer.getMessageSize(new StyxTWalkMessage(
                         0x1234,
@@ -112,6 +118,9 @@ class StyxSerializerImplTest {
 
         assertEquals(IDataSerializer.BASE_BINARY_SIZE + StyxQID.CONTENT_SIZE + 4,
                 serializer.getMessageSize(new StyxROpenMessage(0x1111, StyxQID.EMPTY, 0, false)));
+
+        assertEquals(IDataSerializer.BASE_BINARY_SIZE + StyxQID.CONTENT_SIZE + 4,
+                serializer.getMessageSize(new StyxROpenMessage(0x1111, StyxQID.EMPTY, 0, true)));
 
         assertEquals(IDataSerializer.BASE_BINARY_SIZE + 4 + 2 + 4,
                 serializer.getMessageSize(new StyxRVersionMessage(0x1111, "ABCD")));

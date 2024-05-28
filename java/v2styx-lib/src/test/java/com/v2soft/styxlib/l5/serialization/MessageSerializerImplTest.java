@@ -3,6 +3,7 @@ package com.v2soft.styxlib.l5.serialization;
 import com.v2soft.styxlib.l5.enums.FileMode;
 import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.l5.enums.QIDType;
+import com.v2soft.styxlib.l5.messages.StyxROpenMessage;
 import com.v2soft.styxlib.l5.messages.StyxTVersionMessage;
 import com.v2soft.styxlib.l5.serialization.impl.BufferWritterImpl;
 import com.v2soft.styxlib.l5.serialization.impl.StyxSerializerImpl;
@@ -18,7 +19,7 @@ import java.util.Date;
 public class MessageSerializerImplTest {
 
     @Test
-    public void testSerializationTMessages() throws IOException {
+    public void testTVersion() throws IOException {
         var serializer = new StyxSerializerImpl();
         var buffer = ByteBuffer.allocate(8192);
         var outputBuffer = new BufferWritterImpl(buffer);
@@ -83,5 +84,26 @@ public class MessageSerializerImplTest {
                 },
                 data,
                 "StyxSTat serialization failed");
+    }
+
+    @Test
+    public void testRCreate() throws IOException {
+        var serializer = new StyxSerializerImpl();
+        var buffer = ByteBuffer.allocate(8192);
+        var outputBuffer = new BufferWritterImpl(buffer);
+
+        serializer.serialize(new StyxROpenMessage(128, StyxQID.EMPTY, 0x1234, true), outputBuffer);
+        byte[] data = new byte[buffer.limit()];
+        buffer.position(0);
+        buffer.get(data);
+        Assertions.assertArrayEquals(new byte[]{24, 0, 0, 0,
+                (byte) MessageType.Rcreate.getByte(),
+                (byte) 0x80, (byte) 0x00, // tag
+                // qid
+                (byte) 0x0, 0, 0, 0,
+                0x00, 0x00, 0x00, 0x00,
+                0x00, 0x00,
+                0x00,
+                0x00, 0x00, 0x34, 0x12, 0, 0}, data, "Rcreate");
     }
 }
