@@ -1,3 +1,5 @@
+package com.v2soft.styxlib;
+
 import com.v2soft.styxlib.l5.Connection;
 import com.v2soft.styxlib.l6.StyxFile;
 import com.v2soft.styxlib.library.types.impl.CredentialsImpl;
@@ -15,6 +17,10 @@ public class StyxConsoleClient {
     private static Logger log = Logger.getLogger(StyxConsoleClient.class.getSimpleName());
 
     public static void main(String[] args) {
+        // server samnples
+        // diod -f -n -l 0.0.0.0:12345 -e ~/temp/
+        // or docker docker run -p 6666:6666 --rm -it metacoma/inferno-os:latest
+        // styxlisten -A 'tcp!*!6666' export /
         System.out.println("V2StyxLib-JVM console client");
         var host = "";
         var port = 0;
@@ -41,8 +47,9 @@ public class StyxConsoleClient {
         System.out.println("Connection to the " + host + ":" + port);
         try {
             var driver = new TCPClientChannelDriver(InetAddress.getByName(host), port, false);
-            var connection = new Connection(new CredentialsImpl("user", ""), driver);
+            var connection = new Connection(new CredentialsImpl("", ""), driver);
             connection.connect();
+            System.out.println("Connected");
             // list files
             StyxFile rootDir = connection.getRoot();
             var files = rootDir.listStat();

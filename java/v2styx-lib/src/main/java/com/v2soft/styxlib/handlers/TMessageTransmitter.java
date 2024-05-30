@@ -5,7 +5,6 @@ import com.v2soft.styxlib.l5.messages.base.StyxMessage;
 import com.v2soft.styxlib.l5.messages.base.StyxTMessage;
 import com.v2soft.styxlib.server.ClientDetails;
 import com.v2soft.styxlib.server.IChannelDriver;
-import com.v2soft.styxlib.server.IMessageTransmitter;
 
 import java.io.IOException;
 import java.net.SocketException;

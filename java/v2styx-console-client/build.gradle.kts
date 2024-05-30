@@ -25,5 +25,5 @@ dependencies {
 }
 
 application {
-    mainClass.set("JavaServerSample")
+    mainClass.set("StyxConsoleClient")
 }

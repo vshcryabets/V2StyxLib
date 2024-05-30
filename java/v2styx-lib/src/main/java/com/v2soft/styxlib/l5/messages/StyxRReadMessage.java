@@ -3,14 +3,14 @@ package com.v2soft.styxlib.l5.messages;
 import com.v2soft.styxlib.Config;
 import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
-import com.v2soft.styxlib.l5.serialization.BufferReader;
+import com.v2soft.styxlib.l5.serialization.IBufferReader;
 import com.v2soft.styxlib.utils.MetricsAndStats;
 
 import java.io.IOException;
 
 public class StyxRReadMessage extends StyxMessage {
-    private byte[] mData;
-    private int mDataLength;
+    private final byte[] mData;
+    private final int mDataLength;
 
     public StyxRReadMessage(int tag, byte[] data, int length) {
         super(MessageType.Rread, tag);
@@ -18,23 +18,7 @@ public class StyxRReadMessage extends StyxMessage {
         mDataLength = length;
     }
 
-    @Override
-    public void load(BufferReader input)
-            throws IOException  {
-        super.load(input);
-        mDataLength = (int)input.readUInt32();
-        mData = new byte[mDataLength];
-        MetricsAndStats.byteArrayAllocationRRead++;
-        input.read(mData, 0, mDataLength);
-    }
-
     public int getDataLength() {return mDataLength;}
-
-    @Override
-    public int getBinarySize() {
-        return super.getBinarySize() + 4
-                + mDataLength;
-    }
 
     @Override
     public String toString() {

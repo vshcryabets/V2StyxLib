@@ -1,15 +1,16 @@
 package com.v2soft.styxlib.l5.serialization.impl;
 
 import com.v2soft.styxlib.l5.io.Buffer;
-import com.v2soft.styxlib.l5.serialization.BufferReader;
+import com.v2soft.styxlib.l5.serialization.IBufferReader;
 import com.v2soft.styxlib.utils.MetricsAndStats;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
-public class BufferReaderImpl implements BufferReader {
+public class BufferReaderImpl implements IBufferReader {
 
-    protected static final Charset sUTFCharset = Charset.forName("utf-8");
+    protected static final Charset sUTFCharset = StandardCharsets.UTF_8;
     protected static final int sDataBufferSize = 16;
     protected byte[] mInternalBuffer;
     protected Buffer mBuffer;

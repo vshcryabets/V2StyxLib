@@ -1,5 +1,3 @@
-import com.v2soft.styxlib.l5.serialization.DataSerializer;
-import com.v2soft.styxlib.l5.serialization.impl.MessageSerializerImpl;
 import com.v2soft.styxlib.l6.vfs.DiskStyxDirectory;
 import com.v2soft.styxlib.server.StyxServerManager;
 import com.v2soft.styxlib.server.tcp.TCPServerChannelDriver;

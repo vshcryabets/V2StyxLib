@@ -2,30 +2,21 @@ package com.v2soft.styxlib.l5.messages;
 
 import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.l5.messages.base.StyxTMessageFID;
-import com.v2soft.styxlib.l5.serialization.BufferReader;
+import com.v2soft.styxlib.l5.serialization.IBufferReader;
 import com.v2soft.styxlib.l5.serialization.UTF;
 
 import java.io.IOException;
 
 public class StyxTAttachMessage extends StyxTMessageFID {
-    private long mAuthFID;
-    private String mUserName;
-    private String mMountPoint;
+    private final long mAuthFID;
+    private final String mUserName;
+    private final String mMountPoint;
 
     public StyxTAttachMessage(long fid, long afid, String username, String mountpoint) {
         super(MessageType.Tattach, MessageType.Rattach, fid);
         mAuthFID = afid;
         mUserName = username;
         mMountPoint = mountpoint;
-    }
-
-    @Override
-    public void load(BufferReader input)
-            throws IOException {
-        super.load(input);
-        mAuthFID = input.readUInt32();
-        mUserName = input.readUTFString();
-        mMountPoint =  input.readUTFString();
     }
 
     public long getAuthFID() {
@@ -44,14 +35,6 @@ public class StyxTAttachMessage extends StyxTMessageFID {
             return "";
         }
         return mMountPoint;
-    }
-
-    @Override
-    public int getBinarySize() {
-        int res = super.getBinarySize() + 4
-                + UTF.getUTFSize(getUserName())
-                + UTF.getUTFSize(getMountPoint());
-        return res;
     }
 
     @Override

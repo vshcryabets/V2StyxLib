@@ -2,7 +2,7 @@ package com.v2soft.styxlib.l5.messages;
 
 import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
-import com.v2soft.styxlib.l5.serialization.BufferReader;
+import com.v2soft.styxlib.l5.serialization.IBufferReader;
 import com.v2soft.styxlib.l5.serialization.UTF;
 
 import java.io.IOException;
@@ -15,21 +15,11 @@ public class StyxRErrorMessage extends StyxMessage {
 		mError = error;
 	}
 
-    @Override
-    public void load(BufferReader input)
-        throws IOException  {
-        setError(input.readUTFString());
-    }
 	public String getError() {
 		return mError;
 	}
 	public void setError(String error) {
 		mError = error;
-	}
-
-	@Override
-	public int getBinarySize() {
-		return super.getBinarySize() + UTF.getUTFSize(getError());
 	}
 
 	@Override

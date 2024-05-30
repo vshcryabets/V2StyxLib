@@ -4,14 +4,17 @@ import com.v2soft.styxlib.l5.messages.StyxRErrorMessage;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
 import com.v2soft.styxlib.l5.enums.MessageType;
 
+import java.io.Serial;
+
 /**
  *
  * @author V.Shcriabets (vshcryabets@gmail.com)
  *
  */
 public class StyxErrorMessageException extends StyxException {
+    @Serial
     private static final long serialVersionUID = 1;
-    private StyxRErrorMessage mMessage;
+    private final StyxRErrorMessage mMessage;
 
     public static StyxErrorMessageException newInstance(String message) {
         if (message == null)

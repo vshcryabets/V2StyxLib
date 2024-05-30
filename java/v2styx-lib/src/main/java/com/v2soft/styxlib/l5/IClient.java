@@ -2,10 +2,8 @@ package com.v2soft.styxlib.l5;
 
 import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.server.ClientDetails;
-import com.v2soft.styxlib.server.IChannelDriver;
-import com.v2soft.styxlib.server.IMessageTransmitter;
+import com.v2soft.styxlib.handlers.IMessageTransmitter;
 import com.v2soft.styxlib.library.types.ConnectionDetails;
-import com.v2soft.styxlib.library.types.Credentials;
 
 import java.io.Closeable;
 import java.io.IOException;

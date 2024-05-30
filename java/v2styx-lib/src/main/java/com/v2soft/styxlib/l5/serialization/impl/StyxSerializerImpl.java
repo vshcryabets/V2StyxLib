@@ -4,18 +4,73 @@ import com.v2soft.styxlib.l5.messages.*;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
 import com.v2soft.styxlib.l5.messages.base.StyxRSingleQIDMessage;
 import com.v2soft.styxlib.l5.messages.base.StyxTMessageFID;
-import com.v2soft.styxlib.l5.serialization.BufferWritter;
-import com.v2soft.styxlib.l5.serialization.DataSerializer;
+import com.v2soft.styxlib.l5.serialization.IBufferWritter;
+import com.v2soft.styxlib.l5.serialization.IDataSerializer;
+import com.v2soft.styxlib.l5.serialization.UTF;
 import com.v2soft.styxlib.l5.structs.StyxQID;
 import com.v2soft.styxlib.l5.structs.StyxStat;
+import com.v2soft.styxlib.l6.StyxFile;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 
-public class MessageSerializerImpl implements DataSerializer {
+public class StyxSerializerImpl implements IDataSerializer {
+    protected int getMessageSize(StyxMessage message) {
+        var size = IDataSerializer.BASE_BINARY_SIZE;
+        if (message instanceof StyxTMessageFID) {
+            size += 4;
+        }
+        if (message instanceof StyxRSingleQIDMessage) {
+            size += StyxQID.CONTENT_SIZE;
+        }
+        switch (message.getType()) {
+            case Rerror -> size += UTF.getUTFSize(((StyxRErrorMessage)message).getError());
+            case Tattach -> {
+                var attachMessage = (StyxTAttachMessage)message;
+                size += 2 + 2 + UTF.getUTFSize(attachMessage.getUserName()) +
+                        UTF.getUTFSize(attachMessage.getMountPoint());
+            }
+            case Tauth -> {
+                var authMessage = (StyxTAuthMessage)message;
+                size += UTF.getUTFSize(authMessage.getUserName())
+                    + UTF.getUTFSize(authMessage.getMountPoint());
+            }
+            case Twalk -> {
+                var walkMessage = (StyxTWalkMessage)message;
+                size += 4 + 2;
+                for (var pathElement : walkMessage.getPathElements())
+                    size += UTF.getUTFSize(pathElement);
+            }
+            case Topen -> size++;
+            case Tcreate -> {
+                var createMessage = (StyxTCreateMessage)message;
+                size += 5 + UTF.getUTFSize(createMessage.getName());
+            }
+            case Twstat -> size += ((StyxTWStatMessage)message).getStat().getSize();
+            case Twrite -> size += 12 + ((StyxTWriteMessage)message).getDataLength();
+            case Tread -> size += 8 + 4;
+            case Rwrite -> size += 4;
+            case Rstat -> size += 2 + ((StyxRStatMessage)message).stat.getSize();
+            case Rread -> size += 4 + ((StyxRReadMessage)message).getDataLength();
+            case Tflush -> size += 2;
+            case Rcreate -> size += 4;
+            case Ropen -> size += 4;
+            case Tversion -> size += 4 + UTF.getUTFSize(((StyxTVersionMessage)message).getProtocolVersion());
+            case Rversion -> size += 4 + UTF.getUTFSize(((StyxRVersionMessage)message).protocolVersion);
+            case Rwalk -> {
+                var walkMessage = (StyxRWalkMessage)message;
+                size += 2 + walkMessage.getQIDListLength() * StyxQID.CONTENT_SIZE;
+            }
+        }
+        return size;
+    }
+
     @Override
-    public void serialize(StyxMessage message, BufferWritter output) throws IOException {
-        int packetSize = message.getBinarySize();
+    public void serialize(StyxMessage message, IBufferWritter output) throws IOException {
+        int packetSize = getMessageSize(message);
         output.prepareBuffer(packetSize);
         output.writeUInt32(packetSize);
         output.writeUInt8((short) message.getType().getByte());
@@ -28,7 +83,7 @@ public class MessageSerializerImpl implements DataSerializer {
 
     }
 
-    private void serializeTMessage(StyxMessage message, BufferWritter output) throws IOException {
+    private void serializeTMessage(StyxMessage message, IBufferWritter output) throws IOException {
         if (message instanceof StyxTMessageFID) {
             StyxTMessageFID msg = (StyxTMessageFID) message;
             output.writeUInt32(msg.getFID());
@@ -79,7 +134,7 @@ public class MessageSerializerImpl implements DataSerializer {
                 break;
             case Tflush:
                 StyxTFlushMessage tFlushMessage = (StyxTFlushMessage) message;
-                output.writeUInt16(tFlushMessage.getOldTag());
+                output.writeUInt16(tFlushMessage.oldTag);
                 break;
             case Topen:
                 StyxTOpenMessage tOpenMessage = (StyxTOpenMessage) message;
@@ -94,7 +149,7 @@ public class MessageSerializerImpl implements DataSerializer {
         }
     }
 
-    private void serializeRMessage(StyxMessage message, BufferWritter output) throws IOException {
+    private void serializeRMessage(StyxMessage message, IBufferWritter output) throws IOException {
         if (message instanceof StyxRSingleQIDMessage) {
             StyxRSingleQIDMessage msg = (StyxRSingleQIDMessage) message;
             msg.getQID().writeBinaryTo(output);
@@ -105,12 +160,12 @@ public class MessageSerializerImpl implements DataSerializer {
                 break;
             case Rversion:
                 StyxRVersionMessage version = (StyxRVersionMessage) message;
-                output.writeUInt32(version.getMaxPacketSize());
-                output.writeUTFString(version.getProtocolVersion());
+                output.writeUInt32(version.maxPacketSize);
+                output.writeUTFString(version.protocolVersion);
                 break;
             case Rwrite:
                 StyxRWriteMessage msg = (StyxRWriteMessage) message;
-                output.writeUInt32(msg.getCount());
+                output.writeUInt32(msg.count);
                 break;
             case Rread:
                 StyxRReadMessage read = (StyxRReadMessage) message;
@@ -121,17 +176,18 @@ public class MessageSerializerImpl implements DataSerializer {
                 break;
             case Rstat:
                 StyxRStatMessage rStatMessage = (StyxRStatMessage) message;
-                output.writeUInt16(rStatMessage.getStat().getSize());
-                serializeStat(rStatMessage.getStat(), output);
+                output.writeUInt16(rStatMessage.stat.getSize());
+                serializeStat(rStatMessage.stat, output);
                 break;
+            case Rcreate:
             case Ropen:
                 StyxROpenMessage rOpenMessage = (StyxROpenMessage) message;
-                output.writeUInt32(rOpenMessage.getIOUnit());
+                output.writeUInt32(rOpenMessage.ioUnit);
                 break;
             case Rwalk:
                 StyxRWalkMessage rWalkMessage = (StyxRWalkMessage) message;
                 output.writeUInt16(rWalkMessage.getQIDListLength());
-                for (StyxQID qid : rWalkMessage.getQIDIterable())
+                for (var qid : rWalkMessage.qidList)
                     qid.writeBinaryTo(output);
                 break;
         }
@@ -144,7 +200,7 @@ public class MessageSerializerImpl implements DataSerializer {
     }
 
     @Override
-    public void serializeStat(StyxStat stat, BufferWritter output)
+    public void serializeStat(StyxStat stat, IBufferWritter output)
             throws IOException {
         int size = stat.getSize();
         output.writeUInt16(size - 2); // total size except first 2 bytes with size
@@ -159,5 +215,23 @@ public class MessageSerializerImpl implements DataSerializer {
         output.writeUTFString(stat.getUserName());
         output.writeUTFString(stat.getGroupName());
         output.writeUTFString(stat.getModificationUser());
+    }
+
+
+    public static List<String> splitPath(String path) {
+        if (path == null) {
+            throw new NullPointerException("Path is null");
+        }
+        var result = new LinkedList<String>();
+        if (path.length() > 0 ) {
+            StringBuilder builder = new StringBuilder(path);
+            while (builder.toString().startsWith(StyxFile.SEPARATOR))
+                builder.delete(0, 1);
+            while (builder.toString().endsWith(StyxFile.SEPARATOR))
+                builder.delete(builder.length() - 1, builder.length());
+            String [] pathElements = builder.toString().split(StyxFile.SEPARATOR);
+            result.addAll(Arrays.asList(pathElements));
+        }
+        return result;
     }
 }

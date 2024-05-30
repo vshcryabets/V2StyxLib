@@ -4,6 +4,7 @@ import com.v2soft.styxlib.l5.Connection;
 import com.v2soft.styxlib.l5.IClient;
 import com.v2soft.styxlib.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.exceptions.StyxException;
+import com.v2soft.styxlib.l5.serialization.impl.StyxSerializerImpl;
 import com.v2soft.styxlib.l6.io.DualStreams;
 import com.v2soft.styxlib.io.StyxDataInputStream;
 import com.v2soft.styxlib.l6.io.StyxFileBufferedInputStream;
@@ -23,7 +24,7 @@ import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.l5.enums.ModeType;
 import com.v2soft.styxlib.l5.structs.StyxStat;
 import com.v2soft.styxlib.server.ClientDetails;
-import com.v2soft.styxlib.server.IMessageTransmitter;
+import com.v2soft.styxlib.handlers.IMessageTransmitter;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -94,7 +95,7 @@ public class StyxFile implements Closeable {
         StyxMessage rMessage = tOpen.waitForAnswer(mTimeout);
 
         StyxROpenMessage rOpen = (StyxROpenMessage) rMessage;
-        return (int) rOpen.getIOUnit();
+        return (int) rOpen.ioUnit;
     }
 
     @Override
@@ -410,7 +411,7 @@ public class StyxFile implements Closeable {
             throws StyxException, InterruptedException, TimeoutException, IOException {
         long newFID = mRecepient.getPolls().getFIDPoll().getFreeItem();
         final StyxTWalkMessage tWalk = new StyxTWalkMessage(parentFID,
-                newFID, path);
+                newFID, StyxSerializerImpl.splitPath(path));
         mMessenger.sendMessage(tWalk, mRecepient);
         final StyxMessage rWalk = tWalk.waitForAnswer(mTimeout);
         StyxErrorMessageException.doException(rWalk, mPath);
@@ -430,7 +431,7 @@ public class StyxFile implements Closeable {
             StyxTMessageFID tStat = new StyxTMessageFID(MessageType.Tstat, MessageType.Rstat, getFID());
             mMessenger.sendMessage(tStat, mRecepient);
             StyxMessage rMessage = tStat.waitForAnswer(mTimeout);
-            mStat = ((StyxRStatMessage) rMessage).getStat();
+            mStat = ((StyxRStatMessage) rMessage).stat;
         }
         return mStat;
     }

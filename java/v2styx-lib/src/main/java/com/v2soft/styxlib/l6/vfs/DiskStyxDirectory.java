@@ -1,7 +1,7 @@
 package com.v2soft.styxlib.l6.vfs;
 
 import com.v2soft.styxlib.exceptions.StyxErrorMessageException;
-import com.v2soft.styxlib.l5.serialization.DataSerializer;
+import com.v2soft.styxlib.l5.serialization.IDataSerializer;
 import com.v2soft.styxlib.l5.serialization.impl.BufferWritterImpl;
 import com.v2soft.styxlib.l5.enums.FileMode;
 import com.v2soft.styxlib.l5.enums.ModeType;
@@ -32,9 +32,9 @@ extends DiskStyxFile {
     private Map<ClientDetails, ByteBuffer> mBuffersMap;
     protected Vector<IVirtualStyxFile> mFiles;
     protected List<IVirtualStyxFile> mDirectoryFiles;
-    private DataSerializer mSerializer;
+    private IDataSerializer mSerializer;
 
-    public DiskStyxDirectory(File directory, DataSerializer serializer) throws IOException {
+    public DiskStyxDirectory(File directory, IDataSerializer serializer) throws IOException {
         super(directory);
         mQID = new StyxQID(QIDType.QTDIR, 0, mName.hashCode());
         mSerializer = serializer;

@@ -1,7 +1,6 @@
 package com.v2soft.styxlib.l5.structs;
 
-import com.v2soft.styxlib.l5.serialization.BufferReader;
-import com.v2soft.styxlib.l5.serialization.BufferWritter;
+import com.v2soft.styxlib.l5.serialization.IBufferReader;
 import com.v2soft.styxlib.l5.serialization.UTF;
 
 import java.io.IOException;
@@ -11,15 +10,15 @@ public class StyxStat {
     public static final StyxStat EMPTY = new StyxStat(
             (short)0,
             0,
-            null,
+            StyxQID.EMPTY,
             0,
-            null,
-            null,
+            new Date(),
+            new Date(),
             0,
-            null,
-            null,
-            null,
-            null);
+            "",
+            "",
+            "",
+            "");
 
     private int mType; //for kernel use
     private long mDev; //for kernel use
@@ -62,7 +61,7 @@ public class StyxStat {
         mModificationUser = modificationUser;
     }
 
-    public StyxStat(BufferReader input) throws IOException {
+    public StyxStat(IBufferReader input) throws IOException {
         // TODO move to factory
         int size = input.readUInt16(); // skip size bytes
         // TODO check size

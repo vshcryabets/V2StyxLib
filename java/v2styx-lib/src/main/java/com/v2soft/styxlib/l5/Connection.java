@@ -13,7 +13,7 @@ import com.v2soft.styxlib.library.types.ConnectionDetails;
 import com.v2soft.styxlib.library.types.Credentials;
 import com.v2soft.styxlib.server.ClientDetails;
 import com.v2soft.styxlib.server.IChannelDriver;
-import com.v2soft.styxlib.server.IMessageTransmitter;
+import com.v2soft.styxlib.handlers.IMessageTransmitter;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -202,39 +202,32 @@ public class Connection
 
         StyxMessage rMessage = tVersion.waitForAnswer(mTimeout);
         StyxRVersionMessage rVersion = (StyxRVersionMessage) rMessage;
-        if (rVersion.getMaxPacketSize() < mDetails.ioUnit()) {
-            mDetails = new ConnectionDetails(getProtocol(), (int) rVersion.getMaxPacketSize());
+        if (rVersion.maxPacketSize < mDetails.ioUnit()) {
+            mDetails = new ConnectionDetails(getProtocol(), (int) rVersion.maxPacketSize);
         }
         mRecepient.getPolls().getFIDPoll().clean();
-        if ((mCredentials.getUserName() != null) && (mCredentials.getPassword() != null)) {
-            sendAuthMessage();
-        } else {
-            sendAttachMessage();
-        }
+        sendAuthMessage();
     }
 
     private void sendAuthMessage()
             throws InterruptedException, StyxException, IOException, TimeoutException {
-        mAuthFID = mRecepient.getPolls().getFIDPoll().getFreeItem();
+        if (!mCredentials.getUserName().isEmpty() && !mCredentials.getPassword().isEmpty()) {
+            mAuthFID = mRecepient.getPolls().getFIDPoll().getFreeItem();
 
-        StyxTAuthMessage tAuth = new StyxTAuthMessage(mAuthFID, getCredentials().getUserName(), getMountPoint());
-        mTransmitter.sendMessage(tAuth, mRecepient);
+            StyxTAuthMessage tAuth = new StyxTAuthMessage(mAuthFID, getCredentials().getUserName(), getMountPoint());
+            mTransmitter.sendMessage(tAuth, mRecepient);
 
-        StyxMessage rMessage = tAuth.waitForAnswer(mTimeout);
-        StyxRAuthMessage rAuth = (StyxRAuthMessage) rMessage;
-        mAuthQID = rAuth.getQID();
+            StyxMessage rMessage = tAuth.waitForAnswer(mTimeout);
+            StyxRAuthMessage rAuth = (StyxRAuthMessage) rMessage;
+            mAuthQID = rAuth.getQID();
 
-        // TODO uncomment later
-        //        StyxOutputStream output = new StyxOutputStream((new StyxFile(this,
-        //                ((StyxTAuthMessage)tMessage).getAuthFID())).openForWrite());
-        //        output.writeString(getPassword());
-        //        output.flush();
+            // TODO uncomment later
+            //        StyxOutputStream output = new StyxOutputStream((new StyxFile(this,
+            //                ((StyxTAuthMessage)tMessage).getAuthFID())).openForWrite());
+            //        output.writeString(getPassword());
+            //        output.flush();
+        }
 
-        sendAttachMessage();
-    }
-
-    private void sendAttachMessage()
-            throws InterruptedException, StyxException, TimeoutException, IOException {
         mFID = mRecepient.getPolls().getFIDPoll().getFreeItem();
         StyxTAttachMessage tAttach = new StyxTAttachMessage(getRootFID(), getAuthFID(),
                 getCredentials().getUserName(),
@@ -246,6 +239,7 @@ public class Connection
         mQID = rAttach.getQID();
         setAttached(true);
     }
+
 
     @Override
     public void close() throws IOException {
