@@ -1,3 +1,5 @@
+package com.v2soft.styxlib;
+
 import com.v2soft.styxlib.l5.Connection;
 import com.v2soft.styxlib.l6.StyxFile;
 import com.v2soft.styxlib.library.types.impl.CredentialsImpl;
@@ -16,7 +18,7 @@ public class StyxConsoleClient {
 
     public static void main(String[] args) {
         // server samnples
-        // diod -f -n -l 0.0.0.0:10563 -e ~/temp/
+        // diod -f -n -l 0.0.0.0:12345 -e ~/temp/
         System.out.println("V2StyxLib-JVM console client");
         var host = "";
         var port = 0;
@@ -43,7 +45,7 @@ public class StyxConsoleClient {
         System.out.println("Connection to the " + host + ":" + port);
         try {
             var driver = new TCPClientChannelDriver(InetAddress.getByName(host), port, false);
-            var connection = new Connection(new CredentialsImpl("user", ""), driver);
+            var connection = new Connection(new CredentialsImpl("", ""), driver);
             connection.connect();
             // list files
             StyxFile rootDir = connection.getRoot();

@@ -1,8 +1,8 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="StyxConsoleClient" type="Application" factoryName="Application" nameIsGenerated="true">
-    <option name="MAIN_CLASS_NAME" value="StyxConsoleClient" />
-    <module name="V2StyxLib-JVM.v2styx-console-client" />
-    <option name="PROGRAM_PARAMETERS" value="--host localhost --port 10563" />
+    <option name="MAIN_CLASS_NAME" value="com.v2soft.styxlib.StyxConsoleClient" />
+    <module name="V2StyxLib-JVM.v2styx-console-client.main" />
+    <option name="PROGRAM_PARAMETERS" value="--host localhost --port 12345" />
     <method v="2">
       <option name="Make" enabled="true" />
     </method>
