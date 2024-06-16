@@ -13,7 +13,7 @@ import java.util.Arrays;
  * @author V.Shcriyabets (vshcryabets@gmail.com)
  */
 public class FolderServerSample {
-    private static final int PORT = 10234;
+    private static final int PORT = 6666;
 
     public static void main(String[] args) throws IOException, InterruptedException {
         var driver = new TCPServerChannelDriver(

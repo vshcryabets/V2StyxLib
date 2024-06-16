@@ -23,9 +23,10 @@ public class StyxDeserializerImpl implements IDataDeserializer {
         if (packet_size > io_unit) {
             throw new IOException("Packet size to large");
         }
-        MessageType type = MessageType.factory(buffer.readUInt8());
+        var typeId = buffer.readUInt8();
+        MessageType type = MessageType.factory(typeId);
         if (type == null) {
-            throw new NullPointerException("Type is null, can't decode message");
+            throw new NullPointerException("Type is null, can't decode message ps="+ packet_size+" typeId=" + typeId);
         }
         int tag = buffer.readUInt16();
         // load other data
@@ -110,9 +111,11 @@ public class StyxDeserializerImpl implements IDataDeserializer {
                     MessageType.Rclunk,
                         buffer.readUInt32());
             case Rclunk -> result = new StyxMessage(MessageType.Rclunk, tag);
-            case Tremove -> result = new StyxTMessageFID(MessageType.Tremove, MessageType.Rremove, tag);
+            case Tremove -> result = new StyxTMessageFID(MessageType.Tremove, MessageType.Rremove,
+                    buffer.readUInt32());
             case Rremove -> result = new StyxMessage(MessageType.Rremove, tag);
-            case Tstat -> result = new StyxTMessageFID(MessageType.Tstat, MessageType.Rstat, tag);
+            case Tstat -> result = new StyxTMessageFID(MessageType.Tstat, MessageType.Rstat,
+                        buffer.readUInt32());
             case Rstat -> {
                 buffer.readUInt16(); //??
                 result = new StyxRStatMessage(tag, deserializeStat(buffer));
