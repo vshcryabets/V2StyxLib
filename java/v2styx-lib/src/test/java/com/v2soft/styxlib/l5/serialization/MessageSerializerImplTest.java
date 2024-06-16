@@ -83,7 +83,7 @@ public class MessageSerializerImplTest {
                         'e', 'd', 'i', 't', 'o', 'r'
                 },
                 data,
-                "StyxSTat serialization failed");
+                "StyxStat serialization failed");
     }
 
     @Test

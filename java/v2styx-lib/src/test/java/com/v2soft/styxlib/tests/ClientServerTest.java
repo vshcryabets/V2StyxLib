@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
@@ -60,7 +61,7 @@ public class ClientServerTest {
     @Test
     public void testMD5() throws IOException, StyxException, InterruptedException, TimeoutException, NoSuchAlgorithmException {
         IClient connection = new Connection(
-                new CredentialsImpl("user", null),
+                new CredentialsImpl("user", ""),
                 new TCPClientChannelDriver(
                         InetAddress.getByName("127.0.0.1"), PORT, false));
         assertTrue(connection.connect());
@@ -84,5 +85,19 @@ public class ClientServerTest {
         newFile.close();
         assertEquals(16, read, "Wrong remote hash size");
         assertArrayEquals(localHash, remoteHash, "Wrong remote hash");
+    }
+
+    @Test
+    public void testStat() throws IOException, InterruptedException, StyxException, TimeoutException {
+        Connection connection = new Connection(
+                new CredentialsImpl("user", ""),
+                new TCPClientChannelDriver(
+                        InetAddress.getByName("127.0.0.1"), PORT, false));
+        assertTrue(connection.connect());
+
+        StyxFile rootDir = connection.getRoot();
+        var files = rootDir.listStat();
+
+        connection.close();
     }
 }
