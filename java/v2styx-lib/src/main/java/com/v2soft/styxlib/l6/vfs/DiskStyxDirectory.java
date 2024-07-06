@@ -30,16 +30,16 @@ import java.util.Vector;
 public class DiskStyxDirectory
 extends DiskStyxFile {
     private Map<ClientDetails, ByteBuffer> mBuffersMap;
-    protected Vector<IVirtualStyxFile> mFiles;
-    protected List<IVirtualStyxFile> mDirectoryFiles;
+    protected List<IVirtualStyxFile> mVirtualFiles;
+    protected List<IVirtualStyxFile> mRealFiles;
     private IDataSerializer mSerializer;
 
     public DiskStyxDirectory(File directory, IDataSerializer serializer) throws IOException {
         super(directory);
         mQID = new StyxQID(QIDType.QTDIR, 0, mName.hashCode());
         mSerializer = serializer;
-        mFiles = new Vector<IVirtualStyxFile>();
-        mDirectoryFiles = new ArrayList<IVirtualStyxFile>();
+        mVirtualFiles = new ArrayList<>();
+        mRealFiles = new ArrayList<>();
         mBuffersMap = new HashMap<ClientDetails, ByteBuffer>();
     }
 
@@ -53,7 +53,7 @@ extends DiskStyxFile {
             throws StyxErrorMessageException {
         if ( pathElements.hasNext() ) {
             String filename = pathElements.next();
-            for (IVirtualStyxFile file : mFiles) {
+            for (IVirtualStyxFile file : mVirtualFiles) {
                 if ( file.getName().equals(filename)) {
                     qids.add(file.getQID());
                     return file.walk(pathElements, qids);
@@ -90,16 +90,17 @@ extends DiskStyxFile {
             // prepare binary structure of the directory
             int size = 0;
             final List<StyxStat> stats = new LinkedList<StyxStat>();
-            for (IVirtualStyxFile file : mFiles) {
+            for (IVirtualStyxFile file : mVirtualFiles) {
                 final StyxStat stat = file.getStat();
                 size += stat.getSize();
                 stats.add(stat);
             }
             // reload disk files
-            mDirectoryFiles.clear();
+            mRealFiles.clear();
             for (File file : mFile.listFiles()) {
-                final DiskStyxFile item = new DiskStyxFile(file);
-                mDirectoryFiles.add(item);
+                final var item = file.isDirectory() ? new DiskStyxDirectory(file, mSerializer)
+                        : new DiskStyxFile(file);
+                mRealFiles.add(item);
                 final StyxStat stat = item.getStat();
                 size += stat.getSize();
                 stats.add(stat);
@@ -149,7 +150,7 @@ extends DiskStyxFile {
      */
     public void addFile(IVirtualStyxFile file) {
         // TODO check! may be this folder already contains file with same name
-        mFiles.add(file);
+        mVirtualFiles.add(file);
     }
 
     @Override
@@ -160,7 +161,7 @@ extends DiskStyxFile {
 
     @Override
     public void onConnectionClosed(ClientDetails state) {
-        for (IVirtualStyxFile file : mFiles) {
+        for (IVirtualStyxFile file : mVirtualFiles) {
             file.onConnectionClosed(state);
         }
         mBuffersMap.remove(state);
