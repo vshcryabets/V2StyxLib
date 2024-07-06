@@ -22,6 +22,7 @@ repositories {
 
 dependencies {
     implementation(project(":v2styx-lib"))
+    implementation("org.jline:jline:3.25.0")
 }
 
 application {

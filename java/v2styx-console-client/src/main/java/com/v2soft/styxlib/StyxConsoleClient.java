@@ -1,11 +1,19 @@
 package com.v2soft.styxlib;
 
+import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.l5.Connection;
+import com.v2soft.styxlib.l5.enums.QIDType;
 import com.v2soft.styxlib.l6.StyxFile;
 import com.v2soft.styxlib.library.types.impl.CredentialsImpl;
 import com.v2soft.styxlib.server.tcp.TCPClientChannelDriver;
+import org.jline.reader.LineReader;
+import org.jline.reader.LineReaderBuilder;
+import org.jline.terminal.Terminal;
+import org.jline.terminal.TerminalBuilder;
 
+import java.io.IOException;
 import java.net.InetAddress;
+import java.util.concurrent.TimeoutException;
 import java.util.logging.Logger;
 
 /**
@@ -17,6 +25,38 @@ public class StyxConsoleClient {
     private static Logger log = Logger.getLogger(StyxConsoleClient.class.getSimpleName());
 
     public static void main(String[] args) {
+        try {
+            new StyxConsoleClient().mainLoop(args);
+        } catch (Exception err) {
+            err.printStackTrace();
+        }
+    }
+
+    private void listFiles(Connection connection,
+                           Terminal terminal,
+                           StyxFile currentDir) throws IOException, InterruptedException,
+            StyxException, TimeoutException {
+        // list files
+        var files = currentDir.listStat();
+        for (var it : files) {
+            var quid = it.getQID();
+            if (quid.getType() == QIDType.QTDIR) {
+                terminal.writer().println("D\t" +
+                        it.getGroupName() + "/" +
+                        it.getUserName() + "\t" +
+                        it.getLength() + "\t\t" +
+                        it.getName());
+            } else {
+                terminal.writer().println("F\t" +
+                        it.getGroupName() + "/" +
+                        it.getUserName() + "\t" +
+                        it.getLength() + "\t\t" +
+                        it.getName());
+            }
+        }
+    }
+
+    public void mainLoop(String[] args) throws IOException {
         // server samnples
         // diod -f -n -l 0.0.0.0:12345 -e ~/temp/
         // or docker docker run -p 6666:6666 --rm -it metacoma/inferno-os:latest
@@ -44,19 +84,34 @@ public class StyxConsoleClient {
                     """);
             System.exit(255);
         }
-        System.out.println("Connection to the " + host + ":" + port);
+        Terminal terminal = TerminalBuilder.builder()
+                .system(true).build();
+        LineReader lineReader = LineReaderBuilder.builder()
+                .terminal(terminal)
+                .build();
+        terminal.writer().println("Connection to the " + host + ":" + port);
         try {
             var driver = new TCPClientChannelDriver(InetAddress.getByName(host), port, false);
             var connection = new Connection(new CredentialsImpl("", ""), driver);
             connection.connect();
-            System.out.println("Connected");
-            // list files
-            StyxFile rootDir = connection.getRoot();
-            var files = rootDir.listStat();
-            for (var it : files) {
-                System.out.println("File: " + it.getName() + " " + it.getGroupName() + " " + it.getUserName());
+            terminal.writer().println("Connected");
+            StyxFile currentDir = connection.getRoot();
+            while (true) {
+                var cmd = lineReader.readLine(">");
+                if (cmd.isEmpty())
+                    continue;
+                if (cmd.equalsIgnoreCase("quit")) {
+                    terminal.writer().println("Shutdown server");
+                    connection.close();
+                    break;
+                }
+                if (cmd.equalsIgnoreCase("ls")) {
+                    listFiles(connection, terminal, currentDir);
+                    continue;
+                }
+                terminal.writer().println("Unknown command " + cmd);
+
             }
-            connection.close();
         } catch (Exception err) {
             err.printStackTrace();
             System.exit(255);
