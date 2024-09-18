@@ -1,5 +1,6 @@
 package com.v2soft.styxlib.handlers;
 
+import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
 import com.v2soft.styxlib.server.ClientDetails;
 
@@ -52,7 +53,7 @@ public abstract class QueueMessagesProcessor implements IMessageProcessor {
                     if ( pair != null ) {
                         try {
                             processPacket(pair.mMessage, pair.mTransmitter);
-                        } catch (IOException e) {
+                        } catch (StyxException e) {
                             e.printStackTrace();
                         }
                     }

@@ -140,7 +140,7 @@ public class Connection
         return mDriver.isConnected();
     }
 
-    public StyxFile getRoot() throws IOException {
+    public StyxFile getRoot() throws StyxException {
         if (mRoot == null) {
             mRoot = new StyxFile(this, "");
         }

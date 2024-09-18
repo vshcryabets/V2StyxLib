@@ -1,6 +1,7 @@
 package com.v2soft.styxlib.l6.vfs;
 
 import com.v2soft.styxlib.exceptions.StyxErrorMessageException;
+import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.l5.serialization.IDataSerializer;
 import com.v2soft.styxlib.l5.serialization.impl.BufferWritterImpl;
 import com.v2soft.styxlib.l5.enums.FileMode;
@@ -34,7 +35,7 @@ extends DiskStyxFile {
     protected List<IVirtualStyxFile> mRealFiles;
     private IDataSerializer mSerializer;
 
-    public DiskStyxDirectory(File directory, IDataSerializer serializer) throws IOException {
+    public DiskStyxDirectory(File directory, IDataSerializer serializer) throws StyxException {
         super(directory);
         mQID = new StyxQID(QIDType.QTDIR, 0, mName.hashCode());
         mSerializer = serializer;
@@ -72,7 +73,7 @@ extends DiskStyxFile {
                         }
                         qids.add(styxFile.getQID());
                         return styxFile.walk(pathElements, qids);
-                    } catch (IOException e) {
+                    } catch (StyxException e) {
                         throw StyxErrorMessageException.newInstance(e.toString());
                     }
                 }
@@ -83,7 +84,7 @@ extends DiskStyxFile {
     }
 
     @Override
-    public boolean open(ClientDetails clientDetails, int mode) throws IOException {
+    public boolean open(ClientDetails clientDetails, int mode) throws StyxException {
         boolean result = ((mode&0x0F) == ModeType.OREAD);
         if ( result && mFile.canRead() ) {
             // load files
@@ -190,8 +191,8 @@ extends DiskStyxFile {
                 DiskStyxFile file = new DiskStyxFile(newFile);
                 return file.getQID();
             }
-        } catch (IOException e) {
-            throw StyxErrorMessageException.newInstance("Can't create file, unknown error.");
+        } catch (Exception e) {
+            throw StyxErrorMessageException.newInstance("Can't create file, unknown error. " + e.getMessage());
         }
     }
 }

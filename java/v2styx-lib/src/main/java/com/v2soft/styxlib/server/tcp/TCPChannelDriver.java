@@ -1,5 +1,6 @@
 package com.v2soft.styxlib.server.tcp;
 
+import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.l5.serialization.IDataDeserializer;
 import com.v2soft.styxlib.l5.serialization.IDataSerializer;
 import com.v2soft.styxlib.l5.serialization.impl.StyxDeserializerImpl;
@@ -67,7 +68,7 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
     }
 
     @Override
-    public boolean sendMessage(StyxMessage message, ClientDetails recipient) {
+    public void sendMessage(StyxMessage message, ClientDetails recipient) throws StyxException {
         if ( recipient == null ) {
             throw new NullPointerException("Client can't be null");
         }
@@ -77,12 +78,11 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
                 serializer.serialize(message, client.getOutputWriter());
                 client.sendOutputBuffer();
                 mTransmittedPacketsCount++;
-                return true;
-            } catch (IOException e) {
+            } catch (StyxException e) {
                 mTransmissionErrorsCount++;
+                throw e;
             }
         }
-        return false;
     }
 
     public void setTMessageHandler(IMessageProcessor handler) {

@@ -1,6 +1,7 @@
 package com.v2soft.styxlib.handlers;
 
 import com.v2soft.styxlib.exceptions.StyxErrorMessageException;
+import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.l5.messages.*;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
@@ -51,7 +52,7 @@ public class TMessagesProcessor extends QueueMessagesProcessor implements IMessa
      * @throws IOException
      */
     @Override
-    public void processPacket(StyxMessage message, ClientDetails target) throws IOException {
+    public void processPacket(StyxMessage message, ClientDetails target) throws StyxException {
         mHandledPackets++;
         StyxMessage answer = null;
         IVirtualStyxFile file;
@@ -178,7 +179,8 @@ public class TMessagesProcessor extends QueueMessagesProcessor implements IMessa
      * @throws StyxErrorMessageException
      * @throws IOException
      */
-    private StyxMessage processOpen(ClientDetails clientDetails, StyxTOpenMessage msg) throws StyxErrorMessageException, IOException {
+    private StyxMessage processOpen(ClientDetails clientDetails, StyxTOpenMessage msg)
+            throws StyxException {
         long fid = msg.getFID();
         IVirtualStyxFile file = clientDetails.getAssignedFile(fid);
         if ( file.open(clientDetails, msg.getMode()) ) {

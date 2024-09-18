@@ -1,6 +1,7 @@
 package com.v2soft.styxlib.l6.vfs;
 
 import com.v2soft.styxlib.exceptions.StyxErrorMessageException;
+import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.l5.serialization.IBufferWritter;
 import com.v2soft.styxlib.l5.serialization.IDataSerializer;
 import com.v2soft.styxlib.l5.serialization.impl.BufferWritterImpl;
@@ -61,7 +62,7 @@ extends MemoryStyxFile {
     }
 
     @Override
-    public boolean open(ClientDetails clientDetails, int mode) throws IOException {
+    public boolean open(ClientDetails clientDetails, int mode) throws StyxException {
         boolean result = ((mode&0x0F) == ModeType.OREAD);
         if ( result ) {
             // prepare binary structure of the directory

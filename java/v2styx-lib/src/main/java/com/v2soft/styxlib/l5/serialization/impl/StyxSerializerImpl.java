@@ -1,5 +1,6 @@
 package com.v2soft.styxlib.l5.serialization.impl;
 
+import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.l5.messages.*;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
 import com.v2soft.styxlib.l5.messages.base.StyxRSingleQIDMessage;
@@ -69,7 +70,7 @@ public class StyxSerializerImpl implements IDataSerializer {
     }
 
     @Override
-    public void serialize(StyxMessage message, IBufferWritter output) throws IOException {
+    public void serialize(StyxMessage message, IBufferWritter output) throws StyxException {
         int packetSize = getMessageSize(message);
         output.prepareBuffer(packetSize);
         output.writeUInt32(packetSize);
@@ -83,7 +84,7 @@ public class StyxSerializerImpl implements IDataSerializer {
 
     }
 
-    private void serializeTMessage(StyxMessage message, IBufferWritter output) throws IOException {
+    private void serializeTMessage(StyxMessage message, IBufferWritter output) throws StyxException {
         if (message instanceof StyxTMessageFID) {
             StyxTMessageFID msg = (StyxTMessageFID) message;
             output.writeUInt32(msg.getFID());
@@ -149,7 +150,7 @@ public class StyxSerializerImpl implements IDataSerializer {
         }
     }
 
-    private void serializeRMessage(StyxMessage message, IBufferWritter output) throws IOException {
+    private void serializeRMessage(StyxMessage message, IBufferWritter output) throws StyxException {
         if (message instanceof StyxRSingleQIDMessage) {
             StyxRSingleQIDMessage msg = (StyxRSingleQIDMessage) message;
             msg.getQID().writeBinaryTo(output);
@@ -201,7 +202,7 @@ public class StyxSerializerImpl implements IDataSerializer {
 
     @Override
     public void serializeStat(StyxStat stat, IBufferWritter output)
-            throws IOException {
+            throws StyxException {
         int size = stat.getSize();
         output.writeUInt16(size - 2); // total size except first 2 bytes with size
         output.writeUInt16(stat.getType());

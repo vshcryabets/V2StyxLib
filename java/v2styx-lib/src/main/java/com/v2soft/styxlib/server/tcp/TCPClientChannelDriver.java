@@ -1,5 +1,6 @@
 package com.v2soft.styxlib.server.tcp;
 
+import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.l5.io.impl.BufferImpl;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
 import com.v2soft.styxlib.l5.serialization.IBufferReader;
@@ -59,11 +60,11 @@ public class TCPClientChannelDriver extends TCPChannelDriver {
     }
 
     @Override
-    public boolean sendMessage(StyxMessage message, ClientDetails recipient) {
+    public void sendMessage(StyxMessage message, ClientDetails recipient) throws StyxException {
         if ( !recipient.equals(mServerClientDetails)) {
-            throw new IllegalArgumentException("Wrong recipient");
+            throw new StyxException("Wrong recipient");
         }
-        return super.sendMessage(message, recipient);
+        super.sendMessage(message, recipient);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.v2soft.styxlib.server.tcp;
 
+import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.l5.io.Buffer;
 import com.v2soft.styxlib.l5.io.BufferLoader;
 import com.v2soft.styxlib.l5.io.InChannel;
@@ -83,8 +84,12 @@ public class TCPClientDetails extends ClientDetails {
         return mBuffer;
     }
 
-    public void sendOutputBuffer() throws IOException {
+    public void sendOutputBuffer() throws StyxException {
         mOutputBuffer.flip();
-        mTcpChannel.write(mOutputBuffer);
+        try {
+            mTcpChannel.write(mOutputBuffer);
+        } catch (IOException error) {
+            throw new StyxException(error.getMessage());
+        }
     }
 }

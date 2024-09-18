@@ -1,6 +1,7 @@
 package com.v2soft.styxlib.l6.vfs;
 
 import com.v2soft.styxlib.exceptions.StyxErrorMessageException;
+import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.l5.structs.StyxQID;
 import com.v2soft.styxlib.l5.structs.StyxStat;
 import com.v2soft.styxlib.server.ClientDetails;
@@ -50,7 +51,7 @@ public interface IVirtualStyxFile {
      * @throws IOException
      * @return true if file was successfully opened
      */
-    boolean open(ClientDetails clientDetails, int mode) throws IOException;
+    boolean open(ClientDetails clientDetails, int mode) throws StyxException;
     /**
      * Close file
      */

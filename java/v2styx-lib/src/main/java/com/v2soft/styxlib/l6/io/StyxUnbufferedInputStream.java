@@ -91,8 +91,8 @@ public class StyxUnbufferedInputStream extends InputStream {
     public void close() throws IOException {
         // send Tclunk
         final StyxTMessageFID tClunk = new StyxTMessageFID(MessageType.Tclunk, MessageType.Rclunk, mFID);
-        mMessenger.sendMessage(tClunk, mRecepient);
         try {
+            mMessenger.sendMessage(tClunk, mRecepient);
             tClunk.waitForAnswer(mTimeout);
         } catch (Exception e) {
             throw new IOException(e);

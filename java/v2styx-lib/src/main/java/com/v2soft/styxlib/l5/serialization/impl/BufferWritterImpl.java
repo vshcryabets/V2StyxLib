@@ -1,5 +1,6 @@
 package com.v2soft.styxlib.l5.serialization.impl;
 
+import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.l5.serialization.IBufferWritter;
 import com.v2soft.styxlib.utils.MetricsAndStats;
 
@@ -56,7 +57,7 @@ public class BufferWritterImpl implements IBufferWritter {
     }
 
     @Override
-    public void writeUTFString(String string) throws UnsupportedEncodingException {
+    public void writeUTFString(String string) throws StyxException {
         byte[] data = string.getBytes(sUTFCharset);
         writeUInt16(data.length);
         write(data, 0, data.length);

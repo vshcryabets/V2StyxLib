@@ -33,7 +33,7 @@ public class RMessagesProcessor extends QueueMessagesProcessor implements IMessa
     }
 
     @Override
-    public void processPacket(StyxMessage message, ClientDetails client) throws IOException {
+    public void processPacket(StyxMessage message, ClientDetails client) throws StyxException {
         mReceivedCount++;
         int tag = message.getTag();
         final Map<Integer, StyxTMessage> clientMessagesMap = client.getPolls().getMessagesMap();
