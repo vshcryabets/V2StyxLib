@@ -29,9 +29,9 @@ public class TCPServerChannelDriver extends TCPChannelDriver {
 
     public TCPServerChannelDriver(InetAddress address, int port, boolean ssl) throws StyxException {
         super(address, port, ssl);
-        mNewConnetions = new Stack<SocketChannel>();
-        mReadable = new Stack<SocketChannel>();
-        mClientStatesMap = new HashMap<SocketChannel, ClientDetails>();
+        mNewConnetions = new Stack<>();
+        mReadable = new Stack<>();
+        mClientStatesMap = new HashMap<>();
     }
 
     protected void prepareSocket(InetSocketAddress isa, boolean useSSL) throws StyxException {

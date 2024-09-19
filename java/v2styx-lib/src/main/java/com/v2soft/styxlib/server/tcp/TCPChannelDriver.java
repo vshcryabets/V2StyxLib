@@ -41,8 +41,7 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
         mAddress = address;
 
         // Bind the server socket to the local host and port
-        InetSocketAddress socketAddress = new InetSocketAddress(address, port);
-
+        var socketAddress = new InetSocketAddress(address, port);
         prepareSocket(socketAddress, ssl);
         mTransmittedPacketsCount = 0;
         mTransmissionErrorsCount = 0;

@@ -1,3 +1,6 @@
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.v2soft.folderserver.ServerConfig;
 import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.l6.vfs.DiskStyxDirectory;
 import com.v2soft.styxlib.server.StyxServerManager;
@@ -8,6 +11,7 @@ import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.util.Arrays;
@@ -19,27 +23,26 @@ import java.util.List;
  * @author V.Shcriyabets (vshcryabets@gmail.com)
  */
 public class FolderServerSample {
-    private static final int PORT = 6666;
-    private static final String SHARE_FOLDER = ".";
     private static final String CMD_HELP = "help";
 
-    public static void main(String[] args) throws StyxException, InterruptedException, IOException {
-        var shareFolder = SHARE_FOLDER;
+    public static void main(String[] args) throws InterruptedException, IOException {
+        var configFilePath = "";
         System.out.println("V2StyxLib-JVM console server");
-
+        var mapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
         var pos = 0;
-        var port = PORT;
         while (pos < args.length) {
-            if (args[pos].equals("--folder")) {
-                shareFolder = args[pos + 1];
-                pos++;
-            }
-            if (args[pos].equals("--port")) {
-                port = Integer.parseInt(args[pos + 1]);
+            if (args[pos].equals("--config")) {
+                configFilePath = args[pos + 1];
                 pos++;
             }
             pos++;
         }
+        System.out.println("Load configuration from file " + configFilePath);
+        // load configuration file
+        var projectJson = new FileInputStream(configFilePath);
+        ServerConfig configuration = mapper.readValue(projectJson, ServerConfig.class);
+        projectJson.close();
+
 
         Terminal terminal = TerminalBuilder.builder()
                 .system(true).build();
@@ -48,13 +51,14 @@ public class FolderServerSample {
                 .build();
 
         var driver = new TCPServerChannelDriver(
-                InetAddress.getByName("127.0.0.1"),
-                port,
+                InetAddress.getByName(configuration.interfaces().get(0)),
+                configuration.port(),
                 false);
-        var root = new DiskStyxDirectory(new File(shareFolder), driver.getSerializer());
+        var root = new DiskStyxDirectory(new File(configuration.exportPath()), driver.getSerializer());
         var mServer = new StyxServerManager(root, List.of(driver));
         mServer.start();
-        System.out.println("Test server listen on 127.0.0.1:" + port + " share folder " + shareFolder);
+        System.out.println("Test server listening on " + configuration.interfaces().get(0) + ":"
+                + configuration.port() + " share folder " + configuration.exportPath());
 
         while (true) {
             var cmd = lineReader.readLine(">");
