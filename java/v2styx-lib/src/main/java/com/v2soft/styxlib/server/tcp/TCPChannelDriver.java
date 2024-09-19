@@ -35,7 +35,7 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
 
     public TCPChannelDriver(InetAddress address,
                             int port,
-                            boolean ssl) throws IOException {
+                            boolean ssl) throws StyxException {
         mPort = port;
         mAddress = address;
 
@@ -49,7 +49,7 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
         serializer = new StyxSerializerImpl();
     }
 
-    protected abstract void prepareSocket(InetSocketAddress socketAddress, boolean ssl) throws IOException;
+    protected abstract void prepareSocket(InetSocketAddress socketAddress, boolean ssl) throws StyxException;
 
     protected int getTimeout() {
         return StyxServerManager.DEFAULT_TIMEOUT;
@@ -110,7 +110,7 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
      * Read data from assigned SocketChannel
      * @throws IOException
      */
-    protected boolean readSocket(TCPClientDetails client) throws IOException {
+    protected boolean readSocket(TCPClientDetails client) throws StyxException {
         int read = 0;
         try {
             read = client.getBufferLoader().readFromChannelToBuffer(client.getChannel());
@@ -131,7 +131,7 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
      * @return true if message was processed
      * @throws IOException
      */
-    private boolean process(TCPClientDetails client) throws IOException {
+    private boolean process(TCPClientDetails client) throws StyxException {
         int inBuffer = client.getBuffer().remainsToRead();
         if ( inBuffer > 4 ) {
             long packetSize = client.getInputReader().getUInt32();
