@@ -7,7 +7,6 @@ import com.v2soft.styxlib.l5.messages.base.StyxTMessage;
 import com.v2soft.styxlib.l5.messages.base.StyxTMessageFID;
 import com.v2soft.styxlib.server.ClientDetails;
 
-import java.io.IOException;
 import java.util.Map;
 
 /**
@@ -33,7 +32,7 @@ public class RMessagesProcessor extends QueueMessagesProcessor implements IMessa
     }
 
     @Override
-    public void processPacket(StyxMessage message, ClientDetails client) throws StyxException {
+    public void processPacket(StyxMessage message, ClientDetails client) {
         mReceivedCount++;
         int tag = message.getTag();
         final Map<Integer, StyxTMessage> clientMessagesMap = client.getPolls().getMessagesMap();

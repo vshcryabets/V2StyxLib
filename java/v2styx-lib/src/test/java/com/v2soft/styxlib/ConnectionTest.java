@@ -69,14 +69,14 @@ public class ConnectionTest {
     // TVersion & TAttach
     @Test
     @Tag("dev")
-    public void testConnection() throws IOException, StyxException, InterruptedException, TimeoutException {
+    public void testConnection() throws IOException, InterruptedException, TimeoutException {
         int count = 1000;
         mConnection.getMessenger().clearStatistics();
         long startTime = System.currentTimeMillis();
         for (int i = 0; i < count; i++) {
             mConnection.sendVersionMessage();
         }
-        assertEquals(count * 4, mConnection.getMessenger().getTransmittedCount());
+        assertEquals(count * 3, mConnection.getMessenger().getTransmittedCount()); // TVersion, Tattach, TClunk
         assertEquals(0, mConnection.getMessenger().getErrorsCount());
         long diff = System.currentTimeMillis() - startTime;
         log.info(String.format("\tTransmited %d messages\n\t" +

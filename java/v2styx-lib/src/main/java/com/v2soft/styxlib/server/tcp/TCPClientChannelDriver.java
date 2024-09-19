@@ -86,22 +86,18 @@ public class TCPClientChannelDriver extends TCPChannelDriver {
                 if (Thread.interrupted()) break;
                 // read from socket
                 try {
-                    int readed = buffer.readFromChannelToBuffer(mServerClientDetails.getChannel());
-                    if ( readed > 0 ) {
-                        // loop unitl we have unprocessed packets in the input buffer
+                    int bytesRead = buffer.readFromChannelToBuffer(mServerClientDetails.getChannel());
+                    if ( bytesRead > 0 ) {
+                        // loop until we have unprocessed packets in the input buffer
                         while ( buffer.remainsToRead() > 4 ) {
                             // try to decode
                             final long packetSize = reader.getUInt32();
                             if ( buffer.remainsToRead() >= packetSize ) {
-                                final StyxMessage message = deserializer.deserializeMessage(reader, mIOUnit);
-                                if ( message.getType().isTMessage() ) {
-                                    if ( mTMessageHandler != null ) {
+                                var message = deserializer.deserializeMessage(reader, mIOUnit);
+                                if ( message.getType().isTMessage() && ( mTMessageHandler != null )) {
                                         mTMessageHandler.postPacket(message, mServerClientDetails);
-                                    }
-                                } else {
-                                    if ( mRMessageHandler != null ) {
-                                        mRMessageHandler.postPacket(message, mServerClientDetails);
-                                    }
+                                } else if ( mRMessageHandler != null ) {
+                                    mRMessageHandler.postPacket(message, mServerClientDetails);
                                 }
                             } else {
                                 break;
@@ -111,7 +107,7 @@ public class TCPClientChannelDriver extends TCPChannelDriver {
                 }
                 catch (SocketTimeoutException e) {
                     // Nothing to read
-                                        e.printStackTrace();
+                    e.printStackTrace();
                 } catch (ClosedByInterruptException e) {
                     // finish
                     break;

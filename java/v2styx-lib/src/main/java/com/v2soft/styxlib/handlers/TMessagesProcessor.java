@@ -49,7 +49,6 @@ public class TMessagesProcessor extends QueueMessagesProcessor implements IMessa
     /**
      * Processing incoming messages
      * @param message incoming message
-     * @throws IOException
      */
     @Override
     public void processPacket(StyxMessage message, ClientDetails target) throws StyxException {

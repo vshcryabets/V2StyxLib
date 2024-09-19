@@ -1,5 +1,6 @@
 package com.v2soft.styxlib.server.tcp;
 
+import com.v2soft.styxlib.Logger;
 import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.l5.serialization.IDataDeserializer;
 import com.v2soft.styxlib.l5.serialization.IDataSerializer;
@@ -129,14 +130,13 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
     /**
      * Read income message from specified client.
      * @return true if message was processed
-     * @throws IOException
      */
     private boolean process(TCPClientDetails client) throws StyxException {
         int inBuffer = client.getBuffer().remainsToRead();
         if ( inBuffer > 4 ) {
             long packetSize = client.getInputReader().getUInt32();
             if ( inBuffer >= packetSize ) {
-                final StyxMessage message = deserializer.deserializeMessage(client.getInputReader(), mIOUnit);
+                var message = deserializer.deserializeMessage(client.getInputReader(), mIOUnit);
                 if ( message.getType().isTMessage() ) {
                     if ( mTMessageHandler != null ) {
                         mTMessageHandler.postPacket(message, client);
@@ -169,16 +169,6 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
     @Override
     public String toString() {
         return String.format("%s:%s:%d", getClass().getSimpleName(), mAddress.toString(), mPort);
-    }
-
-    @Override
-    public IMessageProcessor getTMessageHandler() {
-        return mTMessageHandler;
-    }
-
-    @Override
-    public IMessageProcessor getRMessageHandler() {
-        return mRMessageHandler;
     }
 
     public int getPort() {

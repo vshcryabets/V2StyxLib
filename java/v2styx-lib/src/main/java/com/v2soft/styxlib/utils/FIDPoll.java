@@ -1,5 +1,7 @@
 package com.v2soft.styxlib.utils;
 
+import com.v2soft.styxlib.Config;
+import com.v2soft.styxlib.Logger;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
 
 /**
@@ -13,9 +15,19 @@ public class FIDPoll extends AbstractPoll<Long> {
     }
 
     @Override
+    public Long getFreeItem() {
+        var id = super.getFreeItem();
+        if (Config.DEBUG_FID_POLL)
+            Logger.DEBUG.println("Reserve " + id);
+        return id;
+    }
+
+    @Override
     public boolean release(Long id) {
         if (id == StyxMessage.NOFID)
             return false;
+        if (Config.DEBUG_FID_POLL)
+            Logger.DEBUG.println("Release " + id);
         return super.release(id);
     }
     @Override

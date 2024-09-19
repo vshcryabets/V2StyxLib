@@ -32,7 +32,7 @@ public class TMessageTransmitter implements IMessageTransmitter {
             throw new StyxException("Can't sent RMessage");
         }
         if (recepient == null) {
-            throw new StyxException("Recepient is null");
+            throw new StyxException("Recipient is null");
         }
 
         IChannelDriver driver = recepient.getDriver();

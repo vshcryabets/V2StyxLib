@@ -79,7 +79,7 @@ public class StyxDeserializerImpl implements IDataDeserializer {
                     buffer.readUInt8());
             case Rcreate -> result = new StyxROpenMessage(
                     tag,
-                    new StyxQID(buffer), 0, true);
+                    new StyxQID(buffer), buffer.readUInt32(), true);
             case Tread -> result = new StyxTReadMessage(
                     buffer.readUInt32(),
                     buffer.readUInt64(),

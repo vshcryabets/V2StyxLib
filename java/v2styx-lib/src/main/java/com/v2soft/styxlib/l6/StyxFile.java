@@ -46,11 +46,11 @@ public class StyxFile {
 
     private final IClient mClient;
     private long mFID = StyxMessage.NOFID;
-    private long mParentFID = StyxMessage.NOFID;
+    private long mParentFID;
     private StyxStat mStat;
     private final String mPath;
     private final IMessageTransmitter mMessenger;
-    private long mTimeout = Connection.DEFAULT_TIMEOUT;
+    private long mTimeout;
     protected ClientDetails mRecipient;
 
     public StyxFile(IClient manager, String path)
@@ -215,13 +215,16 @@ public class StyxFile {
         checkConnection();
         // reserve FID
         long tempFID = sendWalkMessage(mParentFID, "");
-        final StyxTCreateMessage tCreate =
-                new StyxTCreateMessage(tempFID, mPath, permissions, ModeType.OREAD);
+        var tCreate = new StyxTCreateMessage(tempFID, mPath, permissions, ModeType.OREAD);
         mMessenger.sendMessage(tCreate, mRecipient);
         tCreate.waitForAnswer(mTimeout);
-
+        // TODO reuse FID
+//        mFID = tempFID;
         // close temp FID
-        mRecipient.getPolls().getFIDPoll().release(tempFID);
+        var tClunk = new StyxTMessageFID(MessageType.Tclunk, MessageType.Rclunk, tempFID);
+        mMessenger.sendMessage(tClunk, mRecipient);
+        tClunk.waitForAnswer(mTimeout);
+//        mRecipient.getPolls().releaseFID(tCreate);
     }
 
     public boolean exists() throws StyxException {
@@ -237,7 +240,7 @@ public class StyxFile {
      * Delete file or empty folder
      */
     public void delete()
-            throws  StyxException {
+            throws StyxException {
         delete(false);
     }
 
