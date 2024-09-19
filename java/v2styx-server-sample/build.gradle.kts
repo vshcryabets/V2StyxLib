@@ -1,16 +1,14 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+
 plugins {
     java
-    kotlin("jvm")
     application
-}
-
-kotlin {
-    jvmToolchain(Versions.jvmLevel)
+    id("com.github.johnrengelman.shadow") version "7.1.2"
 }
 
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(Versions.jvmLevel))
+        languageVersion.set(JavaLanguageVersion.of(17))
     }
 }
 
@@ -26,5 +24,21 @@ dependencies {
 }
 
 application {
-    mainClass.set("JavaServerSample")
+    mainClass.set("FolderServerSample")
+}
+
+tasks {
+    named<ShadowJar>("shadowJar") {
+        archiveBaseName.set("shadow")
+        mergeServiceFiles()
+        manifest {
+            attributes(mapOf("Main-Class" to "FolderServerSample"))
+        }
+    }
+}
+
+tasks {
+    build {
+        dependsOn(shadowJar)
+    }
 }

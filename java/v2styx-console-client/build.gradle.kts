@@ -1,16 +1,11 @@
 plugins {
     java
-    kotlin("jvm")
     application
-}
-
-kotlin {
-    jvmToolchain(Versions.jvmLevel)
 }
 
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(Versions.jvmLevel))
+        languageVersion.set(JavaLanguageVersion.of(17))
     }
 }
 

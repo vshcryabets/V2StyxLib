@@ -1,7 +1,6 @@
 plugins {
     `java-library`
     id("maven-publish")
-    kotlin("jvm")
 }
 
 dependencies {
@@ -9,13 +8,9 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter")
 }
 
-kotlin {
-    jvmToolchain(Versions.jvmLevel)
-}
-
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(Versions.jvmLevel))
+        languageVersion.set(JavaLanguageVersion.of(17))
     }
 }
 
