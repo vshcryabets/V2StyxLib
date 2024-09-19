@@ -72,7 +72,7 @@ public class TCPClientChannelDriver extends TCPChannelDriver {
     }
 
     @Override
-    public void clearStatisitcis() {
+    public void clearStatistics() {
 
     }
 

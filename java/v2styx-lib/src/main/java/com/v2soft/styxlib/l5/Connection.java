@@ -210,7 +210,7 @@ public class Connection
     }
 
     private void sendAuthMessage()
-            throws InterruptedException, StyxException, IOException, TimeoutException {
+            throws StyxException {
         if (!mCredentials.getUserName().isEmpty() && !mCredentials.getPassword().isEmpty()) {
             mAuthFID = mRecepient.getPolls().getFIDPoll().getFreeItem();
 
@@ -234,8 +234,7 @@ public class Connection
                 getMountPoint());
         mTransmitter.sendMessage(tAttach, mRecepient);
 
-        StyxMessage rMessage = tAttach.waitForAnswer(mTimeout);
-        StyxRAttachMessage rAttach = (StyxRAttachMessage) rMessage;
+        var rAttach = (StyxRAttachMessage)tAttach.waitForAnswer(mTimeout);
         mQID = rAttach.getQID();
         setAttached(true);
     }

@@ -37,7 +37,7 @@ import java.util.concurrent.TimeoutException;
 /**
  * @author V.Shcriyabets (vshcryabets@gmail.com)
  */
-public class StyxFile implements Closeable {
+public class StyxFile {
     public interface StyxFilenameFilter {
         boolean accept(StyxFile parent, String name);
     }
@@ -99,30 +99,21 @@ public class StyxFile implements Closeable {
         return (int) rOpen.ioUnit;
     }
 
-    @Override
-    public void close() throws IOException {
+    public void close() throws StyxException {
         if (mFID == StyxMessage.NOFID) {
             return;
         }
-        try {
-            // send Tclunk
-            final StyxTMessageFID tClunk = new StyxTMessageFID(MessageType.Tclunk, MessageType.Rclunk, mFID);
-            mMessenger.sendMessage(tClunk, mRecipient);
-            try {
-                tClunk.waitForAnswer(mTimeout);
-            } catch (Exception e) {
-                throw new IOException(e);
-            }
+        // send Tclunk
+        final StyxTMessageFID tClunk = new StyxTMessageFID(MessageType.Tclunk, MessageType.Rclunk, mFID);
+        mMessenger.sendMessage(tClunk, mRecipient);
+        tClunk.waitForAnswer(mTimeout);
 
-            mFID = StyxMessage.NOFID;
-            mStat = null;
-        } catch (Exception e) {
-            throw new IOException(e.toString());
-        }
+        mFID = StyxMessage.NOFID;
+        mStat = null;
     }
 
     public List<StyxStat> listStat()
-            throws IOException, InterruptedException, StyxException, TimeoutException {
+            throws StyxException {
         if (!isDirectory())
             return Collections.emptyList();
         var tempFID = getCloneFID();
@@ -149,7 +140,7 @@ public class StyxFile implements Closeable {
     }
 
     public List<String> list(StyxFilenameFilter filter)
-            throws StyxException, InterruptedException, TimeoutException, IOException {
+            throws StyxException {
         if (filter == null) {
             return listStat()
                     .stream()
@@ -170,16 +161,16 @@ public class StyxFile implements Closeable {
      * @return input stream
      */
     public StyxFileBufferedInputStream openForRead()
-            throws StyxException, IOException {
+            throws StyxException {
         checkConnection();
         long tempFID = getCloneFID();
         int iounit = open(ModeType.OREAD, tempFID);
         return new StyxFileBufferedInputStream(mMessenger, tempFID, iounit, mRecipient);
     }
 
-    private void checkConnection() throws IOException {
+    private void checkConnection() throws StyxException {
         if (!mClient.isConnected()) {
-            throw new IOException("Not connected to server");
+            throw new StyxException("Not connected to server");
         }
     }
 
@@ -204,7 +195,7 @@ public class StyxFile implements Closeable {
     }
 
     public OutputStream openForWrite()
-            throws InterruptedException, StyxException, TimeoutException, IOException {
+            throws StyxException {
         checkConnection();
         long clonedFID = getCloneFID();
         int iounit = open(ModeType.OWRITE, clonedFID);
@@ -220,8 +211,7 @@ public class StyxFile implements Closeable {
     }
 
 
-    public void create(long permissions)
-            throws StyxException, IOException {
+    public void create(long permissions) throws StyxException {
         checkConnection();
         // reserve FID
         long tempFID = sendWalkMessage(mParentFID, "");
@@ -247,7 +237,7 @@ public class StyxFile implements Closeable {
      * Delete file or empty folder
      */
     public void delete()
-            throws InterruptedException, StyxException, TimeoutException, IOException {
+            throws  StyxException {
         delete(false);
     }
 
@@ -257,7 +247,7 @@ public class StyxFile implements Closeable {
      * @param recurse Recursive delete
      */
     public void delete(boolean recurse)
-            throws InterruptedException, StyxException, TimeoutException, IOException {
+            throws StyxException {
         if (recurse && this.isDirectory()) {
             for (var name : list(null)) {
                 var file = new StyxFile(mClient, name, mFID);

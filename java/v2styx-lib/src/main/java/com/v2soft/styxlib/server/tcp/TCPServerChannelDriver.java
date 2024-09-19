@@ -168,7 +168,7 @@ public class TCPServerChannelDriver extends TCPChannelDriver {
     }
 
     @Override
-    public void clearStatisitcis() {
+    public void clearStatistics() {
 
     }
 }

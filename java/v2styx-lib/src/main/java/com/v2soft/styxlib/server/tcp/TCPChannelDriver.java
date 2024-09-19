@@ -70,7 +70,7 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
     @Override
     public void sendMessage(StyxMessage message, ClientDetails recipient) throws StyxException {
         if ( recipient == null ) {
-            throw new NullPointerException("Client can't be null");
+            throw new StyxException("Client can't be null");
         }
         TCPClientDetails client = (TCPClientDetails) recipient;
         synchronized (client) {

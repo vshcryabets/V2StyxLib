@@ -32,7 +32,7 @@ public class TMessageTransmitter implements IMessageTransmitter {
             throw new StyxException("Can't sent RMessage");
         }
         if (recepient == null) {
-            throw new NullPointerException("Recepient is null");
+            throw new StyxException("Recepient is null");
         }
 
         IChannelDriver driver = recepient.getDriver();
@@ -61,7 +61,7 @@ public class TMessageTransmitter implements IMessageTransmitter {
     }
 
     @Override
-    public void clearStatisitcis() {
+    public void clearStatistics() {
         mTransmittedCount = 0;
         mErrorCount = 0;
     }

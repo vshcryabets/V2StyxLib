@@ -1,8 +1,8 @@
 package com.v2soft.styxlib.exceptions;
 
-import java.io.Serial;
+import java.io.IOException;
 
-public class StyxException extends Exception {
+public class StyxException extends IOException {
     public StyxException() {
         super();
     }
