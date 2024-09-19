@@ -1,5 +1,6 @@
 package com.v2soft.styxlib.l5.serialization;
 
+import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.l5.io.impl.BufferImpl;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
@@ -14,7 +15,7 @@ import java.io.IOException;
 public class StyxDeserializerImplTest {
 
     @Test
-    public void testDeserializationStyxStat() throws IOException {
+    public void testDeserializationStyxStat() throws StyxException {
         var dataBuffer = new byte[]{71, 0, //0
                 0x22, 0x11, //type //2
                 (byte) 0xE7, (byte) 0x89, 0x0E, 0x00,// 4:dev
@@ -43,7 +44,7 @@ public class StyxDeserializerImplTest {
     }
 
     @Test
-    public void testDeserializeTStat() throws IOException {
+    public void testDeserializeTStat() throws StyxException {
         var dataBuffer = new byte[]{11, 0, 0, 0,
                 (byte) MessageType.Tstat.getByte(),
                 (byte) 0x11, (byte) 0xFF, // tag

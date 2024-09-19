@@ -25,7 +25,7 @@ public class StyxQID {
 		mPath = path;
 	}
 
-    public StyxQID(IBufferReader input) throws IOException {
+    public StyxQID(IBufferReader input) throws StyxException {
         mType = QIDType.factory(input.readUInt8());
         mVersion = input.readUInt32();
         mPath = input.readUInt64();

@@ -38,14 +38,23 @@ public class TCPServerChannelDriver extends TCPChannelDriver {
         if (useSSL) {
             throw new StyxException("Not implemented");
         } else {
-            mChannel = ServerSocketChannel.open();
+            try {
+                mChannel = ServerSocketChannel.open();
+            } catch (IOException e) {
+                throw new StyxException(e.getMessage());
+            }
         }
-        ServerSocket socket = mChannel.socket();
-        socket.bind(isa);
-        socket.setReuseAddress(true);
-        socket.setSoTimeout(getTimeout());
-        mSelector = Selector.open();
-        mChannel.configureBlocking(false);
+        try {
+            ServerSocket socket = mChannel.socket();
+            socket.bind(isa);
+            socket.setReuseAddress(true);
+            socket.setSoTimeout(getTimeout());
+            mSelector = Selector.open();
+            mChannel.configureBlocking(false);
+        } catch (IOException e) {
+            throw new StyxException(e.getMessage());
+        }
+
     }
 
     @Override
@@ -111,10 +120,14 @@ public class TCPServerChannelDriver extends TCPChannelDriver {
         isWorking = false;
     }
 
-    protected void processEventsQueue() throws IOException {
+    protected void processEventsQueue() throws StyxException {
         // new connections
         for (SocketChannel channel : mNewConnetions) {
-            channel.configureBlocking(false);
+            try {
+                channel.configureBlocking(false);
+            } catch (IOException error) {
+                throw new StyxException(error.getMessage());
+            }
             TCPClientDetails client = new TCPClientDetails(channel, this, mIOUnit, mLastClientId++);
             mRMessageHandler.addClient(client);
             mTMessageHandler.addClient(client);
@@ -132,12 +145,16 @@ public class TCPServerChannelDriver extends TCPChannelDriver {
         mReadable.clear();
     }
 
-    private void removeClient(SocketChannel channel) throws IOException {
+    private void removeClient(SocketChannel channel) throws StyxException {
         final ClientDetails clientDetails = mClientStatesMap.get(channel);
         mTMessageHandler.removeClient(clientDetails);
         mRMessageHandler.removeClient(clientDetails);
         mClientStatesMap.remove(channel);
-        channel.close();
+        try {
+            channel.close();
+        } catch (IOException error) {
+            throw new StyxException(error.getMessage());
+        }
     }
 
     @Override

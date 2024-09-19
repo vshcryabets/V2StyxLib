@@ -8,5 +8,5 @@ import java.io.IOException;
 
 public interface IDataDeserializer {
     StyxMessage deserializeMessage(IBufferReader input, int io_unit) throws StyxException;
-    StyxStat deserializeStat(IBufferReader input) throws IOException;
+    StyxStat deserializeStat(IBufferReader input) throws StyxException;
 }

@@ -1,6 +1,7 @@
 package com.v2soft.styxlib.tests;
 
 import com.v2soft.styxlib.exceptions.StyxErrorMessageException;
+import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.server.ClientDetails;
 import com.v2soft.styxlib.l6.vfs.MemoryStyxFile;
 
@@ -25,7 +26,7 @@ public class MD5StyxFile extends MemoryStyxFile {
 
     @Override
     public boolean open(ClientDetails clientDetails, int mode)
-            throws IOException {
+            throws StyxException {
         try {
             MessageDigest md = MessageDigest.getInstance("MD5");
             mClientsMap.put(clientDetails, md);

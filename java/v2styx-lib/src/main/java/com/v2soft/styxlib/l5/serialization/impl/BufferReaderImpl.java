@@ -1,5 +1,6 @@
 package com.v2soft.styxlib.l5.serialization.impl;
 
+import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.l5.io.Buffer;
 import com.v2soft.styxlib.l5.serialization.IBufferReader;
 import com.v2soft.styxlib.utils.MetricsAndStats;
@@ -46,11 +47,11 @@ public class BufferReaderImpl implements IBufferReader {
     }
 
     @Override
-    public String readUTFString() throws UnsupportedEncodingException {
+    public String readUTFString() {
         int count = readUInt16();
         byte[] bytes = new byte[count];
         MetricsAndStats.byteArrayAllocationIo++;
-        read(bytes, 0, count);
+        readData(bytes, 0, count);
         return new String(bytes, sUTFCharset);
     }
 
@@ -75,8 +76,8 @@ public class BufferReaderImpl implements IBufferReader {
     }
 
     @Override
-    public int read(byte[] data, int offset, int count) {
-        return mBuffer.read(data, offset, count);
+    public int readData(byte[] data, int offset, int dataLength) {
+        return mBuffer.read(data, offset, dataLength);
     }
 
     @Override

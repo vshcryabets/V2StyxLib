@@ -1,5 +1,6 @@
 package com.v2soft.styxlib.l6;
 
+import com.v2soft.styxlib.exceptions.StyxEOFException;
 import com.v2soft.styxlib.l5.Connection;
 import com.v2soft.styxlib.l5.IClient;
 import com.v2soft.styxlib.exceptions.StyxErrorMessageException;
@@ -133,7 +134,7 @@ public class StyxFile implements Closeable {
             while (true) {
                 stats.add(new StyxStat(sis));
             }
-        } catch (EOFException e) {
+        } catch (StyxEOFException e) {
             // That's ok
         } finally {
             // TODO ???

@@ -1,4 +1,5 @@
 import com.v2soft.styxlib.exceptions.StyxErrorMessageException;
+import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.l6.vfs.MemoryStyxDirectory;
 import com.v2soft.styxlib.l6.vfs.MemoryStyxFile;
 import com.v2soft.styxlib.server.ClientDetails;
@@ -21,12 +22,12 @@ public class MD5ServerSample {
     private static final int PORT = 10234;
     private static final String FILE_NAME = "md5file";
 
-    public static void main(String[] args) throws IOException, InterruptedException {
+    public static void main(String[] args) throws IOException, InterruptedException, StyxException {
         MemoryStyxFile md5 = new MemoryStyxFile(FILE_NAME){
             protected HashMap<ClientDetails, MessageDigest> mClientsMap = new HashMap<ClientDetails, MessageDigest>();
             @Override
             public boolean open(ClientDetails client, int mode)
-                    throws IOException {
+                    throws StyxException {
                 try {
                     MessageDigest md = MessageDigest.getInstance("MD5");
                     mClientsMap.put(client, md);

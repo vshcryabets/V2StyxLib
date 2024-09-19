@@ -1,7 +1,11 @@
 package com.v2soft.styxlib.io;
 
+import com.v2soft.styxlib.exceptions.StyxEOFException;
+import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.l5.serialization.IBufferReader;
 import com.v2soft.styxlib.utils.MetricsAndStats;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.io.EOFException;
 import java.io.FilterInputStream;
@@ -22,16 +26,16 @@ public class StyxDataInputStream
     }
 
 
-    private long readInteger(int bytes) throws IOException {
+    private long readInteger(int bytes) throws StyxException {
         if ( bytes > sDataBufferSize ) throw new IllegalArgumentException("Too much bytes to read");
         long result = 0L;
         int shift = 0;
-        var read = read(mDataBuffer, 0, bytes);
+        var read = readData(mDataBuffer, 0, bytes);
         if (read <= 0 ) {
-            throw new EOFException();
+            throw new StyxEOFException();
         }
         if (read < bytes) {
-            throw new IOException("Can't read " + bytes + " bytes from stream");
+            throw new StyxException("Can't read " + bytes + " bytes from stream");
         }
         for (int i=0; i<bytes; i++) {
             long b = (mDataBuffer[i]&0xFF);
@@ -46,13 +50,13 @@ public class StyxDataInputStream
     // IStyxDataReader
     // ==================================================
     @Override
-    public short readUInt8() throws IOException {return (short) (readInteger(1)&0XFF);}
+    public short readUInt8() throws StyxException {return (short) (readInteger(1)&0XFF);}
     @Override
-    public int readUInt16() throws IOException {return (int) (readInteger(2)&0xFFFF);}
+    public int readUInt16() throws StyxException {return (int) (readInteger(2)&0xFFFF);}
     @Override
-    public long readUInt32() throws IOException {return (readInteger(4) &0xFFFFFFFF);}
+    public long readUInt32() throws StyxException {return (readInteger(4) &0xFFFFFFFF);}
     @Override
-    public long readUInt64() throws IOException {
+    public long readUInt64() throws StyxException {
         return readInteger(8);
     }
 
@@ -62,11 +66,20 @@ public class StyxDataInputStream
     }
 
     @Override
-    public String readUTFString() throws IOException {
+    public String readUTFString() throws StyxException {
         int count = readUInt16();
         byte[] bytes = new byte[count];
         MetricsAndStats.byteArrayAllocationIo++;
-        read(bytes, 0, count);
+        readData(bytes, 0, count);
         return new String(bytes, StandardCharsets.UTF_8);
+    }
+
+    @Override
+    public int readData(byte[] data, int offset, int dataLength) throws StyxException {
+        try {
+            return super.read(data, offset, dataLength);
+        } catch (IOException e) {
+            throw new StyxException(e.toString());
+        }
     }
 }
