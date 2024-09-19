@@ -24,7 +24,4 @@ public interface IChannelDriver extends Closeable, IMessageTransmitter {
 
     boolean isConnected();
     boolean isStarted();
-
-    IMessageProcessor getTMessageHandler();
-    IMessageProcessor getRMessageHandler();
 }

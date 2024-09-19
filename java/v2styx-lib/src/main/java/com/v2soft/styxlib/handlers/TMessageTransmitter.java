@@ -1,5 +1,6 @@
 package com.v2soft.styxlib.handlers;
 
+import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
 import com.v2soft.styxlib.l5.messages.base.StyxTMessage;
@@ -26,34 +27,27 @@ public class TMessageTransmitter implements IMessageTransmitter {
     }
 
     @Override
-    public boolean sendMessage(StyxMessage message, ClientDetails recepient) throws IOException {
+    public void sendMessage(StyxMessage message, ClientDetails recepient) throws StyxException {
         if ( !message.getType().isTMessage() ) {
-            throw new IOException("Can't sent RMessage");
+            throw new StyxException("Can't sent RMessage");
         }
         if (recepient == null) {
-            throw new NullPointerException("Recepient is null");
+            throw new StyxException("Recipient is null");
         }
-        try {
-            IChannelDriver driver = recepient.getDriver();
-            if (!driver.isConnected()) throw new IOException("Not connected to server");
 
-            // set message tag
-            int tag = StyxMessage.NOTAG;
-            if (message.getType() != MessageType.Tversion) {
-                tag = recepient.getPolls().getTagPoll().getFreeItem();
-            }
-            message.setTag((short) tag);
-            recepient.getPolls().getMessagesMap().put(tag, (StyxTMessage) message);
+        IChannelDriver driver = recepient.getDriver();
+        if (!driver.isConnected()) throw new StyxException("Not connected to server");
 
-            driver.sendMessage(message, recepient);
-            mTransmittedCount++;
-            return true;
-        } catch (SocketException e) {
-            if ( mListener != null ) {
-                mListener.onLostConnection();
-            }
+        // set message tag
+        int tag = StyxMessage.NOTAG;
+        if (message.getType() != MessageType.Tversion) {
+            tag = recepient.getPolls().getTagPoll().getFreeItem();
         }
-        return false;
+        message.setTag((short) tag);
+        recepient.getPolls().getMessagesMap().put(tag, (StyxTMessage) message);
+
+        driver.sendMessage(message, recepient);
+        mTransmittedCount++;
     }
 
     @Override
@@ -67,7 +61,7 @@ public class TMessageTransmitter implements IMessageTransmitter {
     }
 
     @Override
-    public void clearStatisitcis() {
+    public void clearStatistics() {
         mTransmittedCount = 0;
         mErrorCount = 0;
     }

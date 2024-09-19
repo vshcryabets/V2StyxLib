@@ -1,5 +1,7 @@
 package com.v2soft.styxlib.server.tcp;
 
+import com.v2soft.styxlib.Logger;
+import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.l5.serialization.IDataDeserializer;
 import com.v2soft.styxlib.l5.serialization.IDataSerializer;
 import com.v2soft.styxlib.l5.serialization.impl.StyxDeserializerImpl;
@@ -34,7 +36,7 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
 
     public TCPChannelDriver(InetAddress address,
                             int port,
-                            boolean ssl) throws IOException {
+                            boolean ssl) throws StyxException {
         mPort = port;
         mAddress = address;
 
@@ -48,7 +50,7 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
         serializer = new StyxSerializerImpl();
     }
 
-    protected abstract void prepareSocket(InetSocketAddress socketAddress, boolean ssl) throws IOException;
+    protected abstract void prepareSocket(InetSocketAddress socketAddress, boolean ssl) throws StyxException;
 
     protected int getTimeout() {
         return StyxServerManager.DEFAULT_TIMEOUT;
@@ -67,9 +69,9 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
     }
 
     @Override
-    public boolean sendMessage(StyxMessage message, ClientDetails recipient) {
+    public void sendMessage(StyxMessage message, ClientDetails recipient) throws StyxException {
         if ( recipient == null ) {
-            throw new NullPointerException("Client can't be null");
+            throw new StyxException("Client can't be null");
         }
         TCPClientDetails client = (TCPClientDetails) recipient;
         synchronized (client) {
@@ -77,12 +79,11 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
                 serializer.serialize(message, client.getOutputWriter());
                 client.sendOutputBuffer();
                 mTransmittedPacketsCount++;
-                return true;
-            } catch (IOException e) {
+            } catch (StyxException e) {
                 mTransmissionErrorsCount++;
+                throw e;
             }
         }
-        return false;
     }
 
     public void setTMessageHandler(IMessageProcessor handler) {
@@ -110,7 +111,7 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
      * Read data from assigned SocketChannel
      * @throws IOException
      */
-    protected boolean readSocket(TCPClientDetails client) throws IOException {
+    protected boolean readSocket(TCPClientDetails client) throws StyxException {
         int read = 0;
         try {
             read = client.getBufferLoader().readFromChannelToBuffer(client.getChannel());
@@ -129,14 +130,13 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
     /**
      * Read income message from specified client.
      * @return true if message was processed
-     * @throws IOException
      */
-    private boolean process(TCPClientDetails client) throws IOException {
+    private boolean process(TCPClientDetails client) throws StyxException {
         int inBuffer = client.getBuffer().remainsToRead();
         if ( inBuffer > 4 ) {
             long packetSize = client.getInputReader().getUInt32();
             if ( inBuffer >= packetSize ) {
-                final StyxMessage message = deserializer.deserializeMessage(client.getInputReader(), mIOUnit);
+                var message = deserializer.deserializeMessage(client.getInputReader(), mIOUnit);
                 if ( message.getType().isTMessage() ) {
                     if ( mTMessageHandler != null ) {
                         mTMessageHandler.postPacket(message, client);
@@ -169,16 +169,6 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
     @Override
     public String toString() {
         return String.format("%s:%s:%d", getClass().getSimpleName(), mAddress.toString(), mPort);
-    }
-
-    @Override
-    public IMessageProcessor getTMessageHandler() {
-        return mTMessageHandler;
-    }
-
-    @Override
-    public IMessageProcessor getRMessageHandler() {
-        return mRMessageHandler;
     }
 
     public int getPort() {

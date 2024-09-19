@@ -65,4 +65,9 @@ public class DirectoryOperationsTests {
         var fileStats = rootDir.listStat();
         assertFalse(fileStats.isEmpty());
     }
+
+    @Test
+    public void testChDir() {
+        assertTrue(false, "Not implemented");
+    }
 }

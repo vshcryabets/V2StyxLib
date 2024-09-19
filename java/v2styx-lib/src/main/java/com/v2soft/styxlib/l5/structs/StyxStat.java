@@ -1,5 +1,6 @@
 package com.v2soft.styxlib.l5.structs;
 
+import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.l5.serialization.IBufferReader;
 import com.v2soft.styxlib.l5.serialization.UTF;
 
@@ -61,7 +62,7 @@ public class StyxStat {
         mModificationUser = modificationUser;
     }
 
-    public StyxStat(IBufferReader input) throws IOException {
+    public StyxStat(IBufferReader input) throws StyxException {
         // TODO move to factory
         int size = input.readUInt16(); // skip size bytes
         // TODO check size

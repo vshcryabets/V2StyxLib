@@ -2,7 +2,10 @@ package com.v2soft.styxlib;
 
 import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.l5.Connection;
+import com.v2soft.styxlib.l5.enums.FileMode;
 import com.v2soft.styxlib.l5.enums.QIDType;
+import com.v2soft.styxlib.l5.structs.StyxQID;
+import com.v2soft.styxlib.l5.structs.StyxStat;
 import com.v2soft.styxlib.l6.StyxFile;
 import com.v2soft.styxlib.library.types.impl.CredentialsImpl;
 import com.v2soft.styxlib.server.tcp.TCPClientChannelDriver;
@@ -13,6 +16,10 @@ import org.jline.terminal.TerminalBuilder;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.List;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Logger;
 
@@ -22,6 +29,10 @@ import java.util.logging.Logger;
  * @author V.Shcriyabets (vshcryabets@gmail.com)
  */
 public class StyxConsoleClient {
+    private static final String COMMAND_LS = "ls";
+    private static final String COMMAND_PWD = "pwd";
+    private static final String COMMAND_CD = "cd ";
+
     private static Logger log = Logger.getLogger(StyxConsoleClient.class.getSimpleName());
 
     public static void main(String[] args) {
@@ -38,21 +49,25 @@ public class StyxConsoleClient {
             StyxException, TimeoutException {
         // list files
         var files = currentDir.listStat();
-        for (var it : files) {
+        var dirs = files.stream().filter(it -> it.getQID().getType() == QIDType.QTDIR)
+                .sorted(Comparator.comparing(StyxStat::getName))
+                .toList();
+        var other = files.stream().filter(it -> it.getQID().getType() != QIDType.QTDIR)
+                .sorted(Comparator.comparing(StyxStat::getName))
+                .toList();
+        var sorted = new ArrayList<>(dirs);
+        sorted.addAll(other);
+        for (var it : sorted) {
             var quid = it.getQID();
             if (quid.getType() == QIDType.QTDIR) {
-                terminal.writer().println("D\t" +
-                        it.getGroupName() + "/" +
-                        it.getUserName() + "\t" +
-                        it.getLength() + "\t\t" +
-                        it.getName());
+                terminal.writer().print("D ");
             } else {
-                terminal.writer().println("F\t" +
-                        it.getGroupName() + "/" +
-                        it.getUserName() + "\t" +
-                        it.getLength() + "\t\t" +
-                        it.getName());
+                terminal.writer().print("F ");
             }
+            terminal.writer().println(it.getGroupName() + "/" +
+                    it.getUserName() + "\t" +
+                    it.getLength() + "\t\t" +
+                    it.getName());
         }
     }
 
@@ -96,25 +111,45 @@ public class StyxConsoleClient {
             connection.connect();
             terminal.writer().println("Connected");
             StyxFile currentDir = connection.getRoot();
+
             while (true) {
                 var cmd = lineReader.readLine(">");
                 if (cmd.isEmpty())
                     continue;
-                if (cmd.equalsIgnoreCase("quit")) {
-                    terminal.writer().println("Shutdown server");
-                    connection.close();
-                    break;
+                try {
+                    if (cmd.equalsIgnoreCase("quit")) {
+                        terminal.writer().println("Shutdown server");
+                        connection.close();
+                        break;
+                    }
+                    if (cmd.equalsIgnoreCase(COMMAND_LS)) {
+                        listFiles(connection, terminal, currentDir);
+                        continue;
+                    }
+                    if (cmd.equalsIgnoreCase(COMMAND_PWD)) {
+                        terminal.writer().println(currentDir.getPath());
+                        continue;
+                    }
+                    if (cmd.startsWith(COMMAND_CD)) {
+                        var subdir = cmd.substring(COMMAND_CD.length());
+                        currentDir = chdir(connection, terminal, currentDir, subdir);
+                        continue;
+                    }
+                    terminal.writer().println("Unknown command " + cmd);
+                } catch (StyxException error) {
+                    terminal.writer().println("Got error: " + error.toString());
                 }
-                if (cmd.equalsIgnoreCase("ls")) {
-                    listFiles(connection, terminal, currentDir);
-                    continue;
-                }
-                terminal.writer().println("Unknown command " + cmd);
+
 
             }
         } catch (Exception err) {
             err.printStackTrace();
             System.exit(255);
         }
+    }
+
+    private StyxFile chdir(Connection connection, Terminal terminal, StyxFile currentDir, String subdir) throws StyxException {
+        terminal.writer().println(String.format("Change dir to %s", subdir));
+        return currentDir.walk(subdir);
     }
 }

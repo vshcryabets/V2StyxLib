@@ -1,5 +1,6 @@
 package com.v2soft.styxlib.l5.structs;
 
+import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.l5.serialization.IBufferReader;
 import com.v2soft.styxlib.l5.serialization.IBufferWritter;
 import com.v2soft.styxlib.l5.enums.QIDType;
@@ -24,7 +25,7 @@ public class StyxQID {
 		mPath = path;
 	}
 
-    public StyxQID(IBufferReader input) throws IOException {
+    public StyxQID(IBufferReader input) throws StyxException {
         mType = QIDType.factory(input.readUInt8());
         mVersion = input.readUInt32();
         mPath = input.readUInt64();
@@ -36,7 +37,7 @@ public class StyxQID {
     public long getVersion(){return mVersion;}
     public long getPath(){return mPath;}
 
-	public void writeBinaryTo(IBufferWritter output) throws IOException {
+	public void writeBinaryTo(IBufferWritter output) throws StyxException {
         output.writeUInt8((short) getType().getByte());
         output.writeUInt32(getVersion());
         output.writeUInt64(getPath());

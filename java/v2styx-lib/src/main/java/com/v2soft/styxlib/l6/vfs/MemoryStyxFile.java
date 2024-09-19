@@ -1,6 +1,7 @@
 package com.v2soft.styxlib.l6.vfs;
 
 import com.v2soft.styxlib.exceptions.StyxErrorMessageException;
+import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.l5.enums.ModeType;
 import com.v2soft.styxlib.l5.enums.QIDType;
 import com.v2soft.styxlib.l5.structs.StyxQID;
@@ -96,7 +97,7 @@ public class MemoryStyxFile implements IVirtualStyxFile {
     }
 
     @Override
-    public boolean open(ClientDetails clientDetails, int mode) throws IOException {
+    public boolean open(ClientDetails clientDetails, int mode) throws StyxException {
         return ( ( mode == ModeType.OREAD ) ||
                 ( mode == ModeType.OWRITE ) ||
                 ( mode == ModeType.ORDWR ) );

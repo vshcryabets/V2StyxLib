@@ -45,7 +45,7 @@ public class ClientServerTest {
         mServer.closeAndWait();
     }
 
-    private void startServer() throws IOException {
+    private void startServer() throws IOException, StyxException {
         var md5 = new MD5StyxFile();
         var localHost = InetAddress.getByName("127.0.0.1");
         var serverDriver = new TCPServerChannelDriver(localHost, PORT, false);

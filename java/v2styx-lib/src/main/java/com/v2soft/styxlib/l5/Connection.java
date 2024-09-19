@@ -75,17 +75,6 @@ public class Connection
         mDriver = driver;
         mDetails = new ConnectionDetails(getProtocol(), getIOBufSize());
         mCredentials = credentials;
-    }
-    /**
-     * Connect to server with specified parameters
-     *
-     * @return true if connected
-     * @throws IOException
-     * @throws StyxException
-     * @throws TimeoutException
-     */
-    public boolean connect()
-            throws IOException, StyxException, InterruptedException, TimeoutException {
         if ( mAnswerProcessor == null ) {
             mAnswerProcessor = new RMessagesProcessor("RH" + mDriver.toString());
             shouldCloseAnswerProcessor = true;
@@ -94,53 +83,33 @@ public class Connection
             mTransmitter = new TMessageTransmitter(mTransmitterListener);
             shouldCloseTransmitter = true;
         }
-
+    }
+    /**
+     * Connect to server with specified parameters
+     *
+     * @return true if connected
+     */
+    public boolean connect()
+            throws IOException, InterruptedException, TimeoutException {
         if (!mDriver.isStarted()) {
             mDriver.start(getIOBufSize());
             isAutoStartDriver = true;
         }
-
         if (mRecepient == null) {
-            // get first client from driver
-            mRecepient = mDriver.getClients().iterator().next();
+            var firstClient = mDriver.getClients().stream().findFirst();
+            if (firstClient.isEmpty()) {
+                throw new StyxException("No recipient");
+            }
+            mRecepient = firstClient.get();
         }
-
-        return this.connect(mAnswerProcessor, mTransmitter, mRecepient);
-    }
-
-    /**
-     * Connect to server with specified parameters
-     * @return true if connected
-     * @throws IOException
-     * @throws StyxException
-     * @throws TimeoutException
-     */
-    public boolean connect(RMessagesProcessor answerProcessor,
-                           TMessageTransmitter transmitter, ClientDetails recepient)
-            throws IOException, StyxException, InterruptedException, TimeoutException {
-
-        if (recepient == null) {
-            throw new NullPointerException("recepient can't be null");
-        }
-        mRecepient = recepient;
-
-        if (transmitter == null) {
-            throw new NullPointerException("transmitter can't be null");
-        }
-        mTransmitter = transmitter;
-        if ( answerProcessor == null ) {
-            throw new NullPointerException("answerProcessor can't be null");
-        }
-        mAnswerProcessor = answerProcessor;
         mDriver.setRMessageHandler(mAnswerProcessor);
-
         mMountPoint = "/";
         sendVersionMessage();
         mDriver.isConnected();
         return mDriver.isConnected();
     }
 
-    public StyxFile getRoot() throws IOException {
+    public StyxFile getRoot() throws StyxException {
         if (mRoot == null) {
             mRoot = new StyxFile(this, "");
         }
@@ -210,7 +179,7 @@ public class Connection
     }
 
     private void sendAuthMessage()
-            throws InterruptedException, StyxException, IOException, TimeoutException {
+            throws StyxException {
         if (!mCredentials.getUserName().isEmpty() && !mCredentials.getPassword().isEmpty()) {
             mAuthFID = mRecepient.getPolls().getFIDPoll().getFreeItem();
 
@@ -234,8 +203,7 @@ public class Connection
                 getMountPoint());
         mTransmitter.sendMessage(tAttach, mRecepient);
 
-        StyxMessage rMessage = tAttach.waitForAnswer(mTimeout);
-        StyxRAttachMessage rAttach = (StyxRAttachMessage) rMessage;
+        var rAttach = (StyxRAttachMessage)tAttach.waitForAnswer(mTimeout);
         mQID = rAttach.getQID();
         setAttached(true);
     }

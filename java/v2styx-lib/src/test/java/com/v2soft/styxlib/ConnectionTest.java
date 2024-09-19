@@ -11,7 +11,6 @@ import com.v2soft.styxlib.l6.vfs.DiskStyxDirectory;
 import com.v2soft.styxlib.l6.vfs.MemoryStyxFile;
 import com.v2soft.styxlib.library.types.impl.CredentialsImpl;
 import com.v2soft.styxlib.server.ClientDetails;
-import com.v2soft.styxlib.server.IChannelDriver;
 import com.v2soft.styxlib.server.StyxServerManager;
 import com.v2soft.styxlib.server.tcp.TCPClientChannelDriver;
 import com.v2soft.styxlib.server.tcp.TCPServerChannelDriver;
@@ -70,14 +69,14 @@ public class ConnectionTest {
     // TVersion & TAttach
     @Test
     @Tag("dev")
-    public void testConnection() throws IOException, StyxException, InterruptedException, TimeoutException {
+    public void testConnection() throws IOException, InterruptedException, TimeoutException {
         int count = 1000;
-        mConnection.getMessenger().clearStatisitcis();
+        mConnection.getMessenger().clearStatistics();
         long startTime = System.currentTimeMillis();
         for (int i = 0; i < count; i++) {
             mConnection.sendVersionMessage();
         }
-        assertEquals(count * 4, mConnection.getMessenger().getTransmittedCount());
+        assertEquals(count * 3, mConnection.getMessenger().getTransmittedCount()); // TVersion, Tattach, TClunk
         assertEquals(0, mConnection.getMessenger().getErrorsCount());
         long diff = System.currentTimeMillis() - startTime;
         log.info(String.format("\tTransmited %d messages\n\t" +
@@ -92,7 +91,7 @@ public class ConnectionTest {
 
     // TVersion, Tattach, Twalk, create, write, Tclunk, open, read, remove
     @Test
-    public void testFileCreation() throws IOException, StyxException, InterruptedException, TimeoutException {
+    public void testFileCreation() throws IOException {
         final StyxFile newFile = new StyxFile(mConnection, UUID.randomUUID().toString());
         newFile.create(FileMode.ReadOthersPermission.getMode() |
                 FileMode.WriteOthersPermission.getMode());
@@ -113,7 +112,7 @@ public class ConnectionTest {
     }
 
     @Test
-    public void testFSTree() throws IOException, StyxException, InterruptedException, TimeoutException {
+    public void testFSTree() throws IOException {
         // create 2 directory and 4 sub-directories
         String nameA = UUID.randomUUID().toString();
         String nameB = UUID.randomUUID().toString();
@@ -177,7 +176,7 @@ public class ConnectionTest {
 
     @Test
     public void testBigFileTransmition()
-            throws IOException, StyxException, InterruptedException, TimeoutException {
+            throws IOException {
         byte[] buffer = new byte[156];
         System.out.println("Generating pattern...");
         Random random = new Random();
@@ -244,15 +243,14 @@ public class ConnectionTest {
 
     @Test
     public void testWriteTransmitionSpeed()
-            throws IOException, InterruptedException, TimeoutException, StyxException {
+            throws IOException {
         int blockSize = 128;
         long blocksCount = 1024 * 1024;
         final String filename = "write";
         final long[] stat = new long[1];
         ((DiskStyxDirectory) mServer.getRoot()).addFile(new MemoryStyxFile(filename) {
             @Override
-            public int write(ClientDetails clientDetails, byte[] data, long offset)
-                    throws StyxErrorMessageException {
+            public int write(ClientDetails clientDetails, byte[] data, long offset) {
                 stat[0] += data.length;
                 return data.length;
             }

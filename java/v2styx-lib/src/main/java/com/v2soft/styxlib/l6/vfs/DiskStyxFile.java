@@ -1,10 +1,12 @@
 package com.v2soft.styxlib.l6.vfs;
 
 import com.v2soft.styxlib.exceptions.StyxErrorMessageException;
+import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.l5.enums.ModeType;
 import com.v2soft.styxlib.server.ClientDetails;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.Date;
@@ -20,10 +22,10 @@ public class DiskStyxFile extends MemoryStyxFile {
     protected File mFile;
     protected Map<ClientDetails, RandomAccessFile> mFilesMap;
 
-    public DiskStyxFile(File file) throws IOException {
+    public DiskStyxFile(File file) throws StyxException {
         super(file.getName());
         if ( !file.exists() ) {
-            throw new IOException("File not exists");
+            throw new StyxException("File not exists");
         }
         mFile = file;
         mFilesMap = new HashMap<ClientDetails, RandomAccessFile>();
@@ -68,7 +70,7 @@ public class DiskStyxFile extends MemoryStyxFile {
     }
 
     @Override
-    public boolean open(ClientDetails clientDetails, int mode) throws IOException {
+    public boolean open(ClientDetails clientDetails, int mode) throws StyxException {
         boolean canOpen = false;
         String ramode = null;
         switch (mode) {
@@ -87,7 +89,12 @@ public class DiskStyxFile extends MemoryStyxFile {
             break;
         }
         if ( canOpen ) {
-            final RandomAccessFile rf = new RandomAccessFile(mFile, ramode);
+            final RandomAccessFile rf;
+            try {
+                rf = new RandomAccessFile(mFile, ramode);
+            } catch (FileNotFoundException e) {
+                throw new StyxException("File not found " + mFile.getName());
+            }
             mFilesMap.put(clientDetails, rf);
         }
         return canOpen;

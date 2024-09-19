@@ -1,12 +1,8 @@
 package com.v2soft.styxlib.exceptions;
 
-import java.io.Serial;
+import java.io.IOException;
 
-public class StyxException extends Exception {
-
-    @Serial
-    private static final long serialVersionUID = 5801949049418471796L;
-
+public class StyxException extends IOException {
     public StyxException() {
         super();
     }

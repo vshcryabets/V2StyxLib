@@ -1,5 +1,6 @@
 package com.v2soft.styxlib.l5.serialization.impl;
 
+import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.l5.enums.ModeType;
 import com.v2soft.styxlib.l5.messages.*;
@@ -17,11 +18,11 @@ import java.util.LinkedList;
 
 public class StyxDeserializerImpl implements IDataDeserializer {
     @Override
-    public StyxMessage deserializeMessage(IBufferReader buffer, int io_unit) throws IOException {
+    public StyxMessage deserializeMessage(IBufferReader buffer, int io_unit) throws StyxException {
         // get common packet data
         long packet_size = buffer.readUInt32();
         if (packet_size > io_unit) {
-            throw new IOException("Packet size to large");
+            throw new StyxException("Packet size to large");
         }
         var typeId = buffer.readUInt8();
         MessageType type = MessageType.factory(typeId);
@@ -78,7 +79,7 @@ public class StyxDeserializerImpl implements IDataDeserializer {
                     buffer.readUInt8());
             case Rcreate -> result = new StyxROpenMessage(
                     tag,
-                    new StyxQID(buffer), 0, true);
+                    new StyxQID(buffer), buffer.readUInt32(), true);
             case Tread -> result = new StyxTReadMessage(
                     buffer.readUInt32(),
                     buffer.readUInt64(),
@@ -87,7 +88,7 @@ public class StyxDeserializerImpl implements IDataDeserializer {
                 var dataLength = (int) buffer.readUInt32();
                 MetricsAndStats.byteArrayAllocationRRead++;
                 var data = new byte[dataLength];
-                buffer.read(data, 0, dataLength);
+                buffer.readData(data, 0, dataLength);
                 result = new StyxRReadMessage(tag,
                         data,
                         dataLength);
@@ -98,7 +99,7 @@ public class StyxDeserializerImpl implements IDataDeserializer {
                 var dataLength = (int) buffer.readUInt32();
                 var data = new byte[dataLength];
                 MetricsAndStats.byteArrayAllocationTWrite++;
-                buffer.read(data, 0, dataLength);
+                buffer.readData(data, 0, dataLength);
                 result = new StyxTWriteMessage(fid,
                         offset,
                         data,
@@ -137,7 +138,7 @@ public class StyxDeserializerImpl implements IDataDeserializer {
     }
 
     @Override
-    public StyxStat deserializeStat(IBufferReader input) throws IOException {
+    public StyxStat deserializeStat(IBufferReader input) throws StyxException {
         int size = input.readUInt16(); // skip size bytes
         // TODO check size
         short type = (short) input.readUInt16();

@@ -75,8 +75,8 @@ public class StyxUnbufferedOutputStream extends OutputStream {
         super.close();
         // send Tclunk
         final StyxTMessageFID tClunk = new StyxTMessageFID(MessageType.Tclunk, MessageType.Rclunk, mFID);
-        mMessenger.sendMessage(tClunk, mRecipient);
         try {
+            mMessenger.sendMessage(tClunk, mRecipient);
             tClunk.waitForAnswer(mTimeout);
         } catch (Exception e) {
             throw new IOException(e);

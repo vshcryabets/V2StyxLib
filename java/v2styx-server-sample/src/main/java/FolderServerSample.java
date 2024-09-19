@@ -1,3 +1,4 @@
+import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.l6.vfs.DiskStyxDirectory;
 import com.v2soft.styxlib.server.StyxServerManager;
 import com.v2soft.styxlib.server.tcp.TCPServerChannelDriver;
@@ -20,8 +21,9 @@ import java.util.List;
 public class FolderServerSample {
     private static final int PORT = 6666;
     private static final String SHARE_FOLDER = ".";
+    private static final String CMD_HELP = "help";
 
-    public static void main(String[] args) throws IOException, InterruptedException {
+    public static void main(String[] args) throws StyxException, InterruptedException, IOException {
         var shareFolder = SHARE_FOLDER;
         System.out.println("V2StyxLib-JVM console server");
 
@@ -58,6 +60,10 @@ public class FolderServerSample {
             var cmd = lineReader.readLine(">");
             if (cmd.isEmpty())
                 continue;
+            if (cmd.equalsIgnoreCase(CMD_HELP)) {
+                showCommandsHelp(terminal);
+                continue;
+            }
             if (cmd.equalsIgnoreCase("quit")) {
                 terminal.writer().println("Shutdown server");
                 mServer.close();
@@ -66,5 +72,11 @@ public class FolderServerSample {
             terminal.writer().println("Unknown command " + cmd);
         }
         mServer.joinThreads();
+    }
+
+    private static void showCommandsHelp(Terminal terminal) {
+        terminal.writer().println("Supported commands:");
+        terminal.writer().println("\thelp - show help information.");
+        terminal.writer().println("\tquit - quit from server.");
     }
 }

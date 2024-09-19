@@ -2,6 +2,7 @@ package com.v2soft.styxlib.l5.messages.base;
 
 import com.v2soft.styxlib.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.exceptions.StyxException;
+import com.v2soft.styxlib.exceptions.StyxInterruptedException;
 import com.v2soft.styxlib.exceptions.StyxWrongMessageException;
 import com.v2soft.styxlib.l5.enums.MessageType;
 
@@ -27,11 +28,14 @@ public class StyxTMessage extends StyxMessage {
     }
 
     public synchronized StyxMessage waitForAnswer(long timeout)
-            throws TimeoutException, StyxErrorMessageException, InterruptedException {
-        if ( mAnswer == null)
+            throws StyxException {
+        if ( mAnswer == null) try {
             wait(timeout);
+        } catch (InterruptedException err) {
+            throw new StyxInterruptedException();
+        }
         if ( mAnswer == null )
-            throw new TimeoutException("Don't receive answer for "+this.toString());
+            throw new StyxException("Don't receive answer for "+this.toString());
         if (mAnswer.getType() == MessageType.Rerror) {
             StyxErrorMessageException.doException(mAnswer, null);
         }
