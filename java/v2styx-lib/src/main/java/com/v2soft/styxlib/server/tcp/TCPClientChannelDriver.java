@@ -28,7 +28,7 @@ public class TCPClientChannelDriver extends TCPChannelDriver {
     protected TCPClientDetails mServerClientDetails;
     protected SocketChannel mChanel;
 
-    public TCPClientChannelDriver(InetAddress address, int port, boolean ssl) throws IOException {
+    public TCPClientChannelDriver(InetAddress address, int port, boolean ssl) throws StyxException {
         super(address, port, ssl);
     }
 
@@ -39,11 +39,15 @@ public class TCPClientChannelDriver extends TCPChannelDriver {
     }
 
     @Override
-    protected void prepareSocket(InetSocketAddress socketAddress, boolean ssl) throws IOException {
-        mChanel = SocketChannel.open(socketAddress);
-        mChanel.configureBlocking(true);
-        Socket socket = mChanel.socket();
-        socket.setSoTimeout(getTimeout());
+    protected void prepareSocket(InetSocketAddress socketAddress, boolean ssl) throws StyxException {
+        try {
+            mChanel = SocketChannel.open(socketAddress);
+            mChanel.configureBlocking(true);
+            Socket socket = mChanel.socket();
+            socket.setSoTimeout(getTimeout());
+        } catch (Exception err) {
+            throw new StyxException(err.getMessage());
+        }
     }
 
     @Override

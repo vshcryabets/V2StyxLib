@@ -1,5 +1,6 @@
 package com.v2soft.styxlib.server.tcp;
 
+import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.server.ClientDetails;
 
 import java.io.IOException;
@@ -26,16 +27,16 @@ public class TCPServerChannelDriver extends TCPChannelDriver {
     protected Map<SocketChannel, ClientDetails> mClientStatesMap;
     protected int mLastClientId = 1;
 
-    public TCPServerChannelDriver(InetAddress address, int port, boolean ssl) throws IOException {
+    public TCPServerChannelDriver(InetAddress address, int port, boolean ssl) throws StyxException {
         super(address, port, ssl);
         mNewConnetions = new Stack<SocketChannel>();
         mReadable = new Stack<SocketChannel>();
         mClientStatesMap = new HashMap<SocketChannel, ClientDetails>();
     }
 
-    protected void prepareSocket(InetSocketAddress isa, boolean useSSL) throws IOException {
+    protected void prepareSocket(InetSocketAddress isa, boolean useSSL) throws StyxException {
         if (useSSL) {
-            throw new RuntimeException("Not implemented");
+            throw new StyxException("Not implemented");
         } else {
             mChannel = ServerSocketChannel.open();
         }

@@ -49,12 +49,12 @@ public class PacketIOTests {
         mServer.closeAndWait();
     }
 
-    private void startServer() throws IOException {
+    private void startServer() throws StyxException {
         MemoryStyxFile md5 = new MemoryStyxFile(FILE_NAME){
             protected HashMap<ClientDetails, MessageDigest> mClientsMap = new HashMap<ClientDetails, MessageDigest>();
             @Override
             public boolean open(ClientDetails client, int mode)
-                    throws IOException {
+                    throws StyxException {
                 try {
                     MessageDigest md = MessageDigest.getInstance("MD5");
                     mClientsMap.put(client, md);

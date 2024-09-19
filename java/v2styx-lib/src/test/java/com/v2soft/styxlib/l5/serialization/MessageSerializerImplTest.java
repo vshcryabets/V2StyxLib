@@ -1,5 +1,6 @@
 package com.v2soft.styxlib.l5.serialization;
 
+import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.l5.enums.FileMode;
 import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.l5.enums.QIDType;
@@ -19,7 +20,7 @@ import java.util.Date;
 public class MessageSerializerImplTest {
 
     @Test
-    public void testTVersion() throws IOException {
+    public void testTVersion() throws StyxException {
         var serializer = new StyxSerializerImpl();
         var buffer = ByteBuffer.allocate(8192);
         var outputBuffer = new BufferWritterImpl(buffer);
@@ -38,7 +39,7 @@ public class MessageSerializerImplTest {
     }
 
     @Test
-    public void testSerializationStyxStat() throws IOException {
+    public void testSerializationStyxStat() throws StyxException {
         var serializer = new StyxSerializerImpl();
         var buffer = ByteBuffer.allocate(8192);
         var outputBuffer = new BufferWritterImpl(buffer);
@@ -87,7 +88,7 @@ public class MessageSerializerImplTest {
     }
 
     @Test
-    public void testRCreate() throws IOException {
+    public void testRCreate() throws StyxException {
         var serializer = new StyxSerializerImpl();
         var buffer = ByteBuffer.allocate(8192);
         var outputBuffer = new BufferWritterImpl(buffer);

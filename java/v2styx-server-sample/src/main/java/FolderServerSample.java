@@ -22,7 +22,7 @@ public class FolderServerSample {
     private static final String SHARE_FOLDER = ".";
     private static final String CMD_HELP = "help";
 
-    public static void main(String[] args) throws IOException, InterruptedException {
+    public static void main(String[] args) throws StyxException, InterruptedException {
         var shareFolder = SHARE_FOLDER;
         System.out.println("V2StyxLib-JVM console server");
 
