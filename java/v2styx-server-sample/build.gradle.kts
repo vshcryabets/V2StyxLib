@@ -1,4 +1,3 @@
-import ce.defs.DataType
 import ce.defs.domain.DirsConfiguration
 import ce.domain.usecase.entry.BuildProjectUseCase
 import ce.domain.usecase.load.LoadMetaFilesForTargetUseCase
@@ -12,7 +11,7 @@ import javax.script.ScriptEngineManager
 plugins {
     java
     application
-    id("com.github.johnrengelman.shadow") version "7.1.2"
+    id("com.github.johnrengelman.shadow") version "8.1.1"
 }
 
 buildscript {
@@ -48,7 +47,7 @@ dependencies {
 }
 
 application {
-    mainClass.set("FolderServerSample")
+    mainClass.set("com.v2soft.folderserver.FolderServerSample")
 }
 
 tasks {
@@ -57,7 +56,7 @@ tasks {
         archiveVersion.set("0.1.0")
         mergeServiceFiles()
         manifest {
-            attributes(mapOf("Main-Class" to "FolderServerSample"))
+            attributes(mapOf("Main-Class" to "com.v2soft.folderserver.FolderServerSample"))
         }
     }
 }

@@ -1,7 +1,7 @@
+package com.v2soft.folderserver;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.v2soft.folderserver.ServerConfig;
-import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.l6.vfs.DiskStyxDirectory;
 import com.v2soft.styxlib.server.StyxServerManager;
 import com.v2soft.styxlib.server.tcp.TCPServerChannelDriver;
@@ -14,7 +14,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.InetAddress;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -36,6 +35,10 @@ public class FolderServerSample {
                 pos++;
             }
             pos++;
+        }
+        if (configFilePath.isEmpty()) {
+            System.err.println("Please specify configuration file i.e --config fileName");
+            System.exit(255);
         }
         System.out.println("Load configuration from file " + configFilePath);
         // load configuration file

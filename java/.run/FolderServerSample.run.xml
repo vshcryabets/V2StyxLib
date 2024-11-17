@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="FolderServerSample" type="Application" factoryName="Application" nameIsGenerated="true">
-    <option name="MAIN_CLASS_NAME" value="FolderServerSample" />
+  <configuration default="false" name="FolderServerSample" type="Application" factoryName="Application">
+    <option name="MAIN_CLASS_NAME" value="com.v2soft.folderserver.FolderServerSample" />
     <module name="V2StyxLib-JVM.v2styx-server-sample.main" />
     <option name="PROGRAM_PARAMETERS" value="--config ./v2styx-server-sample/folderserverconfig.json" />
     <method v="2">

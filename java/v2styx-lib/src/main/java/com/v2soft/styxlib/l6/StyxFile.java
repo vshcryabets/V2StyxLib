@@ -1,7 +1,6 @@
 package com.v2soft.styxlib.l6;
 
 import com.v2soft.styxlib.exceptions.StyxEOFException;
-import com.v2soft.styxlib.l5.Connection;
 import com.v2soft.styxlib.l5.IClient;
 import com.v2soft.styxlib.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.exceptions.StyxException;
@@ -30,7 +29,6 @@ import com.v2soft.styxlib.handlers.IMessageTransmitter;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeoutException;
 
@@ -70,8 +68,6 @@ public class StyxFile {
     }
 
     public String getPath() {
-        if (mPath == null)
-            return "/";
         return mPath;
     }
 
@@ -131,6 +127,7 @@ public class StyxFile {
             // TODO ???
 //            mRecepient.getPolls().getFIDPoll().release(mFID);
         }
+        // why close file FID we have a cloned FID?
         close();
         return stats;
     }
@@ -185,7 +182,6 @@ public class StyxFile {
         int iounit = open(ModeType.OREAD, tempFID);
         return new StyxUnbufferedInputStream(tempFID, mMessenger, iounit, mRecipient);
     }
-
 
     /**
      * Open both streams - input and output.
