@@ -1,4 +1,5 @@
-import com.v2soft.styxlib.exceptions.StyxException;
+package com.v2soft.styxserver;
+
 import com.v2soft.styxlib.l6.vfs.DiskStyxDirectory;
 import com.v2soft.styxlib.server.StyxServerManager;
 import com.v2soft.styxlib.server.tcp.TCPServerChannelDriver;
@@ -10,7 +11,6 @@ import org.jline.terminal.TerminalBuilder;
 import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -23,7 +23,7 @@ public class FolderServerSample {
     private static final String SHARE_FOLDER = ".";
     private static final String CMD_HELP = "help";
 
-    public static void main(String[] args) throws StyxException, InterruptedException, IOException {
+    public static void main(String[] args) throws InterruptedException, IOException {
         var shareFolder = SHARE_FOLDER;
         System.out.println("V2StyxLib-JVM console server");
 

@@ -370,7 +370,7 @@ public class StyxFile {
         final StyxTWalkMessage tWalk = new StyxTWalkMessage(parentFID,
                 newFID, StyxSerializerImpl.splitPath(path));
         mMessenger.sendMessage(tWalk, mRecipient);
-        final StyxMessage rWalk = tWalk.waitForAnswer(mTimeout);
+        var rWalk = tWalk.waitForAnswer(mTimeout);
         StyxErrorMessageException.doException(rWalk, mPath);
         if (((StyxRWalkMessage) rWalk).getQIDListLength() != tWalk.getPathLength())
             throw new StyxException("File not found " + mPath);

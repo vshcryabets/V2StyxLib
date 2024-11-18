@@ -23,6 +23,8 @@ repositories {
 dependencies {
     implementation(project(":v2styx-lib"))
     implementation("org.jline:jline:3.25.0")
+    implementation("com.fasterxml.jackson.core:jackson-core:2.15.0")
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.15.0")
 }
 
 application {

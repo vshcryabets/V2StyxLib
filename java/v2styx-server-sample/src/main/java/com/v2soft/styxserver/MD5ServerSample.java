@@ -1,3 +1,5 @@
+package com.v2soft.styxserver;
+
 import com.v2soft.styxlib.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.l6.vfs.MemoryStyxDirectory;
