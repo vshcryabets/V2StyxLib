@@ -37,6 +37,7 @@ public class StyxQID {
     public long getVersion(){return mVersion;}
     public long getPath(){return mPath;}
 
+	@Deprecated
 	public void writeBinaryTo(IBufferWritter output) throws StyxException {
         output.writeUInt8((short) getType().getByte());
         output.writeUInt32(getVersion());

@@ -53,10 +53,10 @@ public class StyxServerManager
 
     @Override
     public void close() throws IOException {
-        mBalancer.close();
         for (var driver : mDrivers) {
             driver.close();
         }
+        mBalancer.close();
     }
 
     public void closeAndWait() throws IOException, InterruptedException {

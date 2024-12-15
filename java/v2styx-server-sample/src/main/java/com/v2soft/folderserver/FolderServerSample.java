@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.v2soft.styxlib.l6.vfs.DiskStyxDirectory;
 import com.v2soft.styxlib.server.StyxServerManager;
+import com.v2soft.styxlib.server.tcp.TCPClientDetails;
 import com.v2soft.styxlib.server.tcp.TCPServerChannelDriver;
 import org.jline.reader.LineReader;
 import org.jline.reader.LineReaderBuilder;
@@ -23,6 +24,8 @@ import java.util.List;
  */
 public class FolderServerSample {
     private static final String CMD_HELP = "help";
+    private static final String CMD_QUIT = "quit";
+    private static final String CMD_CLIENTS = "lsclients";
 
     public static void main(String[] args) throws InterruptedException, IOException {
         var configFilePath = "";
@@ -70,8 +73,10 @@ public class FolderServerSample {
             if (cmd.equalsIgnoreCase(CMD_HELP)) {
                 showCommandsHelp(terminal);
                 continue;
-            }
-            if (cmd.equalsIgnoreCase("quit")) {
+            } else if (cmd.equalsIgnoreCase(CMD_CLIENTS)) {
+                listClients(terminal, mServer);
+                continue;
+            } else if (cmd.equalsIgnoreCase(CMD_QUIT)) {
                 terminal.writer().println("Shutdown server");
                 mServer.close();
                 break;
@@ -81,9 +86,28 @@ public class FolderServerSample {
         mServer.joinThreads();
     }
 
+    private static void listClients(Terminal terminal, StyxServerManager server) {
+        for (var driver : server.getDrivers()) {
+            terminal.writer().println("ID\tName\tAddress");
+            for (var client : driver.getClients()) {
+                terminal.writer().print(client.getId());
+                terminal.writer().print("\t");
+                terminal.writer().print(client.getCredentials().getUserName());
+                terminal.writer().print("\t");
+                if (client instanceof TCPClientDetails) {
+                    terminal.writer().print(client.toString());
+                }
+                terminal.writer().println(" .");
+            }
+        }
+    }
+
     private static void showCommandsHelp(Terminal terminal) {
         terminal.writer().println("Supported commands:");
         terminal.writer().println("\thelp - show help information.");
         terminal.writer().println("\tquit - quit from server.");
+        terminal.writer().print("\t");
+        terminal.writer().print(CMD_CLIENTS);
+        terminal.writer().println(" - list clients.");
     }
 }

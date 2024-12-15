@@ -70,7 +70,7 @@ extends MemoryStyxFile {
             final List<StyxStat> stats = new LinkedList<StyxStat>();
             for (IVirtualStyxFile file : mFiles) {
                 final StyxStat stat = file.getStat();
-                size += stat.getSize();
+                size += mSerializer.getStatSerializedSize(stat);
                 stats.add(stat);
             }
             // allocate buffer

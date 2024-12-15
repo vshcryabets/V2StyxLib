@@ -1,9 +1,0 @@
-<component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="com.v2soft.folderserver.FolderServerSample" type="Application" factoryName="Application" nameIsGenerated="true">
-    <option name="MAIN_CLASS_NAME" value="com.v2soft.folderserver.FolderServerSample" />
-    <module name="V2StyxLib-JVM.v2styx-server-sample.main" />
-    <method v="2">
-      <option name="Make" enabled="true" />
-    </method>
-  </configuration>
-</component>

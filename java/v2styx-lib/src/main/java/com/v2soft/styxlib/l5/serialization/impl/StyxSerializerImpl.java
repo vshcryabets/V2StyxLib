@@ -50,11 +50,11 @@ public class StyxSerializerImpl implements IDataSerializer {
                 var createMessage = (StyxTCreateMessage)message;
                 size += 5 + UTF.getUTFSize(createMessage.getName());
             }
-            case Twstat -> size += ((StyxTWStatMessage)message).getStat().getSize();
+            case Twstat -> size += getStatSerializedSize(((StyxTWStatMessage)message).getStat());
             case Twrite -> size += 12 + ((StyxTWriteMessage)message).getDataLength();
             case Tread -> size += 8 + 4;
             case Rwrite -> size += 4;
-            case Rstat -> size += 2 + ((StyxRStatMessage)message).stat.getSize();
+            case Rstat -> size += 2 + getStatSerializedSize(((StyxRStatMessage)message).stat);
             case Rread -> size += 4 + ((StyxRReadMessage)message).getDataLength();
             case Tflush -> size += 2;
             case Rcreate -> size += 4;
@@ -130,7 +130,7 @@ public class StyxSerializerImpl implements IDataSerializer {
                 break;
             case Twstat:
                 StyxTWStatMessage twStatMessage = (StyxTWStatMessage) message;
-                output.writeUInt16(twStatMessage.getStat().getSize());
+                output.writeUInt16(getStatSerializedSize(twStatMessage.getStat()));
                 serializeStat(twStatMessage.getStat(), output);
                 break;
             case Tflush:
@@ -177,7 +177,7 @@ public class StyxSerializerImpl implements IDataSerializer {
                 break;
             case Rstat:
                 StyxRStatMessage rStatMessage = (StyxRStatMessage) message;
-                output.writeUInt16(rStatMessage.stat.getSize());
+                output.writeUInt16(getStatSerializedSize(rStatMessage.stat));
                 serializeStat(rStatMessage.stat, output);
                 break;
             case Rcreate:
@@ -203,19 +203,28 @@ public class StyxSerializerImpl implements IDataSerializer {
     @Override
     public void serializeStat(StyxStat stat, IBufferWritter output)
             throws StyxException {
-        int size = stat.getSize();
+        int size = getStatSerializedSize(stat);
         output.writeUInt16(size - 2); // total size except first 2 bytes with size
-        output.writeUInt16(stat.getType());
-        output.writeUInt32(stat.getDev());
-        stat.getQID().writeBinaryTo(output);
-        output.writeUInt32(stat.getMode());
-        output.writeUInt32(DateToInt(stat.getAccessTime()));
-        output.writeUInt32(DateToInt(stat.getModificationTime()));
-        output.writeUInt64(stat.getLength());
-        output.writeUTFString(stat.getName());
-        output.writeUTFString(stat.getUserName());
-        output.writeUTFString(stat.getGroupName());
-        output.writeUTFString(stat.getModificationUser());
+        output.writeUInt16(stat.type());
+        output.writeUInt32(stat.dev());
+        stat.QID().writeBinaryTo(output);
+        output.writeUInt32(stat.mode());
+        output.writeUInt32(DateToInt(stat.accessTime()));
+        output.writeUInt32(DateToInt(stat.modificationTime()));
+        output.writeUInt64(stat.length());
+        output.writeUTFString(stat.name());
+        output.writeUTFString(stat.userName());
+        output.writeUTFString(stat.groupName());
+        output.writeUTFString(stat.modificationUser());
+    }
+
+    @Override
+    public int getStatSerializedSize(StyxStat stat) {
+        return 28 + StyxQID.CONTENT_SIZE
+                + UTF.getUTFSize(stat.name())
+                + UTF.getUTFSize(stat.userName())
+                + UTF.getUTFSize(stat.groupName())
+                + UTF.getUTFSize(stat.modificationUser());
     }
 
 

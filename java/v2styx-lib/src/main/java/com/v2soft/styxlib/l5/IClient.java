@@ -1,6 +1,7 @@
 package com.v2soft.styxlib.l5;
 
 import com.v2soft.styxlib.exceptions.StyxException;
+import com.v2soft.styxlib.l5.serialization.IDataDeserializer;
 import com.v2soft.styxlib.server.ClientDetails;
 import com.v2soft.styxlib.handlers.IMessageTransmitter;
 import com.v2soft.styxlib.library.types.ConnectionDetails;
@@ -51,4 +52,5 @@ public interface IClient extends Closeable {
      * @return message recepient information
      */
     ClientDetails getRecepient();
+    IDataDeserializer getDeserializer();
 }

@@ -7,6 +7,7 @@ import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.l5.messages.*;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
 import com.v2soft.styxlib.l5.messages.base.StyxTMessageFID;
+import com.v2soft.styxlib.l5.serialization.IDataDeserializer;
 import com.v2soft.styxlib.l5.structs.StyxQID;
 import com.v2soft.styxlib.l6.StyxFile;
 import com.v2soft.styxlib.library.types.ConnectionDetails;
@@ -274,5 +275,10 @@ public class Connection
     @Override
     public ClientDetails getRecepient() {
         return mRecepient;
+    }
+
+    @Override
+    public IDataDeserializer getDeserializer() {
+        return mDriver.getDeserializer();
     }
 }

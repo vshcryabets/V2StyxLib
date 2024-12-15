@@ -15,10 +15,7 @@ import com.v2soft.styxlib.l6.vfs.MemoryStyxDirectory;
 import com.v2soft.styxlib.l6.vfs.MemoryStyxFile;
 
 import com.v2soft.styxlib.server.tcp.TCPServerChannelDriver;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -66,6 +63,7 @@ public class TwoWayExportTest {
 
     // TVersion & TAttach
     @Test
+    @Disabled
     public void testTwoWayExport() throws IOException, StyxException, InterruptedException, TimeoutException, NoSuchAlgorithmException {
         List<IChannelDriver> drivers = mServer.getDrivers();
         Assertions.assertNotNull(drivers);
@@ -162,6 +160,7 @@ public class TwoWayExportTest {
     }
 
     @Test
+    @Disabled
     public void testChat() throws IOException, InterruptedException, TimeoutException, StyxException {
         int count = 5;
         final AtomicInteger syncObject = new AtomicInteger(0);

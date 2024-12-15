@@ -18,10 +18,10 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 class StyxSerializerImplTest {
+    StyxSerializerImpl serializer = new StyxSerializerImpl();
 
     @Test
     void testGetSize() {
-        var serializer = new StyxSerializerImpl();
         assertEquals(IDataSerializer.BASE_BINARY_SIZE + 2 + 2,
                 serializer.getMessageSize(new StyxRErrorMessage(0, "AB")));
 
@@ -128,5 +128,11 @@ class StyxSerializerImplTest {
         assertEquals(IDataSerializer.BASE_BINARY_SIZE + 2 + StyxQID.CONTENT_SIZE,
                 serializer.getMessageSize(new StyxRWalkMessage(0x1111, Collections.singletonList(StyxQID.EMPTY))));
 
+    }
+
+    @Test
+    void testGetStyxStatSize() {
+        // empty stat = 28 + 7 + 2 + 2 + 2 + 2
+        assertEquals(28 + 13 + 2 + 2 + 2 + 2, serializer.getStatSerializedSize(StyxStat.EMPTY));
     }
 }

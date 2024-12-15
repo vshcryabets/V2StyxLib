@@ -1,6 +1,7 @@
 package com.v2soft.styxlib.server.tcp;
 
 import com.v2soft.styxlib.exceptions.StyxException;
+import com.v2soft.styxlib.l5.serialization.IDataDeserializer;
 import com.v2soft.styxlib.server.ClientDetails;
 
 import java.io.IOException;
@@ -19,8 +20,6 @@ import java.util.*;
  * @author V.Shcryabets (vshcryabets@gmail.com)
  */
 public class TCPServerChannelDriver extends TCPChannelDriver {
-    private static final String TAG = TCPServerChannelDriver.class.getSimpleName();
-
     protected ServerSocketChannel mChannel;
     protected Selector mSelector;
     protected Stack<SocketChannel> mNewConnetions, mReadable;
