@@ -1,16 +1,14 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+
 plugins {
     java
-    kotlin("jvm")
     application
-}
-
-kotlin {
-    jvmToolchain(Versions.jvmLevel)
+    id("com.github.johnrengelman.shadow") version "8.1.1"
 }
 
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(Versions.jvmLevel))
+        languageVersion.set(JavaLanguageVersion.of(17))
     }
 }
 
@@ -26,5 +24,16 @@ dependencies {
 }
 
 application {
-    mainClass.set("StyxConsoleClient")
+    mainClass.set("com.v2soft.styxlib.StyxConsoleClient")
+}
+
+tasks {
+    named<ShadowJar>("shadowJar") {
+        archiveBaseName.set("console-client")
+        archiveVersion.set("0.1.0")
+        mergeServiceFiles()
+        manifest {
+            attributes(mapOf("Main-Class" to "com.v2soft.styxlib.StyxConsoleClient"))
+        }
+    }
 }
