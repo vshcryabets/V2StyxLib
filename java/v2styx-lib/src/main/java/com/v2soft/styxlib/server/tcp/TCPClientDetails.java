@@ -39,7 +39,7 @@ public class TCPClientDetails extends ClientDetails {
 
         mOutputBuffer = ByteBuffer.allocate(iounit);
         MetricsAndStats.byteBufferAllocation++;
-        BufferImpl impl = new BufferImpl(iounit * 2);
+        var impl = new BufferImpl(iounit * 2);
         mBuffer = impl;
         mBufferLoader = impl;
         mReader = new BufferReaderImpl(mBuffer);

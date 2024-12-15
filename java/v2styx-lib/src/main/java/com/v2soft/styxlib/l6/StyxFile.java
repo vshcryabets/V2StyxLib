@@ -51,15 +51,15 @@ public class StyxFile {
     private long mTimeout;
     protected ClientDetails mRecipient;
 
-    public StyxFile(IClient manager, String path)
+    public StyxFile(IClient client, String path)
             throws StyxException {
-        this(manager, path, manager.getRootFID());
+        this(client, path, client.getRootFID());
     }
 
-    public StyxFile(IClient manager, String path, long parentFid) throws StyxException {
-        if (!manager.isConnected())
+    public StyxFile(IClient client, String path, long parentFid) throws StyxException {
+        if (!client.isConnected())
             throw new StyxException("No connection");
-        mClient = manager;
+        mClient = client;
         mMessenger = mClient.getMessenger();
         mRecipient = mClient.getRecepient();
         mTimeout = mClient.getTimeout();
@@ -119,7 +119,7 @@ public class StyxFile {
             var is = new StyxFileBufferedInputStream(mMessenger, tempFID, iounit, mRecipient);
             var sis = new StyxDataInputStream(is);
             while (true) {
-                stats.add(new StyxStat(sis));
+                stats.add(mClient.getDeserializer().deserializeStat(sis));
             }
         } catch (StyxEOFException e) {
             // That's ok
@@ -141,12 +141,12 @@ public class StyxFile {
         if (filter == null) {
             return listStat()
                     .stream()
-                    .map(StyxStat::getName)
+                    .map(StyxStat::name)
                     .toList();
         } else {
             return listStat()
                     .stream()
-                    .map(StyxStat::getName)
+                    .map(StyxStat::name)
                     .filter(name -> filter.accept(this, name))
                     .toList();
         }
@@ -263,8 +263,18 @@ public class StyxFile {
     public void renameTo(String name)
             throws StyxException {
         StyxStat stat = getStat();
-        stat.setName(name);
-        StyxTWStatMessage tWStat = new StyxTWStatMessage(getFID(), stat);
+        var newStat = new StyxStat(stat.type(),
+                stat.dev(),
+                stat.QID(),
+                stat.mode(),
+                stat.accessTime(),
+                stat.modificationTime(),
+                stat.length(),
+                name,
+                stat.userName(),
+                stat.groupName(),
+                stat.modificationUser());
+        StyxTWStatMessage tWStat = new StyxTWStatMessage(getFID(), newStat);
         mMessenger.sendMessage(tWStat, mRecipient);
         StyxMessage rMessage = tWStat.waitForAnswer(mTimeout);
     }
@@ -279,7 +289,7 @@ public class StyxFile {
     public boolean checkFileMode(FileMode mode)
             throws StyxException {
         StyxStat stat = getStat();
-        return mode.check(stat.getMode());
+        return mode.check(stat.mode());
     }
 
     public boolean isDirectory()

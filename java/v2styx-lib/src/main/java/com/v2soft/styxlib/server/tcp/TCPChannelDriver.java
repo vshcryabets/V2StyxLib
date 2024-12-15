@@ -174,7 +174,13 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
         return mPort;
     }
 
+    @Override
     public IDataSerializer getSerializer() {
         return serializer;
+    }
+
+    @Override
+    public IDataDeserializer getDeserializer() {
+        return deserializer;
     }
 }

@@ -93,7 +93,7 @@ extends DiskStyxFile {
             final List<StyxStat> stats = new LinkedList<StyxStat>();
             for (IVirtualStyxFile file : mVirtualFiles) {
                 final StyxStat stat = file.getStat();
-                size += stat.getSize();
+                size += mSerializer.getStatSerializedSize(stat);
                 stats.add(stat);
             }
             // reload disk files
@@ -103,7 +103,7 @@ extends DiskStyxFile {
                         : new DiskStyxFile(file);
                 mRealFiles.add(item);
                 final StyxStat stat = item.getStat();
-                size += stat.getSize();
+                size += mSerializer.getStatSerializedSize(stat);
                 stats.add(stat);
             }
 

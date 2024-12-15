@@ -124,7 +124,7 @@ public class StyxDeserializerImpl implements IDataDeserializer {
             case Twstat -> {
                 var fid = buffer.readUInt32();
                 buffer.readUInt16(); // ???
-                var stat = new StyxStat(buffer);
+                var stat = deserializeStat(buffer);
                 result = new StyxTWStatMessage(fid, stat);
             }
             case Rwstat -> result = new StyxMessage(MessageType.Rwstat, tag);

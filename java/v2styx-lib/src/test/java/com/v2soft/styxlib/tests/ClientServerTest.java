@@ -21,6 +21,7 @@ import java.net.UnknownHostException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 import java.util.concurrent.TimeoutException;
 
@@ -45,7 +46,7 @@ public class ClientServerTest {
         mServer.closeAndWait();
     }
 
-    private void startServer() throws IOException, StyxException {
+    private void startServer() throws IOException {
         var md5 = new MD5StyxFile();
         var localHost = InetAddress.getByName("127.0.0.1");
         var serverDriver = new TCPServerChannelDriver(localHost, PORT, false);
@@ -53,13 +54,14 @@ public class ClientServerTest {
         root.addFile(md5);
         mServer = new StyxServerManager(
                 root,
-                Arrays.asList(serverDriver));
+                List.of(serverDriver));
         mServer.start();
     }
 
     // TVersion & TAttach
     @Test
-    public void testMD5() throws IOException, StyxException, InterruptedException, TimeoutException, NoSuchAlgorithmException {
+    public void testMD5() throws IOException, StyxException, InterruptedException, TimeoutException,
+            NoSuchAlgorithmException {
         IClient connection = new Connection(
                 new CredentialsImpl("user", ""),
                 new TCPClientChannelDriver(
@@ -69,7 +71,8 @@ public class ClientServerTest {
         connection.close();
     }
 
-    protected static void checkMD5Hash(IClient connection) throws NoSuchAlgorithmException, InterruptedException, StyxException, TimeoutException, IOException {
+    protected static void checkMD5Hash(IClient connection) throws NoSuchAlgorithmException, InterruptedException,
+            TimeoutException, IOException {
         Random random = new Random();
         byte[] someData = new byte[1024];
         random.nextBytes(someData);
@@ -88,7 +91,7 @@ public class ClientServerTest {
     }
 
     @Test
-    public void testStat() throws IOException, InterruptedException, StyxException, TimeoutException {
+    public void testStat() throws IOException, InterruptedException, TimeoutException {
         Connection connection = new Connection(
                 new CredentialsImpl("user", ""),
                 new TCPClientChannelDriver(
@@ -97,7 +100,7 @@ public class ClientServerTest {
 
         StyxFile rootDir = connection.getRoot();
         var files = rootDir.listStat();
-
+        assertEquals(1, files.size());
         connection.close();
     }
 }
