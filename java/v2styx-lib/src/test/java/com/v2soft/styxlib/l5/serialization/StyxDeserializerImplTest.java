@@ -82,7 +82,7 @@ public class StyxDeserializerImplTest {
         Assertions.assertEquals(MessageType.Rcreate, message.getType());
         Assertions.assertEquals(1, message.getTag());
         var qid = message.getQID();
-        Assertions.assertEquals(0, qid.getType().getByte());
+        Assertions.assertEquals(0, qid.getType());
         Assertions.assertEquals(0, qid.getVersion());
         Assertions.assertEquals(427389138, qid.getPath());
         Assertions.assertEquals(8192, message.ioUnit);

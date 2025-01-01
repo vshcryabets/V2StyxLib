@@ -2,9 +2,8 @@ package com.v2soft.styxlib.l5.serialization.impl;
 
 import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.l5.enums.MessageType;
-import com.v2soft.styxlib.l5.enums.QIDType;
+import com.v2soft.styxlib.l5.enums.QidType;
 import com.v2soft.styxlib.l5.messages.*;
-import com.v2soft.styxlib.l5.messages.base.StyxMessage;
 import com.v2soft.styxlib.l5.messages.base.StyxRSingleQIDMessage;
 import com.v2soft.styxlib.l5.messages.base.StyxTMessageFID;
 import com.v2soft.styxlib.l5.serialization.IDataSerializer;
@@ -43,7 +42,7 @@ class StyxSerializerImplTest {
                 serializer.getMessageSize(new StyxRSingleQIDMessage(
                         MessageType.Unspecified,
                         0x10,
-                        new StyxQID(QIDType.QTFILE, 1, 2))));
+                        new StyxQID(QidType.QTFILE, 1, 2))));
 
         assertEquals(IDataSerializer.BASE_BINARY_SIZE + 4 + 6 + 12,
                 serializer.getMessageSize(new StyxTAuthMessage(
@@ -81,7 +80,7 @@ class StyxSerializerImplTest {
                         new StyxStat(
                                 (short)1,
                                 2,
-                                new StyxQID(QIDType.QTFILE, 0x80, 0x90),
+                                new StyxQID(QidType.QTFILE, 0x80, 0x90),
                                 0x01,
                                 new Date(),
                                 new Date(),
@@ -146,7 +145,7 @@ class StyxSerializerImplTest {
     @Test
     void testQidSerialization() throws StyxException {
         var qid = new StyxQID(
-                QIDType.QTDIR,
+                QidType.QTDIR,
                 0x6A7470F1,
                 0x12309E51049E5104L
         );

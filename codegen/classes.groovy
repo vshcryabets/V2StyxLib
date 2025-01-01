@@ -19,6 +19,17 @@ modeType.add("OEXEC", 3)
 modeType.add("OTRUNC", 0x10)
 
 def styxQidType = ns.constantsBlock("QidType")
+styxQidType.addBlockComment("QID record types")
+styxQidType.defaultType(DataType.int32.INSTANCE)
+styxQidType.add("QTDIR", 0x80)
+styxQidType.add("QTAPPEND", 0x40)
+styxQidType.add("QTEXCL", 0x20)
+styxQidType.add("QTMOUNT", 0x10)
+styxQidType.add("QTAUTH", 0x08)
+styxQidType.add("QTTMP", 0x04)
+styxQidType.add("QTSYMLINK", 0x02)
+styxQidType.add("QTLINK", 0x01)
+styxQidType.add("QTFILE", 0x00)
 
 def styxQid = ns.dataClass("StyxQID")
 

@@ -1,24 +1,21 @@
 package com.v2soft.styxlib.l5.structs;
 
 import com.v2soft.styxlib.exceptions.StyxException;
+import com.v2soft.styxlib.l5.enums.QidType;
 import com.v2soft.styxlib.l5.serialization.IBufferReader;
-import com.v2soft.styxlib.l5.serialization.IBufferWritter;
-import com.v2soft.styxlib.l5.enums.QIDType;
-
-import java.io.IOException;
 
 /**
  * Styx QID structure
  * @author V.Shcriyabets (vshcryabets@gmail.com)
  */
 public class StyxQID {
-	public static final StyxQID EMPTY = new StyxQID(QIDType.QTFILE, 0L, 0L);
+	public static final StyxQID EMPTY = new StyxQID(QidType.QTFILE, 0L, 0L);
 
-	private final QIDType mType; //the type of the file (directory, etc.), represented as a bit vector corresponding to the high 8 bits of the file's mode word.
+	private final int mType; //the type of the file (directory, etc.), represented as a bit vector corresponding to the high 8 bits of the file's mode word.
 	private final long mVersion; // version number for given path
 	private final long mPath; //the file server's unique identification for the file
 
-	public StyxQID(QIDType type, long version, long path) {
+	public StyxQID(int type, long version, long path) {
 		mType = type;
 		mVersion = version;
 		mPath = path;
@@ -26,14 +23,14 @@ public class StyxQID {
 
 	@Deprecated
     public StyxQID(IBufferReader input) throws StyxException {
-        mType = QIDType.factory(input.readUInt8());
+        mType = input.readUInt8();
         mVersion = input.readUInt32();
         mPath = input.readUInt64();
     }
     // ==================================================
     // Getters
     // ==================================================
-	public QIDType getType(){return mType;}
+	public int getType(){return mType;}
     public long getVersion(){return mVersion;}
     public long getPath(){return mPath;}
 

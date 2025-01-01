@@ -233,7 +233,7 @@ public class StyxSerializerImpl implements IDataSerializer {
 
     @Override
     public void serializeQid(StyxQID qid, IBufferWritter output) throws StyxException {
-        output.writeUInt8((short) qid.getType().getByte());
+        output.writeUInt8((short) qid.getType());
         output.writeUInt32(qid.getVersion());
         output.writeUInt64(qid.getPath());
     }

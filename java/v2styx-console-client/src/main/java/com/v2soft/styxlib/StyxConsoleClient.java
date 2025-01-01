@@ -2,9 +2,7 @@ package com.v2soft.styxlib;
 
 import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.l5.Connection;
-import com.v2soft.styxlib.l5.enums.FileMode;
-import com.v2soft.styxlib.l5.enums.QIDType;
-import com.v2soft.styxlib.l5.structs.StyxQID;
+import com.v2soft.styxlib.l5.enums.QidType;
 import com.v2soft.styxlib.l5.structs.StyxStat;
 import com.v2soft.styxlib.l6.StyxFile;
 import com.v2soft.styxlib.library.types.impl.CredentialsImpl;
@@ -18,11 +16,8 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.Deque;
-import java.util.List;
 import java.util.concurrent.LinkedBlockingDeque;
-import java.util.concurrent.TimeoutException;
 import java.util.logging.Logger;
 
 /**
@@ -58,25 +53,25 @@ public class StyxConsoleClient {
         });
         var currentDir = connection.getRoot().walk(path.toString());
         var files = currentDir.listStat();
-        var dirs = files.stream().filter(it -> it.getQID().getType() == QIDType.QTDIR)
-                .sorted(Comparator.comparing(StyxStat::getName))
+        var dirs = files.stream().filter(it -> it.QID().getType() == QidType.QTDIR)
+                .sorted(Comparator.comparing(StyxStat::name))
                 .toList();
-        var other = files.stream().filter(it -> it.getQID().getType() != QIDType.QTDIR)
-                .sorted(Comparator.comparing(StyxStat::getName))
+        var other = files.stream().filter(it -> it.QID().getType() != QidType.QTDIR)
+                .sorted(Comparator.comparing(StyxStat::name))
                 .toList();
         var sorted = new ArrayList<>(dirs);
         sorted.addAll(other);
         for (var it : sorted) {
-            var quid = it.getQID();
-            if (quid.getType() == QIDType.QTDIR) {
+            var quid = it.QID();
+            if (quid.getType() == QidType.QTDIR) {
                 terminal.writer().print("D ");
             } else {
                 terminal.writer().print("F ");
             }
-            terminal.writer().println(it.getGroupName() + "/" +
-                    it.getUserName() + "\t" +
-                    it.getLength() + "\t\t" +
-                    it.getName());
+            terminal.writer().println(it.groupName() + "/" +
+                    it.userName() + "\t" +
+                    it.length() + "\t\t" +
+                    it.name());
         }
     }
 
