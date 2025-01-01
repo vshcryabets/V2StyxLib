@@ -12,7 +12,6 @@ import java.io.IOException;
  * @author V.Shcriyabets (vshcryabets@gmail.com)
  */
 public class StyxQID {
-	public static final int CONTENT_SIZE = 13;
 	public static final StyxQID EMPTY = new StyxQID(QIDType.QTFILE, 0L, 0L);
 
 	private final QIDType mType; //the type of the file (directory, etc.), represented as a bit vector corresponding to the high 8 bits of the file's mode word.
@@ -25,6 +24,7 @@ public class StyxQID {
 		mPath = path;
 	}
 
+	@Deprecated
     public StyxQID(IBufferReader input) throws StyxException {
         mType = QIDType.factory(input.readUInt8());
         mVersion = input.readUInt32();
@@ -36,13 +36,6 @@ public class StyxQID {
 	public QIDType getType(){return mType;}
     public long getVersion(){return mVersion;}
     public long getPath(){return mPath;}
-
-	@Deprecated
-	public void writeBinaryTo(IBufferWritter output) throws StyxException {
-        output.writeUInt8((short) getType().getByte());
-        output.writeUInt32(getVersion());
-        output.writeUInt64(getPath());
-    }
 
 	@Override
 	public String toString() {

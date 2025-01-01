@@ -15,7 +15,12 @@ allprojects {
   repositories {
     mavenCentral()
   }
+//  project.ext {
+//    this.set("jdkLevel", 21)
+//  }
 }
+
+val jdkLevel by extra { JavaLanguageVersion.of(21) }
 
 plugins {
 }

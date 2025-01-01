@@ -13,7 +13,6 @@ import com.v2soft.styxlib.l5.structs.StyxStat;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Date;
 

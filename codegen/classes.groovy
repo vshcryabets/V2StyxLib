@@ -17,3 +17,11 @@ modeType.add("OWRITE", 1)
 modeType.add("ORDWR", 2)
 modeType.add("OEXEC", 3)
 modeType.add("OTRUNC", 0x10)
+
+def styxQidType = ns.constantsBlock("QidType")
+
+def styxQid = ns.dataClass("StyxQID")
+
+def stat = ns.dataClass("StyxStat")
+//stat.field("type", DataType.int32.INSTANCE)
+//stat.field("dev", DataType.int64.INSTANCE)

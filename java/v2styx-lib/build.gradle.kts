@@ -8,6 +8,8 @@ import ce.domain.usecase.store.StoreOutTreeUseCase
 import ce.domain.usecase.transform.TransformInTreeToOutTreeUseCase
 import javax.script.ScriptEngineManager
 
+val jdkLevel: JavaLanguageVersion by rootProject.extra
+
 plugins {
     `java-library`
     id("maven-publish")
@@ -21,7 +23,7 @@ buildscript {
     }
     dependencies {
         classpath("org.codehaus.groovy:groovy-jsr223:3.0.17")
-        classpath("com.github.vshcryabets:codegen:c88c97e217")
+        classpath("com.github.vshcryabets:codegen:04a82249d7")
     }
 }
 
@@ -32,7 +34,7 @@ dependencies {
 
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(17))
+        languageVersion.set(jdkLevel)
     }
 }
 

@@ -1,5 +1,7 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
+val jdkLevel: JavaLanguageVersion by rootProject.extra
+
 plugins {
     java
     application
@@ -8,7 +10,7 @@ plugins {
 
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(17))
+        languageVersion.set(jdkLevel)
     }
 }
 

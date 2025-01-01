@@ -8,6 +8,8 @@ import ce.domain.usecase.transform.TransformInTreeToOutTreeUseCase
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import javax.script.ScriptEngineManager
 
+val jdkLevel: JavaLanguageVersion by rootProject.extra
+
 plugins {
     java
     application
@@ -29,7 +31,7 @@ buildscript {
 
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(17))
+        languageVersion.set(jdkLevel)
     }
 }
 
