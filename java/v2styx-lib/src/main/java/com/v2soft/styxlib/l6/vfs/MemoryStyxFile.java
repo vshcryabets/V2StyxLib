@@ -3,7 +3,7 @@ package com.v2soft.styxlib.l6.vfs;
 import com.v2soft.styxlib.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.l5.enums.ModeType;
-import com.v2soft.styxlib.l5.enums.QIDType;
+import com.v2soft.styxlib.l5.enums.QidType;
 import com.v2soft.styxlib.l5.structs.StyxQID;
 import com.v2soft.styxlib.l5.structs.StyxStat;
 import com.v2soft.styxlib.server.ClientDetails;
@@ -30,7 +30,7 @@ public class MemoryStyxFile implements IVirtualStyxFile {
             throw new NullPointerException("Filename is null");
         }
         mName = name;
-        mQID = new StyxQID(QIDType.QTFILE, 0, mName.hashCode());
+        mQID = new StyxQID(QidType.QTFILE, 0, mName.hashCode());
     }
 
     @Override

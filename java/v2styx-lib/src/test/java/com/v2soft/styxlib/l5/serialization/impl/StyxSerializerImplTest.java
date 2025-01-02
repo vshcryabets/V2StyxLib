@@ -1,9 +1,9 @@
 package com.v2soft.styxlib.l5.serialization.impl;
 
+import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.l5.enums.MessageType;
-import com.v2soft.styxlib.l5.enums.QIDType;
+import com.v2soft.styxlib.l5.enums.QidType;
 import com.v2soft.styxlib.l5.messages.*;
-import com.v2soft.styxlib.l5.messages.base.StyxMessage;
 import com.v2soft.styxlib.l5.messages.base.StyxRSingleQIDMessage;
 import com.v2soft.styxlib.l5.messages.base.StyxTMessageFID;
 import com.v2soft.styxlib.l5.serialization.IDataSerializer;
@@ -11,6 +11,7 @@ import com.v2soft.styxlib.l5.structs.StyxQID;
 import com.v2soft.styxlib.l5.structs.StyxStat;
 import org.junit.jupiter.api.Test;
 
+import java.nio.ByteBuffer;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -37,11 +38,11 @@ class StyxSerializerImplTest {
                         "user",
                         "mountpoint")));
 
-        assertEquals(IDataSerializer.BASE_BINARY_SIZE + StyxQID.CONTENT_SIZE,
+        assertEquals(IDataSerializer.BASE_BINARY_SIZE + serializer.getQidSize(),
                 serializer.getMessageSize(new StyxRSingleQIDMessage(
                         MessageType.Unspecified,
                         0x10,
-                        new StyxQID(QIDType.QTFILE, 1, 2))));
+                        new StyxQID(QidType.QTFILE, 1, 2))));
 
         assertEquals(IDataSerializer.BASE_BINARY_SIZE + 4 + 6 + 12,
                 serializer.getMessageSize(new StyxTAuthMessage(
@@ -79,7 +80,7 @@ class StyxSerializerImplTest {
                         new StyxStat(
                                 (short)1,
                                 2,
-                                new StyxQID(QIDType.QTFILE, 0x80, 0x90),
+                                new StyxQID(QidType.QTFILE, 0x80, 0x90),
                                 0x01,
                                 new Date(),
                                 new Date(),
@@ -116,16 +117,16 @@ class StyxSerializerImplTest {
         assertEquals(IDataSerializer.BASE_BINARY_SIZE + 4 + 2 + 4,
                 serializer.getMessageSize(new StyxTVersionMessage(0x1111, "ABCD")));
 
-        assertEquals(IDataSerializer.BASE_BINARY_SIZE + StyxQID.CONTENT_SIZE + 4,
+        assertEquals(IDataSerializer.BASE_BINARY_SIZE + serializer.getQidSize() + 4,
                 serializer.getMessageSize(new StyxROpenMessage(0x1111, StyxQID.EMPTY, 0, false)));
 
-        assertEquals(IDataSerializer.BASE_BINARY_SIZE + StyxQID.CONTENT_SIZE + 4,
+        assertEquals(IDataSerializer.BASE_BINARY_SIZE + serializer.getQidSize() + 4,
                 serializer.getMessageSize(new StyxROpenMessage(0x1111, StyxQID.EMPTY, 0, true)));
 
         assertEquals(IDataSerializer.BASE_BINARY_SIZE + 4 + 2 + 4,
                 serializer.getMessageSize(new StyxRVersionMessage(0x1111, "ABCD")));
 
-        assertEquals(IDataSerializer.BASE_BINARY_SIZE + 2 + StyxQID.CONTENT_SIZE,
+        assertEquals(IDataSerializer.BASE_BINARY_SIZE + 2 + serializer.getQidSize(),
                 serializer.getMessageSize(new StyxRWalkMessage(0x1111, Collections.singletonList(StyxQID.EMPTY))));
 
     }
@@ -134,5 +135,33 @@ class StyxSerializerImplTest {
     void testGetStyxStatSize() {
         // empty stat = 28 + 7 + 2 + 2 + 2 + 2
         assertEquals(28 + 13 + 2 + 2 + 2 + 2, serializer.getStatSerializedSize(StyxStat.EMPTY));
+    }
+
+    @Test
+    void testGetQidSize() {
+        assertEquals(13, serializer.getQidSize());
+    }
+
+    @Test
+    void testQidSerialization() throws StyxException {
+        var qid = new StyxQID(
+                QidType.QTDIR,
+                0x6A7470F1,
+                0x12309E51049E5104L
+        );
+        byte[] expected = {
+                (byte) QidType.QTDIR,
+                (byte) 0xF1, 0x70, 0x74, 0x6A, //9: qid.version[4] 0x6A7470F1
+                0x04, 0x51, (byte) 0x9E, 0x04, 0x51, (byte) 0x9E, 0x30, 0x12 //13: qid.path[8] 0x12309E51049E5104L
+        };
+
+        var buffer = ByteBuffer.allocate(8192);
+        var outputBuffer = new BufferWritterImpl(buffer);
+        outputBuffer.prepareBuffer(serializer.getQidSize());
+        serializer.serializeQid(qid, outputBuffer);
+        byte[] data = new byte[buffer.limit()];
+        buffer.position(0);
+        buffer.get(data);
+        assertArrayEquals(expected, data);
     }
 }

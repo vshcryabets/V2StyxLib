@@ -2,18 +2,17 @@ package com.v2soft.styxlib.l6.vfs;
 
 import com.v2soft.styxlib.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.exceptions.StyxException;
+import com.v2soft.styxlib.l5.enums.QidType;
 import com.v2soft.styxlib.l5.serialization.IDataSerializer;
 import com.v2soft.styxlib.l5.serialization.impl.BufferWritterImpl;
 import com.v2soft.styxlib.l5.enums.FileMode;
 import com.v2soft.styxlib.l5.enums.ModeType;
-import com.v2soft.styxlib.l5.enums.QIDType;
 import com.v2soft.styxlib.l5.structs.StyxQID;
 import com.v2soft.styxlib.l5.structs.StyxStat;
 import com.v2soft.styxlib.server.ClientDetails;
 import com.v2soft.styxlib.utils.MetricsAndStats;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,7 +20,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Vector;
 
 /**
  * Disk directory
@@ -37,7 +35,7 @@ extends DiskStyxFile {
 
     public DiskStyxDirectory(File directory, IDataSerializer serializer) throws StyxException {
         super(directory);
-        mQID = new StyxQID(QIDType.QTDIR, 0, mName.hashCode());
+        mQID = new StyxQID(QidType.QTDIR, 0, mName.hashCode());
         mSerializer = serializer;
         mVirtualFiles = new ArrayList<>();
         mRealFiles = new ArrayList<>();

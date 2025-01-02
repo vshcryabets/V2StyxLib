@@ -3,7 +3,7 @@ package com.v2soft.styxlib.l5.serialization;
 import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.l5.enums.FileMode;
 import com.v2soft.styxlib.l5.enums.MessageType;
-import com.v2soft.styxlib.l5.enums.QIDType;
+import com.v2soft.styxlib.l5.enums.QidType;
 import com.v2soft.styxlib.l5.messages.StyxROpenMessage;
 import com.v2soft.styxlib.l5.messages.StyxTVersionMessage;
 import com.v2soft.styxlib.l5.serialization.impl.BufferWritterImpl;
@@ -13,7 +13,6 @@ import com.v2soft.styxlib.l5.structs.StyxStat;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Date;
 
@@ -48,7 +47,7 @@ public class MessageSerializerImplTest {
         var stat = new StyxStat(
                 (short) 0x1122,
                 0x000E89E7,
-                new StyxQID(QIDType.QTFILE,
+                new StyxQID(QidType.QTFILE,
                         0x6A7470F1,
                         0x12309E51049E5104L),
                 (int) FileMode.ReadOwnerPermission.getMode(),

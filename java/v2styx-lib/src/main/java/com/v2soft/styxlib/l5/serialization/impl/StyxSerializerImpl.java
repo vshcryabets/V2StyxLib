@@ -12,7 +12,6 @@ import com.v2soft.styxlib.l5.structs.StyxQID;
 import com.v2soft.styxlib.l5.structs.StyxStat;
 import com.v2soft.styxlib.l6.StyxFile;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedList;
@@ -25,7 +24,7 @@ public class StyxSerializerImpl implements IDataSerializer {
             size += 4;
         }
         if (message instanceof StyxRSingleQIDMessage) {
-            size += StyxQID.CONTENT_SIZE;
+            size += getQidSize();
         }
         switch (message.getType()) {
             case Rerror -> size += UTF.getUTFSize(((StyxRErrorMessage)message).getError());
@@ -63,7 +62,7 @@ public class StyxSerializerImpl implements IDataSerializer {
             case Rversion -> size += 4 + UTF.getUTFSize(((StyxRVersionMessage)message).protocolVersion);
             case Rwalk -> {
                 var walkMessage = (StyxRWalkMessage)message;
-                size += 2 + walkMessage.getQIDListLength() * StyxQID.CONTENT_SIZE;
+                size += 2 + walkMessage.getQIDListLength() * getQidSize();
             }
         }
         return size;
@@ -81,7 +80,6 @@ public class StyxSerializerImpl implements IDataSerializer {
         } else {
             serializeTMessage(message, output);
         }
-
     }
 
     private void serializeTMessage(StyxMessage message, IBufferWritter output) throws StyxException {
@@ -153,7 +151,7 @@ public class StyxSerializerImpl implements IDataSerializer {
     private void serializeRMessage(StyxMessage message, IBufferWritter output) throws StyxException {
         if (message instanceof StyxRSingleQIDMessage) {
             StyxRSingleQIDMessage msg = (StyxRSingleQIDMessage) message;
-            msg.getQID().writeBinaryTo(output);
+            serializeQid(msg.getQID(), output);
         }
         switch (message.getType()) {
             case Rerror:
@@ -189,7 +187,7 @@ public class StyxSerializerImpl implements IDataSerializer {
                 StyxRWalkMessage rWalkMessage = (StyxRWalkMessage) message;
                 output.writeUInt16(rWalkMessage.getQIDListLength());
                 for (var qid : rWalkMessage.qidList)
-                    qid.writeBinaryTo(output);
+                    serializeQid(qid, output);
                 break;
         }
     }
@@ -207,7 +205,8 @@ public class StyxSerializerImpl implements IDataSerializer {
         output.writeUInt16(size - 2); // total size except first 2 bytes with size
         output.writeUInt16(stat.type());
         output.writeUInt32(stat.dev());
-        stat.QID().writeBinaryTo(output);
+        serializeQid(stat.QID(), output);
+//        stat.QID().writeBinaryTo(output);
         output.writeUInt32(stat.mode());
         output.writeUInt32(DateToInt(stat.accessTime()));
         output.writeUInt32(DateToInt(stat.modificationTime()));
@@ -220,20 +219,31 @@ public class StyxSerializerImpl implements IDataSerializer {
 
     @Override
     public int getStatSerializedSize(StyxStat stat) {
-        return 28 + StyxQID.CONTENT_SIZE
+        return 28 + getQidSize()
                 + UTF.getUTFSize(stat.name())
                 + UTF.getUTFSize(stat.userName())
                 + UTF.getUTFSize(stat.groupName())
                 + UTF.getUTFSize(stat.modificationUser());
     }
 
+    @Override
+    public int getQidSize() {
+        return 13;
+    }
+
+    @Override
+    public void serializeQid(StyxQID qid, IBufferWritter output) throws StyxException {
+        output.writeUInt8((short) qid.type());
+        output.writeUInt32(qid.version());
+        output.writeUInt64(qid.path());
+    }
 
     public static List<String> splitPath(String path) {
         if (path == null) {
             throw new NullPointerException("Path is null");
         }
         var result = new LinkedList<String>();
-        if (path.length() > 0 ) {
+        if (!path.isEmpty()) {
             StringBuilder builder = new StringBuilder(path);
             while (builder.toString().startsWith(StyxFile.SEPARATOR))
                 builder.delete(0, 1);
