@@ -67,6 +67,7 @@ tasks.register("runCgen") {
         )
         buildProjectUseCase(
             projectFile = "project.json",
-            dirsConfiguration = dirsConfiguration)
+            dirsConfiguration = dirsConfiguration
+        )
     }
 }

@@ -68,28 +68,3 @@ tasks {
         dependsOn(shadowJar)
     }
 }
-
-tasks.register("runCgen") {
-    group = "Custom"
-    description = "Run code generation"
-
-    doLast {
-        val engineMaps = mapOf<ce.defs.MetaEngine, javax.script.ScriptEngine>(
-            ce.defs.MetaEngine.GROOVY to ScriptEngineManager().getEngineByName("groovy")
-        )
-        val dirsConfiguration = DirsConfiguration(
-            workingDir = rootDir.parentFile.absolutePath + "/codegen/" //project.projectDir.absolutePath
-        )
-        println("Project dir = ${dirsConfiguration.workingDir}")
-        val buildProjectUseCase = BuildProjectUseCase(
-            getProjectUseCase = LoadProjectUseCaseImpl(),
-            storeInTreeUseCase = StoreAstTreeUseCase(),
-            loadMetaFilesUseCase = LoadMetaFilesForTargetUseCase(engineMaps),
-            storeOutTreeUseCase = StoreOutTreeUseCase(),
-            transformInTreeToOutTreeUseCase = TransformInTreeToOutTreeUseCase(),
-        )
-        buildProjectUseCase(
-            projectFile = "../codegen/project.json",
-            dirsConfiguration = dirsConfiguration)
-    }
-}

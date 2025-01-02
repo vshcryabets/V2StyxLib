@@ -31,8 +31,8 @@ styxQidType.add("QTSYMLINK", 0x02)
 styxQidType.add("QTLINK", 0x01)
 styxQidType.add("QTFILE", 0x00)
 
-def styxQid = ns.dataClass("StyxQID")
+//def styxQid = ns.dataClass("StyxQID")
 
-def stat = ns.dataClass("StyxStat")
+//def stat = ns.dataClass("StyxStat")
 //stat.field("type", DataType.int32.INSTANCE)
 //stat.field("dev", DataType.int64.INSTANCE)
