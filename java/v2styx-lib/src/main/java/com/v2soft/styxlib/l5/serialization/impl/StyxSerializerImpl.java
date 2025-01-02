@@ -233,9 +233,9 @@ public class StyxSerializerImpl implements IDataSerializer {
 
     @Override
     public void serializeQid(StyxQID qid, IBufferWritter output) throws StyxException {
-        output.writeUInt8((short) qid.getType());
-        output.writeUInt32(qid.getVersion());
-        output.writeUInt64(qid.getPath());
+        output.writeUInt8((short) qid.type());
+        output.writeUInt32(qid.version());
+        output.writeUInt64(qid.path());
     }
 
     public static List<String> splitPath(String path) {

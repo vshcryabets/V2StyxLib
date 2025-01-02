@@ -150,7 +150,7 @@ class StyxSerializerImplTest {
                 0x12309E51049E5104L
         );
         byte[] expected = {
-                (byte) 0x80, // QTDIR
+                (byte) QidType.QTDIR,
                 (byte) 0xF1, 0x70, 0x74, 0x6A, //9: qid.version[4] 0x6A7470F1
                 0x04, 0x51, (byte) 0x9E, 0x04, 0x51, (byte) 0x9E, 0x30, 0x12 //13: qid.path[8] 0x12309E51049E5104L
         };

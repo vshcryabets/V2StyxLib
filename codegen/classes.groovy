@@ -19,7 +19,7 @@ modeType.add("OEXEC", 3)
 modeType.add("OTRUNC", 0x10)
 
 def styxQidType = ns.constantsBlock("QidType")
-styxQidType.addBlockComment("QID record types")
+styxQidType.addBlockComment("QID record types, the type of the file (directory, etc.), represented as a bit vector corresponding to the high 8 bits of the file's mode word.")
 styxQidType.defaultType(DataType.int32.INSTANCE)
 styxQidType.add("QTDIR", 0x80)
 styxQidType.add("QTAPPEND", 0x40)

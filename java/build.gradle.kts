@@ -17,7 +17,7 @@ allprojects {
   }
 }
 
-val jdkLevel by extra { JavaLanguageVersion.of(21) }
+val jdkLevel by extra { JavaLanguageVersion.of(17) }
 
 plugins {
 }

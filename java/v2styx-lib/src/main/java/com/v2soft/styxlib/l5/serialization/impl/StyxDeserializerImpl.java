@@ -27,7 +27,7 @@ public class StyxDeserializerImpl implements IDataDeserializer {
         var typeId = buffer.readUInt8();
         MessageType type = MessageType.factory(typeId);
         if (type == null) {
-            throw new NullPointerException("Type is null, can't decode message ps="+ packet_size+" typeId=" + typeId);
+            throw new NullPointerException("Type is null, can't decode message ps=" + packet_size + " typeId=" + typeId);
         }
         int tag = buffer.readUInt16();
         // load other data
@@ -56,22 +56,22 @@ public class StyxDeserializerImpl implements IDataDeserializer {
                         newFid,
                         pathElements);
             }
-            case Rauth -> result = new StyxRAuthMessage(tag, new StyxQID(buffer));
+            case Rauth -> result = new StyxRAuthMessage(tag, deserializeQid(buffer));
             case Rerror -> result = new StyxRErrorMessage(tag, buffer.readUTFString());
             case Rflush -> result = new StyxMessage(MessageType.Rflush, tag);
-            case Rattach -> result = new StyxRAttachMessage(tag, new StyxQID(buffer));
+            case Rattach -> result = new StyxRAttachMessage(tag, deserializeQid(buffer));
             case Rwalk -> {
                 var count = buffer.readUInt16();
                 var qids = new LinkedList<StyxQID>();
                 for (int i = 0; i < count; i++) {
-                    qids.add(new StyxQID(buffer));
+                    qids.add(deserializeQid(buffer));
                 }
                 result = new StyxRWalkMessage(tag, qids);
             }
             case Topen -> result = new StyxTOpenMessage(buffer.readUInt32(),
                     buffer.readUInt8());
             case Ropen -> result = new StyxROpenMessage(tag,
-                    new StyxQID(buffer),
+                    deserializeQid(buffer),
                     buffer.readUInt32(), false);
             case Tcreate -> result = new StyxTCreateMessage(buffer.readUInt32(),
                     buffer.readUTFString(),
@@ -79,7 +79,8 @@ public class StyxDeserializerImpl implements IDataDeserializer {
                     buffer.readUInt8());
             case Rcreate -> result = new StyxROpenMessage(
                     tag,
-                    new StyxQID(buffer), buffer.readUInt32(), true);
+                    deserializeQid(buffer),
+                    buffer.readUInt32(), true);
             case Tread -> result = new StyxTReadMessage(
                     buffer.readUInt32(),
                     buffer.readUInt64(),
@@ -107,16 +108,16 @@ public class StyxDeserializerImpl implements IDataDeserializer {
                         0);
             }
             case Rwrite -> result = new StyxRWriteMessage(tag, buffer.readUInt32());
-            case Tclunk ->  result = new StyxTMessageFID(
+            case Tclunk -> result = new StyxTMessageFID(
                     MessageType.Tclunk,
                     MessageType.Rclunk,
-                        buffer.readUInt32());
+                    buffer.readUInt32());
             case Rclunk -> result = new StyxMessage(MessageType.Rclunk, tag);
             case Tremove -> result = new StyxTMessageFID(MessageType.Tremove, MessageType.Rremove,
                     buffer.readUInt32());
             case Rremove -> result = new StyxMessage(MessageType.Rremove, tag);
             case Tstat -> result = new StyxTMessageFID(MessageType.Tstat, MessageType.Rstat,
-                        buffer.readUInt32());
+                    buffer.readUInt32());
             case Rstat -> {
                 buffer.readUInt16(); //??
                 result = new StyxRStatMessage(tag, deserializeStat(buffer));
@@ -143,7 +144,7 @@ public class StyxDeserializerImpl implements IDataDeserializer {
         // TODO check size
         short type = (short) input.readUInt16();
         var dev = (int) input.readUInt32();
-        var qid = new StyxQID(input);
+        var qid = deserializeQid(input);
         var mode = (int) input.readUInt32();
         var accessTime = intToDate(input.readUInt32());
         var modificationTime = intToDate(input.readUInt32());
@@ -164,6 +165,15 @@ public class StyxDeserializerImpl implements IDataDeserializer {
                 userName,
                 groupName,
                 modificationUser
+        );
+    }
+
+    @Override
+    public StyxQID deserializeQid(IBufferReader input) throws StyxException {
+        return new StyxQID(
+                input.readUInt8(),
+                input.readUInt32(),
+                input.readUInt64()
         );
     }
 }
