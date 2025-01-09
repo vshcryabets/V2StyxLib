@@ -2,6 +2,7 @@ package com.v2soft.styxlib.server.tcp;
 
 import com.v2soft.styxlib.Logger;
 import com.v2soft.styxlib.exceptions.StyxException;
+import com.v2soft.styxlib.l5.messages.base.StyxTMessage;
 import com.v2soft.styxlib.l5.serialization.IDataDeserializer;
 import com.v2soft.styxlib.l5.serialization.IDataSerializer;
 import com.v2soft.styxlib.l5.serialization.impl.StyxDeserializerImpl;
@@ -11,10 +12,13 @@ import com.v2soft.styxlib.handlers.IMessageProcessor;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
 import com.v2soft.styxlib.server.ClientDetails;
 import com.v2soft.styxlib.server.IChannelDriver;
+import com.v2soft.styxlib.utils.Future;
 
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 
 /**
  * Created by V.Shcryabets on 5/20/14.
@@ -68,7 +72,10 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
     }
 
     @Override
-    public void sendMessage(StyxMessage message, ClientDetails recipient) throws StyxException {
+    public <R extends StyxMessage> Future<R> sendMessage(
+            StyxMessage message,
+            ClientDetails recipient,
+            long timeout) throws StyxException {
         if ( recipient == null ) {
             throw new StyxException("Client can't be null");
         }
@@ -83,6 +90,14 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
                 throw e;
             }
         }
+        return new Future<>(CompletableFuture.supplyAsync(() -> {
+            try {
+                return (R)((StyxTMessage) message).waitForAnswer(timeout);
+            } catch (StyxException e) {
+                throw new CompletionException(e);
+            }
+        }));
+
     }
 
     public void setTMessageHandler(IMessageProcessor handler) {

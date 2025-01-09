@@ -39,7 +39,7 @@ extends DiskStyxFile {
         mSerializer = serializer;
         mVirtualFiles = new ArrayList<>();
         mRealFiles = new ArrayList<>();
-        mBuffersMap = new HashMap<ClientDetails, ByteBuffer>();
+        mBuffersMap = new HashMap<>();
     }
 
     @Override
@@ -136,10 +136,6 @@ extends DiskStyxFile {
 
     @Override
     public void close(ClientDetails clientDetails) {
-        //        if ( !mBuffersMap.containsKey(client)) {
-        //            throw StyxErrorMessageException.newInstance("This file isn't open");
-        //        }
-        // remove buffer
         mBuffersMap.remove(clientDetails);
     }
 

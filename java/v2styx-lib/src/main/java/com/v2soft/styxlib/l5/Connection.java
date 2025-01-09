@@ -110,9 +110,10 @@ public class Connection
         return mDriver.isConnected();
     }
 
+    @Deprecated
     public StyxFile getRoot() throws StyxException {
         if (mRoot == null) {
-            mRoot = new StyxFile(this, "");
+            mRoot = new StyxFile(this, "", getRootFID());
         }
         return mRoot;
     }
@@ -155,22 +156,17 @@ public class Connection
     }
 
     public void sendVersionMessage()
-            throws InterruptedException, StyxException, IOException, TimeoutException {
+            throws StyxException {
         // release attached FID
         if (mFID != StyxMessage.NOFID) {
-            try {
-                final StyxTMessageFID tClunk = new StyxTMessageFID(MessageType.Tclunk, MessageType.Rclunk, mFID);
-                mTransmitter.sendMessage(tClunk, mRecepient);
-            } catch (Exception e) {
-                throw new IOException(e);
-            }
+            final StyxTMessageFID tClunk = new StyxTMessageFID(MessageType.Tclunk, MessageType.Rclunk, mFID);
+            mTransmitter.sendMessage(tClunk, mRecepient, mTimeout).getResult();
             mFID = StyxMessage.NOFID;
         }
-
-        StyxTVersionMessage tVersion = new StyxTVersionMessage(mDetails.ioUnit(), getProtocol());
-        mTransmitter.sendMessage(tVersion, mRecepient);
-
-        StyxMessage rMessage = tVersion.waitForAnswer(mTimeout);
+        StyxMessage rMessage = mTransmitter.sendMessage(
+                new StyxTVersionMessage(mDetails.ioUnit(), getProtocol()),
+                mRecepient,
+                mTimeout).getResult();
         StyxRVersionMessage rVersion = (StyxRVersionMessage) rMessage;
         if (rVersion.maxPacketSize < mDetails.ioUnit()) {
             mDetails = new ConnectionDetails(getProtocol(), (int) rVersion.maxPacketSize);
@@ -185,9 +181,7 @@ public class Connection
             mAuthFID = mRecepient.getPolls().getFIDPoll().getFreeItem();
 
             StyxTAuthMessage tAuth = new StyxTAuthMessage(mAuthFID, getCredentials().getUserName(), getMountPoint());
-            mTransmitter.sendMessage(tAuth, mRecepient);
-
-            StyxMessage rMessage = tAuth.waitForAnswer(mTimeout);
+            StyxMessage rMessage = mTransmitter.sendMessage(tAuth, mRecepient, mTimeout).getResult();
             StyxRAuthMessage rAuth = (StyxRAuthMessage) rMessage;
             mAuthQID = rAuth.getQID();
 
@@ -202,9 +196,8 @@ public class Connection
         StyxTAttachMessage tAttach = new StyxTAttachMessage(getRootFID(), getAuthFID(),
                 getCredentials().getUserName(),
                 getMountPoint());
-        mTransmitter.sendMessage(tAttach, mRecepient);
-
-        var rAttach = (StyxRAttachMessage)tAttach.waitForAnswer(mTimeout);
+        var rAttach = (StyxRAttachMessage)mTransmitter.sendMessage(tAttach, mRecepient, mTimeout)
+                .getResult();
         mQID = rAttach.getQID();
         setAttached(true);
     }
@@ -280,5 +273,10 @@ public class Connection
     @Override
     public IDataDeserializer getDeserializer() {
         return mDriver.getDeserializer();
+    }
+
+    @Override
+    public StyxFile open(String filename) throws StyxException {
+        return new StyxFile(this, filename, getRootFID());
     }
 }

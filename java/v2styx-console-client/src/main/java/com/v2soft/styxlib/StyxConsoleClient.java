@@ -12,6 +12,7 @@ import org.jline.reader.LineReaderBuilder;
 import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.util.ArrayList;
@@ -30,6 +31,8 @@ public class StyxConsoleClient {
     private static final String COMMAND_EXIT = "exit";
     private static final String COMMAND_PWD = "pwd";
     private static final String COMMAND_CD = "cd ";
+    private static final String COMMAND_LCD = "lcd ";
+    private static final String COMMAND_LPWD = "lpwd";
     private static final String DIR_PARENT = "..";
 
     private static Logger log = Logger.getLogger(StyxConsoleClient.class.getSimpleName());
@@ -42,28 +45,52 @@ public class StyxConsoleClient {
         }
     }
 
+    private void getFile(Connection connection,
+                         Terminal terminal,
+                         Deque<String> currentPath,
+                         String fileName,
+                         File localFolder) {
+        try {
+            StringBuilder path = new StringBuilder();
+            currentPath.forEach(it -> {
+                path.append('/');
+                path.append(it);
+            });
+            path.append(fileName);
+            StyxFile src = connection.open(path.toString());
+            if (!src.exists()) {
+                terminal.writer().println(String.format("File %s doesn't exists", path.toString()));
+                return;
+            }
+            src.close();
+        } catch (StyxException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private void listFiles(Connection connection,
                            Terminal terminal,
                            Deque<String> currentPath) throws IOException {
         // list files
         StringBuilder path = new StringBuilder();
-        currentPath.stream().forEach(it -> {
+        currentPath.forEach(it -> {
             path.append('/');
             path.append(it);
         });
+        // TODO use connection.open()
         var currentDir = connection.getRoot().walk(path.toString());
         var files = currentDir.listStat();
-        var dirs = files.stream().filter(it -> it.QID().getType() == QidType.QTDIR)
+        var dirs = files.stream().filter(it -> it.QID().type() == QidType.QTDIR)
                 .sorted(Comparator.comparing(StyxStat::name))
                 .toList();
-        var other = files.stream().filter(it -> it.QID().getType() != QidType.QTDIR)
+        var other = files.stream().filter(it -> it.QID().type() != QidType.QTDIR)
                 .sorted(Comparator.comparing(StyxStat::name))
                 .toList();
         var sorted = new ArrayList<>(dirs);
         sorted.addAll(other);
         for (var it : sorted) {
             var quid = it.QID();
-            if (quid.getType() == QidType.QTDIR) {
+            if (quid.type() == QidType.QTDIR) {
                 terminal.writer().print("D ");
             } else {
                 terminal.writer().print("F ");
@@ -114,7 +141,7 @@ public class StyxConsoleClient {
             var connection = new Connection(new CredentialsImpl("", ""), driver);
             connection.connect();
             terminal.writer().println("Connected");
-            StyxFile rootDir = connection.getRoot();
+            File currentLocalDirectory = new File("");
             Deque<String> currentDirPath = new LinkedBlockingDeque<>();
 
             while (true) {
@@ -135,7 +162,22 @@ public class StyxConsoleClient {
                         terminal.writer().println(currentDirPath);
                         continue;
                     }
+                    if (cmd.equalsIgnoreCase(COMMAND_LPWD)) {
+                        terminal.writer().println(currentLocalDirectory.getAbsolutePath());
+                        continue;
+                    }
+                    if (cmd.startsWith(COMMAND_LCD)) {
+                        // change local directory
+                        var subdir = cmd.substring(COMMAND_CD.length()).trim();
+                        if (subdir.startsWith("/")) {
+                            currentLocalDirectory = new File(subdir);
+                        } else {
+                            currentLocalDirectory = new File(currentLocalDirectory, subdir);
+                        }
+                        continue;
+                    }
                     if (cmd.startsWith(COMMAND_CD)) {
+                        // change remote directory
                         var subdir = cmd.substring(COMMAND_CD.length()).trim();
                         if (subdir.equalsIgnoreCase(DIR_PARENT)) {
                             if (currentDirPath.isEmpty()) {
@@ -162,9 +204,4 @@ public class StyxConsoleClient {
             System.exit(255);
         }
     }
-
-//    private StyxFile chdir(Connection connection, Terminal terminal, String subdir) throws StyxException {
-//        terminal.writer().println(String.format("Change dir to %s", subdir));
-//        return currentDir.walk(subdir);
-//    }
 }
