@@ -58,46 +58,46 @@ public class TMessagesProcessor extends QueueMessagesProcessor implements IMessa
         long fid;
         try {
             switch (message.getType()) {
-                case Tversion:
+                case MessageType.Tversion:
                     answer = new StyxRVersionMessage(mConnectionDetails.ioUnit(), mConnectionDetails.protocol());
                     break;
-                case Tattach:
+                case MessageType.Tattach:
                     answer = processAttach(target, (StyxTAttachMessage)message);
                     break;
-                case Tauth:
+                case MessageType.Tauth:
                     answer = processAuth(target, (StyxTAuthMessage)message);
                     break;
-                case Tstat:
+                case MessageType.Tstat:
                     fid = ((StyxTMessageFID)message).getFID();
                     file = target.getAssignedFile(fid);
                     answer = new StyxRStatMessage(message.getTag(), file.getStat());
                     break;
-                case Tclunk:
+                case MessageType.Tclunk:
                     answer = processClunk(target, (StyxTMessageFID)message);
                     break;
-                case Tflush:
+                case MessageType.Tflush:
                     // TODO do something there
                     answer = new StyxMessage(MessageType.Rflush, message.getTag());
                     break;
-                case Twalk:
+                case MessageType.Twalk:
                     answer = processWalk(target, (StyxTWalkMessage) message);
                     break;
-                case Topen:
+                case MessageType.Topen:
                     answer = processOpen(target, (StyxTOpenMessage)message);
                     break;
-                case Tread:
+                case MessageType.Tread:
                     answer = processRead(target, (StyxTReadMessage)message);
                     break;
-                case Twrite:
+                case MessageType.Twrite:
                     answer = processWrite(target, (StyxTWriteMessage)message);
                     break;
-                case Twstat:
+                case MessageType.Twstat:
                     answer = processWStat((StyxTWStatMessage)message);
                     break;
-                case Tcreate:
+                case MessageType.Tcreate:
                     answer = processCreate(target, (StyxTCreateMessage)message);
                     break;
-                case Tremove:
+                case MessageType.Tremove:
                     answer = processRemove(target, (StyxTMessageFID)message);
                     break;
                 default:

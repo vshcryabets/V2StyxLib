@@ -28,7 +28,7 @@ public class MessageSerializerImplTest {
         buffer.position(0);
         buffer.get(data);
         Assertions.assertArrayEquals(new byte[]{19, 0, 0, 0,
-                (byte) MessageType.Tversion.getByte(),
+                (byte) MessageType.Tversion,
                 (byte) 0xFF, (byte) 0xFF, // tag
                 (byte) 0x80, 0, 0, 0,  // io unit
                 // proto string size
@@ -97,7 +97,7 @@ public class MessageSerializerImplTest {
         buffer.position(0);
         buffer.get(data);
         Assertions.assertArrayEquals(new byte[]{24, 0, 0, 0,
-                (byte) MessageType.Rcreate.getByte(),
+                (byte) MessageType.Rcreate,
                 (byte) 0x80, (byte) 0x00, // tag
                 // qid
                 (byte) 0x0, 0, 0, 0,

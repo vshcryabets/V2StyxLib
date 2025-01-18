@@ -10,9 +10,9 @@ import java.util.concurrent.TimeoutException;
 
 public class StyxTMessage extends StyxMessage {
     private StyxMessage mAnswer;
-    private final MessageType mRequiredAnswerType;
+    private final int mRequiredAnswerType;
 
-    public StyxTMessage(MessageType type, MessageType answer) {
+    public StyxTMessage(int type, int answer) {
         super(type, NOTAG);
         mRequiredAnswerType = answer;
     }
@@ -43,7 +43,7 @@ public class StyxTMessage extends StyxMessage {
     }
 
     protected boolean checkAnswer(StyxMessage answer) {
-        final MessageType received = answer.getType();
+        final int received = answer.getType();
         return (mRequiredAnswerType == received || received == MessageType.Rerror);
     }
 }

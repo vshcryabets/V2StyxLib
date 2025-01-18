@@ -8,7 +8,7 @@ import java.io.IOException;
 public class StyxTMessageFID extends StyxTMessage {
     private long mFID;
 
-    public StyxTMessageFID(MessageType type, MessageType answer, long fid) {
+    public StyxTMessageFID(int type, int answer, long fid) {
         super(type, answer);
         mFID = fid;
     }

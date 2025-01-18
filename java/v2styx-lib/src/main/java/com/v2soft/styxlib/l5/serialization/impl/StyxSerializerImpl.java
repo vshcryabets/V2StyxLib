@@ -1,6 +1,8 @@
 package com.v2soft.styxlib.l5.serialization.impl;
 
 import com.v2soft.styxlib.exceptions.StyxException;
+import com.v2soft.styxlib.l5.enums.Checks;
+import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.l5.messages.*;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
 import com.v2soft.styxlib.l5.messages.base.StyxRSingleQIDMessage;
@@ -27,40 +29,40 @@ public class StyxSerializerImpl implements IDataSerializer {
             size += getQidSize();
         }
         switch (message.getType()) {
-            case Rerror -> size += UTF.getUTFSize(((StyxRErrorMessage)message).getError());
-            case Tattach -> {
+            case MessageType.Rerror -> size += UTF.getUTFSize(((StyxRErrorMessage)message).getError());
+            case MessageType.Tattach -> {
                 var attachMessage = (StyxTAttachMessage)message;
                 size += 2 + 2 + UTF.getUTFSize(attachMessage.getUserName()) +
                         UTF.getUTFSize(attachMessage.getMountPoint());
             }
-            case Tauth -> {
+            case MessageType.Tauth -> {
                 var authMessage = (StyxTAuthMessage)message;
                 size += UTF.getUTFSize(authMessage.getUserName())
                     + UTF.getUTFSize(authMessage.getMountPoint());
             }
-            case Twalk -> {
+            case MessageType.Twalk -> {
                 var walkMessage = (StyxTWalkMessage)message;
                 size += 4 + 2;
                 for (var pathElement : walkMessage.getPathElements())
                     size += UTF.getUTFSize(pathElement);
             }
-            case Topen -> size++;
-            case Tcreate -> {
+            case MessageType.Topen -> size++;
+            case MessageType.Tcreate -> {
                 var createMessage = (StyxTCreateMessage)message;
                 size += 5 + UTF.getUTFSize(createMessage.getName());
             }
-            case Twstat -> size += getStatSerializedSize(((StyxTWStatMessage)message).getStat());
-            case Twrite -> size += 12 + ((StyxTWriteMessage)message).getDataLength();
-            case Tread -> size += 8 + 4;
-            case Rwrite -> size += 4;
-            case Rstat -> size += 2 + getStatSerializedSize(((StyxRStatMessage)message).stat);
-            case Rread -> size += 4 + ((StyxRReadMessage)message).getDataLength();
-            case Tflush -> size += 2;
-            case Rcreate -> size += 4;
-            case Ropen -> size += 4;
-            case Tversion -> size += 4 + UTF.getUTFSize(((StyxTVersionMessage)message).getProtocolVersion());
-            case Rversion -> size += 4 + UTF.getUTFSize(((StyxRVersionMessage)message).protocolVersion);
-            case Rwalk -> {
+            case MessageType.Twstat -> size += getStatSerializedSize(((StyxTWStatMessage)message).getStat());
+            case MessageType.Twrite -> size += 12 + ((StyxTWriteMessage)message).getDataLength();
+            case MessageType.Tread -> size += 8 + 4;
+            case MessageType.Rwrite -> size += 4;
+            case MessageType.Rstat -> size += 2 + getStatSerializedSize(((StyxRStatMessage)message).stat);
+            case MessageType.Rread -> size += 4 + ((StyxRReadMessage)message).getDataLength();
+            case MessageType.Tflush -> size += 2;
+            case MessageType.Rcreate -> size += 4;
+            case MessageType.Ropen -> size += 4;
+            case MessageType.Tversion -> size += 4 + UTF.getUTFSize(((StyxTVersionMessage)message).getProtocolVersion());
+            case MessageType.Rversion -> size += 4 + UTF.getUTFSize(((StyxRVersionMessage)message).protocolVersion);
+            case MessageType.Rwalk -> {
                 var walkMessage = (StyxRWalkMessage)message;
                 size += 2 + walkMessage.getQIDListLength() * getQidSize();
             }
@@ -73,9 +75,9 @@ public class StyxSerializerImpl implements IDataSerializer {
         int packetSize = getMessageSize(message);
         output.prepareBuffer(packetSize);
         output.writeUInt32(packetSize);
-        output.writeUInt8((short) message.getType().getByte());
+        output.writeUInt8((short) message.getType());
         output.writeUInt16(message.getTag());
-        if (!message.getType().isTMessage()) {
+        if (!Checks.isTMessage(message.getType())) {
             serializeRMessage(message, output);
         } else {
             serializeTMessage(message, output);
@@ -88,18 +90,18 @@ public class StyxSerializerImpl implements IDataSerializer {
             output.writeUInt32(msg.getFID());
         }
         switch (message.getType()) {
-            case Tversion:
+            case MessageType.Tversion:
                 StyxTVersionMessage tVersionMessage = (StyxTVersionMessage) message;
                 output.writeUInt32(tVersionMessage.getMaxPacketSize());
                 output.writeUTFString(tVersionMessage.getProtocolVersion());
                 break;
-            case Tcreate:
+            case MessageType.Tcreate:
                 StyxTCreateMessage tCreate = (StyxTCreateMessage) message;
                 output.writeUTFString(tCreate.getName());
                 output.writeUInt32(tCreate.getPermissions());
                 output.writeUInt8((short) tCreate.getMode());
                 break;
-            case Twalk:
+            case MessageType.Twalk:
                 StyxTWalkMessage tWalk = (StyxTWalkMessage) message;
                 output.writeUInt32(tWalk.getNewFID());
                 if (tWalk.getPathElements() != null) {
@@ -110,36 +112,36 @@ public class StyxSerializerImpl implements IDataSerializer {
                     output.writeUInt16(0);
                 }
                 break;
-            case Twrite:
+            case MessageType.Twrite:
                 StyxTWriteMessage tWriteMessage = (StyxTWriteMessage) message;
                 output.writeUInt64(tWriteMessage.getOffset());
                 output.writeUInt32(tWriteMessage.getDataLength());
                 output.write(tWriteMessage.getData(), tWriteMessage.getDataOffset(), tWriteMessage.getDataLength());
                 break;
-            case Tauth:
+            case MessageType.Tauth:
                 StyxTAuthMessage tAuthMessage = (StyxTAuthMessage) message;
                 output.writeUTFString(tAuthMessage.getUserName());
                 output.writeUTFString(tAuthMessage.getMountPoint());
                 break;
-            case Tread:
+            case MessageType.Tread:
                 StyxTReadMessage tReadMessage = (StyxTReadMessage) message;
                 output.writeUInt64(tReadMessage.getOffset());
                 output.writeUInt32(tReadMessage.getCount());
                 break;
-            case Twstat:
+            case MessageType.Twstat:
                 StyxTWStatMessage twStatMessage = (StyxTWStatMessage) message;
                 output.writeUInt16(getStatSerializedSize(twStatMessage.getStat()));
                 serializeStat(twStatMessage.getStat(), output);
                 break;
-            case Tflush:
+            case MessageType.Tflush:
                 StyxTFlushMessage tFlushMessage = (StyxTFlushMessage) message;
                 output.writeUInt16(tFlushMessage.oldTag);
                 break;
-            case Topen:
+            case MessageType.Topen:
                 StyxTOpenMessage tOpenMessage = (StyxTOpenMessage) message;
                 output.writeUInt8((short) tOpenMessage.getMode());
                 break;
-            case Tattach:
+            case MessageType.Tattach:
                 StyxTAttachMessage tAttachMessage = (StyxTAttachMessage) message;
                 output.writeUInt32(tAttachMessage.getAuthFID());
                 output.writeUTFString(tAttachMessage.getUserName());
@@ -154,36 +156,36 @@ public class StyxSerializerImpl implements IDataSerializer {
             serializeQid(msg.getQID(), output);
         }
         switch (message.getType()) {
-            case Rerror:
+            case MessageType.Rerror:
                 output.writeUTFString(((StyxRErrorMessage)message).getError());
                 break;
-            case Rversion:
+            case MessageType.Rversion:
                 StyxRVersionMessage version = (StyxRVersionMessage) message;
                 output.writeUInt32(version.maxPacketSize);
                 output.writeUTFString(version.protocolVersion);
                 break;
-            case Rwrite:
+            case MessageType.Rwrite:
                 StyxRWriteMessage msg = (StyxRWriteMessage) message;
                 output.writeUInt32(msg.count);
                 break;
-            case Rread:
+            case MessageType.Rread:
                 StyxRReadMessage read = (StyxRReadMessage) message;
                 output.writeUInt32(read.getDataLength());
                 if ( read.getDataLength() > 0 ) {
                     output.write(read.getDataBuffer(), 0, read.getDataLength());
                 }
                 break;
-            case Rstat:
+            case MessageType.Rstat:
                 StyxRStatMessage rStatMessage = (StyxRStatMessage) message;
                 output.writeUInt16(getStatSerializedSize(rStatMessage.stat));
                 serializeStat(rStatMessage.stat, output);
                 break;
-            case Rcreate:
-            case Ropen:
+            case MessageType.Rcreate:
+            case MessageType.Ropen:
                 StyxROpenMessage rOpenMessage = (StyxROpenMessage) message;
                 output.writeUInt32(rOpenMessage.ioUnit);
                 break;
-            case Rwalk:
+            case MessageType.Rwalk:
                 StyxRWalkMessage rWalkMessage = (StyxRWalkMessage) message;
                 output.writeUInt16(rWalkMessage.getQIDListLength());
                 for (var qid : rWalkMessage.qidList)

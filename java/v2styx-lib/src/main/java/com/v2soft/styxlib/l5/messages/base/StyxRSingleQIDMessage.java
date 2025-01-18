@@ -9,7 +9,7 @@ import java.io.IOException;
 public class StyxRSingleQIDMessage extends StyxMessage {
     protected final StyxQID mQID;
 
-    public StyxRSingleQIDMessage(MessageType type, int tag, StyxQID qid) {
+    public StyxRSingleQIDMessage(int type, int tag, StyxQID qid) {
         super(type, tag);
         mQID = qid;
     }

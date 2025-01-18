@@ -1,6 +1,7 @@
 package com.v2soft.styxlib.handlers;
 
 import com.v2soft.styxlib.exceptions.StyxException;
+import com.v2soft.styxlib.l5.enums.Checks;
 import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
 import com.v2soft.styxlib.l5.messages.base.StyxTMessage;
@@ -28,7 +29,7 @@ public class TMessageTransmitter implements IMessageTransmitter {
 
     @Override
     public void sendMessage(StyxMessage message, ClientDetails recepient) throws StyxException {
-        if ( !message.getType().isTMessage() ) {
+        if ( !Checks.isTMessage(message.getType())) {
             throw new StyxException("Can't sent RMessage");
         }
         if (recepient == null) {

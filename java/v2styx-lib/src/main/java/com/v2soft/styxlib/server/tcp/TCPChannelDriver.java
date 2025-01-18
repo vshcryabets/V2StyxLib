@@ -2,6 +2,7 @@ package com.v2soft.styxlib.server.tcp;
 
 import com.v2soft.styxlib.Logger;
 import com.v2soft.styxlib.exceptions.StyxException;
+import com.v2soft.styxlib.l5.enums.Checks;
 import com.v2soft.styxlib.l5.serialization.IDataDeserializer;
 import com.v2soft.styxlib.l5.serialization.IDataSerializer;
 import com.v2soft.styxlib.l5.serialization.impl.StyxDeserializerImpl;
@@ -136,7 +137,7 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
             long packetSize = client.getInputReader().getUInt32();
             if ( inBuffer >= packetSize ) {
                 var message = deserializer.deserializeMessage(client.getInputReader(), mIOUnit);
-                if ( message.getType().isTMessage() ) {
+                if ( Checks.isTMessage(message.getType()) ) {
                     if ( mTMessageHandler != null ) {
                         mTMessageHandler.postPacket(message, client);
                     }
