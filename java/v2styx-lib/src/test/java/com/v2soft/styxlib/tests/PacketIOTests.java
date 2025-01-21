@@ -117,7 +117,7 @@ public class PacketIOTests {
 
         assertTrue(mConnection.connect());
 
-        final StyxFile newFile = new StyxFile(mConnection, FILE_NAME);
+        final StyxFile newFile = mConnection.open(FILE_NAME);
         OutputStream output = newFile.openForWriteUnbuffered();
         InputStream input = newFile.openForReadUnbuffered();
 

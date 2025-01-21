@@ -92,7 +92,7 @@ public class ConnectionTest {
     // TVersion, Tattach, Twalk, create, write, Tclunk, open, read, remove
     @Test
     public void testFileCreation() throws IOException {
-        final StyxFile newFile = new StyxFile(mConnection, UUID.randomUUID().toString());
+        final StyxFile newFile = mConnection.open(UUID.randomUUID().toString());
         newFile.create(FileMode.ReadOthersPermission.getMode() |
                 FileMode.WriteOthersPermission.getMode());
         final OutputStream out = newFile.openForWrite();
@@ -124,7 +124,7 @@ public class ConnectionTest {
 
         StyxFile dirBC = null;
         try {
-            dirBC = new StyxFile(mConnection, nameBC);
+            dirBC = mConnection.open(nameBC);
             dirBC.create(FileMode.ReadOthersPermission.getMode() |
                     FileMode.WriteOthersPermission.getMode() |
                     FileMode.Directory.getMode());
@@ -134,10 +134,10 @@ public class ConnectionTest {
         assertNull(dirBC);
 
 
-        final StyxFile dirA = new StyxFile(mConnection, nameA);
-        final StyxFile dirB = new StyxFile(mConnection, nameB);
-        final StyxFile dirAA = new StyxFile(mConnection, nameAA);
-        final StyxFile dirAB = new StyxFile(mConnection, nameAB);
+        final StyxFile dirA = mConnection.open(nameA);
+        final StyxFile dirB = mConnection.open(nameB);
+        final StyxFile dirAA = mConnection.open(nameAA);
+        final StyxFile dirAB = mConnection.open(nameAB);
 
 
         dirA.create(FileMode.PERMISSION_BITMASK | FileMode.Directory.getMode());
@@ -191,7 +191,7 @@ public class ConnectionTest {
 
         // create file
         String filename = UUID.randomUUID().toString();
-        StyxFile file = new StyxFile(mConnection, filename);
+        StyxFile file = mConnection.open(filename);
         file.create(FileMode.PERMISSION_BITMASK);
 
         final OutputStream out = file.openForWrite();
@@ -260,7 +260,7 @@ public class ConnectionTest {
         Random random = new Random();
         random.nextBytes(buffer);
 
-        StyxFile file = new StyxFile(mConnection, filename);
+        StyxFile file = mConnection.open(filename);
         OutputStream out = file.openForWriteUnbuffered();
         long startTime = System.nanoTime();
         // write it
@@ -290,7 +290,7 @@ public class ConnectionTest {
     // TVersion, Tattach, Twalk, create, write, Tclunk, open, read, remove
     @Test
     public void testFileSeek() throws IOException, StyxException, InterruptedException, TimeoutException {
-        final StyxFile newFile = new StyxFile(mConnection, UUID.randomUUID().toString());
+        final StyxFile newFile = mConnection.open(UUID.randomUUID().toString());
         newFile.create(FileMode.ReadOthersPermission.getMode() |
                 FileMode.WriteOthersPermission.getMode());
         final OutputStream out = newFile.openForWrite();

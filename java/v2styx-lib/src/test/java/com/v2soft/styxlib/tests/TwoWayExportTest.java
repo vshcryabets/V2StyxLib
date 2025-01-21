@@ -326,7 +326,7 @@ public class TwoWayExportTest {
 
         public void attachToServer(IClient client) throws InterruptedException, StyxException, TimeoutException,
                 IOException {
-            mFile = new StyxFile(client, "/chat");
+            mFile = client.open("/chat");
             mOut = mFile.openForWriteUnbuffered();
         }
 

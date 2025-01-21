@@ -3,7 +3,6 @@ package com.v2soft.styxlib.l6.io;
 import com.v2soft.styxlib.l5.Connection;
 import com.v2soft.styxlib.l5.messages.StyxRReadMessage;
 import com.v2soft.styxlib.l5.messages.StyxTReadMessage;
-import com.v2soft.styxlib.l5.messages.base.StyxMessage;
 import com.v2soft.styxlib.l5.messages.base.StyxTMessageFID;
 import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.server.ClientDetails;
@@ -61,10 +60,8 @@ public class StyxUnbufferedInputStream extends InputStream {
         try {
             // send Tread
             final StyxTReadMessage tRead = new StyxTReadMessage(mFID, mFileOffset, len);
-            mMessenger.sendMessage(tRead, mRecepient);
-            final StyxMessage rMessage = tRead.waitForAnswer(mTimeout);
-
-            final StyxRReadMessage rRead = (StyxRReadMessage) rMessage;
+            final var rRead = mMessenger.<StyxRReadMessage>sendMessage(tRead, mRecepient, mTimeout)
+                    .getResult();
             read = rRead.getDataLength();
             if ( read > 0 ) {
                 System.arraycopy(rRead.getDataBuffer(), 0, b, 0, read);
@@ -92,8 +89,7 @@ public class StyxUnbufferedInputStream extends InputStream {
         // send Tclunk
         final StyxTMessageFID tClunk = new StyxTMessageFID(MessageType.Tclunk, MessageType.Rclunk, mFID);
         try {
-            mMessenger.sendMessage(tClunk, mRecepient);
-            tClunk.waitForAnswer(mTimeout);
+            mMessenger.sendMessage(tClunk, mRecepient, mTimeout).getResult();
         } catch (Exception e) {
             throw new IOException(e);
         }
