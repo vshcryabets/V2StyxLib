@@ -5,6 +5,7 @@ import com.v2soft.styxlib.l5.enums.FileMode;
 import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.l5.enums.QidType;
 import com.v2soft.styxlib.l5.messages.StyxROpenMessage;
+import com.v2soft.styxlib.l5.messages.StyxRReadMessage;
 import com.v2soft.styxlib.l5.messages.StyxTVersionMessage;
 import com.v2soft.styxlib.l5.serialization.impl.BufferWritterImpl;
 import com.v2soft.styxlib.l5.serialization.impl.StyxSerializerImpl;
@@ -17,12 +18,12 @@ import java.nio.ByteBuffer;
 import java.util.Date;
 
 public class MessageSerializerImplTest {
+    final StyxSerializerImpl serializer = new StyxSerializerImpl();
+    ByteBuffer buffer = ByteBuffer.allocate(8192);
+    BufferWritterImpl outputBuffer = new BufferWritterImpl(buffer);
 
     @Test
     public void testTVersion() throws StyxException {
-        var serializer = new StyxSerializerImpl();
-        var buffer = ByteBuffer.allocate(8192);
-        var outputBuffer = new BufferWritterImpl(buffer);
         serializer.serialize(new StyxTVersionMessage(128, "9P2000"), outputBuffer);
         byte[] data = new byte[buffer.limit()];
         buffer.position(0);
@@ -39,9 +40,6 @@ public class MessageSerializerImplTest {
 
     @Test
     public void testSerializationStyxStat() throws StyxException {
-        var serializer = new StyxSerializerImpl();
-        var buffer = ByteBuffer.allocate(8192);
-        var outputBuffer = new BufferWritterImpl(buffer);
         var fileName = "filename";
         var accessTime = new Date(0x70203040L * 1000);
         var stat = new StyxStat(
@@ -88,10 +86,6 @@ public class MessageSerializerImplTest {
 
     @Test
     public void testRCreate() throws StyxException {
-        var serializer = new StyxSerializerImpl();
-        var buffer = ByteBuffer.allocate(8192);
-        var outputBuffer = new BufferWritterImpl(buffer);
-
         serializer.serialize(new StyxROpenMessage(128, StyxQID.EMPTY, 0x1234, true), outputBuffer);
         byte[] data = new byte[buffer.limit()];
         buffer.position(0);
@@ -105,5 +99,18 @@ public class MessageSerializerImplTest {
                 0x00, 0x00,
                 0x00,
                 0x00, 0x00, 0x34, 0x12, 0, 0}, data, "Rcreate");
+    }
+
+    @Test
+    public void testRReadZeroDataLength() throws StyxException {
+        serializer.serialize(new StyxRReadMessage(128, new byte[0], 0), outputBuffer);
+        byte[] data = new byte[buffer.limit()];
+        buffer.position(0);
+        buffer.get(data);
+        Assertions.assertArrayEquals(new byte[]{11, 0, 0, 0,
+                (byte) MessageType.Rread,
+                (byte) 0x80, (byte) 0x00, // tag
+                // size
+                0, 0, 0, 0}, data, "Rread");
     }
 }

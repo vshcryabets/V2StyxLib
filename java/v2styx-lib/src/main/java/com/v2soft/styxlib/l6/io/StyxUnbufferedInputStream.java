@@ -99,4 +99,8 @@ public class StyxUnbufferedInputStream extends InputStream {
     public void seek(long position) {
         mFileOffset = position;
     }
+
+    public int ioUnit() {
+        return mIOUnitSize;
+    }
 }

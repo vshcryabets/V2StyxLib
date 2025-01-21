@@ -45,7 +45,6 @@ public class StyxFile {
     private final IClient mClient;
     private long mFID = StyxMessage.NOFID;
     private long mParentFID;
-    private StyxStat mStat;
     private final String mPath;
     private final IMessageTransmitter mMessenger;
     private long mTimeout;
@@ -96,7 +95,6 @@ public class StyxFile {
         feature.getResult();
 
         mFID = StyxMessage.NOFID;
-        mStat = null;
     }
 
     public List<StyxStat> listStat()
@@ -167,7 +165,7 @@ public class StyxFile {
      *
      * @return unbuffered input stream
      */
-    public InputStream openForReadUnbuffered() throws IOException, StyxException {
+    public StyxUnbufferedInputStream openForReadUnbuffered() throws StyxException {
         checkConnection();
         long tempFID = getCloneFID();
         int iounit = open(ModeType.OREAD, tempFID);
@@ -384,16 +382,13 @@ public class StyxFile {
      *
      * @return return stat structure of the current file.
      */
-    private StyxStat getStat()
+    public StyxStat getStat()
             throws StyxException {
-        if (mStat == null) {
-            final var rMessage = mMessenger.sendMessage(
-                    new StyxTMessageFID(MessageType.Tstat, MessageType.Rstat, getFID()),
-                    mRecipient,
-                    mTimeout).getResult();
-            mStat = ((StyxRStatMessage) rMessage).stat;
-        }
-        return mStat;
+        final var rMessage = mMessenger.<StyxRStatMessage>sendMessage(
+                new StyxTMessageFID(MessageType.Tstat, MessageType.Rstat, getFID()),
+                mRecipient,
+                mTimeout).getResult();
+        return rMessage.stat;
     }
 
     public IClient getIClient() {
