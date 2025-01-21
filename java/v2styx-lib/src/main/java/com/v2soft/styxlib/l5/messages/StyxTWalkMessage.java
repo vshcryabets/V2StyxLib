@@ -15,8 +15,8 @@ import java.util.List;
  */
 public class StyxTWalkMessage
 extends StyxTMessageFID {
-    private long mNewFID;
-    private List<String> mPathElements;
+    private final long mNewFID;
+    private final List<String> mPathElements;
 
     public StyxTWalkMessage(long fid, long new_fid, List<String> path){
         super(MessageType.Twalk, MessageType.Rwalk, fid);
@@ -24,19 +24,9 @@ extends StyxTMessageFID {
         mPathElements = path;
     }
 
-
     public long getNewFID()
     {
         return mNewFID;
-    }
-
-    public String getPath()	{
-        StringBuilder builder = new StringBuilder();
-        for (String string : mPathElements) {
-            builder.append('/');
-            builder.append(string);
-        }
-        return builder.toString();
     }
 
     public int getPathLength() {
@@ -52,6 +42,6 @@ extends StyxTMessageFID {
     @Override
     public String toString() {
         return String.format("%s\nNewFID: %d\nNumber of walks:%d\nPath: %s",
-                super.toString(), mNewFID, mPathElements.size(), getPath());
+                super.toString(), mNewFID, mPathElements.size(), mPathElements.toString());
     }
 }

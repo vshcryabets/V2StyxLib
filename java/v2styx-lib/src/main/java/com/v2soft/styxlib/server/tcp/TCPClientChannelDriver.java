@@ -64,14 +64,6 @@ public class TCPClientChannelDriver extends TCPChannelDriver {
     }
 
     @Override
-    public void sendMessage(StyxMessage message, ClientDetails recipient) throws StyxException {
-        if ( !recipient.equals(mServerClientDetails)) {
-            throw new StyxException("Wrong recipient");
-        }
-        super.sendMessage(message, recipient);
-    }
-
-    @Override
     public void clearStatistics() {
 
     }

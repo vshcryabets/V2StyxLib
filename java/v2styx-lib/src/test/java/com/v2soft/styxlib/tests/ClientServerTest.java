@@ -79,7 +79,7 @@ public class ClientServerTest {
         MessageDigest digest = MessageDigest.getInstance("MD5");
         byte [] localHash = digest.digest(someData);
         byte [] remoteHash = new byte[16];
-        final StyxFile newFile = new StyxFile(connection, MD5StyxFile.FILE_NAME);
+        final StyxFile newFile = connection.open(MD5StyxFile.FILE_NAME);
         DualStreams streams = newFile.openForReadAndWrite();
         streams.output.write(someData);
         streams.output.flush();
