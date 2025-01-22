@@ -12,7 +12,7 @@ import java.util.HashMap;
  * @author V.Shcriyabets (vshcryabets@gmail.com)
  *
  */
-public abstract class ClientDetails {
+public class ClientDetails {
     protected HashMap<Long, IVirtualStyxFile> mAssignedFiles;
     protected IChannelDriver mDriver; // TODO move to map
     protected int mId;

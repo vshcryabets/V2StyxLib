@@ -115,8 +115,8 @@ public class MemoryStyxFile implements IVirtualStyxFile {
     }
 
     @Override
-    public long read(ClientDetails clientDetails, byte[] outbuffer, long offset,
-                     long count) throws StyxErrorMessageException {
+    public int read(ClientDetails clientDetails, byte[] outbuffer, long offset,
+                     int count) throws StyxErrorMessageException {
         return 0;
     }
 
@@ -145,11 +145,6 @@ public class MemoryStyxFile implements IVirtualStyxFile {
             System.arraycopy(reply, 0, buffer, 0, count);
             return count;
         }
-    }
-
-    @Override
-    public void onConnectionClosed(ClientDetails state) {
-        // ok, nothing to do
     }
 
     @Override

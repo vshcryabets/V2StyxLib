@@ -43,7 +43,7 @@ public class TMessagesProcessor extends QueueMessagesProcessor implements IMessa
 
     @Override
     public void removeClient(ClientDetails clientDetails) {
-        mRoot.onConnectionClosed(clientDetails);
+        mRoot.close(clientDetails);
     }
 
     /**

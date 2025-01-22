@@ -80,7 +80,7 @@ public class StyxDeserializerImpl implements IDataDeserializer {
             case MessageType.Tread -> result = new StyxTReadMessage(
                     buffer.readUInt32(),
                     buffer.readUInt64(),
-                    buffer.readUInt32());
+                    (int) buffer.readUInt32());
             case MessageType.Rread -> {
                 var dataLength = (int) buffer.readUInt32();
                 MetricsAndStats.byteArrayAllocationRRead++;

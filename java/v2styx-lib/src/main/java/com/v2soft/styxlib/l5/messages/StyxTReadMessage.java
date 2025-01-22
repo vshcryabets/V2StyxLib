@@ -8,9 +8,9 @@ import java.io.IOException;
 
 public class StyxTReadMessage extends StyxTMessageFID {
 	private final long mOffset;
-	private final long mCount;
+	private final int mCount;
 
-	public StyxTReadMessage(long fid, long offset, long count)	{
+	public StyxTReadMessage(long fid, long offset, int count)	{
 		super(MessageType.Tread, MessageType.Rread, fid);
 		mOffset = offset;
 		mCount = count;
@@ -21,7 +21,7 @@ public class StyxTReadMessage extends StyxTMessageFID {
 		return mOffset;
 	}
 
-	public long getCount()
+	public int getCount()
 	{
 		return mCount;
 	}
