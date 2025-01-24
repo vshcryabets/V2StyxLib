@@ -73,7 +73,6 @@ public class StyxSerializerImpl implements IDataSerializer {
     @Override
     public void serialize(StyxMessage message, IBufferWritter output) throws StyxException {
         int packetSize = getMessageSize(message);
-        System.err.printf("ASD packetSize=%d %s", packetSize, message);
         output.prepareBuffer(packetSize);
         output.writeUInt32(packetSize);
         output.writeUInt8((short) message.getType());

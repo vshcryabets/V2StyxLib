@@ -4,7 +4,6 @@ import com.v2soft.styxlib.l5.enums.ModeType;
 import com.v2soft.styxlib.l6.vfs.DiskStyxFile;
 import com.v2soft.styxlib.server.ClientDetails;
 import com.v2soft.styxlib.server.EmptyChannelDriver;
-import com.v2soft.styxlib.server.tcp.TCPClientDetails;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

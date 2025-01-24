@@ -124,7 +124,10 @@ public class DiskStyxFile extends MemoryStyxFile {
             final RandomAccessFile rf = mFilesMap.get(clientDetails);
             try {
                 rf.seek(offset);
-                return rf.read(outbuffer, 0, count);
+                var result = rf.read(outbuffer, 0, count);
+                if (result < 0)
+                    result = 0;
+                return result;
             } catch (IOException e) {
                 throw StyxErrorMessageException.newInstance(e.toString());
             }

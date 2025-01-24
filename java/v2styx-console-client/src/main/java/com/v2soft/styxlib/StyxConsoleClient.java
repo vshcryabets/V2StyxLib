@@ -14,6 +14,7 @@ import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.util.ArrayList;
@@ -67,15 +68,32 @@ public class StyxConsoleClient {
                 return;
             }
             var stat = src.getStat();
-            terminal.writer().println("File size " + stat.length() + " bytes");
+            terminal.writer().printf("File size %d bytes", stat.length());
             var inputStream = src.openForReadUnbuffered();
+            var outputStream = new FileOutputStream(new File(localFolder, fileName));
             var bufferSize = inputStream.ioUnit() - IDataSerializer.BASE_BINARY_SIZE - 4;
             var buffer = new byte[bufferSize];
             var read = 0;
+            long totalRead = 0;
+            long lastMark = totalRead;
+            long startTime = System.currentTimeMillis();
             do {
                 read = inputStream.read(buffer);
+                if (read > 0) {
+                    outputStream.write(buffer, 0, read);
+                    totalRead += read;
+                }
+                if (totalRead - lastMark > 256000) {
+                    long timeDelta = System.currentTimeMillis() - startTime;
+                    terminal.writer().printf("\rRead %d bytes in %d ms", totalRead, timeDelta);
+                    terminal.writer().flush();
+                    lastMark = totalRead;
+                }
             } while (read > 0);
+            long timeDelta = System.currentTimeMillis() - startTime;
+            terminal.writer().printf("\nDone. Download speed %f b/s. \n", ((float)totalRead)/((float)timeDelta/1000));
             inputStream.close();
+            outputStream.close();
             src.close();
         } catch (IOException e) {
             throw new RuntimeException(e);
