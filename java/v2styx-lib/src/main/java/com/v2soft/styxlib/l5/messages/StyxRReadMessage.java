@@ -14,6 +14,9 @@ public class StyxRReadMessage extends StyxMessage {
 
     public StyxRReadMessage(int tag, byte[] data, int length) {
         super(MessageType.Rread, tag);
+        if (length < 0) {
+            throw new IllegalArgumentException("length is negative " + length);
+        }
         mData = data;
         mDataLength = length;
     }
@@ -25,12 +28,12 @@ public class StyxRReadMessage extends StyxMessage {
         if ( Config.LOG_DATA_FIELDS ) {
             return String.format("%s\nData Length:%d\nData: %s",
                     super.toString(),
-                    mData.length,
+                    mDataLength,
                     StyxMessage.toString(mData));
         } else {
             return String.format("%s\nData Length:%d",
                     super.toString(),
-                    mData.length);
+                    mDataLength);
         }
     }
     public byte[] getDataBuffer() {

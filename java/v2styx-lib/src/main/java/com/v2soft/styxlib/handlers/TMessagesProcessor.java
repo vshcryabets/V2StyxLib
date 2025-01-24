@@ -43,7 +43,7 @@ public class TMessagesProcessor extends QueueMessagesProcessor implements IMessa
 
     @Override
     public void removeClient(ClientDetails clientDetails) {
-        mRoot.onConnectionClosed(clientDetails);
+        mRoot.close(clientDetails);
     }
 
     /**
@@ -59,47 +59,47 @@ public class TMessagesProcessor extends QueueMessagesProcessor implements IMessa
         long fid;
         try {
             switch (message.getType()) {
-                case Tversion:
+                case MessageType.Tversion:
                     answer = new StyxRVersionMessage(mConnectionDetails.ioUnit(), mConnectionDetails.protocol());
                     break;
-                case Tattach:
-                    answer = processAttach(target, (StyxTAttachMessage) message);
+                case MessageType.Tattach:
+                    answer = processAttach(target, (StyxTAttachMessage)message);
                     break;
-                case Tauth:
-                    answer = processAuth(target, (StyxTAuthMessage) message);
+                case MessageType.Tauth:
+                    answer = processAuth(target, (StyxTAuthMessage)message);
                     break;
-                case Tstat:
-                    fid = ((StyxTMessageFID) message).getFID();
+                case MessageType.Tstat:
+                    fid = ((StyxTMessageFID)message).getFID();
                     file = target.getAssignedFile(fid);
                     answer = new StyxRStatMessage(message.getTag(), file.getStat());
                     break;
-                case Tclunk:
-                    answer = processClunk(target, (StyxTMessageFID) message);
+                case MessageType.Tclunk:
+                    answer = processClunk(target, (StyxTMessageFID)message);
                     break;
-                case Tflush:
+                case MessageType.Tflush:
                     // TODO do something there
                     answer = new StyxMessage(MessageType.Rflush, message.getTag());
                     break;
-                case Twalk:
+                case MessageType.Twalk:
                     answer = processWalk(target, (StyxTWalkMessage) message);
                     break;
-                case Topen:
-                    answer = processOpen(target, (StyxTOpenMessage) message);
+                case MessageType.Topen:
+                    answer = processOpen(target, (StyxTOpenMessage)message);
                     break;
-                case Tread:
-                    answer = processRead(target, (StyxTReadMessage) message);
+                case MessageType.Tread:
+                    answer = processRead(target, (StyxTReadMessage)message);
                     break;
-                case Twrite:
-                    answer = processWrite(target, (StyxTWriteMessage) message);
+                case MessageType.Twrite:
+                    answer = processWrite(target, (StyxTWriteMessage)message);
                     break;
-                case Twstat:
-                    answer = processWStat((StyxTWStatMessage) message);
+                case MessageType.Twstat:
+                    answer = processWStat((StyxTWStatMessage)message);
                     break;
-                case Tcreate:
-                    answer = processCreate(target, (StyxTCreateMessage) message);
+                case MessageType.Tcreate:
+                    answer = processCreate(target, (StyxTCreateMessage)message);
                     break;
-                case Tremove:
-                    answer = processRemove(target, (StyxTMessageFID) message);
+                case MessageType.Tremove:
+                    answer = processRemove(target, (StyxTMessageFID)message);
                     break;
                 default:
                     System.out.println("Got message:");

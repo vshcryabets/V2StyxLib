@@ -3,6 +3,7 @@ package com.v2soft.styxlib;
 import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.l5.Connection;
 import com.v2soft.styxlib.l5.enums.QidType;
+import com.v2soft.styxlib.l5.serialization.IDataSerializer;
 import com.v2soft.styxlib.l5.structs.StyxStat;
 import com.v2soft.styxlib.l6.StyxFile;
 import com.v2soft.styxlib.library.types.impl.CredentialsImpl;
@@ -13,6 +14,7 @@ import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.util.ArrayList;
@@ -33,6 +35,8 @@ public class StyxConsoleClient {
     private static final String COMMAND_CD = "cd ";
     private static final String COMMAND_LCD = "lcd ";
     private static final String COMMAND_LPWD = "lpwd";
+    private static final String COMMAND_DOWNLOAD = "download";
+    private static final String COMMAND_UPLOAD = "upload";
     private static final String DIR_PARENT = "..";
 
     private static Logger log = Logger.getLogger(StyxConsoleClient.class.getSimpleName());
@@ -51,19 +55,47 @@ public class StyxConsoleClient {
                          String fileName,
                          File localFolder) {
         try {
-            StringBuilder path = new StringBuilder();
+            var path = new StringBuilder();
             currentPath.forEach(it -> {
                 path.append('/');
                 path.append(it);
             });
             path.append(fileName);
-            StyxFile src = connection.open(path.toString());
+            terminal.writer().println("Downloading file \"" + path + "\" to " + localFolder.getAbsolutePath());
+            var src = connection.open(path.toString());
             if (!src.exists()) {
                 terminal.writer().println(String.format("File %s doesn't exists", path.toString()));
                 return;
             }
+            var stat = src.getStat();
+            terminal.writer().printf("File size %d bytes", stat.length());
+            var inputStream = src.openForReadUnbuffered();
+            var outputStream = new FileOutputStream(new File(localFolder, fileName));
+            var bufferSize = inputStream.ioUnit() - IDataSerializer.BASE_BINARY_SIZE - 4;
+            var buffer = new byte[bufferSize];
+            var read = 0;
+            long totalRead = 0;
+            long lastMark = totalRead;
+            long startTime = System.currentTimeMillis();
+            do {
+                read = inputStream.read(buffer);
+                if (read > 0) {
+                    outputStream.write(buffer, 0, read);
+                    totalRead += read;
+                }
+                if (totalRead - lastMark > 256000) {
+                    long timeDelta = System.currentTimeMillis() - startTime;
+                    terminal.writer().printf("\rRead %d bytes in %d ms", totalRead, timeDelta);
+                    terminal.writer().flush();
+                    lastMark = totalRead;
+                }
+            } while (read > 0);
+            long timeDelta = System.currentTimeMillis() - startTime;
+            terminal.writer().printf("\nDone. Download speed %f b/s. \n", ((float)totalRead)/((float)timeDelta/1000));
+            inputStream.close();
+            outputStream.close();
             src.close();
-        } catch (StyxException e) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
@@ -166,9 +198,19 @@ public class StyxConsoleClient {
                         terminal.writer().println(currentLocalDirectory.getAbsolutePath());
                         continue;
                     }
+                    if (cmd.startsWith(COMMAND_DOWNLOAD)) {
+                        // download specified file to current local directory
+                        var fileName = cmd.substring(COMMAND_DOWNLOAD.length()).trim();
+                        getFile(connection,
+                                terminal,
+                                currentDirPath,
+                                fileName,
+                                currentLocalDirectory);
+                        continue;
+                    }
                     if (cmd.startsWith(COMMAND_LCD)) {
                         // change local directory
-                        var subdir = cmd.substring(COMMAND_CD.length()).trim();
+                        var subdir = cmd.substring(COMMAND_LCD.length()).trim();
                         if (subdir.startsWith("/")) {
                             currentLocalDirectory = new File(subdir);
                         } else {

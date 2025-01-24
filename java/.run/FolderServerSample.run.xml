@@ -1,0 +1,13 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="FolderServerSample" type="Application" factoryName="Application" nameIsGenerated="true">
+    <option name="ALTERNATIVE_JRE_PATH" value="17" />
+    <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
+    <option name="MAIN_CLASS_NAME" value="com.v2soft.folderserver.FolderServerSample" />
+    <module name="V2StyxLib-JVM.v2styx-server-sample.main" />
+    <option name="PROGRAM_PARAMETERS" value="--config folderserverconfig.json" />
+    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/v2styx-server-sample" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

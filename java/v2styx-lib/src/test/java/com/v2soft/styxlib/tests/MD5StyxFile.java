@@ -49,7 +49,7 @@ public class MD5StyxFile extends MemoryStyxFile {
         return super.write(clientDetails, data, offset);
     }
     @Override
-    public long read(ClientDetails clientDetails, byte[] outbuffer, long offset, long count)
+    public int read(ClientDetails clientDetails, byte[] outbuffer, long offset, int count)
             throws StyxErrorMessageException {
         if ( mClientsMap.containsKey(clientDetails) ) {
             byte[] digest = mClientsMap.get(clientDetails).digest();

@@ -62,7 +62,7 @@ public interface IVirtualStyxFile {
      * @param count number of bytes to read
      * @return number of bytes that was readed into the buffer
      */
-    long read(ClientDetails clientDetails, byte[] buffer, long offset, long count) throws StyxErrorMessageException;
+    int read(ClientDetails clientDetails, byte[] buffer, long offset, int count) throws StyxErrorMessageException;
     IVirtualStyxFile walk(Iterator<String> pathElements, List<StyxQID> qids)
             throws StyxErrorMessageException;
     /**
@@ -73,11 +73,6 @@ public interface IVirtualStyxFile {
      * @throws StyxErrorMessageException
      */
     int write(ClientDetails clientDetails, byte[] data, long offset) throws StyxErrorMessageException;
-    /**
-     * Will be fired when client close connection to this server
-     * @param client client information
-     */
-    void onConnectionClosed(ClientDetails client);
 
     /**
      * Will be fired when client connect to this server

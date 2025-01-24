@@ -15,6 +15,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.util.Enumeration;
 import java.util.List;
 
 /**
@@ -26,6 +29,7 @@ public class FolderServerSample {
     private static final String CMD_HELP = "help";
     private static final String CMD_QUIT = "quit";
     private static final String CMD_CLIENTS = "lsclients";
+    private static final String CMD_IP = "ip";
 
     public static void main(String[] args) throws InterruptedException, IOException {
         var configFilePath = "";
@@ -76,6 +80,9 @@ public class FolderServerSample {
             } else if (cmd.equalsIgnoreCase(CMD_CLIENTS)) {
                 listClients(terminal, mServer);
                 continue;
+            } else if (cmd.equalsIgnoreCase(CMD_IP)) {
+                showInterfaces(terminal, mServer);
+                continue;
             } else if (cmd.equalsIgnoreCase(CMD_QUIT)) {
                 terminal.writer().println("Shutdown server");
                 mServer.close();
@@ -99,6 +106,32 @@ public class FolderServerSample {
                 }
                 terminal.writer().println(" .");
             }
+        }
+    }
+
+    private static void showInterfaces(Terminal terminal, StyxServerManager server) {
+        try {
+            // Get all network interfaces
+            Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
+
+            // Iterate through each network interface
+            while (networkInterfaces.hasMoreElements()) {
+                NetworkInterface networkInterface = networkInterfaces.nextElement();
+
+                // Print interface name and details
+                System.out.println("Name: " + networkInterface.getName());
+                System.out.println("Display Name: " + networkInterface.getDisplayName());
+                System.out.println("Is Up: " + networkInterface.isUp());
+                System.out.println("Supports Multicast: " + networkInterface.supportsMulticast());
+                System.out.println("Is Virtual: " + networkInterface.isVirtual());
+//                System.out.println("Hardware Address: " + (networkInterface.getHardwareAddress() != null
+//                        ? bytesToHex(networkInterface.getHardwareAddress())
+//                        : "N/A"));
+                System.out.println("MTU: " + networkInterface.getMTU());
+                System.out.println("--------------------------------");
+            }
+        } catch (SocketException e) {
+            System.err.println("Error enumerating network interfaces: " + e.getMessage());
         }
     }
 

@@ -11,9 +11,9 @@ public class StyxMessage {
     public static final long NOFID = 0xFFFFFFFFL;
 
     private int mTag;
-    private final MessageType mType;
+    private final int mType;
 
-    public StyxMessage(MessageType type, int tag) {
+    public StyxMessage(int type, int tag) {
         MetricsAndStats.newStyxMessage++;
         mType = type;
         mTag = tag;
@@ -34,7 +34,7 @@ public class StyxMessage {
         return String.format("(%s)", result);
     }
 
-    public MessageType getType(){
+    public int getType(){
         return mType;
     }
 
@@ -48,7 +48,7 @@ public class StyxMessage {
 
     @Override
     public String toString() {
-        return String.format("Type: %s\tTag: %d",
-                getType().toString(), getTag());
+        return String.format("Type: %d\tTag: %d",
+                getType(), getTag());
     }
 }

@@ -45,7 +45,7 @@ public class StyxDeserializerImplTest {
     @Test
     public void testDeserializeTStat() throws StyxException {
         var dataBuffer = new byte[]{11, 0, 0, 0,
-                (byte) MessageType.Tstat.getByte(),
+                (byte) MessageType.Tstat,
                 (byte) 0x11, (byte) 0xFF, // tag
                 0x01, 0x02, 0x03, 0x04 // FID
         };

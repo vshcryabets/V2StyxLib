@@ -50,7 +50,7 @@ public class MD5ServerSample {
                 return super.write(client, data, offset);
             }
             @Override
-            public long read(ClientDetails client, byte[] outbuffer, long offset, long count)
+            public int read(ClientDetails client, byte[] outbuffer, long offset, int count)
                     throws StyxErrorMessageException {
                 if ( mClientsMap.containsKey(client) ) {
                     byte[] digest = mClientsMap.get(client).digest();
