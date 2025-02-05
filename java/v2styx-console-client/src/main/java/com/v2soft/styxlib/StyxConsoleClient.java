@@ -1,5 +1,7 @@
 package com.v2soft.styxlib;
 
+import com.v2soft.styxlib.client.DownloadFileUseCase;
+import com.v2soft.styxlib.client.DownloadFileUseCaseImpl;
 import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.l5.Connection;
 import com.v2soft.styxlib.l5.enums.QidType;
@@ -21,6 +23,8 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Deque;
 import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
 import java.util.logging.Logger;
 
 /**
@@ -54,50 +58,35 @@ public class StyxConsoleClient {
                          Deque<String> currentPath,
                          String fileName,
                          File localFolder) {
-        try {
-            var path = new StringBuilder();
-            currentPath.forEach(it -> {
-                path.append('/');
-                path.append(it);
-            });
-            path.append(fileName);
-            terminal.writer().println("Downloading file \"" + path + "\" to " + localFolder.getAbsolutePath());
-            var src = connection.open(path.toString());
-            if (!src.exists()) {
-                terminal.writer().println(String.format("File %s doesn't exists", path.toString()));
-                return;
-            }
-            var stat = src.getStat();
-            terminal.writer().printf("File size %d bytes", stat.length());
-            var inputStream = src.openForReadUnbuffered();
-            var outputStream = new FileOutputStream(new File(localFolder, fileName));
-            var bufferSize = inputStream.ioUnit() - IDataSerializer.BASE_BINARY_SIZE - 4;
-            var buffer = new byte[bufferSize];
-            var read = 0;
-            long totalRead = 0;
-            long lastMark = totalRead;
-            long startTime = System.currentTimeMillis();
-            do {
-                read = inputStream.read(buffer);
-                if (read > 0) {
-                    outputStream.write(buffer, 0, read);
-                    totalRead += read;
-                }
-                if (totalRead - lastMark > 256000) {
-                    long timeDelta = System.currentTimeMillis() - startTime;
-                    terminal.writer().printf("\rRead %d bytes in %d ms", totalRead, timeDelta);
+        var path = new StringBuilder();
+        currentPath.forEach(it -> {
+            path.append('/');
+            path.append(it);
+        });
+        path.append('/');
+        path.append(fileName);
+        terminal.writer().println("Downloading file \"" + path.toString() + "\" to " + localFolder.getAbsolutePath());
+        var useCase = new DownloadFileUseCaseImpl();
+        final AtomicBoolean firstLine = new AtomicBoolean(true);
+        useCase.download(
+                connection,
+                path.toString(),
+                new File(localFolder, fileName),
+                progress -> {
+                    if (firstLine.compareAndSet(true, false)) {
+                        terminal.writer().printf("File size %d bytes\n", progress.totalSizeBytes());
+                    }
+                    if (progress.processedBytes() != progress.totalSizeBytes()) {
+                        terminal.writer().printf("\rRead %d bytes in %d ms", progress.processedBytes(), progress.timeDeltaMs());
+                    } else {
+                        terminal.writer().printf("\nDone. Download speed %f b/s. \n", ((float)progress.processedBytes())/((float)progress.timeDeltaMs()/1000));
+                    }
                     terminal.writer().flush();
-                    lastMark = totalRead;
+                },
+                throwable -> {
+                    terminal.writer().println(throwable.toString());
                 }
-            } while (read > 0);
-            long timeDelta = System.currentTimeMillis() - startTime;
-            terminal.writer().printf("\nDone. Download speed %f b/s. \n", ((float)totalRead)/((float)timeDelta/1000));
-            inputStream.close();
-            outputStream.close();
-            src.close();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        );
     }
 
     private void listFiles(Connection connection,
