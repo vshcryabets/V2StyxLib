@@ -24,18 +24,23 @@ public class StyxUnbufferedOutputStream extends OutputStream {
     protected IMessageTransmitter mMessenger;
     protected long mFileOffset = 0;
     protected ClientDetails mRecipient;
+    private int mIOUnitSize;
 
-    public StyxUnbufferedOutputStream(long fid, IMessageTransmitter messenger, ClientDetails recepient) {
+    public StyxUnbufferedOutputStream(long fid,
+                                      IMessageTransmitter messenger,
+                                      ClientDetails recipient,
+                                      int ioUnit) {
         if ( messenger == null ) {
             throw new NullPointerException("messenger is null");
         }
-        if ( recepient == null ) {
+        if ( recipient == null ) {
             throw new NullPointerException("recipient is null");
         }
         mSingleByteArray = new byte[1];
         MetricsAndStats.byteArrayAllocation++;
-        mRecipient = recepient;
+        mRecipient = recipient;
         mFID = fid;
+        mIOUnitSize = ioUnit;
         mMessenger = messenger;
     }
 
@@ -71,12 +76,16 @@ public class StyxUnbufferedOutputStream extends OutputStream {
     @Override
     public void close() throws IOException {
         super.close();
-        // send Tclunk
-        final StyxTMessageFID tClunk = new StyxTMessageFID(MessageType.Tclunk, MessageType.Rclunk, mFID);
         try {
-            mMessenger.sendMessage(tClunk, mRecipient, mTimeout).getResult();
+            mMessenger.sendMessage(new StyxTMessageFID(MessageType.Tclunk, MessageType.Rclunk, mFID),
+                    mRecipient,
+                    mTimeout).getResult();
         } catch (Exception e) {
             throw new IOException(e);
         }
+    }
+
+    public int ioUnit() {
+        return mIOUnitSize;
     }
 }

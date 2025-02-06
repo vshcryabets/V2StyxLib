@@ -2,6 +2,7 @@ package com.v2soft.styxlib;
 
 import com.v2soft.styxlib.client.DownloadFileUseCase;
 import com.v2soft.styxlib.client.DownloadFileUseCaseImpl;
+import com.v2soft.styxlib.client.UploadFileUseCaseImpl;
 import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.l5.Connection;
 import com.v2soft.styxlib.l5.enums.QidType;
@@ -55,23 +56,18 @@ public class StyxConsoleClient {
 
     private void getFile(Connection connection,
                          Terminal terminal,
-                         Deque<String> currentPath,
+                         String currentRemoteDirectory,
                          String fileName,
-                         File localFolder) {
-        var path = new StringBuilder();
-        currentPath.forEach(it -> {
-            path.append('/');
-            path.append(it);
-        });
-        path.append('/');
-        path.append(fileName);
-        terminal.writer().println("Downloading file \"" + path.toString() + "\" to " + localFolder.getAbsolutePath());
+                         String currentLocalDirectory) {
+        terminal.writer().println("Downloading file \"" + fileName + "\" from remote /" +
+                currentRemoteDirectory + " to local " +
+                currentLocalDirectory);
         var useCase = new DownloadFileUseCaseImpl();
         final AtomicBoolean firstLine = new AtomicBoolean(true);
         useCase.download(
                 connection,
-                path.toString(),
-                new File(localFolder, fileName),
+                currentRemoteDirectory + "/" + fileName,
+                new File(currentLocalDirectory, fileName),
                 progress -> {
                     if (firstLine.compareAndSet(true, false)) {
                         terminal.writer().printf("File size %d bytes\n", progress.totalSizeBytes());
@@ -79,7 +75,7 @@ public class StyxConsoleClient {
                     if (progress.processedBytes() != progress.totalSizeBytes()) {
                         terminal.writer().printf("\rRead %d bytes in %d ms", progress.processedBytes(), progress.timeDeltaMs());
                     } else {
-                        terminal.writer().printf("\nDone. Download speed %f b/s. \n", ((float)progress.processedBytes())/((float)progress.timeDeltaMs()/1000));
+                        terminal.writer().printf("\nDone. Download speed %f b/s. \n", ((float) progress.processedBytes()) / ((float) progress.timeDeltaMs() / 1000));
                     }
                     terminal.writer().flush();
                 },
@@ -91,15 +87,8 @@ public class StyxConsoleClient {
 
     private void listFiles(Connection connection,
                            Terminal terminal,
-                           Deque<String> currentPath) throws IOException {
-        // list files
-        StringBuilder path = new StringBuilder();
-        currentPath.forEach(it -> {
-            path.append('/');
-            path.append(it);
-        });
-        // TODO use connection.open()
-        var currentDir = connection.getRoot().walk(path.toString());
+                           String currentPath) throws IOException {
+        var currentDir = connection.open(currentPath);
         var files = currentDir.listStat();
         var dirs = files.stream().filter(it -> it.QID().type() == QidType.QTDIR)
                 .sorted(Comparator.comparing(StyxStat::name))
@@ -164,9 +153,10 @@ public class StyxConsoleClient {
             terminal.writer().println("Connected");
             File currentLocalDirectory = new File("");
             Deque<String> currentDirPath = new LinkedBlockingDeque<>();
+            String currentDirPathStr = "";
 
             while (true) {
-                var cmd = lineReader.readLine(currentDirPath + " >");
+                var cmd = lineReader.readLine("/" + currentDirPathStr + " >");
                 if (cmd.isEmpty())
                     continue;
                 try {
@@ -176,11 +166,11 @@ public class StyxConsoleClient {
                         break;
                     }
                     if (cmd.equalsIgnoreCase(COMMAND_LS)) {
-                        listFiles(connection, terminal, currentDirPath);
+                        listFiles(connection, terminal, currentDirPathStr);
                         continue;
                     }
                     if (cmd.equalsIgnoreCase(COMMAND_PWD)) {
-                        terminal.writer().println(currentDirPath);
+                        terminal.writer().println(currentDirPathStr);
                         continue;
                     }
                     if (cmd.equalsIgnoreCase(COMMAND_LPWD)) {
@@ -192,9 +182,19 @@ public class StyxConsoleClient {
                         var fileName = cmd.substring(COMMAND_DOWNLOAD.length()).trim();
                         getFile(connection,
                                 terminal,
-                                currentDirPath,
+                                currentDirPathStr,
                                 fileName,
-                                currentLocalDirectory);
+                                currentLocalDirectory.getAbsolutePath());
+                        continue;
+                    }
+                    if (cmd.startsWith(COMMAND_UPLOAD)) {
+                        // download specified file to current local directory
+                        var fileName = cmd.substring(COMMAND_UPLOAD.length()).trim();
+                        sendFile(connection,
+                                terminal,
+                                currentDirPathStr,
+                                fileName,
+                                currentLocalDirectory.getAbsolutePath());
                         continue;
                     }
                     if (cmd.startsWith(COMMAND_LCD)) {
@@ -219,13 +219,21 @@ public class StyxConsoleClient {
                         } else {
                             currentDirPath.addLast(subdir);
                         }
+                        StringBuilder path = new StringBuilder();
+                        currentDirPath.forEach(it -> {
+                            if (!path.isEmpty())
+                                path.append('/');
+                            path.append(it);
+                        });
+                        currentDirPathStr = path.toString();
                         // TODO check that folder exists
                         //currentDir = chdir(connection, terminal, currentDir, subdir);
                         continue;
                     }
                     terminal.writer().println("Unknown command " + cmd);
                 } catch (StyxException error) {
-                    terminal.writer().println("Got error: " + error.toString());
+                    terminal.writer().println("Got error: " + error);
+                    error.printStackTrace();
                 }
 
 
@@ -234,5 +242,37 @@ public class StyxConsoleClient {
             err.printStackTrace();
             System.exit(255);
         }
+    }
+
+    private void sendFile(Connection connection,
+                          Terminal terminal,
+                          String currentRemoteDirectory,
+                          String fileName,
+                          String currentLocalDirectory) {
+        terminal.writer().println("Uploading file \"" + fileName + "\" from local " +
+                currentLocalDirectory + " to remote /" +
+                currentRemoteDirectory);
+        final AtomicBoolean firstLine = new AtomicBoolean(true);
+        var uploadUsecase = new UploadFileUseCaseImpl();
+        uploadUsecase.upload(
+                connection,
+                new File(currentLocalDirectory, fileName),
+                currentRemoteDirectory + "/" + fileName,
+                progress -> {
+                    if (firstLine.compareAndSet(true, false)) {
+                        terminal.writer().printf("File size %d bytes\n", progress.totalSizeBytes());
+                    }
+                    if (progress.processedBytes() != progress.totalSizeBytes()) {
+                        terminal.writer().printf("\rRead %d bytes in %d ms", progress.processedBytes(), progress.timeDeltaMs());
+                    } else {
+                        terminal.writer().printf("\nDone. Upload speed %f b/s. \n", ((float) progress.processedBytes()) / ((float) progress.timeDeltaMs() / 1000));
+                    }
+                    terminal.writer().flush();
+                },
+                throwable -> {
+                    terminal.writer().println(throwable.toString());
+                }
+        );
+
     }
 }
