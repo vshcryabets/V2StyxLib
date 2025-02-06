@@ -175,32 +175,31 @@ public class StyxFile {
     /**
      * Open both streams - input and output.
      */
-    public DualStreams openForReadAndWrite() throws InterruptedException, StyxException, TimeoutException, IOException {
+    public DualStreams openForReadAndWrite() throws StyxException {
         return new DualStreams(openForRead(), openForWrite());
     }
 
     public OutputStream openForWrite()
             throws StyxException {
-        checkConnection();
-        long clonedFID = getCloneFID();
-        int iounit = open(ModeType.OWRITE, clonedFID);
-        return new BufferedOutputStream(new StyxUnbufferedOutputStream(clonedFID, mMessenger, mRecipient), iounit);
+        return new BufferedOutputStream(openForWriteUnbuffered());
     }
 
-    public OutputStream openForWriteUnbuffered()
-            throws StyxException, IOException {
+    public StyxUnbufferedOutputStream openForWriteUnbuffered()
+            throws StyxException {
         checkConnection();
         long clonedFID = getCloneFID();
-        int iounit = open(ModeType.OWRITE, clonedFID);
-        return new StyxUnbufferedOutputStream(clonedFID, mMessenger, mRecipient);
+        return new StyxUnbufferedOutputStream(clonedFID,
+                mMessenger,
+                mRecipient,
+                open(ModeType.OWRITE, clonedFID)
+        );
     }
-
 
     public void create(long permissions) throws StyxException {
         checkConnection();
         // reserve FID
         long tempFID = sendWalkMessage(mParentFID, "");
-        var tCreate = new StyxTCreateMessage(tempFID, mPath, permissions, ModeType.OREAD);
+        var tCreate = new StyxTCreateMessage(tempFID, mPath, permissions, ModeType.OWRITE);
         mMessenger
             .sendMessage(tCreate, mRecipient, mTimeout)
 //                .exceptionally()

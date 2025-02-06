@@ -12,7 +12,11 @@ import java.util.function.Consumer;
 public class DownloadFileUseCaseImpl implements DownloadFileUseCase {
 
     @Override
-    public void download(Connection connection, String srcFileName, File dstFile, Consumer<Progress> progress, Consumer<Throwable> error) {
+    public void download(Connection connection,
+                         String srcFileName,
+                         File dstFile,
+                         Consumer<Progress> progress,
+                         Consumer<Throwable> error) {
         try {
             var src = connection.open(srcFileName);
             if (!src.exists()) {

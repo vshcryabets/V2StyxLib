@@ -159,87 +159,87 @@ public class TwoWayExportTest {
         Assertions.assertEquals(0, clientDetailses.size());
     }
 
-    @Test
-    @Disabled
-    public void testChat() throws IOException, InterruptedException, TimeoutException, StyxException {
-        int count = 5;
-        final AtomicInteger syncObject = new AtomicInteger(0);
-
-        String[] messages = new String[count];
-        ConnectionWithExport[] clients = new ConnectionWithExport[count];
-        IChannelDriver[] clientDrivers = new TCPClientChannelDriver[count];
-        ChatStyxFile[] clientFiles = new ChatStyxFile[count];
-        final OutputStream[] outputs = new OutputStream[count];
-
-        // prepare server chat file
-        MemoryStyxFile chatServer = new ChatServerFile(outputs);
-        ((MemoryStyxDirectory) mServer.getRoot()).addFile(chatServer);
-
-        // prepare messages
-        for (int i = 0; i < count; i++) {
-            messages[i] = UUID.randomUUID().toString();
-        }
-        // create clients
-        for (int i = 0; i < count; i++) {
-            String prefix = "CL" + i;
-            var driver = new TCPClientChannelDriver(InetAddress.getByName("127.0.0.1"), PORT, false);
-            clientDrivers[i] = driver;
-            clients[i] = new ConnectionWithExport(new CredentialsImpl("user", ""), clientDrivers[i]);
-//            clientDrivers[i].setLogListener(new TestLogListener(prefix));
-            String marker = (i == 0 ? messages[count - 1] : messages[i - 1]);
-            clientFiles[i] = new ChatStyxFile("chat", messages[i], marker, (i == 0 ? syncObject : null), prefix);
-            MemoryStyxDirectory root = new MemoryStyxDirectory("clientroot",
-                    driver.getSerializer());
-            root.addFile(clientFiles[i]);
-            clients[i].export(root);
-            Assertions.assertTrue(clients[i].connect());
-            clientFiles[i].attachToServer(clients[i]);
-        }
-
-        // prepare server
-        List<IChannelDriver> drivers = mServer.getDrivers();
-        Collection<ClientDetails> clientDetails = drivers.get(0).getClients();
-        int pos = 0;
-        for (ClientDetails details : clientDetails) {
-            IClient reverseConnection = mServer.getReverseConnectionForClient(details,
-                    new CredentialsImpl(null, null));
-            Assertions.assertNotNull(reverseConnection,"Can't retrieve reverse connection to client");
-            reverseConnection.connect();
-            // get chat file for client
-            outputs[pos] = new StyxUnbufferedFileOutputStream(reverseConnection, "/chat");
-            pos++;
-        }
-
-        Thread.sleep(1000);
-        System.out.println("\t\t========================");
-        // lets go
-        clientFiles[0].sendMessage();
-        synchronized (syncObject) {
-            syncObject.wait(5000);
-        }
-        Assertions.assertTrue(syncObject.get() >= 100);
-
-        chatServer.release();
-
-        // close server connections
-        pos = 0;
-        for (ClientDetails details : clientDetails) {
-            System.out.printf("Trying to disconnect from %s\n", details.toString());
-            IClient reverseConnection = ((StyxUnbufferedFileOutputStream) outputs[pos]).getIClient();
-            outputs[pos].close();
-            reverseConnection.close();
-            pos++;
-        }
-
-        // close clients
-        for (int i = 0; i < count; i++) {
-            clients[i].close();
-        }
-        Thread.sleep(500);
-        clientDetails = drivers.get(0).getClients();
-        Assertions.assertNotNull(clientDetails);
-        Assertions.assertEquals(0, clientDetails.size());
-    }
+//    @Test
+//    @Disabled
+//    public void testChat() throws IOException, InterruptedException, TimeoutException, StyxException {
+//        int count = 5;
+//        final AtomicInteger syncObject = new AtomicInteger(0);
+//
+//        String[] messages = new String[count];
+//        ConnectionWithExport[] clients = new ConnectionWithExport[count];
+//        IChannelDriver[] clientDrivers = new TCPClientChannelDriver[count];
+//        ChatStyxFile[] clientFiles = new ChatStyxFile[count];
+//        final OutputStream[] outputs = new OutputStream[count];
+//
+//        // prepare server chat file
+//        MemoryStyxFile chatServer = new ChatServerFile(outputs);
+//        ((MemoryStyxDirectory) mServer.getRoot()).addFile(chatServer);
+//
+//        // prepare messages
+//        for (int i = 0; i < count; i++) {
+//            messages[i] = UUID.randomUUID().toString();
+//        }
+//        // create clients
+//        for (int i = 0; i < count; i++) {
+//            String prefix = "CL" + i;
+//            var driver = new TCPClientChannelDriver(InetAddress.getByName("127.0.0.1"), PORT, false);
+//            clientDrivers[i] = driver;
+//            clients[i] = new ConnectionWithExport(new CredentialsImpl("user", ""), clientDrivers[i]);
+////            clientDrivers[i].setLogListener(new TestLogListener(prefix));
+//            String marker = (i == 0 ? messages[count - 1] : messages[i - 1]);
+//            clientFiles[i] = new ChatStyxFile("chat", messages[i], marker, (i == 0 ? syncObject : null), prefix);
+//            MemoryStyxDirectory root = new MemoryStyxDirectory("clientroot",
+//                    driver.getSerializer());
+//            root.addFile(clientFiles[i]);
+//            clients[i].export(root);
+//            Assertions.assertTrue(clients[i].connect());
+//            clientFiles[i].attachToServer(clients[i]);
+//        }
+//
+//        // prepare server
+//        List<IChannelDriver> drivers = mServer.getDrivers();
+//        Collection<ClientDetails> clientDetails = drivers.get(0).getClients();
+//        int pos = 0;
+//        for (ClientDetails details : clientDetails) {
+//            IClient reverseConnection = mServer.getReverseConnectionForClient(details,
+//                    new CredentialsImpl(null, null));
+//            Assertions.assertNotNull(reverseConnection,"Can't retrieve reverse connection to client");
+//            reverseConnection.connect();
+//            // get chat file for client
+//            outputs[pos] = new StyxUnbufferedFileOutputStream(reverseConnection, "/chat");
+//            pos++;
+//        }
+//
+//        Thread.sleep(1000);
+//        System.out.println("\t\t========================");
+//        // lets go
+//        clientFiles[0].sendMessage();
+//        synchronized (syncObject) {
+//            syncObject.wait(5000);
+//        }
+//        Assertions.assertTrue(syncObject.get() >= 100);
+//
+//        chatServer.release();
+//
+//        // close server connections
+//        pos = 0;
+//        for (ClientDetails details : clientDetails) {
+//            System.out.printf("Trying to disconnect from %s\n", details.toString());
+//            IClient reverseConnection = ((StyxUnbufferedFileOutputStream) outputs[pos]).getIClient();
+//            outputs[pos].close();
+//            reverseConnection.close();
+//            pos++;
+//        }
+//
+//        // close clients
+//        for (int i = 0; i < count; i++) {
+//            clients[i].close();
+//        }
+//        Thread.sleep(500);
+//        clientDetails = drivers.get(0).getClients();
+//        Assertions.assertNotNull(clientDetails);
+//        Assertions.assertEquals(0, clientDetails.size());
+//    }
 
     private class ChatServerFile extends MemoryStyxFile {
         final OutputStream mOutputs[];
