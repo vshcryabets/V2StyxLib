@@ -4,6 +4,7 @@ import com.v2soft.styxlib.exceptions.StyxEOFException;
 import com.v2soft.styxlib.l5.IClient;
 import com.v2soft.styxlib.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.exceptions.StyxException;
+import com.v2soft.styxlib.l5.enums.FileMode;
 import com.v2soft.styxlib.l5.serialization.impl.StyxSerializerImpl;
 import com.v2soft.styxlib.l6.io.DualStreams;
 import com.v2soft.styxlib.io.StyxDataInputStream;
@@ -19,7 +20,6 @@ import com.v2soft.styxlib.l5.messages.StyxTWStatMessage;
 import com.v2soft.styxlib.l5.messages.StyxTWalkMessage;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
 import com.v2soft.styxlib.l5.messages.base.StyxTMessageFID;
-import com.v2soft.styxlib.l5.enums.FileMode;
 import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.l5.enums.ModeType;
 import com.v2soft.styxlib.l5.structs.StyxStat;
@@ -30,7 +30,6 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.TimeoutException;
 
 /**
  * @author V.Shcriyabets (vshcryabets@gmail.com)
@@ -271,15 +270,15 @@ public class StyxFile {
     }
 
     public void mkdir(long permissions) throws InterruptedException, StyxException {
-        permissions = FileMode.getPermissionsByMode(permissions) | FileMode.Directory.getMode();
+        permissions = permissions & FileMode.PERMISSION_BITMASK | FileMode.Directory;
         StyxTCreateMessage tCreate = new StyxTCreateMessage(mParentFID, getName(), permissions, ModeType.OREAD);
         mMessenger.sendMessage(tCreate, mRecipient, mTimeout).getResult();
     }
 
-    public boolean checkFileMode(FileMode mode)
+    public boolean checkFileMode(long mode)
             throws StyxException {
         StyxStat stat = getStat();
-        return mode.check(stat.mode());
+        return (mode & stat.mode()) != 0;
     }
 
     public boolean isDirectory()

@@ -2,11 +2,11 @@ package com.v2soft.styxlib.l6.vfs;
 
 import com.v2soft.styxlib.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.exceptions.StyxException;
+import com.v2soft.styxlib.l5.enums.FileMode;
+import com.v2soft.styxlib.l5.enums.ModeType;
 import com.v2soft.styxlib.l5.enums.QidType;
 import com.v2soft.styxlib.l5.serialization.IDataSerializer;
 import com.v2soft.styxlib.l5.serialization.impl.BufferWritterImpl;
-import com.v2soft.styxlib.l5.enums.FileMode;
-import com.v2soft.styxlib.l5.enums.ModeType;
 import com.v2soft.styxlib.l5.structs.StyxQID;
 import com.v2soft.styxlib.l5.structs.StyxStat;
 import com.v2soft.styxlib.server.ClientDetails;
@@ -44,7 +44,7 @@ extends DiskStyxFile {
 
     @Override
     public int getMode() {
-        return (int) (FileMode.Directory.getMode() | 0x01FF);
+        return (int) FileMode.Directory;
     }
 
     @Override
@@ -165,7 +165,7 @@ extends DiskStyxFile {
             throw StyxErrorMessageException.newInstance("Can't create file, already exists");
         }
         try {
-            if ( (permissions & FileMode.Directory.getMode()) != 0 ) {
+            if ( (permissions & FileMode.Directory) != 0 ) {
                 // create directory
                 if ( !newFile.mkdir() ) {
                     throw StyxErrorMessageException.newInstance("Can't create directory, unknown error.");

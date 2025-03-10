@@ -11,6 +11,7 @@ import com.v2soft.styxlib.l5.serialization.impl.BufferWritterImpl;
 import com.v2soft.styxlib.l5.serialization.impl.StyxSerializerImpl;
 import com.v2soft.styxlib.l5.structs.StyxQID;
 import com.v2soft.styxlib.l5.structs.StyxStat;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -48,7 +49,7 @@ public class MessageSerializerImplTest {
                 new StyxQID(QidType.QTFILE,
                         0x6A7470F1,
                         0x12309E51049E5104L),
-                (int) FileMode.ReadOwnerPermission.getMode(),
+                (int) FileMode.ReadOwnerPermission,
                 accessTime,
                 accessTime,
                 0x0FE70123L,
