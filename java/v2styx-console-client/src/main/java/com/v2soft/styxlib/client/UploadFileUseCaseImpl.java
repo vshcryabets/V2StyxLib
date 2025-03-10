@@ -19,7 +19,7 @@ public class UploadFileUseCaseImpl implements UploadFileUseCase {
                        Consumer<Throwable> errorHandler) {
         try {
             var dst = connection.open(dstFileName);
-            dst.create(FileMode.WriteOwnerPermission.getMode() | FileMode.ReadOwnerPermission.getMode());
+            dst.create(FileMode.WriteOwnerPermission | FileMode.ReadOwnerPermission);
             if (!dst.exists()) {
                 errorHandler.accept(new FileNotFoundException(String.format("File %s doesn't exists", dstFileName)));
                 return;

@@ -1,5 +1,11 @@
 package com.v2soft.styxlib;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import com.v2soft.styxlib.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.l5.Connection;
@@ -15,7 +21,12 @@ import com.v2soft.styxlib.server.StyxServerManager;
 import com.v2soft.styxlib.server.tcp.TCPClientChannelDriver;
 import com.v2soft.styxlib.server.tcp.TCPServerChannelDriver;
 import com.v2soft.styxlib.utils.MetricsAndStats;
-import org.junit.jupiter.api.*;
+
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,8 +39,6 @@ import java.util.UUID;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Logger;
 import java.util.zip.CRC32;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Client JUnit tests
@@ -93,8 +102,7 @@ public class ConnectionTest {
     @Test
     public void testFileCreation() throws IOException {
         final StyxFile newFile = mConnection.open(UUID.randomUUID().toString());
-        newFile.create(FileMode.ReadOthersPermission.getMode() |
-                FileMode.WriteOthersPermission.getMode());
+        newFile.create(FileMode.ReadOthersPermission | FileMode.WriteOthersPermission);
         final OutputStream out = newFile.openForWrite();
         assertNotNull(out);
         byte[] testArray = new byte[]{1, 3, 5, 7, 11, 13, 17, 19, 23, 29};
@@ -125,9 +133,9 @@ public class ConnectionTest {
         StyxFile dirBC = null;
         try {
             dirBC = mConnection.open(nameBC);
-            dirBC.create(FileMode.ReadOthersPermission.getMode() |
-                    FileMode.WriteOthersPermission.getMode() |
-                    FileMode.Directory.getMode());
+            dirBC.create(FileMode.ReadOthersPermission |
+                    FileMode.WriteOthersPermission |
+                    FileMode.Directory);
         } catch (StyxErrorMessageException e) {
             dirBC = null; // we should get an error
         }
@@ -140,15 +148,15 @@ public class ConnectionTest {
         final StyxFile dirAB = mConnection.open(nameAB);
 
 
-        dirA.create(FileMode.PERMISSION_BITMASK | FileMode.Directory.getMode());
-        dirB.create(FileMode.PERMISSION_BITMASK | FileMode.Directory.getMode());
-        dirAA.create(FileMode.PERMISSION_BITMASK | FileMode.Directory.getMode());
-        dirAB.create(FileMode.PERMISSION_BITMASK | FileMode.Directory.getMode());
+        dirA.create(FileMode.PERMISSION_BITMASK | FileMode.Directory);
+        dirB.create(FileMode.PERMISSION_BITMASK | FileMode.Directory);
+        dirAA.create(FileMode.PERMISSION_BITMASK | FileMode.Directory);
+        dirAB.create(FileMode.PERMISSION_BITMASK | FileMode.Directory);
         // test other way to create file (with specified parent)
         final StyxFile dirBA = new StyxFile(mConnection, nameBA, dirB.getFID());
         final StyxFile dirBB = new StyxFile(mConnection, nameBB, dirB.getFID());
-        dirBA.create(FileMode.PERMISSION_BITMASK | FileMode.Directory.getMode());
-        dirBB.create(FileMode.PERMISSION_BITMASK | FileMode.Directory.getMode());
+        dirBA.create(FileMode.PERMISSION_BITMASK | FileMode.Directory);
+        dirBB.create(FileMode.PERMISSION_BITMASK | FileMode.Directory);
 
         try {
             dirA.delete();
@@ -291,8 +299,8 @@ public class ConnectionTest {
     @Test
     public void testFileSeek() throws IOException, StyxException, InterruptedException, TimeoutException {
         final StyxFile newFile = mConnection.open(UUID.randomUUID().toString());
-        newFile.create(FileMode.ReadOthersPermission.getMode() |
-                FileMode.WriteOthersPermission.getMode());
+        newFile.create(FileMode.ReadOthersPermission |
+                FileMode.WriteOthersPermission);
         final OutputStream out = newFile.openForWrite();
         assertNotNull(out);
         // prepare random block

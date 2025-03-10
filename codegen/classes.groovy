@@ -69,6 +69,33 @@ messageType.with {
     add("Rwstat",127)
 }
 
+def fileMode = nsEnums.constantsBlock("FileMode")
+fileMode.with {
+    defaultType(DataType.int64.INSTANCE)
+    preferredRadix(16)
+    add("Directory",0x80000000L)
+    add("AppendOnly",0x40000000L)
+    add("ExclusiveUse",0x20000000L)
+    add("MountedChannel",0x10000000L)
+    add("AuthenticationFile",0x08000000L)
+    add("TemporaryFile",0x04000000L)
+    add("SymLinkFile",0x02000000)
+    add("LinkFile",0x01000000)
+    add("DeviceFile",0x00800000)
+    add("NamedPipeFile",0x00200000)
+    add("SocketFile",0x00100000)
+    add("ReadOwnerPermission",0x00000100L)
+    add("WriteOwnerPermission",0x00000080L)
+    add("ExecuteOwnerPermission",0x00000040L)
+    add("ReadGroupPermission",0x00000020L)
+    add("WriteGroupPermission",0x00000010L)
+    add("ExecuteGroupPermission",0x00000008L)
+    add("ReadOthersPermission",0x00000004L)
+    add("WriteOthersPermission",0x00000002L)
+    add("ExecuteOthersPermission",0x00000001L)
+    add("PERMISSION_BITMASK", 0x000001FFL)
+}
+
 def styxQid = nsStructs.dataClass("StyxQID")
 styxQid.with {
     addBlockComment("Styx QID structure")
