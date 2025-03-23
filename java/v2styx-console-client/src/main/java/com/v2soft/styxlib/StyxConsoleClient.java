@@ -1,15 +1,13 @@
 package com.v2soft.styxlib;
 
-import com.v2soft.styxlib.client.DownloadFileUseCase;
 import com.v2soft.styxlib.client.DownloadFileUseCaseImpl;
 import com.v2soft.styxlib.client.UploadFileUseCaseImpl;
 import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.l5.Connection;
 import com.v2soft.styxlib.l5.enums.QidType;
-import com.v2soft.styxlib.l5.serialization.IDataSerializer;
 import com.v2soft.styxlib.l5.structs.StyxStat;
-import com.v2soft.styxlib.l6.StyxFile;
 import com.v2soft.styxlib.library.types.impl.CredentialsImpl;
+import com.v2soft.styxlib.server.ClientsRepoImpl;
 import com.v2soft.styxlib.server.tcp.TCPClientChannelDriver;
 import org.jline.reader.LineReader;
 import org.jline.reader.LineReaderBuilder;
@@ -17,7 +15,6 @@ import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.util.ArrayList;
@@ -25,7 +22,6 @@ import java.util.Comparator;
 import java.util.Deque;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Consumer;
 import java.util.logging.Logger;
 
 /**
@@ -147,8 +143,9 @@ public class StyxConsoleClient {
                 .build();
         terminal.writer().println("Connection to the " + host + ":" + port);
         try {
-            var driver = new TCPClientChannelDriver(InetAddress.getByName(host), port, false);
-            var connection = new Connection(new CredentialsImpl("", ""), driver);
+            var clientsRepo = new ClientsRepoImpl();
+            var driver = new TCPClientChannelDriver(InetAddress.getByName(host), port, false, clientsRepo);
+            var connection = new Connection(new CredentialsImpl("", ""), driver, clientsRepo);
             connection.connect();
             terminal.writer().println("Connected");
             File currentLocalDirectory = new File("");

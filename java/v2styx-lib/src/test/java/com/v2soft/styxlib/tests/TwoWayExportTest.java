@@ -8,22 +8,19 @@ import com.v2soft.styxlib.l6.StyxFile;
 import com.v2soft.styxlib.l6.vfs.MemoryStyxDirectory;
 import com.v2soft.styxlib.l6.vfs.MemoryStyxFile;
 import com.v2soft.styxlib.library.types.impl.CredentialsImpl;
-import com.v2soft.styxlib.server.ClientDetails;
+import com.v2soft.styxlib.server.ClientsRepo;
+import com.v2soft.styxlib.server.ClientsRepoImpl;
 import com.v2soft.styxlib.server.IChannelDriver;
 import com.v2soft.styxlib.server.tcp.TCPClientChannelDriver;
 import com.v2soft.styxlib.server.tcp.TCPDualLinkServerManager;
 import com.v2soft.styxlib.server.tcp.TCPServerChannelDriver;
-
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetAddress;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
 import java.util.Collections;
@@ -41,7 +38,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class TwoWayExportTest {
     private static final int PORT = 10234;
     private TCPDualLinkServerManager mServer;
-    private Charset mCharset = Charset.forName("utf-8");
+    private final Charset mCharset = StandardCharsets.UTF_8;
+    private final ClientsRepo mClientsRepo = new ClientsRepoImpl();
 
     @BeforeEach
     public void setUp() throws Exception {
@@ -56,10 +54,10 @@ public class TwoWayExportTest {
     private void startServer() throws IOException, StyxException {
         MemoryStyxFile md5 = new MD5StyxFile();
         var localHost = InetAddress.getByName("127.0.0.1");
-        var serverDriver = new TCPServerChannelDriver(localHost, PORT, false);
+        var serverDriver = new TCPServerChannelDriver(localHost, PORT, false, mClientsRepo);
         MemoryStyxDirectory root = new MemoryStyxDirectory("root", serverDriver.getSerializer());
         root.addFile(md5);
-        mServer = new TCPDualLinkServerManager(root, Collections.singletonList(serverDriver));
+        mServer = new TCPDualLinkServerManager(root, Collections.singletonList(serverDriver), mClientsRepo);
         mServer.start();
     }
 
@@ -71,13 +69,14 @@ public class TwoWayExportTest {
         Assertions.assertNotNull(drivers);
         Assertions.assertEquals(1, drivers.size());
 
-        var driver = new TCPClientChannelDriver(InetAddress.getByName("127.0.0.1"), PORT, false);
+        var driver = new TCPClientChannelDriver(InetAddress.getByName("127.0.0.1"), PORT, false, mClientsRepo);
         MemoryStyxFile md5 = new MD5StyxFile();
         MemoryStyxDirectory root = new MemoryStyxDirectory("clientroot", driver.getSerializer());
         root.addFile(md5);
         ConnectionWithExport connection = new ConnectionWithExport(
                 new CredentialsImpl("user",""),
-                driver
+                driver,
+                mClientsRepo
         );
         connection.export(root);
 
@@ -87,8 +86,8 @@ public class TwoWayExportTest {
         ClientServerTest.checkMD5Hash(connection);
 
         // reverse test
-        Collection<ClientDetails> clientDetailses = drivers.get(0).getClients();
-        ClientDetails clientDetails = clientDetailses.iterator().next();
+        Collection<Integer> clientDetailses = drivers.get(0).getClients();
+        Integer clientDetails = clientDetailses.iterator().next();
         IClient reverseConnection = mServer.getReverseConnectionForClient(clientDetails,
                 new CredentialsImpl(null, null));
         Assertions.assertNotNull(reverseConnection, "Can't retrieve reverse connection to client");
@@ -110,18 +109,20 @@ public class TwoWayExportTest {
     public void testGetClientsFromClient() throws IOException, InterruptedException, TimeoutException, StyxException {
         IChannelDriver driver = new TCPClientChannelDriver(
                 InetAddress.getByName("127.0.0.1"), PORT,
-                false);
+                false,
+                mClientsRepo);
         ConnectionWithExport connection = new ConnectionWithExport(new CredentialsImpl("user",""),
-                driver);
+                driver,
+                mClientsRepo);
         Assertions.assertTrue(connection.connect());
-        Collection<ClientDetails> clientDetailses = driver.getClients();
+        Collection<Integer> clientDetailses = driver.getClients();
         Assertions.assertNotNull(clientDetailses);
         Assertions.assertEquals(1, clientDetailses.size());
-        ClientDetails pseudoClientDetails = clientDetailses.iterator().next();
+        Integer clientId = clientDetailses.iterator().next();
+        var pseudoClientDetails = mClientsRepo.getClient(clientId);
         Assertions.assertNotNull(pseudoClientDetails);
         Assertions.assertNotNull(pseudoClientDetails.getDriver());
         Assertions.assertEquals(driver, pseudoClientDetails.getDriver());
-        Assertions.assertEquals(TCPClientChannelDriver.PSEUDO_CLIENT_ID, pseudoClientDetails.getId());
         connection.close();
     }
 
@@ -134,17 +135,21 @@ public class TwoWayExportTest {
 
         IChannelDriver driver = new TCPClientChannelDriver(
                 InetAddress.getByName("127.0.0.1"), PORT,
-                false);
-        ConnectionWithExport connection = new ConnectionWithExport(new CredentialsImpl("user", ""), driver);
+                false,
+                mClientsRepo);
+        ConnectionWithExport connection = new ConnectionWithExport(new CredentialsImpl("user", ""), driver,
+                mClientsRepo);
         Assertions.assertTrue(connection.connect());
 
         IChannelDriver driver2 = new TCPClientChannelDriver(
                 InetAddress.getByName("127.0.0.1"), PORT,
-                false);
-        ConnectionWithExport connection2 = new ConnectionWithExport(new CredentialsImpl("user", ""), driver2);
+                false,
+                mClientsRepo);
+        ConnectionWithExport connection2 = new ConnectionWithExport(new CredentialsImpl("user", ""), driver2,
+                mClientsRepo);
         Assertions.assertTrue(connection2.connect());
 
-        Collection<ClientDetails> clientDetailses = drivers.get(0).getClients();
+        Collection<Integer> clientDetailses = drivers.get(0).getClients();
         Assertions.assertNotNull(clientDetailses);
         Assertions.assertEquals(2, clientDetailses.size());
 
@@ -258,7 +263,7 @@ public class TwoWayExportTest {
         }
 
         @Override
-        public int write(ClientDetails clientDetails, final byte[] data,
+        public int write(int cleintId, final byte[] data,
                          long offset) throws StyxErrorMessageException {
             String message = new String(data, mCharset);
             System.out.println(String.format("%d SERVER GOT %s", System.currentTimeMillis(), message));
@@ -333,7 +338,7 @@ public class TwoWayExportTest {
         }
 
         @Override
-        public int write(ClientDetails clientDetails, byte[] data,
+        public int write(int clientId, byte[] data,
                          long offset) throws StyxErrorMessageException {
             String message = new String(data, mCharset);
             System.out.println(String.format("%s GOT %s", mPrefix, message));

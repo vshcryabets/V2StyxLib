@@ -2,9 +2,6 @@ package com.v2soft.styxlib.l6.disk;
 
 import com.v2soft.styxlib.l5.enums.ModeType;
 import com.v2soft.styxlib.l6.vfs.DiskStyxFile;
-import com.v2soft.styxlib.server.ClientDetails;
-import com.v2soft.styxlib.server.EmptyChannelDriver;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -24,13 +21,13 @@ public class DiskStyxFileTest {
             outputStream.write(i);
         outputStream.close();
         var styxFile = new DiskStyxFile(testFile);
-        ClientDetails client = new ClientDetails(new EmptyChannelDriver(), 1);
-        styxFile.open(client, ModeType.OREAD);
+        var clientId = 1;
+        styxFile.open(clientId, ModeType.OREAD);
         var buffer = new byte[8192];
-        int read = styxFile.read(client, buffer, 0, 8192);
+        int read = styxFile.read(clientId, buffer, 0, 8192);
         Assertions.assertEquals(512, read);
-        read = styxFile.read(client, buffer, 512, 8192);
+        read = styxFile.read(clientId, buffer, 512, 8192);
         Assertions.assertEquals(0, read);
-        styxFile.close(client);
+        styxFile.close(clientId);
     }
 }

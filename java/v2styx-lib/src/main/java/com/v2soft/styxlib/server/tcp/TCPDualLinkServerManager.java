@@ -6,11 +6,10 @@ import com.v2soft.styxlib.l5.Connection;
 import com.v2soft.styxlib.l5.IClient;
 import com.v2soft.styxlib.l6.vfs.IVirtualStyxFile;
 import com.v2soft.styxlib.library.types.Credentials;
-import com.v2soft.styxlib.server.ClientDetails;
+import com.v2soft.styxlib.server.ClientsRepo;
 import com.v2soft.styxlib.server.IChannelDriver;
 import com.v2soft.styxlib.server.StyxServerManager;
 
-import java.io.IOException;
 import java.util.List;
 
 /**
@@ -25,9 +24,9 @@ public class TCPDualLinkServerManager extends StyxServerManager {
     protected TMessageTransmitter mReverseTransmitter;
 
     public TCPDualLinkServerManager(IVirtualStyxFile root,
-                                    List<IChannelDriver> drivers)
-            throws IOException {
-        super(root, drivers);
+                                    List<IChannelDriver> drivers,
+                                    ClientsRepo clientsRepo) {
+        super(root, drivers, clientsRepo);
     }
 
     @Override
@@ -35,14 +34,16 @@ public class TCPDualLinkServerManager extends StyxServerManager {
         return DUAL_LINK_PROTO;
     }
 
-    public synchronized  IClient getReverseConnectionForClient(ClientDetails client, Credentials credentials) {
+    public synchronized  IClient getReverseConnectionForClient(int clientId, Credentials credentials) {
         if ( mReverseAnswerProcessor == null ) {
-            mReverseAnswerProcessor = new RMessagesProcessor("RC"+client.toString());
-            mReverseTransmitter = new TMessageTransmitter(null);
+            mReverseAnswerProcessor = new RMessagesProcessor("RC"+clientId, mClientsRepo);
+            mReverseTransmitter = new TMessageTransmitter(null, mClientsRepo);
         }
-        IChannelDriver driver = client.getDriver();
-        Connection connection = new Connection(credentials, driver,
-                mReverseAnswerProcessor, mReverseTransmitter, client);
-        return connection;
+        var driver = mClientsRepo.getChannelDriver(clientId);
+        return new Connection(credentials,
+                driver,
+                mReverseAnswerProcessor,
+                mReverseTransmitter,
+                mClientsRepo);
     }
 }

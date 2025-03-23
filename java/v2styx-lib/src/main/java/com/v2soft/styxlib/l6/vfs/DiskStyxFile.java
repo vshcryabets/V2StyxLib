@@ -20,7 +20,7 @@ import java.util.Map;
  */
 public class DiskStyxFile extends MemoryStyxFile {
     protected File mFile;
-    protected Map<ClientDetails, RandomAccessFile> mFilesMap;
+    protected Map<Integer, RandomAccessFile> mFilesMap;
 
     public DiskStyxFile(File file) throws StyxException {
         super(file.getName());
@@ -28,7 +28,7 @@ public class DiskStyxFile extends MemoryStyxFile {
             throw new StyxException("File not exists");
         }
         mFile = file;
-        mFilesMap = new HashMap<ClientDetails, RandomAccessFile>();
+        mFilesMap = new HashMap<>();
     }
 
     @Override
@@ -70,7 +70,7 @@ public class DiskStyxFile extends MemoryStyxFile {
     }
 
     @Override
-    public boolean open(ClientDetails clientDetails, int mode) throws StyxException {
+    public boolean open(int clientId, int mode) throws StyxException {
         boolean canOpen = false;
         String ramode = null;
         switch (mode) {
@@ -95,16 +95,16 @@ public class DiskStyxFile extends MemoryStyxFile {
             } catch (FileNotFoundException e) {
                 throw new StyxException("File not found " + mFile.getName());
             }
-            mFilesMap.put(clientDetails, rf);
+            mFilesMap.put(clientId, rf);
         }
         return canOpen;
     }
 
     @Override
-    public int write(ClientDetails clientDetails, byte[] data, long offset)
+    public int write(int clientId, byte[] data, long offset)
             throws StyxErrorMessageException {
-        if ( mFilesMap.containsKey(clientDetails)) {
-            final RandomAccessFile rf = mFilesMap.get(clientDetails);
+        if ( mFilesMap.containsKey(clientId)) {
+            final RandomAccessFile rf = mFilesMap.get(clientId);
             try {
                 rf.seek(offset);
                 rf.write(data);
@@ -118,10 +118,10 @@ public class DiskStyxFile extends MemoryStyxFile {
     }
 
     @Override
-    public int read(ClientDetails clientDetails, byte[] outbuffer, long offset, int count)
+    public int read(int clientId, byte[] outbuffer, long offset, int count)
             throws StyxErrorMessageException {
-        if ( mFilesMap.containsKey(clientDetails)) {
-            final RandomAccessFile rf = mFilesMap.get(clientDetails);
+        if ( mFilesMap.containsKey(clientId)) {
+            final RandomAccessFile rf = mFilesMap.get(clientId);
             try {
                 rf.seek(offset);
                 var result = rf.read(outbuffer, 0, count);
@@ -137,9 +137,9 @@ public class DiskStyxFile extends MemoryStyxFile {
     }
 
     @Override
-    public void close(ClientDetails clientDetails) {
-        if ( mFilesMap.containsKey(clientDetails)) {
-            RandomAccessFile rf = mFilesMap.get(clientDetails);
+    public void close(int clientId) {
+        if ( mFilesMap.containsKey(clientId)) {
+            RandomAccessFile rf = mFilesMap.get(clientId);
             mFilesMap.remove(rf);
             try {
                 rf.close();
@@ -150,8 +150,8 @@ public class DiskStyxFile extends MemoryStyxFile {
     }
 
     @Override
-    public boolean delete(ClientDetails clientDetails) {
-        super.delete(clientDetails);
+    public boolean delete(int clientId) {
+        super.delete(clientId);
         return mFile.delete();
     }
 }

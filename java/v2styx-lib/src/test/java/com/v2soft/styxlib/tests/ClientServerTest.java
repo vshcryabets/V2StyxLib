@@ -6,8 +6,9 @@ import com.v2soft.styxlib.l5.IClient;
 import com.v2soft.styxlib.l6.StyxFile;
 import com.v2soft.styxlib.l6.io.DualStreams;
 import com.v2soft.styxlib.l6.vfs.MemoryStyxDirectory;
-import com.v2soft.styxlib.l6.vfs.MemoryStyxFile;
 import com.v2soft.styxlib.library.types.impl.CredentialsImpl;
+import com.v2soft.styxlib.server.ClientsRepo;
+import com.v2soft.styxlib.server.ClientsRepoImpl;
 import com.v2soft.styxlib.server.StyxServerManager;
 import com.v2soft.styxlib.server.tcp.TCPClientChannelDriver;
 import com.v2soft.styxlib.server.tcp.TCPServerChannelDriver;
@@ -17,10 +18,8 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.TimeoutException;
@@ -35,9 +34,11 @@ import static org.junit.jupiter.api.Assertions.*;
 public class ClientServerTest {
     private static final int PORT = 10234;
     private StyxServerManager mServer;
+    private ClientsRepo mClientsRepo;
 
     @BeforeEach
     public void setUp() throws Exception {
+        mClientsRepo = new ClientsRepoImpl();
         startServer();
     }
 
@@ -49,12 +50,13 @@ public class ClientServerTest {
     private void startServer() throws IOException {
         var md5 = new MD5StyxFile();
         var localHost = InetAddress.getByName("127.0.0.1");
-        var serverDriver = new TCPServerChannelDriver(localHost, PORT, false);
+        var serverDriver = new TCPServerChannelDriver(localHost, PORT, false, mClientsRepo);
         var root = new MemoryStyxDirectory("root", serverDriver.getSerializer());
         root.addFile(md5);
         mServer = new StyxServerManager(
                 root,
-                List.of(serverDriver));
+                List.of(serverDriver),
+                mClientsRepo);
         mServer.start();
     }
 
@@ -65,7 +67,8 @@ public class ClientServerTest {
         IClient connection = new Connection(
                 new CredentialsImpl("user", ""),
                 new TCPClientChannelDriver(
-                        InetAddress.getByName("127.0.0.1"), PORT, false));
+                        InetAddress.getByName("127.0.0.1"), PORT, false, mClientsRepo),
+                mClientsRepo);
         assertTrue(connection.connect());
         checkMD5Hash(connection);
         connection.close();
@@ -95,7 +98,8 @@ public class ClientServerTest {
         Connection connection = new Connection(
                 new CredentialsImpl("user", ""),
                 new TCPClientChannelDriver(
-                        InetAddress.getByName("127.0.0.1"), PORT, false));
+                        InetAddress.getByName("127.0.0.1"), PORT, false, mClientsRepo),
+                mClientsRepo);
         assertTrue(connection.connect());
 
         StyxFile rootDir = connection.getRoot();

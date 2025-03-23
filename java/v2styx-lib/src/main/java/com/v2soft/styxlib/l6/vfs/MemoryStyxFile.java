@@ -97,7 +97,7 @@ public class MemoryStyxFile implements IVirtualStyxFile {
     }
 
     @Override
-    public boolean open(ClientDetails clientDetails, int mode) throws StyxException {
+    public boolean open(int clientId, int mode) throws StyxException {
         return ( ( mode == ModeType.OREAD ) ||
                 ( mode == ModeType.OWRITE ) ||
                 ( mode == ModeType.ORDWR ) );
@@ -109,19 +109,19 @@ public class MemoryStyxFile implements IVirtualStyxFile {
         return this;
     }
 
-    public int write(ClientDetails clientDetails, byte[] data,
+    public int write(int clientId, byte[] data,
                      long offset) throws StyxErrorMessageException {
         return 0;
     }
 
     @Override
-    public int read(ClientDetails clientDetails, byte[] outbuffer, long offset,
+    public int read(int clientId, byte[] outbuffer, long offset,
                      int count) throws StyxErrorMessageException {
         return 0;
     }
 
     @Override
-    public void close(ClientDetails clientDetails) {
+    public void close(int clientId) {
     }
 
     protected int stringReply(String value, byte[] buffer, Charset charset) {
@@ -148,7 +148,7 @@ public class MemoryStyxFile implements IVirtualStyxFile {
     }
 
     @Override
-    public void onConnectionOpened(ClientDetails client) {
+    public void onConnectionOpened(int clientId) {
         // ok, nothing to do
     }
 
@@ -159,8 +159,8 @@ public class MemoryStyxFile implements IVirtualStyxFile {
     }
 
     @Override
-    public boolean delete(ClientDetails clientDetails) {
-        close(clientDetails);
+    public boolean delete(int clientId) {
+        close(clientId);
         return false;
     }
 

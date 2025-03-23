@@ -23,18 +23,18 @@ public class StyxUnbufferedOutputStream extends OutputStream {
     protected long mFID;
     protected IMessageTransmitter mMessenger;
     protected long mFileOffset = 0;
-    protected ClientDetails mRecipient;
+    protected int mRecipient;
     private int mIOUnitSize;
 
     public StyxUnbufferedOutputStream(long fid,
                                       IMessageTransmitter messenger,
-                                      ClientDetails recipient,
+                                      int recipient,
                                       int ioUnit) {
         if ( messenger == null ) {
             throw new NullPointerException("messenger is null");
         }
-        if ( recipient == null ) {
-            throw new NullPointerException("recipient is null");
+        if ( recipient < 0 ) {
+            throw new NullPointerException("recipient negative");
         }
         mSingleByteArray = new byte[1];
         MetricsAndStats.byteArrayAllocation++;

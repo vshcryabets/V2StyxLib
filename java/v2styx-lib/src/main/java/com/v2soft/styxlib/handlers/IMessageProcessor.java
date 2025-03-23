@@ -1,11 +1,8 @@
 package com.v2soft.styxlib.handlers;
 
-import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
-import com.v2soft.styxlib.server.ClientDetails;
 
 import java.io.Closeable;
-import java.io.IOException;
 
 /**
  * Created by V.Shcryabets on 5/22/14.
@@ -13,10 +10,8 @@ import java.io.IOException;
  * @author V.Shcryabets (vshcryabets@gmail.com)
  */
 public interface IMessageProcessor extends Closeable {
-    void addClient(ClientDetails state);
-    void removeClient(ClientDetails state);
-    void postPacket(StyxMessage message, ClientDetails target);
-    void processPacket(StyxMessage message, ClientDetails target) throws StyxException;
+    void onClientRemoved(int clientId);
+    void onClientMessage(StyxMessage message, int clientId);
     int getReceivedPacketsCount();
     int getReceivedErrorPacketsCount();
 }
