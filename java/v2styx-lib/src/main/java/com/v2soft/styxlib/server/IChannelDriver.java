@@ -22,7 +22,7 @@ public interface IChannelDriver extends Closeable, IMessageTransmitter {
      * Get all active clients.
      * @return all active clients.
      */
-    Collection<ClientDetails> getClients();
+    Collection<Integer> getClients();
 
     boolean isConnected();
     boolean isStarted();

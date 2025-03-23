@@ -3,6 +3,8 @@ package com.v2soft.folderserver;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.v2soft.styxlib.l6.vfs.DiskStyxDirectory;
+import com.v2soft.styxlib.server.ClientsRepo;
+import com.v2soft.styxlib.server.ClientsRepoImpl;
 import com.v2soft.styxlib.server.StyxServerManager;
 import com.v2soft.styxlib.server.tcp.TCPClientDetails;
 import com.v2soft.styxlib.server.tcp.TCPServerChannelDriver;
@@ -59,13 +61,14 @@ public class FolderServerSample {
         LineReader lineReader = LineReaderBuilder.builder()
                 .terminal(terminal)
                 .build();
-
+        var clientsRepo = new ClientsRepoImpl();
         var driver = new TCPServerChannelDriver(
                 InetAddress.getByName(configuration.interfaces().get(0)),
                 configuration.port(),
-                false);
+                false,
+                clientsRepo);
         var root = new DiskStyxDirectory(new File(configuration.exportPath()), driver.getSerializer());
-        var mServer = new StyxServerManager(root, List.of(driver));
+        var mServer = new StyxServerManager(root, List.of(driver), clientsRepo);
         mServer.start();
         System.out.println("Test server listening on " + configuration.interfaces().get(0) + ":"
                 + configuration.port() + " share folder " + configuration.exportPath());
@@ -78,7 +81,7 @@ public class FolderServerSample {
                 showCommandsHelp(terminal);
                 continue;
             } else if (cmd.equalsIgnoreCase(CMD_CLIENTS)) {
-                listClients(terminal, mServer);
+                listClients(terminal, mServer, clientsRepo);
                 continue;
             } else if (cmd.equalsIgnoreCase(CMD_IP)) {
                 showInterfaces(terminal, mServer);
@@ -93,16 +96,17 @@ public class FolderServerSample {
         mServer.joinThreads();
     }
 
-    private static void listClients(Terminal terminal, StyxServerManager server) {
+    private static void listClients(Terminal terminal, StyxServerManager server, ClientsRepo clientsRepo) {
         for (var driver : server.getDrivers()) {
             terminal.writer().println("ID\tName\tAddress");
-            for (var client : driver.getClients()) {
+            for (var clientId : driver.getClients()) {
+                var client = clientsRepo.getClient(clientId);
                 terminal.writer().print(client.getId());
                 terminal.writer().print("\t");
                 terminal.writer().print(client.getCredentials().getUserName());
                 terminal.writer().print("\t");
                 if (client instanceof TCPClientDetails) {
-                    terminal.writer().print(client.toString());
+                    terminal.writer().print(client);
                 }
                 terminal.writer().println(" .");
             }

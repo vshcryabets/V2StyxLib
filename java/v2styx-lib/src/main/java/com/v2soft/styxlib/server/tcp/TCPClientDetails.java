@@ -31,8 +31,8 @@ public class TCPClientDetails extends ClientDetails {
     protected BufferReaderImpl mReader;
     protected InChannel mChannel;
 
-    public TCPClientDetails(SocketChannel channel, IChannelDriver driver, int iounit, int id) {
-        super(driver, id);
+    public TCPClientDetails(SocketChannel channel, IChannelDriver driver, int iounit) {
+        super(driver);
         if ( channel == null ) throw new NullPointerException("Client channel can't be null");
         mTcpChannel = channel;
         mChannel = dst -> mTcpChannel.read(dst);

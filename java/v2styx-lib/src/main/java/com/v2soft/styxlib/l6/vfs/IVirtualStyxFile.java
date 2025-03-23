@@ -48,21 +48,21 @@ public interface IVirtualStyxFile {
      *  OCEXEC  = 32 // or'ed in, close on exec
      *  ORCLOSE = 64 // or'ed in, remove on close
      *  Flags for the mode field in Topen and Tcreate messages
-     * @throws IOException
+     * @throws StyxException
      * @return true if file was successfully opened
      */
-    boolean open(ClientDetails clientDetails, int mode) throws StyxException;
+    boolean open(int clientId, int mode) throws StyxException;
     /**
      * Close file
      */
-    void close(ClientDetails clientDetails);
+    void close(int clientId);
     /**
      * Read from file
      * @param offset offset from begining of the file
      * @param count number of bytes to read
      * @return number of bytes that was readed into the buffer
      */
-    int read(ClientDetails clientDetails, byte[] buffer, long offset, int count) throws StyxErrorMessageException;
+    int read(int clientId, byte[] buffer, long offset, int count) throws StyxErrorMessageException;
     IVirtualStyxFile walk(Iterator<String> pathElements, List<StyxQID> qids)
             throws StyxErrorMessageException;
     /**
@@ -72,13 +72,13 @@ public interface IVirtualStyxFile {
      * @return return the number of bytes written
      * @throws StyxErrorMessageException
      */
-    int write(ClientDetails clientDetails, byte[] data, long offset) throws StyxErrorMessageException;
+    int write(int clientId, byte[] data, long offset) throws StyxErrorMessageException;
 
     /**
      * Will be fired when client connect to this server
      * @param client client information
      */
-    void onConnectionOpened(ClientDetails client);
+    void onConnectionOpened(int clientId);
 
     /**
      * Create new child file
@@ -92,7 +92,7 @@ public interface IVirtualStyxFile {
     /**
      * Delete this file
      */
-    boolean delete(ClientDetails clientDetails);
+    boolean delete(int clientId);
 
     /**
      * Release all resources.

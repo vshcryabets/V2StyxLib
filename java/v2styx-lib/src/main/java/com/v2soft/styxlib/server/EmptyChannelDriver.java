@@ -27,7 +27,7 @@ public class EmptyChannelDriver implements IChannelDriver {
     }
 
     @Override
-    public Collection<ClientDetails> getClients() {
+    public Collection<Integer> getClients() {
         return List.of();
     }
 
@@ -68,7 +68,7 @@ public class EmptyChannelDriver implements IChannelDriver {
 
     @Override
     public <R extends StyxMessage> Future<R> sendMessage(StyxMessage answer,
-                                                         ClientDetails recipient,
+                                                         int recipient,
                                                          long timeout) throws StyxException {
         throw new StyxException("Not implemented");
     }

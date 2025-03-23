@@ -24,20 +24,20 @@ public class StyxUnbufferedInputStream extends InputStream {
     private IMessageTransmitter mMessenger;
     private long mFileOffset = 0;
     private int mIOUnitSize;
-    protected ClientDetails mRecepient;
+    protected int mRecepient;
 
     public StyxUnbufferedInputStream(long file,
                                      IMessageTransmitter messenger,
                                      int iounit,
-                                     ClientDetails recepient) {
-        if ( recepient == null ) {
-            throw new NullPointerException("recepient is null");
+                                     int clientId) {
+        if ( clientId < 0 ) {
+            throw new NullPointerException("clientId is negative");
         }
         if ( messenger == null ) {
             throw new NullPointerException("messenger is null");
         }
         MetricsAndStats.byteArrayAllocationIo++;
-        mRecepient = recepient;
+        mRecepient = clientId;
         mIOUnitSize = iounit;
         mFID = file;
         mMessenger = messenger;

@@ -6,6 +6,7 @@ import com.v2soft.styxlib.l5.messages.base.StyxMessage;
 import com.v2soft.styxlib.l5.messages.base.StyxTMessage;
 import com.v2soft.styxlib.l5.messages.base.StyxTMessageFID;
 import com.v2soft.styxlib.server.ClientDetails;
+import com.v2soft.styxlib.server.ClientsRepo;
 
 import java.util.Map;
 
@@ -15,39 +16,42 @@ import java.util.Map;
 public class RMessagesProcessor extends QueueMessagesProcessor implements IMessageProcessor {
     protected int mReceivedCount, mErrorCount;
     protected String mTag;
+    protected ClientsRepo mClientsRepo;
 
-    public RMessagesProcessor(String tag) {
+    public RMessagesProcessor(String tag, ClientsRepo clientsRepo) {
         super();
         mTag = tag;
+        mClientsRepo = clientsRepo;
     }
 
     @Override
-    public void addClient(ClientDetails state) {
-
-    }
-
-    @Override
-    public void removeClient(ClientDetails state) {
+    public void addClient(int clientId) {
 
     }
 
     @Override
-    public void processPacket(StyxMessage message, ClientDetails client) {
+    public void removeClient(int clientId) {
+
+    }
+
+    @Override
+    public void processPacket(StyxMessage message, int clientId) {
         mReceivedCount++;
         int tag = message.getTag();
-        final Map<Integer, StyxTMessage> clientMessagesMap = client.getPolls().getMessagesMap();
+        final var polls = mClientsRepo.getPolls(clientId);
+        final Map<Integer, StyxTMessage> clientMessagesMap = polls.getMessagesMap();
         if (!clientMessagesMap.containsKey(tag)) {
             // we didn't send T message with such tag, so ignore this R message
-            System.err.printf("%d\tGot (%s) unknown R message from client %s\n", System.currentTimeMillis(),
+            System.err.printf("%d\tGot (%s) unknown R message from client %d\n", System.currentTimeMillis(),
                     mTag,
-                    client.toString());
+                    clientId);
             return;
         }
         final StyxTMessage tMessage = clientMessagesMap.get(tag);
         // TODO i'm not sure that this is proper place for that logic
         if (tMessage.getType() == MessageType.Tclunk ||
                 tMessage.getType() == MessageType.Tremove) {
-            client.getPolls().releaseFID((StyxTMessageFID) tMessage);
+            polls.releaseFID((StyxTMessageFID) tMessage);
         }
         try {
             tMessage.setAnswer(message);
@@ -57,7 +61,7 @@ public class RMessagesProcessor extends QueueMessagesProcessor implements IMessa
         if (message.getType() == MessageType.Rerror) {
             mErrorCount++;
         }
-        client.getPolls().releaseTag(tag);
+        polls.releaseTag(tag);
     }
 
     @Override

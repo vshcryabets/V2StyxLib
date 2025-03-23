@@ -5,8 +5,7 @@ import com.v2soft.styxlib.l5.enums.Checks;
 import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
 import com.v2soft.styxlib.l5.messages.base.StyxTMessage;
-import com.v2soft.styxlib.server.ClientDetails;
-import com.v2soft.styxlib.server.IChannelDriver;
+import com.v2soft.styxlib.server.ClientsRepo;
 import com.v2soft.styxlib.utils.Future;
 
 /**
@@ -20,37 +19,39 @@ public class TMessageTransmitter implements IMessageTransmitter {
 
     protected int mTransmittedCount, mErrorCount;
     protected Listener mListener;
+    protected ClientsRepo mClientsRepo;
 
-    public TMessageTransmitter(Listener listener) {
+    public TMessageTransmitter(Listener listener, ClientsRepo clientsRepo) {
         mListener = listener;
+        mClientsRepo = clientsRepo;
     }
 
     @Override
     public <R extends StyxMessage> Future<R> sendMessage(
             StyxMessage message,
-            ClientDetails recipient,
+            int clientId,
             long timeout
             )
             throws StyxException {
         if ( !Checks.isTMessage(message.getType())) {
             throw new StyxException("Can't sent RMessage");
         }
-        if (recipient == null) {
-            throw new StyxException("Recipient is null");
+        if (clientId < 0) {
+            throw new StyxException("clientId is negative");
         }
-
-        IChannelDriver driver = recipient.getDriver();
+        final var driver = mClientsRepo.getChannelDriver(clientId);
+        final var polls = mClientsRepo.getPolls(clientId);
         if (!driver.isConnected()) throw new StyxException("Not connected to server");
 
         // set message tag
         int tag = StyxMessage.NOTAG;
         if (message.getType() != MessageType.Tversion) {
-            tag = recipient.getPolls().getTagPoll().getFreeItem();
+            tag = mClientsRepo.getPolls(clientId).getTagPoll().getFreeItem();
         }
         message.setTag((short) tag);
-        recipient.getPolls().getMessagesMap().put(tag, (StyxTMessage) message);
+        polls.getMessagesMap().put(tag, (StyxTMessage) message);
         mTransmittedCount++;
-        return driver.sendMessage(message, recipient, timeout);
+        return driver.sendMessage(message, clientId, timeout);
     }
 
     @Override

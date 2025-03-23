@@ -2,7 +2,6 @@ package com.v2soft.styxlib.handlers;
 
 import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
-import com.v2soft.styxlib.server.ClientDetails;
 
 import java.io.IOException;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -17,7 +16,7 @@ public abstract class QueueMessagesProcessor implements IMessageProcessor {
 
     private class Pair {
         public StyxMessage mMessage;
-        public ClientDetails mTransmitter;
+        public int mClientId;
     }
 
     public QueueMessagesProcessor() {
@@ -27,10 +26,10 @@ public abstract class QueueMessagesProcessor implements IMessageProcessor {
     }
 
     @Override
-    public void postPacket(StyxMessage message, ClientDetails target) {
+    public void postPacket(StyxMessage message, int clientId) {
         Pair pair = new Pair();
         pair.mMessage = message;
-        pair.mTransmitter = target;
+        pair.mClientId = clientId;
         mQueue.offer(pair);
     }
 
@@ -52,7 +51,7 @@ public abstract class QueueMessagesProcessor implements IMessageProcessor {
                     Pair pair = mQueue.poll(1, TimeUnit.SECONDS);
                     if ( pair != null ) {
                         try {
-                            processPacket(pair.mMessage, pair.mTransmitter);
+                            processPacket(pair.mMessage, pair.mClientId);
                         } catch (StyxException e) {
                             e.printStackTrace();
                         }

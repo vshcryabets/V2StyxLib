@@ -18,41 +18,41 @@ import java.util.HashMap;
 public class MD5StyxFile extends MemoryStyxFile {
     public static final String FILE_NAME = "md5file";
 
-    protected HashMap<ClientDetails, MessageDigest> mClientsMap = new HashMap<ClientDetails, MessageDigest>();
+    protected HashMap<Integer, MessageDigest> mClientsMap = new HashMap<>();
 
     public MD5StyxFile() {
         super(FILE_NAME);
     }
 
     @Override
-    public boolean open(ClientDetails clientDetails, int mode)
+    public boolean open(int clientId, int mode)
             throws StyxException {
         try {
             MessageDigest md = MessageDigest.getInstance("MD5");
-            mClientsMap.put(clientDetails, md);
+            mClientsMap.put(clientId, md);
         } catch (NoSuchAlgorithmException e) {
             return false;
         }
-        return super.open(clientDetails, mode);
+        return super.open(clientId, mode);
     }
     @Override
-    public void close(ClientDetails clientDetails) {
-        mClientsMap.remove(clientDetails);
-        super.close(clientDetails);
+    public void close(int clientId) {
+        mClientsMap.remove(clientId);
+        super.close(clientId);
     }
     @Override
-    public int write(ClientDetails clientDetails, byte[] data, long offset)
+    public int write(int clientId, byte[] data, long offset)
             throws StyxErrorMessageException {
-        if ( mClientsMap.containsKey(clientDetails) ) {
-            mClientsMap.get(clientDetails).update(data, 0, data.length);
+        if ( mClientsMap.containsKey(clientId) ) {
+            mClientsMap.get(clientId).update(data, 0, data.length);
         }
-        return super.write(clientDetails, data, offset);
+        return super.write(clientId, data, offset);
     }
     @Override
-    public int read(ClientDetails clientDetails, byte[] outbuffer, long offset, int count)
+    public int read(int clientId, byte[] outbuffer, long offset, int count)
             throws StyxErrorMessageException {
-        if ( mClientsMap.containsKey(clientDetails) ) {
-            byte[] digest = mClientsMap.get(clientDetails).digest();
+        if ( mClientsMap.containsKey(clientId) ) {
+            byte[] digest = mClientsMap.get(clientId).digest();
             if (count < digest.length) {
                 return 0;
             } else {
@@ -60,6 +60,6 @@ public class MD5StyxFile extends MemoryStyxFile {
                 return digest.length;
             }
         }
-        return super.read(clientDetails, outbuffer, offset, count);
+        return super.read(clientId, outbuffer, offset, count);
     }
 }

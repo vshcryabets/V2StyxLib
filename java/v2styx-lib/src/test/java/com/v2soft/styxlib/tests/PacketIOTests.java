@@ -7,7 +7,8 @@ import com.v2soft.styxlib.l6.StyxFile;
 import com.v2soft.styxlib.l6.vfs.MemoryStyxDirectory;
 import com.v2soft.styxlib.l6.vfs.MemoryStyxFile;
 import com.v2soft.styxlib.library.types.impl.CredentialsImpl;
-import com.v2soft.styxlib.server.ClientDetails;
+import com.v2soft.styxlib.server.ClientsRepo;
+import com.v2soft.styxlib.server.ClientsRepoImpl;
 import com.v2soft.styxlib.server.StyxServerManager;
 import com.v2soft.styxlib.server.tcp.TCPClientChannelDriver;
 import com.v2soft.styxlib.server.tcp.TCPServerChannelDriver;
@@ -39,6 +40,7 @@ public class PacketIOTests {
     private static final int PORT = 10234;
     private static final String FILE_NAME = "md5file";
     private StyxServerManager mServer;
+    private ClientsRepo mClientsRepo = new ClientsRepoImpl();
 
     @BeforeEach
     public void setUp() throws Exception {
@@ -52,37 +54,37 @@ public class PacketIOTests {
 
     private void startServer() throws StyxException, UnknownHostException {
         MemoryStyxFile md5 = new MemoryStyxFile(FILE_NAME){
-            protected HashMap<ClientDetails, MessageDigest> mClientsMap = new HashMap<ClientDetails, MessageDigest>();
+            protected HashMap<Integer, MessageDigest> mClientsMap = new HashMap<>();
             @Override
-            public boolean open(ClientDetails client, int mode)
+            public boolean open(int clientId, int mode)
                     throws StyxException {
                 try {
                     MessageDigest md = MessageDigest.getInstance("MD5");
-                    mClientsMap.put(client, md);
+                    mClientsMap.put(clientId, md);
                 } catch (NoSuchAlgorithmException e) {
                     return false;
                 }
-                return super.open(client, mode);
+                return super.open(clientId, mode);
             }
             @Override
-            public void close(ClientDetails client) {
-                mClientsMap.remove(client);
-                super.close(client);
+            public void close(int clientId) {
+                mClientsMap.remove(clientId);
+                super.close(clientId);
             }
             @Override
-            public int write(ClientDetails client, byte[] data, long offset)
+            public int write(int clientId, byte[] data, long offset)
                     throws StyxErrorMessageException {
-                if ( mClientsMap.containsKey(client) ) {
-                    mClientsMap.get(client).reset();
-                    mClientsMap.get(client).update(data);
+                if ( mClientsMap.containsKey(clientId) ) {
+                    mClientsMap.get(clientId).reset();
+                    mClientsMap.get(clientId).update(data);
                 }
-                return super.write(client, data, offset);
+                return super.write(clientId, data, offset);
             }
             @Override
-            public int read(ClientDetails client, byte[] outbuffer, long offset, int count)
+            public int read(int clientId, byte[] outbuffer, long offset, int count)
                     throws StyxErrorMessageException {
-                if ( mClientsMap.containsKey(client) ) {
-                    byte[] digest = mClientsMap.get(client).digest();
+                if ( mClientsMap.containsKey(clientId) ) {
+                    byte[] digest = mClientsMap.get(clientId).digest();
                     if (count < digest.length) {
                         return 0;
                     } else {
@@ -90,16 +92,17 @@ public class PacketIOTests {
                         return digest.length;
                     }
                 }
-                return super.read(client, outbuffer, offset, count);
+                return super.read(clientId, outbuffer, offset, count);
             }
         };
         var localHost = InetAddress.getByName("127.0.0.1");
-        var serverDriver = new TCPServerChannelDriver(localHost, PORT, false);
+        var serverDriver = new TCPServerChannelDriver(localHost, PORT, false, mClientsRepo);
         var root = new MemoryStyxDirectory("root", serverDriver.getSerializer());
         root.addFile(md5);
         mServer = new StyxServerManager(
                 root,
-                Arrays.asList(serverDriver));
+                Arrays.asList(serverDriver),
+                mClientsRepo);
         mServer.start();
     }
 
@@ -111,7 +114,8 @@ public class PacketIOTests {
 
         Connection mConnection = new Connection(new CredentialsImpl("user", ""),
                 new TCPClientChannelDriver(
-                        InetAddress.getByName("localhost"), PORT, false));
+                        InetAddress.getByName("localhost"), PORT, false, mClientsRepo),
+                mClientsRepo);
         byte[] someData = new byte[1024];
         byte [] remoteHash = new byte[16];
 

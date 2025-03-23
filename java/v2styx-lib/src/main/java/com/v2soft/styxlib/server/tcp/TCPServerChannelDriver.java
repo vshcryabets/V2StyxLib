@@ -2,6 +2,7 @@ package com.v2soft.styxlib.server.tcp;
 
 import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.server.ClientDetails;
+import com.v2soft.styxlib.server.ClientsRepo;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -22,11 +23,13 @@ public class TCPServerChannelDriver extends TCPChannelDriver {
     protected ServerSocketChannel mChannel;
     protected Selector mSelector;
     protected Stack<SocketChannel> mReadable;
-    protected Map<SocketChannel, ClientDetails> mClientStatesMap;
-    protected int mLastClientId = 1;
+    protected Map<SocketChannel, Integer> mClientStatesMap;
 
-    public TCPServerChannelDriver(InetAddress address, int port, boolean ssl) throws StyxException {
-        super(address, port, ssl);
+    public TCPServerChannelDriver(InetAddress address,
+                                  int port,
+                                  boolean ssl,
+                                  ClientsRepo clientsRepo) throws StyxException {
+        super(address, port, ssl, clientsRepo);
         mReadable = new Stack<>();
         mClientStatesMap = new HashMap<>();
     }
@@ -127,15 +130,15 @@ public class TCPServerChannelDriver extends TCPChannelDriver {
             } catch (IOException error) {
                 throw new StyxException(error.getMessage());
             }
-            TCPClientDetails client = new TCPClientDetails(channel, this, mIOUnit, mLastClientId++);
-            mRMessageHandler.addClient(client);
-            mTMessageHandler.addClient(client);
-            mClientStatesMap.put(channel, client);
+            int id = mClientsRepo.addClient(new TCPClientDetails(channel, this, mIOUnit));
+            mRMessageHandler.addClient(id);
+            mTMessageHandler.addClient(id);
+            mClientStatesMap.put(channel, id);
         }
         // new readables
         for (SocketChannel channel : mReadable) {
-            final TCPClientDetails state = (TCPClientDetails) mClientStatesMap.get(channel);
-            boolean result = readSocket(state);
+            final int clientId = mClientStatesMap.get(channel);
+            boolean result = readSocket(clientId);
             if ( result ) {
                 removeClient(channel);
             }
@@ -144,9 +147,9 @@ public class TCPServerChannelDriver extends TCPChannelDriver {
     }
 
     private void removeClient(SocketChannel channel) throws StyxException {
-        final ClientDetails clientDetails = mClientStatesMap.get(channel);
-        mTMessageHandler.removeClient(clientDetails);
-        mRMessageHandler.removeClient(clientDetails);
+        var cleintId = mClientStatesMap.get(channel);
+        mTMessageHandler.removeClient(cleintId);
+        mRMessageHandler.removeClient(cleintId);
         mClientStatesMap.remove(channel);
         try {
             channel.close();
@@ -156,7 +159,7 @@ public class TCPServerChannelDriver extends TCPChannelDriver {
     }
 
     @Override
-    public Collection<ClientDetails> getClients() {
+    public Collection<Integer> getClients() {
         return mClientStatesMap.values();
     }
 

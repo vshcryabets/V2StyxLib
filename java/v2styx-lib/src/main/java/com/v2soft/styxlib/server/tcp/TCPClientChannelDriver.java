@@ -3,10 +3,9 @@ package com.v2soft.styxlib.server.tcp;
 import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.l5.enums.Checks;
 import com.v2soft.styxlib.l5.io.impl.BufferImpl;
-import com.v2soft.styxlib.l5.messages.base.StyxMessage;
 import com.v2soft.styxlib.l5.serialization.IBufferReader;
 import com.v2soft.styxlib.l5.serialization.impl.BufferReaderImpl;
-import com.v2soft.styxlib.server.ClientDetails;
+import com.v2soft.styxlib.server.ClientsRepo;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -16,8 +15,7 @@ import java.net.SocketTimeoutException;
 import java.nio.channels.ClosedByInterruptException;
 import java.nio.channels.SocketChannel;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
 /**
  * Created by V.Shcryabets on 5/22/14.
@@ -25,17 +23,20 @@ import java.util.Set;
  * @author V.Shcryabets (vshcryabets@gmail.com)
  */
 public class TCPClientChannelDriver extends TCPChannelDriver {
-    public static final int PSEUDO_CLIENT_ID = 1;
     protected TCPClientDetails mServerClientDetails;
     protected SocketChannel mChanel;
 
-    public TCPClientChannelDriver(InetAddress address, int port, boolean ssl) throws StyxException {
-        super(address, port, ssl);
+    public TCPClientChannelDriver(InetAddress address,
+                                  int port,
+                                  boolean ssl,
+                                  ClientsRepo clientsRepo) throws StyxException {
+        super(address, port, ssl, clientsRepo);
     }
 
     @Override
     public Thread start(int iounit) {
-        mServerClientDetails = new TCPClientDetails(mChanel, this, iounit, PSEUDO_CLIENT_ID);
+        mServerClientDetails = new TCPClientDetails(mChanel, this, iounit);
+        mClientsRepo.addClient(mServerClientDetails);
         return super.start(iounit);
     }
 
@@ -88,9 +89,9 @@ public class TCPClientChannelDriver extends TCPChannelDriver {
                             if ( buffer.remainsToRead() >= packetSize ) {
                                 var message = deserializer.deserializeMessage(reader, mIOUnit);
                                 if ( Checks.isTMessage(message.getType()) && ( mTMessageHandler != null )) {
-                                        mTMessageHandler.postPacket(message, mServerClientDetails);
+                                        mTMessageHandler.postPacket(message, mServerClientDetails.getId());
                                 } else if ( mRMessageHandler != null ) {
-                                    mRMessageHandler.postPacket(message, mServerClientDetails);
+                                    mRMessageHandler.postPacket(message, mServerClientDetails.getId());
                                 }
                             } else {
                                 break;
@@ -125,10 +126,8 @@ public class TCPClientChannelDriver extends TCPChannelDriver {
     }
 
     @Override
-    public Collection<ClientDetails> getClients() {
-        Set<ClientDetails> result = new HashSet<ClientDetails>();
-        result.add(mServerClientDetails);
-        return result;
+    public Collection<Integer> getClients() {
+        return List.of(mServerClientDetails.getId());
     }
 
     @Override

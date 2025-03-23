@@ -1,11 +1,5 @@
 package com.v2soft.styxlib;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import com.v2soft.styxlib.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.l5.Connection;
@@ -16,17 +10,13 @@ import com.v2soft.styxlib.l6.io.StyxFileBufferedInputStream;
 import com.v2soft.styxlib.l6.vfs.DiskStyxDirectory;
 import com.v2soft.styxlib.l6.vfs.MemoryStyxFile;
 import com.v2soft.styxlib.library.types.impl.CredentialsImpl;
-import com.v2soft.styxlib.server.ClientDetails;
+import com.v2soft.styxlib.server.ClientsRepo;
+import com.v2soft.styxlib.server.ClientsRepoImpl;
 import com.v2soft.styxlib.server.StyxServerManager;
 import com.v2soft.styxlib.server.tcp.TCPClientChannelDriver;
 import com.v2soft.styxlib.server.tcp.TCPServerChannelDriver;
 import com.v2soft.styxlib.utils.MetricsAndStats;
-
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -40,6 +30,8 @@ import java.util.concurrent.TimeoutException;
 import java.util.logging.Logger;
 import java.util.zip.CRC32;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 /**
  * Client JUnit tests
  *
@@ -50,6 +42,7 @@ public class ConnectionTest {
     private static final int PORT = 10234;
     private IClient mConnection;
     private StyxServerManager mServer;
+    private ClientsRepo mClientsRepo = new ClientsRepoImpl();
 
     @BeforeEach
     public void setUp() throws Exception {
@@ -59,13 +52,15 @@ public class ConnectionTest {
         if (!testDirectory.exists()) {
             testDirectory.mkdirs();
         }
-        var serverDriver = new TCPServerChannelDriver(localHost, PORT, false);
+        var serverDriver = new TCPServerChannelDriver(localHost, PORT, false, mClientsRepo);
         mServer = new StyxServerManager(
                 new DiskStyxDirectory(testDirectory, serverDriver.getSerializer()),
-                Arrays.asList(serverDriver));
+                Arrays.asList(serverDriver),
+                mClientsRepo);
         mServer.start();
-        var clientDriver = new TCPClientChannelDriver(localHost, PORT, false);
-        mConnection = new Connection(new CredentialsImpl("user", ""), clientDriver);
+        var clientDriver = new TCPClientChannelDriver(localHost, PORT, false, mClientsRepo);
+        mConnection = new Connection(new CredentialsImpl("user", ""), clientDriver,
+                mClientsRepo);
         assertTrue(mConnection.connect());
     }
 
@@ -153,8 +148,8 @@ public class ConnectionTest {
         dirAA.create(FileMode.PERMISSION_BITMASK | FileMode.Directory);
         dirAB.create(FileMode.PERMISSION_BITMASK | FileMode.Directory);
         // test other way to create file (with specified parent)
-        final StyxFile dirBA = new StyxFile(mConnection, nameBA, dirB.getFID());
-        final StyxFile dirBB = new StyxFile(mConnection, nameBB, dirB.getFID());
+        final StyxFile dirBA = dirB.walk(nameBA);
+        final StyxFile dirBB = dirB.walk(nameBB);
         dirBA.create(FileMode.PERMISSION_BITMASK | FileMode.Directory);
         dirBB.create(FileMode.PERMISSION_BITMASK | FileMode.Directory);
 
@@ -258,7 +253,7 @@ public class ConnectionTest {
         final long[] stat = new long[1];
         ((DiskStyxDirectory) mServer.getRoot()).addFile(new MemoryStyxFile(filename) {
             @Override
-            public int write(ClientDetails clientDetails, byte[] data, long offset) {
+            public int write(int clientId, byte[] data, long offset) {
                 stat[0] += data.length;
                 return data.length;
             }

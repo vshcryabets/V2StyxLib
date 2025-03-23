@@ -48,11 +48,6 @@ public interface IClient extends Closeable {
     long getRootFID();
 
     ConnectionDetails getConnectionDetails();
-
-    /**
-     * @return message recepient information
-     */
-    ClientDetails getRecepient();
     IDataDeserializer getDeserializer();
     StyxFile open(String filename) throws StyxException;
 }
