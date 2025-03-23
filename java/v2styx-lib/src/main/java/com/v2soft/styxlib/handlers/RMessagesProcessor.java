@@ -5,7 +5,6 @@ import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
 import com.v2soft.styxlib.l5.messages.base.StyxTMessage;
 import com.v2soft.styxlib.l5.messages.base.StyxTMessageFID;
-import com.v2soft.styxlib.server.ClientDetails;
 import com.v2soft.styxlib.server.ClientsRepo;
 
 import java.util.Map;
@@ -25,12 +24,7 @@ public class RMessagesProcessor extends QueueMessagesProcessor implements IMessa
     }
 
     @Override
-    public void addClient(int clientId) {
-
-    }
-
-    @Override
-    public void removeClient(int clientId) {
+    public void onClientRemoved(int clientId) {
 
     }
 

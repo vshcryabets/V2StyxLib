@@ -1,7 +1,6 @@
 package com.v2soft.styxlib.server;
 
 import com.v2soft.styxlib.exceptions.StyxErrorMessageException;
-import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.handlers.IMessageTransmitter;
 import com.v2soft.styxlib.l6.vfs.IVirtualStyxFile;
 import com.v2soft.styxlib.utils.FIDPoll;
@@ -47,8 +46,10 @@ public class ClientsRepoImpl implements ClientsRepo {
     }
 
     @Override
-    public void closeFile(int clientId, long fid) {
-        mClients.get(clientId).closeFile(fid);
+    public void closeFile(int clientId, long fid) throws StyxErrorMessageException {
+        var client = mClients.get(clientId);
+        client.getAssignedFile(fid).close(clientId);
+        client.closeFile(fid);
     }
 
     @Override

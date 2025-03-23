@@ -11,7 +11,6 @@ import com.v2soft.styxlib.server.ClientsRepo;
 import com.v2soft.styxlib.server.StyxServerManager;
 import com.v2soft.styxlib.handlers.IMessageProcessor;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
-import com.v2soft.styxlib.server.ClientDetails;
 import com.v2soft.styxlib.server.IChannelDriver;
 import com.v2soft.styxlib.utils.Future;
 
@@ -157,11 +156,11 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
                 var message = deserializer.deserializeMessage(client.getInputReader(), mIOUnit);
                 if ( Checks.isTMessage(message.getType()) ) {
                     if ( mTMessageHandler != null ) {
-                        mTMessageHandler.postPacket(message, clientId);
+                        mTMessageHandler.onClientMessage(message, clientId);
                     }
                 } else {
                     if ( mRMessageHandler != null ) {
-                        mRMessageHandler.postPacket(message, clientId);
+                        mRMessageHandler.onClientMessage(message, clientId);
                     }
                 }
                 return true;

@@ -14,7 +14,7 @@ public abstract class QueueMessagesProcessor implements IMessageProcessor {
     protected LinkedBlockingQueue<Pair> mQueue;
     protected Thread mThread;
 
-    private class Pair {
+    private static class Pair {
         public StyxMessage mMessage;
         public int mClientId;
     }
@@ -26,7 +26,7 @@ public abstract class QueueMessagesProcessor implements IMessageProcessor {
     }
 
     @Override
-    public void postPacket(StyxMessage message, int clientId) {
+    public void onClientMessage(StyxMessage message, int clientId) {
         Pair pair = new Pair();
         pair.mMessage = message;
         pair.mClientId = clientId;
@@ -42,6 +42,8 @@ public abstract class QueueMessagesProcessor implements IMessageProcessor {
             throw new IOException(e);
         }
     }
+
+   abstract void processPacket(StyxMessage message, int clientId) throws StyxException;
 
     private final Runnable mRunnable = new Runnable() {
         @Override

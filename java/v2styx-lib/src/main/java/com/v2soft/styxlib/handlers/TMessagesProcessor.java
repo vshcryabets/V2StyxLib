@@ -11,7 +11,6 @@ import com.v2soft.styxlib.l6.vfs.IVirtualStyxFile;
 import com.v2soft.styxlib.library.types.ConnectionDetails;
 import com.v2soft.styxlib.library.types.Credentials;
 import com.v2soft.styxlib.library.types.impl.CredentialsImpl;
-import com.v2soft.styxlib.server.ClientDetails;
 import com.v2soft.styxlib.server.ClientsRepo;
 import com.v2soft.styxlib.utils.MetricsAndStats;
 
@@ -42,12 +41,7 @@ public class TMessagesProcessor extends QueueMessagesProcessor implements IMessa
     }
 
     @Override
-    public void addClient(int clientId) {
-        mRoot.onConnectionOpened(clientId);
-    }
-
-    @Override
-    public void removeClient(int clientId) {
+    public void onClientRemoved(int clientId) {
         mRoot.close(clientId);
     }
 
@@ -137,6 +131,7 @@ public class TMessagesProcessor extends QueueMessagesProcessor implements IMessa
         var clientDetails = mClientsRepo.getClient(clientId);
         clientDetails.setCredentials(credentials);
         String mountPoint = msg.getMountPoint();
+        mRoot.onConnectionOpened(clientId);
         IVirtualStyxFile root = mRoot; // TODO .getDirectory(mountPoint); there should be some logic with mountPoint?
         StyxRAttachMessage answer = new StyxRAttachMessage(msg.getTag(), root.getQID());
         clientDetails.registerOpenedFile(msg.getFID(), root);
@@ -151,7 +146,6 @@ public class TMessagesProcessor extends QueueMessagesProcessor implements IMessa
     }
 
     private StyxMessage processClunk(int clientId, StyxTMessageFID msg) throws StyxErrorMessageException {
-//        mClientsRepo.getAssignedFile(msg.getFID()).close(clientId);
         mClientsRepo.closeFile(clientId, msg.getFID());
         return new StyxMessage(MessageType.Rclunk, msg.getTag());
     }

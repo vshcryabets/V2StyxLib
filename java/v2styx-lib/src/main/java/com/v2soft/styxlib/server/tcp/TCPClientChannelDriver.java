@@ -89,9 +89,9 @@ public class TCPClientChannelDriver extends TCPChannelDriver {
                             if ( buffer.remainsToRead() >= packetSize ) {
                                 var message = deserializer.deserializeMessage(reader, mIOUnit);
                                 if ( Checks.isTMessage(message.getType()) && ( mTMessageHandler != null )) {
-                                        mTMessageHandler.postPacket(message, mServerClientDetails.getId());
+                                        mTMessageHandler.onClientMessage(message, mServerClientDetails.getId());
                                 } else if ( mRMessageHandler != null ) {
-                                    mRMessageHandler.postPacket(message, mServerClientDetails.getId());
+                                    mRMessageHandler.onClientMessage(message, mServerClientDetails.getId());
                                 }
                             } else {
                                 break;

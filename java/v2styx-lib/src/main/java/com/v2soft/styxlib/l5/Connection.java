@@ -45,7 +45,7 @@ public class Connection
     private long mAuthFID = StyxMessage.NOFID;
     private StyxQID mAuthQID;
     private StyxQID mQID;
-    private long mFID = StyxMessage.NOFID;
+    private long mRootFid = StyxMessage.NOFID;
 
     protected IChannelDriver mDriver;
     protected ConnectionDetails mDetails;
@@ -135,7 +135,7 @@ public class Connection
     }
 
     public long getRootFID() {
-        return mFID;
+        return mRootFid;
     }
 
     public StyxQID getQID() {
@@ -158,10 +158,10 @@ public class Connection
     public void sendVersionMessage()
             throws StyxException {
         // release attached FID
-        if (mFID != StyxMessage.NOFID) {
-            final StyxTMessageFID tClunk = new StyxTMessageFID(MessageType.Tclunk, MessageType.Rclunk, mFID);
+        if (mRootFid != StyxMessage.NOFID) {
+            final StyxTMessageFID tClunk = new StyxTMessageFID(MessageType.Tclunk, MessageType.Rclunk, mRootFid);
             mTransmitter.sendMessage(tClunk, mClientId, mTimeout).getResult();
-            mFID = StyxMessage.NOFID;
+            mRootFid = StyxMessage.NOFID;
         }
         StyxMessage rMessage = mTransmitter.sendMessage(
                 new StyxTVersionMessage(mDetails.ioUnit(), getProtocol()),
@@ -192,8 +192,8 @@ public class Connection
             //        output.flush();
         }
 
-        mFID = mClientsRepo.getFidPoll(mClientId).getFreeItem();
-        StyxTAttachMessage tAttach = new StyxTAttachMessage(getRootFID(), getAuthFID(),
+        mRootFid = mClientsRepo.getFidPoll(mClientId).getFreeItem();
+        StyxTAttachMessage tAttach = new StyxTAttachMessage(mRootFid, getAuthFID(),
                 getCredentials().getUserName(),
                 getMountPoint());
         var rAttach = (StyxRAttachMessage)mTransmitter.sendMessage(tAttach, mClientId, mTimeout)
