@@ -108,6 +108,18 @@ styxQid.with {
     // public static final StyxQID EMPTY = new StyxQID(QidType.QTFILE, 0L, 0L);
 }
 
+def nsLibraryTypes = namespace("styxlib.types")
+switch (target()) {
+    case ce.defs.Target.Kotlin:
+    case ce.defs.Target.Java:
+        nsLibraryTypes = namespace("com.v2soft.styxlib.library.types")
+}
+def connectionDetails = nsLibraryTypes.dataClass("ConnectionDetails")
+connectionDetails.with {
+    addBlockComment("Styx connection details")
+    field("protocol", new DataType.string())
+    field("ioUnit", DataType.int32.INSTANCE)
+}
 //def stat = ns.dataClass("StyxStat")
 //stat.field("type", DataType.int32.INSTANCE)
 //stat.field("dev", DataType.int64.INSTANCE)
