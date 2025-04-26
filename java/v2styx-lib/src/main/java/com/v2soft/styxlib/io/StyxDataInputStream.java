@@ -22,7 +22,6 @@ public class StyxDataInputStream
         MetricsAndStats.byteArrayAllocationIo++;
     }
 
-
     private long readInteger(int bytes) throws StyxException {
         if ( bytes > sDataBufferSize ) throw new IllegalArgumentException("Too much bytes to read");
         long result = 0L;
@@ -44,18 +43,16 @@ public class StyxDataInputStream
         return result;
     }
     // ==================================================
-    // IStyxDataReader
+    // IBufferReader
     // ==================================================
     @Override
     public short readUInt8() throws StyxException {return (short) (readInteger(1)&0XFF);}
     @Override
     public int readUInt16() throws StyxException {return (int) (readInteger(2)&0xFFFF);}
     @Override
-    public long readUInt32() throws StyxException {return (readInteger(4) &0xFFFFFFFF);}
+    public long readUInt32() throws StyxException {return (readInteger(4));}
     @Override
-    public long readUInt64() throws StyxException {
-        return readInteger(8);
-    }
+    public long readUInt64() throws StyxException {return readInteger(8);}
 
     @Override
     public long getUInt32() {

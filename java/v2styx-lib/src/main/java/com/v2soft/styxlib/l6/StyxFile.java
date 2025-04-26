@@ -124,22 +124,6 @@ public class StyxFile {
         return sendWalkMessage(getFID(), "");
     }
 
-    public List<String> list(StyxFilenameFilter filter)
-            throws StyxException {
-        if (filter == null) {
-            return listStat()
-                    .stream()
-                    .map(StyxStat::name)
-                    .toList();
-        } else {
-            return listStat()
-                    .stream()
-                    .map(StyxStat::name)
-                    .filter(name -> filter.accept(this, name))
-                    .toList();
-        }
-    }
-
     /**
      * Open input stream to this file.
      *
@@ -230,16 +214,11 @@ public class StyxFile {
         delete(false);
     }
 
-    /**
-     * Delete file or folder
-     *
-     * @param recurse Recursive delete
-     */
-    public void delete(boolean recurse)
+    public void delete(boolean recursive)
             throws StyxException {
-        if (recurse && this.isDirectory()) {
-            for (var name : list(null)) {
-                var file = new StyxFile(mClient, name, mFID);
+        if (recursive && this.isDirectory()) {
+            for (var stat : listStat()) {
+                var file = new StyxFile(mClient, stat.name(), mFID);
                 file.delete(true);
             }
         }
@@ -247,8 +226,8 @@ public class StyxFile {
         mFID = StyxMessage.NOFID;
         var tRemove = new StyxTMessageFID(MessageType.Tremove, MessageType.Rremove, fid);
         mMessenger
-            .sendMessage(tRemove, mRecipient, mTimeout)
-            .getResult();
+                .sendMessage(tRemove, mRecipient, mTimeout)
+                .getResult();
     }
 
     public void renameTo(String name)
@@ -387,10 +366,6 @@ public class StyxFile {
                 mRecipient,
                 mTimeout).getResult();
         return rMessage.stat;
-    }
-
-    public IClient getIClient() {
-        return mClient;
     }
 
     public long getTimeout() {

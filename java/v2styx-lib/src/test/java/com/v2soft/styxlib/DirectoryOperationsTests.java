@@ -60,7 +60,7 @@ public class DirectoryOperationsTests {
     public void testListFilesInRootDir()
             throws IOException, StyxException, InterruptedException, TimeoutException {
         var rootDir = mConnection.getRoot();
-        var files = rootDir.list(null);
+        var files = rootDir.listStat();
         assertFalse(files.isEmpty());
         var fileStats = rootDir.listStat();
         assertFalse(fileStats.isEmpty());
