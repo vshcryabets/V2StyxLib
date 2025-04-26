@@ -36,18 +36,8 @@ public interface IClient extends Closeable {
      */
     boolean connect()
             throws IOException, StyxException, InterruptedException, TimeoutException;
-
     boolean isConnected();
-
-    IMessageTransmitter getMessenger();
-
     int getTimeout();
-    /**
-     * @return FID of root folder
-     */
-    long getRootFID();
-
     ConnectionDetails getConnectionDetails();
-    IDataDeserializer getDeserializer();
     StyxFile open(String filename) throws StyxException;
 }

@@ -41,7 +41,7 @@ public class Connection
     private String mMountPoint;
     private int mTimeout = DEFAULT_TIMEOUT;
     private boolean isAttached;
-    private TMessageTransmitter mTransmitter;
+    protected TMessageTransmitter mTransmitter;
     private long mAuthFID = StyxMessage.NOFID;
     private StyxQID mAuthQID;
     private StyxQID mQID;
@@ -113,13 +113,15 @@ public class Connection
     @Deprecated
     public StyxFile getRoot() throws StyxException {
         if (mRoot == null) {
-            mRoot = new StyxFile(this, "", getRootFID(), mClientsRepo, mClientId);
+            mRoot = new StyxFile( "",
+                    getRootFID(),
+                    mClientsRepo,
+                    mClientId,
+                    mTransmitter,
+                    getTimeout(),
+                    mDriver.getDeserializer());
         }
         return mRoot;
-    }
-
-    public IMessageTransmitter getMessenger() {
-        return mTransmitter;
     }
 
     protected int getIOBufSize() {
@@ -266,12 +268,13 @@ public class Connection
     };
 
     @Override
-    public IDataDeserializer getDeserializer() {
-        return mDriver.getDeserializer();
-    }
-
-    @Override
     public StyxFile open(String filename) throws StyxException {
-        return new StyxFile(this, filename, getRootFID(), mClientsRepo, mClientId);
+        return new StyxFile(filename,
+                getRootFID(),
+                mClientsRepo,
+                mClientId,
+                mTransmitter,
+                getTimeout(),
+                mDriver.getDeserializer());
     }
 }
