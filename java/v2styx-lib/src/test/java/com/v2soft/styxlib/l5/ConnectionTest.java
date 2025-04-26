@@ -1,9 +1,7 @@
-package com.v2soft.styxlib;
+package com.v2soft.styxlib.l5;
 
 import com.v2soft.styxlib.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.exceptions.StyxException;
-import com.v2soft.styxlib.l5.Connection;
-import com.v2soft.styxlib.l5.IClient;
 import com.v2soft.styxlib.l5.enums.FileMode;
 import com.v2soft.styxlib.l6.StyxFile;
 import com.v2soft.styxlib.l6.io.StyxFileBufferedInputStream;
@@ -40,7 +38,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class ConnectionTest {
     private static Logger log = Logger.getLogger(ConnectionTest.class.getSimpleName());
     private static final int PORT = 10234;
-    private IClient mConnection;
+    private Connection mConnection;
     private StyxServerManager mServer;
     private ClientsRepo mClientsRepo = new ClientsRepoImpl();
 
@@ -75,20 +73,20 @@ public class ConnectionTest {
     @Tag("dev")
     public void testConnection() throws IOException, InterruptedException, TimeoutException {
         int count = 1000;
-        mConnection.getMessenger().clearStatistics();
+        mConnection.mTransmitter.clearStatistics();
         long startTime = System.currentTimeMillis();
         for (int i = 0; i < count; i++) {
             mConnection.sendVersionMessage();
         }
-        assertEquals(count * 3, mConnection.getMessenger().getTransmittedCount()); // TVersion, Tattach, TClunk
-        assertEquals(0, mConnection.getMessenger().getErrorsCount());
+        assertEquals(count * 3, mConnection.mTransmitter.getTransmittedCount()); // TVersion, Tattach, TClunk
+        assertEquals(0, mConnection.mTransmitter.getErrorsCount());
         long diff = System.currentTimeMillis() - startTime;
         log.info(String.format("\tTransmited %d messages\n\t" +
                         //"Received %d messages\n\t" +
                         "Error %d messages\n\t" +
                         "Average time for connection %f ms",
-                mConnection.getMessenger().getTransmittedCount(),
-                mConnection.getMessenger().getErrorsCount(),
+                mConnection.mTransmitter.getTransmittedCount(),
+                mConnection.mTransmitter.getErrorsCount(),
                 (float)diff / (float)count
         ));
     }
@@ -238,9 +236,9 @@ public class ConnectionTest {
         long diff = System.currentTimeMillis() - writeTime;
         System.out.println(String.format("Write done in %d ms", (writeTime - startTime)));
         System.out.println(String.format("Read done in %d ms", diff));
-        System.out.println(String.format("\tTransmited %d messages", mConnection.getMessenger().getTransmittedCount()));
-//        System.out.println(String.format("\tReceived %d messages", mConnection.getMessenger().getReceivedCount()));
-        System.out.println(String.format("\tError %d messages", mConnection.getMessenger().getErrorsCount()));
+        System.out.println(String.format("\tTransmited %d messages", mConnection.mTransmitter.getTransmittedCount()));
+//        System.out.println(String.format("\tReceived %d messages", mConnection.mTransmitter.getReceivedCount()));
+        System.out.println(String.format("\tError %d messages", mConnection.mTransmitter.getErrorsCount()));
         //        System.out.println(String.format("\tAverage time for connection %d ms",diff/count));
     }
 
@@ -280,8 +278,8 @@ public class ConnectionTest {
         Assertions.assertEquals(blockSize * blocksCount, stat[0], "Write and received size not equals");
         System.out.println(String.format("\tServer received %d bytes", stat[0]));
         System.out.println(String.format("\tWrite done in %d ms", writeTimeMs));
-        System.out.println(String.format("\tTransmited %d messages", mConnection.getMessenger().getTransmittedCount()));
-        System.out.println(String.format("\tError %d messages", mConnection.getMessenger().getErrorsCount()));
+        System.out.println(String.format("\tTransmited %d messages", mConnection.mTransmitter.getTransmittedCount()));
+        System.out.println(String.format("\tError %d messages", mConnection.mTransmitter.getErrorsCount()));
         System.out.println(String.format("\tByteBuffer allocations count %d", MetricsAndStats.byteBufferAllocation));
         System.out.println(String.format("\tbyte[] allocations count %d", MetricsAndStats.byteArrayAllocation));
         System.out.println(String.format("\tbyte[] allocations count RRead %d", MetricsAndStats.byteArrayAllocationRRead));
