@@ -23,8 +23,8 @@ public class StyxFileBufferedInputStream extends InputStream {
     public StyxFileBufferedInputStream(IMessageTransmitter messenger,
             long fid,
             int iounit,
-            ClientDetails recepient) {
-        mUnbufferedInput = new StyxUnbufferedInputStream(fid, messenger, iounit, recepient);
+            int clientId) {
+        mUnbufferedInput = new StyxUnbufferedInputStream(fid, messenger, iounit, clientId);
         mBufferedInput = new CBufferedInputStream(mUnbufferedInput, iounit);
     }
 

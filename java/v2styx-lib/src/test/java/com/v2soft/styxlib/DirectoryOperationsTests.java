@@ -2,10 +2,10 @@ package com.v2soft.styxlib;
 
 import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.l5.Connection;
-import com.v2soft.styxlib.l6.StyxFile;
 import com.v2soft.styxlib.l6.vfs.DiskStyxDirectory;
 import com.v2soft.styxlib.library.types.impl.CredentialsImpl;
-import com.v2soft.styxlib.server.IChannelDriver;
+import com.v2soft.styxlib.server.ClientsRepo;
+import com.v2soft.styxlib.server.ClientsRepoImpl;
 import com.v2soft.styxlib.server.StyxServerManager;
 import com.v2soft.styxlib.server.tcp.TCPClientChannelDriver;
 import com.v2soft.styxlib.server.tcp.TCPServerChannelDriver;
@@ -17,7 +17,6 @@ import org.junit.jupiter.api.Test;
 import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Logger;
@@ -34,19 +33,22 @@ public class DirectoryOperationsTests {
     private static final int PORT = 10234;
     private Connection mConnection;
     private StyxServerManager mServer;
+    private ClientsRepo mClientsRepo = new ClientsRepoImpl();
 
     @BeforeEach
     public void setUp() throws Exception {
         MetricsAndStats.reset();
         var localHost = InetAddress.getByName("127.0.0.1");
         var testDirectory = new File("./");
-        var serverDriver = new TCPServerChannelDriver(localHost, PORT, false);
+        var serverDriver = new TCPServerChannelDriver(localHost, PORT, false, mClientsRepo);
         mServer = new StyxServerManager(
                 new DiskStyxDirectory(testDirectory, serverDriver.getSerializer()),
-                Collections.singletonList(serverDriver));
+                Collections.singletonList(serverDriver),
+                mClientsRepo);
         mServer.start();
-        var driver = new TCPClientChannelDriver(localHost, PORT, false);
-        mConnection = new Connection(new CredentialsImpl("user", ""), driver);
+        var driver = new TCPClientChannelDriver(localHost, PORT, false, mClientsRepo);
+        mConnection = new Connection(new CredentialsImpl("user", ""), driver,
+                mClientsRepo);
         assertTrue(mConnection.connect());
     }
 

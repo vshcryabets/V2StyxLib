@@ -13,17 +13,17 @@ import java.util.HashMap;
  *
  */
 public class ClientDetails {
+    public final int NOT_ASSIGNED = -1;
     protected HashMap<Long, IVirtualStyxFile> mAssignedFiles;
     protected IChannelDriver mDriver; // TODO move to map
-    protected int mId;
+    protected int mId = NOT_ASSIGNED;
     protected Polls mPolls;
     protected Credentials mCredentials;
 
-    public ClientDetails(IChannelDriver driver, int id) {
+    public ClientDetails(IChannelDriver driver) {
         if ( driver == null ) throw new NullPointerException("Driver is null");
         mAssignedFiles = new HashMap<>();
         mDriver = driver;
-        mId = id;
     }
 
     public void setCredentials(Credentials credential) {
@@ -84,4 +84,9 @@ public class ClientDetails {
             return String.format("%d", mId);
         }
     }
+
+    public void setId(int mId) {
+        this.mId = mId;
+    }
+
 }

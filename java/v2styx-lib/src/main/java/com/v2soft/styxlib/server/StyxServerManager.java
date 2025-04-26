@@ -27,11 +27,15 @@ public class StyxServerManager
     protected final TMessagesProcessor mBalancer;
     protected final IVirtualStyxFile mRoot;
     protected Thread[] mDriverThreads;
+    protected ClientsRepo mClientsRepo;
 
-    public StyxServerManager(IVirtualStyxFile root, List<IChannelDriver> drivers) {
+    public StyxServerManager(IVirtualStyxFile root,
+                             List<IChannelDriver> drivers,
+                             ClientsRepo clientsRepo) {
         mRoot = root;
         var details = new ConnectionDetails(getProtocol(), getIOUnit());
-        mBalancer = new TMessagesProcessor(details, root);
+        mClientsRepo = clientsRepo;
+        mBalancer = new TMessagesProcessor(details, root, mClientsRepo);
         mDrivers = drivers;
         for (var driver : mDrivers) {
             driver.setTMessageHandler(mBalancer);

@@ -1,12 +1,13 @@
 package com.v2soft.styxlib;
 
-import com.v2soft.styxlib.handlers.TMessagesProcessor;
 import com.v2soft.styxlib.exceptions.StyxException;
+import com.v2soft.styxlib.handlers.TMessagesProcessor;
 import com.v2soft.styxlib.l5.Connection;
+import com.v2soft.styxlib.l6.vfs.IVirtualStyxFile;
 import com.v2soft.styxlib.library.types.Credentials;
+import com.v2soft.styxlib.server.ClientsRepo;
 import com.v2soft.styxlib.server.IChannelDriver;
 import com.v2soft.styxlib.server.tcp.TCPDualLinkServerManager;
-import com.v2soft.styxlib.l6.vfs.IVirtualStyxFile;
 
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
@@ -23,9 +24,8 @@ public class ConnectionWithExport extends Connection {
     protected IVirtualStyxFile mExportedRoot = null;
     protected TMessagesProcessor mExportProcessor;
 
-
-    public ConnectionWithExport(Credentials credentials, IChannelDriver driver) {
-        super(credentials, driver);
+    public ConnectionWithExport(Credentials credentials, IChannelDriver driver, ClientsRepo clientsRepo) {
+        super(credentials, driver, clientsRepo);
     }
 
     @Override
@@ -40,7 +40,8 @@ public class ConnectionWithExport extends Connection {
     public boolean connect() throws IOException, StyxException,
             InterruptedException, TimeoutException {
         boolean result = super.connect();
-        mExportProcessor = new TMessagesProcessor(getConnectionDetails(), mExportedRoot);
+        mExportProcessor = new TMessagesProcessor(getConnectionDetails(), mExportedRoot,
+                mClientsRepo);
         mDriver.setTMessageHandler(mExportProcessor);
         return result;
     }

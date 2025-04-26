@@ -28,7 +28,7 @@ import java.util.Map;
 public class MemoryStyxDirectory
 extends MemoryStyxFile {
     private final IDataSerializer mSerializer;
-    private Map<ClientDetails, ByteBuffer> mBuffersMap;
+    private Map<Integer, ByteBuffer> mBuffersMap;
     private List<IVirtualStyxFile> mFiles;
 
     public MemoryStyxDirectory(String name, IDataSerializer serializer) {
@@ -36,7 +36,7 @@ extends MemoryStyxFile {
         mQID = new StyxQID(QidType.QTDIR, 0, mName.hashCode());
         mSerializer = serializer;
         mFiles = new LinkedList<IVirtualStyxFile>();
-        mBuffersMap = new HashMap<ClientDetails, ByteBuffer>();
+        mBuffersMap = new HashMap<Integer, ByteBuffer>();
     }
 
     @Override
@@ -61,7 +61,7 @@ extends MemoryStyxFile {
     }
 
     @Override
-    public boolean open(ClientDetails clientDetails, int mode) throws StyxException {
+    public boolean open(int clientId, int mode) throws StyxException {
         boolean result = ((mode&0x0F) == ModeType.OREAD);
         if ( result ) {
             // prepare binary structure of the directory
@@ -79,16 +79,16 @@ extends MemoryStyxFile {
             for (StyxStat state : stats) {
                 mSerializer.serializeStat(state, writer);
             }
-            mBuffersMap.put(clientDetails, buffer);
+            mBuffersMap.put(clientId, buffer);
         }
         return result;
     }
 
     @Override
-    public int read(ClientDetails clientDetails, byte[] outbuffer, long offset, int count) throws StyxErrorMessageException {
-        if ( !mBuffersMap.containsKey(clientDetails))
+    public int read(int clientId, byte[] outbuffer, long offset, int count) throws StyxErrorMessageException {
+        if ( !mBuffersMap.containsKey(clientId))
             throw StyxErrorMessageException.newInstance("This file isn't open");
-        final ByteBuffer buffer = mBuffersMap.get(clientDetails);
+        final ByteBuffer buffer = mBuffersMap.get(clientId);
         int boffset = buffer.limit();
         if ( offset > boffset ) return 0;
         buffer.position((int) offset);
@@ -101,12 +101,12 @@ extends MemoryStyxFile {
     }
 
     @Override
-    public void close(ClientDetails clientDetails) {
+    public void close(int clientId) {
         for (IVirtualStyxFile file : mFiles) {
-            file.close(clientDetails);
+            file.close(clientId);
         }
         // remove buffer
-        mBuffersMap.remove(clientDetails);
+        mBuffersMap.remove(clientId);
     }
 
     /**
@@ -121,7 +121,7 @@ extends MemoryStyxFile {
     }
 
     @Override
-    public int write(ClientDetails clientDetails, byte[] data, long offset)
+    public int write(int clientId, byte[] data, long offset)
             throws StyxErrorMessageException {
         throw StyxErrorMessageException.newInstance("Can't write to directory");
     }

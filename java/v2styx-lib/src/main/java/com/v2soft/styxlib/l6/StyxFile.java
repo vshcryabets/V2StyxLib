@@ -23,8 +23,8 @@ import com.v2soft.styxlib.l5.messages.base.StyxTMessageFID;
 import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.l5.enums.ModeType;
 import com.v2soft.styxlib.l5.structs.StyxStat;
-import com.v2soft.styxlib.server.ClientDetails;
 import com.v2soft.styxlib.handlers.IMessageTransmitter;
+import com.v2soft.styxlib.server.ClientsRepo;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -47,14 +47,20 @@ public class StyxFile {
     private final String mPath;
     private final IMessageTransmitter mMessenger;
     private long mTimeout;
-    protected ClientDetails mRecipient;
+    protected int mClientId;
+    protected ClientsRepo mClientsRepo;
 
-    public StyxFile(IClient client, String path, long parentFid) throws StyxException {
+    public StyxFile(IClient client,
+                    String path,
+                    long parentFid,
+                    ClientsRepo clientsRepo,
+                    int clientId) throws StyxException {
         if (!client.isConnected())
             throw new StyxException("No connection");
+        mClientsRepo = clientsRepo;
         mClient = client;
         mMessenger = mClient.getMessenger();
-        mRecipient = mClient.getRecepient();
+        mClientId = clientId;
         mTimeout = mClient.getTimeout();
         mPath = path;
         mParentFID = parentFid;
@@ -80,7 +86,7 @@ public class StyxFile {
     private int open(int mode, long fid)
             throws StyxException {
         final StyxTOpenMessage tOpen = new StyxTOpenMessage(fid, mode);
-        final var rOpen = (StyxROpenMessage) mMessenger.sendMessage(tOpen, mRecipient, mTimeout).getResult();
+        final var rOpen = (StyxROpenMessage) mMessenger.sendMessage(tOpen, mClientId, mTimeout).getResult();
         return (int) rOpen.ioUnit;
     }
 
@@ -90,7 +96,7 @@ public class StyxFile {
         }
         // send Tclunk
         final StyxTMessageFID tClunk = new StyxTMessageFID(MessageType.Tclunk, MessageType.Rclunk, mFID);
-        var feature = mMessenger.sendMessage(tClunk, mRecipient, mTimeout);
+        var feature = mMessenger.sendMessage(tClunk, mClientId, mTimeout);
         feature.getResult();
 
         mFID = StyxMessage.NOFID;
@@ -104,7 +110,7 @@ public class StyxFile {
         var iounit = open(ModeType.OREAD, tempFID);
         var stats = new ArrayList<StyxStat>();
         try {
-            var is = new StyxFileBufferedInputStream(mMessenger, tempFID, iounit, mRecipient);
+            var is = new StyxFileBufferedInputStream(mMessenger, tempFID, iounit, mClientId);
             var sis = new StyxDataInputStream(is);
             while (true) {
                 stats.add(mClient.getDeserializer().deserializeStat(sis));
@@ -134,7 +140,7 @@ public class StyxFile {
         checkConnection();
         long tempFID = getCloneFID();
         int iounit = open(ModeType.OREAD, tempFID);
-        return new StyxFileBufferedInputStream(mMessenger, tempFID, iounit, mRecipient);
+        return new StyxFileBufferedInputStream(mMessenger, tempFID, iounit, mClientId);
     }
 
     private void checkConnection() throws StyxException {
@@ -152,7 +158,7 @@ public class StyxFile {
         checkConnection();
         long tempFID = getCloneFID();
         int iounit = open(ModeType.OREAD, tempFID);
-        return new StyxUnbufferedInputStream(tempFID, mMessenger, iounit, mRecipient);
+        return new StyxUnbufferedInputStream(tempFID, mMessenger, iounit, mClientId);
     }
 
     /**
@@ -173,7 +179,7 @@ public class StyxFile {
         long clonedFID = getCloneFID();
         return new StyxUnbufferedOutputStream(clonedFID,
                 mMessenger,
-                mRecipient,
+                mClientId,
                 open(ModeType.OWRITE, clonedFID)
         );
     }
@@ -184,7 +190,7 @@ public class StyxFile {
         long tempFID = sendWalkMessage(mParentFID, "");
         var tCreate = new StyxTCreateMessage(tempFID, mPath, permissions, ModeType.OWRITE);
         mMessenger
-            .sendMessage(tCreate, mRecipient, mTimeout)
+            .sendMessage(tCreate, mClientId, mTimeout)
 //                .exceptionally()
             .getResult();
         // TODO reuse FID
@@ -192,7 +198,7 @@ public class StyxFile {
         // close temp FID
         var tClunk = new StyxTMessageFID(MessageType.Tclunk, MessageType.Rclunk, tempFID);
         mMessenger
-            .sendMessage(tClunk, mRecipient, mTimeout)
+            .sendMessage(tClunk, mClientId, mTimeout)
             .getResult();
 //        mRecipient.getPolls().releaseFID(tCreate);
     }
@@ -218,7 +224,7 @@ public class StyxFile {
             throws StyxException {
         if (recursive && this.isDirectory()) {
             for (var stat : listStat()) {
-                var file = new StyxFile(mClient, stat.name(), mFID);
+                var file = new StyxFile(mClient, stat.name(), mFID, mClientsRepo, mClientId);
                 file.delete(true);
             }
         }
@@ -226,8 +232,8 @@ public class StyxFile {
         mFID = StyxMessage.NOFID;
         var tRemove = new StyxTMessageFID(MessageType.Tremove, MessageType.Rremove, fid);
         mMessenger
-                .sendMessage(tRemove, mRecipient, mTimeout)
-                .getResult();
+            .sendMessage(tRemove, mClientId, mTimeout)
+            .getResult();
     }
 
     public void renameTo(String name)
@@ -245,13 +251,13 @@ public class StyxFile {
                 stat.groupName(),
                 stat.modificationUser());
         StyxTWStatMessage tWStat = new StyxTWStatMessage(getFID(), newStat);
-        mMessenger.sendMessage(tWStat, mRecipient, mTimeout).getResult();
+        mMessenger.sendMessage(tWStat, mClientId, mTimeout).getResult();
     }
 
     public void mkdir(long permissions) throws InterruptedException, StyxException {
         permissions = permissions & FileMode.PERMISSION_BITMASK | FileMode.Directory;
         StyxTCreateMessage tCreate = new StyxTCreateMessage(mParentFID, getName(), permissions, ModeType.OREAD);
-        mMessenger.sendMessage(tCreate, mRecipient, mTimeout).getResult();
+        mMessenger.sendMessage(tCreate, mClientId, mTimeout).getResult();
     }
 
     public boolean checkFileMode(long mode)
@@ -325,8 +331,6 @@ public class StyxFile {
     }
 
     public String getName() throws StyxException, InterruptedException {
-        //StyxStat stat = getStat();
-        //return stat.getName();
         StringBuilder builder = new StringBuilder(getPath());
         while (builder.toString().startsWith(SEPARATOR))
             builder.delete(0, 1);
@@ -343,10 +347,10 @@ public class StyxFile {
 
     private long sendWalkMessage(long parentFID, String path)
             throws StyxException {
-        long newFID = mRecipient.getPolls().getFIDPoll().getFreeItem();
+        long newFID = mClientsRepo.getFidPoll(mClientId).getFreeItem();
         final StyxTWalkMessage tWalk = new StyxTWalkMessage(parentFID,
                 newFID, StyxSerializerImpl.splitPath(path));
-        final var feature = mMessenger.sendMessage(tWalk, mRecipient, mTimeout);
+        final var feature = mMessenger.sendMessage(tWalk, mClientId, mTimeout);
         final StyxMessage rWalk = feature.getResult();
         StyxErrorMessageException.doException(rWalk, mPath);
         if (((StyxRWalkMessage) rWalk).getQIDListLength() != tWalk.getPathLength())
@@ -363,7 +367,7 @@ public class StyxFile {
             throws StyxException {
         final var rMessage = mMessenger.<StyxRStatMessage>sendMessage(
                 new StyxTMessageFID(MessageType.Tstat, MessageType.Rstat, getFID()),
-                mRecipient,
+                mClientId,
                 mTimeout).getResult();
         return rMessage.stat;
     }
@@ -380,7 +384,9 @@ public class StyxFile {
         return new StyxFile(
                 mClient,
                 path,
-                getFID()
+                getFID(),
+                mClientsRepo,
+                mClientId
         );
     }
 }

@@ -7,10 +7,10 @@ import com.v2soft.styxlib.l5.serialization.IDataDeserializer;
 import com.v2soft.styxlib.l5.serialization.IDataSerializer;
 import com.v2soft.styxlib.l5.serialization.impl.StyxDeserializerImpl;
 import com.v2soft.styxlib.l5.serialization.impl.StyxSerializerImpl;
+import com.v2soft.styxlib.server.ClientsRepo;
 import com.v2soft.styxlib.server.StyxServerManager;
 import com.v2soft.styxlib.handlers.IMessageProcessor;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
-import com.v2soft.styxlib.server.ClientDetails;
 import com.v2soft.styxlib.server.IChannelDriver;
 import com.v2soft.styxlib.utils.Future;
 
@@ -37,12 +37,15 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
     protected int mPort;
     protected IDataDeserializer deserializer;
     protected IDataSerializer serializer;
+    protected ClientsRepo mClientsRepo;
 
     public TCPChannelDriver(InetAddress address,
                             int port,
-                            boolean ssl) throws StyxException {
+                            boolean ssl,
+                            ClientsRepo clientsRepo) throws StyxException {
         mPort = port;
         mAddress = address;
+        mClientsRepo = clientsRepo;
 
         // Bind the server socket to the local host and port
         var socketAddress = new InetSocketAddress(address, port);
@@ -74,21 +77,19 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
     @Override
     public <R extends StyxMessage> Future<R> sendMessage(
             StyxMessage message,
-            ClientDetails recipient,
+            int clientId,
             long timeout) throws StyxException {
-        if ( recipient == null ) {
-            throw new StyxException("Client can't be null");
+        if ( clientId < 0) {
+            throw new StyxException("Client id is negative");
         }
-        TCPClientDetails client = (TCPClientDetails) recipient;
-        synchronized (client) {
-            try {
-                serializer.serialize(message, client.getOutputWriter());
-                client.sendOutputBuffer();
-                mTransmittedPacketsCount++;
-            } catch (StyxException e) {
-                mTransmissionErrorsCount++;
-                throw e;
-            }
+        final var client = (TCPClientDetails)mClientsRepo.getClient(clientId);
+        try {
+            serializer.serialize(message, client.getOutputWriter());
+            client.sendOutputBuffer();
+            mTransmittedPacketsCount++;
+        } catch (StyxException e) {
+            mTransmissionErrorsCount++;
+            throw e;
         }
         return new Future<>(CompletableFuture.supplyAsync(() -> {
             try {
@@ -125,8 +126,9 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
      * Read data from assigned SocketChannel
      * @throws IOException
      */
-    protected boolean readSocket(TCPClientDetails client) throws StyxException {
+    protected boolean readSocket(int clientId) throws StyxException {
         int read = 0;
+        final var client = (TCPClientDetails)mClientsRepo.getClient(clientId);
         try {
             read = client.getBufferLoader().readFromChannelToBuffer(client.getChannel());
         }
@@ -136,7 +138,7 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
         if ( read == -1 ) {
             return true;
         } else {
-            while ( process(client) );
+            while ( process(clientId) );
         }
         return false;
     }
@@ -145,7 +147,8 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
      * Read income message from specified client.
      * @return true if message was processed
      */
-    private boolean process(TCPClientDetails client) throws StyxException {
+    private boolean process(int clientId) throws StyxException {
+        final var client = (TCPClientDetails)mClientsRepo.getClient(clientId);
         int inBuffer = client.getBuffer().remainsToRead();
         if ( inBuffer > 4 ) {
             long packetSize = client.getInputReader().getUInt32();
@@ -153,11 +156,11 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
                 var message = deserializer.deserializeMessage(client.getInputReader(), mIOUnit);
                 if ( Checks.isTMessage(message.getType()) ) {
                     if ( mTMessageHandler != null ) {
-                        mTMessageHandler.postPacket(message, client);
+                        mTMessageHandler.onClientMessage(message, clientId);
                     }
                 } else {
                     if ( mRMessageHandler != null ) {
-                        mRMessageHandler.postPacket(message, client);
+                        mRMessageHandler.onClientMessage(message, clientId);
                     }
                 }
                 return true;
