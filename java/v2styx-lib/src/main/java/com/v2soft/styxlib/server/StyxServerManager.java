@@ -17,14 +17,14 @@ import java.util.List;
 public class StyxServerManager
         implements Closeable {
     public static class Configuration {
-        IVirtualStyxFile root;
-        List<IChannelDriver> drivers;
-        ClientsRepo clientsRepo;
-        IDataDeserializer deserializer;
-        IDataSerializer serializer;
-        int iounit;
+        public final IVirtualStyxFile root;
+        public final List<IChannelDriver<?>> drivers;
+        public final ClientsRepo clientsRepo;
+        public final IDataDeserializer deserializer;
+        public final IDataSerializer serializer;
+        public final int iounit;
         public Configuration(IVirtualStyxFile root,
-                             List<IChannelDriver> drivers,
+                             List<IChannelDriver<?>> drivers,
                              ClientsRepo clientsRepo,
                              IDataSerializer serializer,
                              IDataDeserializer deserializer,
@@ -35,21 +35,6 @@ public class StyxServerManager
             this.serializer = serializer;
             this.deserializer = deserializer;
             this.iounit = iounit;
-        }
-
-        public ClientsRepo getClientsRepo() {
-            return clientsRepo;
-        }
-
-        public IDataSerializer getSerializer() {
-            return serializer;
-        }
-        public IDataDeserializer getDeserializer() {
-            return deserializer;
-        }
-
-        public IVirtualStyxFile getRoot() {
-            return root;
         }
     }
     //---------------------------------------------------------------------------
@@ -103,20 +88,6 @@ public class StyxServerManager
     public String getProtocol() {
         return PROTOCOL;
     }
-
-    //-------------------------------------------------------------------------------------
-    // Getters
-    //-------------------------------------------------------------------------------------
-//    public IVirtualStyxFile getRoot() {
-//        return mRoot;
-//    }
-
-    //-------------------------------------------------------------------------------------
-    // Setters
-    //-------------------------------------------------------------------------------------
-//    public List<IChannelDriver> getDrivers() {
-//        return mDrivers;
-//    }
 
     public void joinThreads() throws InterruptedException {
         for (var thread : mDriverThreads) {

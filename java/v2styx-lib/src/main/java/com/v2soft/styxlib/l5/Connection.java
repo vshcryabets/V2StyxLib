@@ -136,9 +136,7 @@ public class Connection
             mClientId = (int) firstClient.get();
         }
         mMountPoint = "/";
-        System.out.println("Connecting to " + mConfiguration.driver.toString());
         sendVersionMessage();
-        System.out.println("Connect--");
         return driver.isConnected();
     }
 

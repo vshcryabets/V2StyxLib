@@ -277,7 +277,7 @@ public class ConnectionTest {
         long blocksCount = 1024 * 1024;
         final String filename = "write";
         final long[] stat = new long[1];
-        ((DiskStyxDirectory) serverConfiguration.getRoot()).addFile(new MemoryStyxFile(filename) {
+        ((DiskStyxDirectory) serverConfiguration.root).addFile(new MemoryStyxFile(filename) {
             @Override
             public int write(int clientId, byte[] data, long offset) {
                 stat[0] += data.length;
