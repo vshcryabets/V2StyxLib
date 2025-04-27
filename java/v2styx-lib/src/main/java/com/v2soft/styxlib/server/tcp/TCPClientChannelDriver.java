@@ -8,7 +8,6 @@ import com.v2soft.styxlib.l5.serialization.impl.BufferReaderImpl;
 import com.v2soft.styxlib.server.ClientsRepo;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
@@ -24,28 +23,20 @@ import java.util.List;
  */
 public class TCPClientChannelDriver extends TCPChannelDriver {
     protected TCPClientDetails mServerClientDetails;
-    protected SocketChannel mChanel;
+    protected SocketChannel mChannel;
 
-    public TCPClientChannelDriver(InetAddress address,
-                                  int port,
-                                  boolean ssl,
-                                  ClientsRepo clientsRepo) throws StyxException {
-        super(address, port, ssl, clientsRepo);
-    }
-
-    @Override
-    public Thread start(int iounit) {
-        mServerClientDetails = new TCPClientDetails(mChanel, this, iounit);
-        mClientsRepo.addClient(mServerClientDetails);
-        return super.start(iounit);
+    public TCPClientChannelDriver(ClientsRepo clientsRepo) throws StyxException {
+        super(clientsRepo);
     }
 
     @Override
     protected void prepareSocket(InetSocketAddress socketAddress, boolean ssl) throws StyxException {
         try {
-            mChanel = SocketChannel.open(socketAddress);
-            mChanel.configureBlocking(true);
-            Socket socket = mChanel.socket();
+            mChannel = SocketChannel.open(socketAddress);
+            mChannel.configureBlocking(true);
+            mServerClientDetails = new TCPClientDetails(mChannel, this, mInitConfiguration.iounit);
+            mClientsRepo.addClient(mServerClientDetails);
+            Socket socket = mChannel.socket();
             socket.setSoTimeout(getTimeout());
         } catch (Exception err) {
             throw new StyxException(err.getMessage());
@@ -74,7 +65,7 @@ public class TCPClientChannelDriver extends TCPChannelDriver {
     public void run() {
         try {
             isWorking = true;
-            final BufferImpl buffer = new BufferImpl(mIOUnit*2);
+            final BufferImpl buffer = new BufferImpl(mInitConfiguration.iounit*2);
             final IBufferReader reader = new BufferReaderImpl(buffer);
             while (isWorking) {
                 if (Thread.interrupted()) break;
@@ -87,11 +78,11 @@ public class TCPClientChannelDriver extends TCPChannelDriver {
                             // try to decode
                             final long packetSize = reader.getUInt32();
                             if ( buffer.remainsToRead() >= packetSize ) {
-                                var message = deserializer.deserializeMessage(reader, mIOUnit);
-                                if ( Checks.isTMessage(message.getType()) && ( mTMessageHandler != null )) {
-                                        mTMessageHandler.onClientMessage(message, mServerClientDetails.getId());
-                                } else if ( mRMessageHandler != null ) {
-                                    mRMessageHandler.onClientMessage(message, mServerClientDetails.getId());
+                                var message = mInitConfiguration.deserializer.deserializeMessage(reader, mInitConfiguration.iounit);
+                                if ( Checks.isTMessage(message.getType())) {
+                                    mStartConfiguration.getTProcessor().onClientMessage(message, mServerClientDetails.getId());
+                                } else {
+                                    mStartConfiguration.getRProcessor().onClientMessage(message, mServerClientDetails.getId());
                                 }
                             } else {
                                 break;
@@ -132,7 +123,10 @@ public class TCPClientChannelDriver extends TCPChannelDriver {
 
     @Override
     public String toString() {
+        if (mChannel == null) {
+            return String.format("%s:NULL", getClass().getSimpleName());
+        }
         return String.format("%s:%s", getClass().getSimpleName(),
-                mChanel.socket().getLocalAddress().toString());
+                mChannel.socket().getLocalAddress().toString());
     }
 }

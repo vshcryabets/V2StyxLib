@@ -1,12 +1,14 @@
 package com.v2soft.styxlib.server;
 
+import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.handlers.TMessagesProcessor;
+import com.v2soft.styxlib.l5.serialization.IDataDeserializer;
+import com.v2soft.styxlib.l5.serialization.IDataSerializer;
 import com.v2soft.styxlib.library.types.ConnectionDetails;
 import com.v2soft.styxlib.l6.vfs.IVirtualStyxFile;
 
 import java.io.Closeable;
 import java.io.IOException;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -14,6 +16,27 @@ import java.util.List;
  */
 public class StyxServerManager
         implements Closeable {
+    public static class Configuration {
+        public final IVirtualStyxFile root;
+        public final List<IChannelDriver<?>> drivers;
+        public final ClientsRepo clientsRepo;
+        public final IDataDeserializer deserializer;
+        public final IDataSerializer serializer;
+        public final int iounit;
+        public Configuration(IVirtualStyxFile root,
+                             List<IChannelDriver<?>> drivers,
+                             ClientsRepo clientsRepo,
+                             IDataSerializer serializer,
+                             IDataDeserializer deserializer,
+                             int iounit) {
+            this.root = root;
+            this.drivers = drivers;
+            this.clientsRepo = clientsRepo;
+            this.serializer = serializer;
+            this.deserializer = deserializer;
+            this.iounit = iounit;
+        }
+    }
     //---------------------------------------------------------------------------
     // Constants
     //---------------------------------------------------------------------------
@@ -23,41 +46,35 @@ public class StyxServerManager
     //---------------------------------------------------------------------------
     // Class fields
     //---------------------------------------------------------------------------
-    protected final List<IChannelDriver> mDrivers;
     protected final TMessagesProcessor mBalancer;
-    protected final IVirtualStyxFile mRoot;
     protected Thread[] mDriverThreads;
-    protected ClientsRepo mClientsRepo;
+    protected Configuration mConfiguration;
 
-    public StyxServerManager(IVirtualStyxFile root,
-                             List<IChannelDriver> drivers,
-                             ClientsRepo clientsRepo) {
-        mRoot = root;
+    public StyxServerManager(Configuration configuration) {
+        mConfiguration = configuration;
         var details = new ConnectionDetails(getProtocol(), getIOUnit());
-        mClientsRepo = clientsRepo;
-        mBalancer = new TMessagesProcessor(details, root, mClientsRepo);
-        mDrivers = drivers;
-        for (var driver : mDrivers) {
-            driver.setTMessageHandler(mBalancer);
-            driver.setRMessageHandler(mBalancer);
-        }
+        mBalancer = new TMessagesProcessor(details, configuration.root, configuration.clientsRepo);
     }
 
-    public void start() {
-        int count = mDrivers.size();
+    public void start() throws StyxException {
+        int count = mConfiguration.drivers.size();
         mDriverThreads = new Thread[count];
+        var configuration = new IChannelDriver.StartConfiguration(
+                mBalancer,
+                mBalancer
+        );
         for (int i = 0; i < count; i++) {
-            mDriverThreads[i] = mDrivers.get(i).start(getIOUnit());
+            mDriverThreads[i] = mConfiguration.drivers.get(i).start(configuration);
         }
     }
 
     public int getIOUnit() {
-        return DEFAULT_IOUNIT;
+        return mConfiguration.iounit;
     }
 
     @Override
     public void close() throws IOException {
-        for (var driver : mDrivers) {
+        for (var driver : mConfiguration.drivers) {
             driver.close();
         }
         mBalancer.close();
@@ -70,20 +87,6 @@ public class StyxServerManager
 
     public String getProtocol() {
         return PROTOCOL;
-    }
-
-    //-------------------------------------------------------------------------------------
-    // Getters
-    //-------------------------------------------------------------------------------------
-    public IVirtualStyxFile getRoot() {
-        return mRoot;
-    }
-
-    //-------------------------------------------------------------------------------------
-    // Setters
-    //-------------------------------------------------------------------------------------
-    public List<IChannelDriver> getDrivers() {
-        return mDrivers;
     }
 
     public void joinThreads() throws InterruptedException {

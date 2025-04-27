@@ -3,6 +3,10 @@ package com.v2soft.styxlib.tests;
 import com.v2soft.styxlib.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.l5.Connection;
+import com.v2soft.styxlib.l5.serialization.IDataDeserializer;
+import com.v2soft.styxlib.l5.serialization.IDataSerializer;
+import com.v2soft.styxlib.l5.serialization.impl.StyxDeserializerImpl;
+import com.v2soft.styxlib.l5.serialization.impl.StyxSerializerImpl;
 import com.v2soft.styxlib.l6.StyxFile;
 import com.v2soft.styxlib.l6.vfs.MemoryStyxDirectory;
 import com.v2soft.styxlib.l6.vfs.MemoryStyxFile;
@@ -10,6 +14,7 @@ import com.v2soft.styxlib.library.types.impl.CredentialsImpl;
 import com.v2soft.styxlib.server.ClientsRepo;
 import com.v2soft.styxlib.server.ClientsRepoImpl;
 import com.v2soft.styxlib.server.StyxServerManager;
+import com.v2soft.styxlib.server.tcp.TCPChannelDriver;
 import com.v2soft.styxlib.server.tcp.TCPClientChannelDriver;
 import com.v2soft.styxlib.server.tcp.TCPServerChannelDriver;
 import org.junit.jupiter.api.AfterEach;
@@ -41,6 +46,16 @@ public class PacketIOTests {
     private static final String FILE_NAME = "md5file";
     private StyxServerManager mServer;
     private ClientsRepo mClientsRepo = new ClientsRepoImpl();
+    private IDataSerializer serializer = new StyxSerializerImpl();
+    private IDataDeserializer deserializer = new StyxDeserializerImpl();
+    private StyxServerManager.Configuration serverConfiguration;
+    private TCPChannelDriver.InitConfiguration initConfiguration = new TCPChannelDriver.InitConfiguration(
+            serializer,
+            deserializer,
+            StyxServerManager.DEFAULT_IOUNIT,
+            false,
+            InetAddress.getLoopbackAddress(),
+            PORT);
 
     @BeforeEach
     public void setUp() throws Exception {
@@ -95,14 +110,18 @@ public class PacketIOTests {
                 return super.read(clientId, outbuffer, offset, count);
             }
         };
-        var localHost = InetAddress.getByName("127.0.0.1");
-        var serverDriver = new TCPServerChannelDriver(localHost, PORT, false, mClientsRepo);
-        var root = new MemoryStyxDirectory("root", serverDriver.getSerializer());
+        var serverDriver = new TCPServerChannelDriver(mClientsRepo);
+        var root = new MemoryStyxDirectory("root", serializer);
         root.addFile(md5);
-        mServer = new StyxServerManager(
+        serverConfiguration = new StyxServerManager.Configuration(
                 root,
                 Arrays.asList(serverDriver),
-                mClientsRepo);
+                mClientsRepo,
+                serializer,
+                deserializer,
+                StyxServerManager.DEFAULT_IOUNIT);
+        mServer = new StyxServerManager(serverConfiguration);
+        serverDriver.prepare(initConfiguration);
         mServer.start();
     }
 
@@ -110,15 +129,17 @@ public class PacketIOTests {
     public void testMD5() throws IOException, StyxException, InterruptedException, TimeoutException, NoSuchAlgorithmException {
         Random random = new Random();
         MessageDigest digest = MessageDigest.getInstance("MD5");
-
-
-        Connection mConnection = new Connection(new CredentialsImpl("user", ""),
-                new TCPClientChannelDriver(
-                        InetAddress.getByName("localhost"), PORT, false, mClientsRepo),
-                mClientsRepo);
+        var driver = new TCPClientChannelDriver(mClientsRepo);
+        var clientConfiguration = new Connection.Configuration(
+                new CredentialsImpl("user", ""),
+                driver,
+                mClientsRepo,
+                serializer,
+                deserializer);
+        Connection mConnection = new Connection(clientConfiguration);
         byte[] someData = new byte[1024];
         byte [] remoteHash = new byte[16];
-
+        driver.prepare(initConfiguration);
         assertTrue(mConnection.connect());
 
         final StyxFile newFile = mConnection.open(FILE_NAME);
