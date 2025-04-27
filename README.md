@@ -9,11 +9,6 @@ How to use it in Java
 Java server:
 
 ```java
-/**
- * Java server that calculate MD5 digest.
- * @author V.Shcriyabets (vshcryabets@gmail.com)
- *
- */
 public class JavaServerSample {
     private static final int PORT = 10234;
     private static final String FILE_NAME = "md5file";
@@ -62,11 +57,28 @@ public class JavaServerSample {
         };
         MemoryStyxDirectory root = new MemoryStyxDirectory("root");
         root.addFile(md5);
-        StyxServerManager mServer = new TCPServerManager(InetAddress.getByName("127.0.0.1"),
-                PORT,
+        ClientsRepo clientsRepo = new ClientsRepoImpl();
+        IDataSerializer serializer = new StyxSerializerImpl();
+        IDataDeserializer deserializer = new StyxDeserializerImpl();
+        StyxServerManager.Configuration serverConfiguration;
+        TCPChannelDriver.InitConfiguration initConfiguration = new TCPChannelDriver.InitConfiguration(
+                serializer,
+                deserializer,
+                StyxServerManager.DEFAULT_IOUNIT,
                 false,
-                root);
-        Thread[] threads = mServer.start();
+                InetAddress.getLoopbackAddress(),
+                PORT);
+        var serverDriver = new TCPServerChannelDriver(clientsRepo);
+        serverConfiguration = new StyxServerManager.Configuration(
+                root,
+                Arrays.asList(serverDriver),
+                clientsRepo,
+                serializer,
+                deserializer,
+                StyxServerManager.DEFAULT_IOUNIT);
+        var server = new StyxServerManager(serverConfiguration);
+        serverDriver.prepare(initConfiguration);
+        Thread[] threads = server.start();
         System.out.println("Test server listen on 127.0.0.1:" + PORT);
         for(Thread thread : threads) {
             thread.join();
@@ -77,18 +89,35 @@ public class JavaServerSample {
 
 Java client sample:
 ```java
-        IClient connection = new Connection();
-        IChannelDriver driver = new TCPClientChannelDriver(
-                InetAddress.getByName("127.0.0.1"), PORT, false);
-	    connection.connect(driver)
-        final StyxFile newFile = new StyxFile(connection, FILE_NAME);
-        OutputStream output = newFile.openForWrite();
-        InputStream input = newFile.openForRead();
-        output.write(someData);
-        output.flush();
-        byte [] remoteHash = new byte[16];
-        int read = input.read(remoteHash);
-        output.close();
-        input.close();
-        connection.close();
+    IDataSerializer serializer = new StyxSerializerImpl();
+    IDataDeserializer deserializer = new StyxDeserializerImpl();
+    ClientsRepo clientsRepo = new ClientsRepoImpl();
+    var clientDriver = new TCPClientChannelDriver(mClientsRepo);
+    clientDriver.prepare(new TCPServerChannelDriver.InitConfiguration(
+         serializer,
+         deserializer,
+         StyxServerManager.DEFAULT_IOUNIT,
+         false,
+         InetAddress.getLoopbackAddress(),
+         PORT
+         ));
+    
+    clientConfiguration = new Connection.Configuration(
+        new CredentialsImpl("user", ""),
+        clientDriver,
+        clientsRepo,
+        serializer,
+        deserializer);
+    var connection = new Connection(clientConfiguration);
+    connection.connect();
+    StyxFile newFile = connection.open(FILE_NAME);
+    OutputStream output = newFile.openForWrite();
+    InputStream input = newFile.openForRead();
+    output.write(someData);
+    output.flush();
+    byte [] remoteHash = new byte[16];
+    int read = input.read(remoteHash);
+    output.close();
+    input.close();
+    connection.close();
 ```

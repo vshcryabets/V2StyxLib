@@ -22,10 +22,9 @@ public class ConnectionWithExport extends Connection {
     // Constants
     //---------------------------------------------------------------------------
     protected IVirtualStyxFile mExportedRoot = null;
-    protected TMessagesProcessor mExportProcessor;
 
-    public ConnectionWithExport(Credentials credentials, IChannelDriver driver, ClientsRepo clientsRepo) {
-        super(credentials, driver, clientsRepo);
+    public ConnectionWithExport(Connection.Configuration configuration) {
+        super(configuration);
     }
 
     @Override
@@ -39,19 +38,14 @@ public class ConnectionWithExport extends Connection {
     @Override
     public boolean connect() throws IOException, StyxException,
             InterruptedException, TimeoutException {
-        boolean result = super.connect();
-        mExportProcessor = new TMessagesProcessor(getConnectionDetails(), mExportedRoot,
-                mClientsRepo);
-        mDriver.setTMessageHandler(mExportProcessor);
-        return result;
+        mConfiguration.requestProcessor = new TMessagesProcessor(getConnectionDetails(), mExportedRoot,
+                mConfiguration.clientsRepo);
+        return super.connect();
     }
 
     @Override
     public void close() throws IOException {
-        if ( mExportProcessor != null ) {
-            mExportProcessor.close();
-            mExportProcessor = null;
-        }
         super.close();
+        mConfiguration.requestProcessor.close();
     }
 }

@@ -2,7 +2,12 @@ package com.v2soft.styxlib.l5;
 
 import com.v2soft.styxlib.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.exceptions.StyxException;
+import com.v2soft.styxlib.handlers.EmptyMessagesProcessor;
 import com.v2soft.styxlib.l5.enums.FileMode;
+import com.v2soft.styxlib.l5.serialization.IDataDeserializer;
+import com.v2soft.styxlib.l5.serialization.IDataSerializer;
+import com.v2soft.styxlib.l5.serialization.impl.StyxDeserializerImpl;
+import com.v2soft.styxlib.l5.serialization.impl.StyxSerializerImpl;
 import com.v2soft.styxlib.l6.StyxFile;
 import com.v2soft.styxlib.l6.io.StyxFileBufferedInputStream;
 import com.v2soft.styxlib.l6.vfs.DiskStyxDirectory;
@@ -11,6 +16,7 @@ import com.v2soft.styxlib.library.types.impl.CredentialsImpl;
 import com.v2soft.styxlib.server.ClientsRepo;
 import com.v2soft.styxlib.server.ClientsRepoImpl;
 import com.v2soft.styxlib.server.StyxServerManager;
+import com.v2soft.styxlib.server.tcp.TCPChannelDriver;
 import com.v2soft.styxlib.server.tcp.TCPClientChannelDriver;
 import com.v2soft.styxlib.server.tcp.TCPServerChannelDriver;
 import com.v2soft.styxlib.utils.MetricsAndStats;
@@ -41,24 +47,46 @@ public class ConnectionTest {
     private Connection mConnection;
     private StyxServerManager mServer;
     private ClientsRepo mClientsRepo = new ClientsRepoImpl();
+    private IDataSerializer serializer = new StyxSerializerImpl();
+    private IDataDeserializer deserializer = new StyxDeserializerImpl();
+    private Connection.Configuration clientConfiguration;
+    private StyxServerManager.Configuration serverConfiguration;
+    private TCPChannelDriver.InitConfiguration initConfiguration = new TCPServerChannelDriver.InitConfiguration(
+            serializer,
+            deserializer,
+            StyxServerManager.DEFAULT_IOUNIT,
+            false,
+            InetAddress.getLoopbackAddress(),
+            PORT
+    );
 
     @BeforeEach
     public void setUp() throws Exception {
         MetricsAndStats.reset();
-        InetAddress localHost = InetAddress.getByName("127.0.0.1");
-        File testDirectory = new File("./test");
+        var testDirectory = new File("./test");
         if (!testDirectory.exists()) {
             testDirectory.mkdirs();
         }
-        var serverDriver = new TCPServerChannelDriver(localHost, PORT, false, mClientsRepo);
-        mServer = new StyxServerManager(
-                new DiskStyxDirectory(testDirectory, serverDriver.getSerializer()),
+        var serverDriver = new TCPServerChannelDriver(mClientsRepo);
+        serverDriver.prepare(initConfiguration);
+        serverConfiguration = new StyxServerManager.Configuration(
+                new DiskStyxDirectory(testDirectory, serializer),
                 Arrays.asList(serverDriver),
-                mClientsRepo);
+                mClientsRepo,
+                serializer,
+                deserializer,
+                StyxServerManager.DEFAULT_IOUNIT);
+        mServer = new StyxServerManager(serverConfiguration);
         mServer.start();
-        var clientDriver = new TCPClientChannelDriver(localHost, PORT, false, mClientsRepo);
-        mConnection = new Connection(new CredentialsImpl("user", ""), clientDriver,
-                mClientsRepo);
+        var clientDriver = new TCPClientChannelDriver(mClientsRepo);
+        clientDriver.prepare(initConfiguration);
+        clientConfiguration = new Connection.Configuration(
+                new CredentialsImpl("user", ""),
+                clientDriver,
+                mClientsRepo,
+                serializer,
+                deserializer);
+        mConnection = new Connection(clientConfiguration);
         assertTrue(mConnection.connect());
     }
 
@@ -73,20 +101,20 @@ public class ConnectionTest {
     @Tag("dev")
     public void testConnection() throws IOException, InterruptedException, TimeoutException {
         int count = 1000;
-        mConnection.mTransmitter.clearStatistics();
+        clientConfiguration.transmitter.clearStatistics();
         long startTime = System.currentTimeMillis();
         for (int i = 0; i < count; i++) {
             mConnection.sendVersionMessage();
         }
-        assertEquals(count * 3, mConnection.mTransmitter.getTransmittedCount()); // TVersion, Tattach, TClunk
-        assertEquals(0, mConnection.mTransmitter.getErrorsCount());
+        assertEquals(count * 3, clientConfiguration.transmitter.getTransmittedCount()); // TVersion, Tattach, TClunk
+        assertEquals(0, clientConfiguration.transmitter.getErrorsCount());
         long diff = System.currentTimeMillis() - startTime;
         log.info(String.format("\tTransmited %d messages\n\t" +
                         //"Received %d messages\n\t" +
                         "Error %d messages\n\t" +
                         "Average time for connection %f ms",
-                mConnection.mTransmitter.getTransmittedCount(),
-                mConnection.mTransmitter.getErrorsCount(),
+                clientConfiguration.transmitter.getTransmittedCount(),
+                clientConfiguration.transmitter.getErrorsCount(),
                 (float)diff / (float)count
         ));
     }
@@ -236,9 +264,9 @@ public class ConnectionTest {
         long diff = System.currentTimeMillis() - writeTime;
         System.out.println(String.format("Write done in %d ms", (writeTime - startTime)));
         System.out.println(String.format("Read done in %d ms", diff));
-        System.out.println(String.format("\tTransmitted %d messages", mConnection.mTransmitter.getTransmittedCount()));
+        System.out.println(String.format("\tTransmitted %d messages", clientConfiguration.transmitter.getTransmittedCount()));
 //        System.out.println(String.format("\tReceived %d messages", mConnection.mTransmitter.getReceivedCount()));
-        System.out.println(String.format("\tError %d messages", mConnection.mTransmitter.getErrorsCount()));
+        System.out.println(String.format("\tError %d messages", clientConfiguration.transmitter.getErrorsCount()));
         //        System.out.println(String.format("\tAverage time for connection %d ms",diff/count));
     }
 
@@ -249,7 +277,7 @@ public class ConnectionTest {
         long blocksCount = 1024 * 1024;
         final String filename = "write";
         final long[] stat = new long[1];
-        ((DiskStyxDirectory) mServer.getRoot()).addFile(new MemoryStyxFile(filename) {
+        ((DiskStyxDirectory) serverConfiguration.getRoot()).addFile(new MemoryStyxFile(filename) {
             @Override
             public int write(int clientId, byte[] data, long offset) {
                 stat[0] += data.length;
@@ -278,8 +306,8 @@ public class ConnectionTest {
         Assertions.assertEquals(blockSize * blocksCount, stat[0], "Write and received size not equals");
         System.out.println(String.format("\tServer received %d bytes", stat[0]));
         System.out.println(String.format("\tWrite done in %d ms", writeTimeMs));
-        System.out.println(String.format("\tTransmited %d messages", mConnection.mTransmitter.getTransmittedCount()));
-        System.out.println(String.format("\tError %d messages", mConnection.mTransmitter.getErrorsCount()));
+        System.out.println(String.format("\tTransmited %d messages", clientConfiguration.transmitter.getTransmittedCount()));
+        System.out.println(String.format("\tError %d messages", clientConfiguration.transmitter.getErrorsCount()));
         System.out.println(String.format("\tByteBuffer allocations count %d", MetricsAndStats.byteBufferAllocation));
         System.out.println(String.format("\tbyte[] allocations count %d", MetricsAndStats.byteArrayAllocation));
         System.out.println(String.format("\tbyte[] allocations count RRead %d", MetricsAndStats.byteArrayAllocationRRead));

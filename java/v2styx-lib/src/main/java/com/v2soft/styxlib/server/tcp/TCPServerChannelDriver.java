@@ -23,11 +23,8 @@ public class TCPServerChannelDriver extends TCPChannelDriver {
     protected Selector mSelector;
     protected Map<SocketChannel, Integer> mClientStatesMap;
 
-    public TCPServerChannelDriver(InetAddress address,
-                                  int port,
-                                  boolean ssl,
-                                  ClientsRepo clientsRepo) throws StyxException {
-        super(address, port, ssl, clientsRepo);
+    public TCPServerChannelDriver(ClientsRepo clientsRepo) throws StyxException {
+        super(clientsRepo);
         mClientStatesMap = new HashMap<>();
     }
 
@@ -130,7 +127,7 @@ public class TCPServerChannelDriver extends TCPChannelDriver {
             } catch (IOException error) {
                 throw new StyxException(error.getMessage());
             }
-            int id = mClientsRepo.addClient(new TCPClientDetails(channel, this, mIOUnit));
+            int id = mClientsRepo.addClient(new TCPClientDetails(channel, this, mInitConfiguration.iounit));
             mClientStatesMap.put(channel, id);
         }
         // new readables
@@ -145,8 +142,8 @@ public class TCPServerChannelDriver extends TCPChannelDriver {
 
     private void removeClient(SocketChannel channel) throws StyxException {
         var cleintId = mClientStatesMap.get(channel);
-        mTMessageHandler.onClientRemoved(cleintId);
-        mRMessageHandler.onClientRemoved(cleintId);
+        mStartConfiguration.getTProcessor().onClientRemoved(cleintId);
+        mStartConfiguration.getRProcessor().onClientRemoved(cleintId);
         mClientsRepo.removeClient(cleintId);
         mClientStatesMap.remove(channel);
         try {

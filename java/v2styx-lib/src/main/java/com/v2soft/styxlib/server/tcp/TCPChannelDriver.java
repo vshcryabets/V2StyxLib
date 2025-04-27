@@ -5,8 +5,6 @@ import com.v2soft.styxlib.l5.enums.Checks;
 import com.v2soft.styxlib.l5.messages.base.StyxTMessage;
 import com.v2soft.styxlib.l5.serialization.IDataDeserializer;
 import com.v2soft.styxlib.l5.serialization.IDataSerializer;
-import com.v2soft.styxlib.l5.serialization.impl.StyxDeserializerImpl;
-import com.v2soft.styxlib.l5.serialization.impl.StyxSerializerImpl;
 import com.v2soft.styxlib.server.ClientsRepo;
 import com.v2soft.styxlib.server.StyxServerManager;
 import com.v2soft.styxlib.handlers.IMessageProcessor;
@@ -25,35 +23,45 @@ import java.util.concurrent.CompletionException;
  *
  * @author V.Shcryabets (vshcryabets@gmail.com)
  */
-public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
+public abstract class TCPChannelDriver implements
+        IChannelDriver<TCPChannelDriver.InitConfiguration>,
+        Runnable {
+    public static class InitConfiguration extends IChannelDriver.InitConfiguration {
+        public final boolean ssl;
+        public final InetAddress address;
+        public final int port;
+
+        public InitConfiguration(IDataSerializer serializer,
+                                 IDataDeserializer deserializer,
+                                 int iounit,
+                                 boolean ssl,
+                                 InetAddress address,
+                                 int port
+        ) {
+            super(serializer, deserializer, iounit);
+            this.ssl = ssl;
+            this.address = address;
+            this.port = port;
+        }
+    }
+
     protected Thread mAcceptorThread;
     protected boolean isWorking;
-    protected IMessageProcessor mTMessageHandler;
-    protected IMessageProcessor mRMessageHandler;
-    protected int mIOUnit;
     protected int mTransmittedPacketsCount;
     protected int mTransmissionErrorsCount;
-    protected InetAddress mAddress;
-    protected int mPort;
-    protected IDataDeserializer deserializer;
-    protected IDataSerializer serializer;
     protected ClientsRepo mClientsRepo;
+    protected InitConfiguration mInitConfiguration;
+    protected StartConfiguration mStartConfiguration;
 
-    public TCPChannelDriver(InetAddress address,
-                            int port,
-                            boolean ssl,
-                            ClientsRepo clientsRepo) throws StyxException {
-        mPort = port;
-        mAddress = address;
+    public TCPChannelDriver(ClientsRepo clientsRepo) throws StyxException {
         mClientsRepo = clientsRepo;
-
-        // Bind the server socket to the local host and port
-        var socketAddress = new InetSocketAddress(address, port);
-        prepareSocket(socketAddress, ssl);
         mTransmittedPacketsCount = 0;
         mTransmissionErrorsCount = 0;
-        deserializer = new StyxDeserializerImpl();
-        serializer = new StyxSerializerImpl();
+    }
+
+    @Override
+    public void prepare(InitConfiguration configuration) {
+        mInitConfiguration = configuration;
     }
 
     protected abstract void prepareSocket(InetSocketAddress socketAddress, boolean ssl) throws StyxException;
@@ -63,11 +71,16 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
     }
 
     @Override
-    public Thread start(int iounit) {
-        if ( mAcceptorThread != null ) {
+    public Thread start(StartConfiguration configuration) throws StyxException {
+        if (mInitConfiguration == null)
+            throw new StyxException("Not initialized");
+        if (mAcceptorThread != null) {
             throw new IllegalStateException("Already started");
         }
-        mIOUnit = iounit;
+        mStartConfiguration = configuration;
+        // Bind the server socket to the local host and port
+        var socketAddress = new InetSocketAddress(mInitConfiguration.address, mInitConfiguration.port);
+        prepareSocket(socketAddress, mInitConfiguration.ssl);
         mAcceptorThread = new Thread(this, toString());
         mAcceptorThread.start();
         isWorking = true;
@@ -79,12 +92,12 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
             StyxMessage message,
             int clientId,
             long timeout) throws StyxException {
-        if ( clientId < 0) {
+        if (clientId < 0) {
             throw new StyxException("Client id is negative");
         }
-        final var client = (TCPClientDetails)mClientsRepo.getClient(clientId);
+        final var client = (TCPClientDetails) mClientsRepo.getClient(clientId);
         try {
-            serializer.serialize(message, client.getOutputWriter());
+            mInitConfiguration.serializer.serialize(message, client.getOutputWriter());
             client.sendOutputBuffer();
             mTransmittedPacketsCount++;
         } catch (StyxException e) {
@@ -93,20 +106,12 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
         }
         return new Future<>(CompletableFuture.supplyAsync(() -> {
             try {
-                return (R)((StyxTMessage) message).waitForAnswer(timeout);
+                return (R) ((StyxTMessage) message).waitForAnswer(timeout);
             } catch (StyxException e) {
                 throw new CompletionException(e);
             }
         }));
 
-    }
-
-    public void setTMessageHandler(IMessageProcessor handler) {
-        mTMessageHandler = handler;
-    }
-
-    public void setRMessageHandler(IMessageProcessor handler) {
-        mRMessageHandler = handler;
     }
 
     @Override
@@ -117,51 +122,49 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        if ( mAcceptorThread.isAlive() ) {
+        if (mAcceptorThread.isAlive()) {
             mAcceptorThread.interrupt();
         }
     }
 
     /**
      * Read data from assigned SocketChannel
+     *
      * @throws IOException
      */
     protected boolean readSocket(int clientId) throws StyxException {
         int read = 0;
-        final var client = (TCPClientDetails)mClientsRepo.getClient(clientId);
+        final var client = (TCPClientDetails) mClientsRepo.getClient(clientId);
         try {
             read = client.getBufferLoader().readFromChannelToBuffer(client.getChannel());
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             read = -1;
         }
-        if ( read == -1 ) {
+        if (read == -1) {
             return true;
         } else {
-            while ( process(clientId) );
+            while (process(clientId)) ;
         }
         return false;
     }
 
     /**
      * Read income message from specified client.
+     *
      * @return true if message was processed
      */
     private boolean process(int clientId) throws StyxException {
-        final var client = (TCPClientDetails)mClientsRepo.getClient(clientId);
+        final var client = (TCPClientDetails) mClientsRepo.getClient(clientId);
         int inBuffer = client.getBuffer().remainsToRead();
-        if ( inBuffer > 4 ) {
+        if (inBuffer > 4) {
             long packetSize = client.getInputReader().getUInt32();
-            if ( inBuffer >= packetSize ) {
-                var message = deserializer.deserializeMessage(client.getInputReader(), mIOUnit);
-                if ( Checks.isTMessage(message.getType()) ) {
-                    if ( mTMessageHandler != null ) {
-                        mTMessageHandler.onClientMessage(message, clientId);
-                    }
+            if (inBuffer >= packetSize) {
+                var message = mInitConfiguration.deserializer.deserializeMessage(client.getInputReader(),
+                        mInitConfiguration.iounit);
+                if (Checks.isTMessage(message.getType())) {
+                    mStartConfiguration.getTProcessor().onClientMessage(message, clientId);
                 } else {
-                    if ( mRMessageHandler != null ) {
-                        mRMessageHandler.onClientMessage(message, clientId);
-                    }
+                    mStartConfiguration.getRProcessor().onClientMessage(message, clientId);
                 }
                 return true;
             }
@@ -171,13 +174,14 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
 
     @Override
     public int hashCode() {
-        return mAddress.hashCode()*mPort;
+        return mInitConfiguration.address.hashCode() * mInitConfiguration.port;
     }
 
     @Override
     public int getTransmittedCount() {
         return mTransmittedPacketsCount;
     }
+
     @Override
     public int getErrorsCount() {
         return mTransmissionErrorsCount;
@@ -185,20 +189,25 @@ public abstract class TCPChannelDriver implements IChannelDriver, Runnable {
 
     @Override
     public String toString() {
-        return String.format("%s:%s:%d", getClass().getSimpleName(), mAddress.toString(), mPort);
+        if (mInitConfiguration == null) {
+            return String.format("%s:uninitialized", getClass().getSimpleName());
+        }
+        return String.format("%s:%s:%d", getClass().getSimpleName(),
+                mInitConfiguration.address.toString(),
+                mInitConfiguration.port);
     }
 
-    public int getPort() {
-        return mPort;
-    }
+//    public int getPort() {
+//        return mPort;
+//    }
 
-    @Override
-    public IDataSerializer getSerializer() {
-        return serializer;
-    }
-
-    @Override
-    public IDataDeserializer getDeserializer() {
-        return deserializer;
-    }
+//    @Override
+//    public IDataSerializer getSerializer() {
+//        return serializer;
+//    }
+//
+//    @Override
+//    public IDataDeserializer getDeserializer() {
+//        return deserializer;
+//    }
 }

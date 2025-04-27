@@ -1,10 +1,7 @@
 package com.v2soft.styxlib.server;
 
 import com.v2soft.styxlib.exceptions.StyxException;
-import com.v2soft.styxlib.handlers.IMessageProcessor;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
-import com.v2soft.styxlib.l5.serialization.IDataDeserializer;
-import com.v2soft.styxlib.l5.serialization.IDataSerializer;
 import com.v2soft.styxlib.utils.Future;
 
 import java.util.Collection;
@@ -12,18 +9,13 @@ import java.util.List;
 
 public class EmptyChannelDriver implements IChannelDriver {
     @Override
-    public Thread start(int iounit) {
+    public void prepare(InitConfiguration configuration) {
+
+    }
+
+    @Override
+    public Thread start(StartConfiguration configuration) {
         return null;
-    }
-
-    @Override
-    public void setTMessageHandler(IMessageProcessor handler) {
-
-    }
-
-    @Override
-    public void setRMessageHandler(IMessageProcessor handler) {
-
     }
 
     @Override
@@ -39,16 +31,6 @@ public class EmptyChannelDriver implements IChannelDriver {
     @Override
     public boolean isStarted() {
         return false;
-    }
-
-    @Override
-    public IDataSerializer getSerializer() {
-        return null;
-    }
-
-    @Override
-    public IDataDeserializer getDeserializer() {
-        return null;
     }
 
     @Override

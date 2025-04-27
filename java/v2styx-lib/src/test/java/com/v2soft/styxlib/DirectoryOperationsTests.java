@@ -2,11 +2,16 @@ package com.v2soft.styxlib;
 
 import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.l5.Connection;
+import com.v2soft.styxlib.l5.serialization.IDataDeserializer;
+import com.v2soft.styxlib.l5.serialization.IDataSerializer;
+import com.v2soft.styxlib.l5.serialization.impl.StyxDeserializerImpl;
+import com.v2soft.styxlib.l5.serialization.impl.StyxSerializerImpl;
 import com.v2soft.styxlib.l6.vfs.DiskStyxDirectory;
 import com.v2soft.styxlib.library.types.impl.CredentialsImpl;
 import com.v2soft.styxlib.server.ClientsRepo;
 import com.v2soft.styxlib.server.ClientsRepoImpl;
 import com.v2soft.styxlib.server.StyxServerManager;
+import com.v2soft.styxlib.server.tcp.TCPChannelDriver;
 import com.v2soft.styxlib.server.tcp.TCPClientChannelDriver;
 import com.v2soft.styxlib.server.tcp.TCPServerChannelDriver;
 import com.v2soft.styxlib.utils.MetricsAndStats;
@@ -17,7 +22,7 @@ import org.junit.jupiter.api.Test;
 import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Logger;
 
@@ -26,6 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Client JUnit tests
+ *
  * @author V.Shcriabets (vshcryabets@gmail.com)
  */
 public class DirectoryOperationsTests {
@@ -40,15 +46,38 @@ public class DirectoryOperationsTests {
         MetricsAndStats.reset();
         var localHost = InetAddress.getByName("127.0.0.1");
         var testDirectory = new File("./");
-        var serverDriver = new TCPServerChannelDriver(localHost, PORT, false, mClientsRepo);
-        mServer = new StyxServerManager(
-                new DiskStyxDirectory(testDirectory, serverDriver.getSerializer()),
-                Collections.singletonList(serverDriver),
-                mClientsRepo);
+        IDataSerializer serializer = new StyxSerializerImpl();
+        IDataDeserializer deserializer = new StyxDeserializerImpl();
+        TCPChannelDriver.InitConfiguration initConfiguration = new TCPChannelDriver.InitConfiguration(
+                serializer,
+                deserializer,
+                StyxServerManager.DEFAULT_IOUNIT,
+                false,
+                localHost,
+                PORT);
+
+        // Server side
+        var serverDriver = new TCPServerChannelDriver(mClientsRepo);
+        mServer = new StyxServerManager(new StyxServerManager.Configuration(
+                new DiskStyxDirectory(testDirectory, serializer),
+                Arrays.asList(serverDriver),
+                mClientsRepo,
+                serializer,
+                deserializer,
+                StyxServerManager.DEFAULT_IOUNIT));
+        serverDriver.prepare(initConfiguration);
         mServer.start();
-        var driver = new TCPClientChannelDriver(localHost, PORT, false, mClientsRepo);
-        mConnection = new Connection(new CredentialsImpl("user", ""), driver,
-                mClientsRepo);
+
+        // client side
+        var driver = new TCPClientChannelDriver(mClientsRepo);
+        var connectionConfiguration = new Connection.Configuration(
+                new CredentialsImpl("user", ""),
+                driver,
+                mClientsRepo,
+                serializer,
+                deserializer);
+        mConnection = new Connection(connectionConfiguration);
+        driver.prepare(initConfiguration);
         assertTrue(mConnection.connect());
     }
 

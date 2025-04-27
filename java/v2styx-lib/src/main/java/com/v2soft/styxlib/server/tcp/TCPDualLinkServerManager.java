@@ -10,6 +10,7 @@ import com.v2soft.styxlib.server.ClientsRepo;
 import com.v2soft.styxlib.server.IChannelDriver;
 import com.v2soft.styxlib.server.StyxServerManager;
 
+import java.net.InetAddress;
 import java.util.List;
 
 /**
@@ -23,10 +24,8 @@ public class TCPDualLinkServerManager extends StyxServerManager {
     protected RMessagesProcessor mReverseAnswerProcessor;
     protected TMessageTransmitter mReverseTransmitter;
 
-    public TCPDualLinkServerManager(IVirtualStyxFile root,
-                                    List<IChannelDriver> drivers,
-                                    ClientsRepo clientsRepo) {
-        super(root, drivers, clientsRepo);
+    public TCPDualLinkServerManager(StyxServerManager.Configuration configuration) {
+        super(configuration);
     }
 
     @Override
@@ -36,14 +35,18 @@ public class TCPDualLinkServerManager extends StyxServerManager {
 
     public synchronized  IClient getReverseConnectionForClient(int clientId, Credentials credentials) {
         if ( mReverseAnswerProcessor == null ) {
-            mReverseAnswerProcessor = new RMessagesProcessor("RC"+clientId, mClientsRepo);
-            mReverseTransmitter = new TMessageTransmitter(null, mClientsRepo);
+            mReverseAnswerProcessor = new RMessagesProcessor("RC"+clientId, mConfiguration.getClientsRepo());
+            mReverseTransmitter = new TMessageTransmitter(null, mConfiguration.getClientsRepo());
         }
-        var driver = mClientsRepo.getChannelDriver(clientId);
-        return new Connection(credentials,
+        var driver = mConfiguration.getClientsRepo().getChannelDriver(clientId);
+        return new Connection(new Connection.Configuration(
+                credentials,
                 driver,
+                mConfiguration.getClientsRepo(),
+                mConfiguration.getSerializer(),
+                mConfiguration.getDeserializer(),
                 mReverseAnswerProcessor,
-                mReverseTransmitter,
-                mClientsRepo);
+                mReverseTransmitter
+        ));
     }
 }
