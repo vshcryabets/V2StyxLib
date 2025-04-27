@@ -4,7 +4,6 @@ import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.server.ClientsRepo;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.nio.channels.SelectionKey;
@@ -141,10 +140,10 @@ public class TCPServerChannelDriver extends TCPChannelDriver {
     }
 
     private void removeClient(SocketChannel channel) throws StyxException {
-        var cleintId = mClientStatesMap.get(channel);
-        mStartConfiguration.getTProcessor().onClientRemoved(cleintId);
-        mStartConfiguration.getRProcessor().onClientRemoved(cleintId);
-        mClientsRepo.removeClient(cleintId);
+        var clientId = mClientStatesMap.get(channel);
+        mStartConfiguration.getTProcessor().onClientRemoved(clientId);
+        mStartConfiguration.getRProcessor().onClientRemoved(clientId);
+        mClientsRepo.removeClient(clientId);
         mClientStatesMap.remove(channel);
         try {
             channel.close();

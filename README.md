@@ -93,7 +93,7 @@ Java client sample:
     IDataDeserializer deserializer = new StyxDeserializerImpl();
     ClientsRepo clientsRepo = new ClientsRepoImpl();
     var clientDriver = new TCPClientChannelDriver(clientsRepo);
-    clientDriver.prepare(new TCPServerChannelDriver.InitConfiguration(
+    clientDriver.prepare(new TCPClientChannelDriver.InitConfiguration(
          serializer,
          deserializer,
          StyxServerManager.DEFAULT_IOUNIT,
