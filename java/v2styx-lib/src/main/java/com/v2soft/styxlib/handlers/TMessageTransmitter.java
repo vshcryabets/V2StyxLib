@@ -2,6 +2,7 @@ package com.v2soft.styxlib.handlers;
 
 import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.l5.enums.Checks;
+import com.v2soft.styxlib.l5.enums.Constants;
 import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
 import com.v2soft.styxlib.l5.messages.base.StyxTMessage;
@@ -33,7 +34,7 @@ public class TMessageTransmitter implements IMessageTransmitter {
             long timeout
             )
             throws StyxException {
-        if ( !Checks.isTMessage(message.getType())) {
+        if ( !Checks.isTMessage(message.type)) {
             throw new StyxException("Can't sent RMessage");
         }
         if (clientId < 0) {
@@ -44,8 +45,8 @@ public class TMessageTransmitter implements IMessageTransmitter {
         if (!driver.isConnected()) throw new StyxException("Not connected to server");
 
         // set message tag
-        int tag = StyxMessage.NOTAG;
-        if (message.getType() != MessageType.Tversion) {
+        int tag = Constants.NOTAG;
+        if (message.type != MessageType.Tversion) {
             tag = mClientsRepo.getPolls(clientId).getTagPoll().getFreeItem();
         }
         message.setTag((short) tag);

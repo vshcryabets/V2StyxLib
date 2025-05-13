@@ -1,41 +1,15 @@
 package com.v2soft.styxlib.l5.messages.base;
 
-import com.v2soft.styxlib.l5.serialization.IBufferReader;
-import com.v2soft.styxlib.l5.enums.MessageType;
-import com.v2soft.styxlib.utils.MetricsAndStats;
-
-import java.io.IOException;
+import com.v2soft.styxlib.l5.dev.MetricsAndStats;
 
 public class StyxMessage {
-    public static final int NOTAG  =      0xFFFF;
-    public static final long NOFID = 0xFFFFFFFFL;
-
     private int mTag;
-    private final int mType;
+    public final int type;
 
     public StyxMessage(int type, int tag) {
         MetricsAndStats.newStyxMessage++;
-        mType = type;
+        this.type = type;
         mTag = tag;
-    }
-
-    public static String toString(byte[] bytes) {
-        if ( (bytes == null) || (bytes.length==0))
-            return "-";
-        final StringBuilder result = new StringBuilder();
-        result.append(Integer.toHexString(((int)bytes[0])&0xFF));
-        result.append(",");
-        int count = bytes.length;
-        for (int i=1; i<count; i++)
-        {
-            result.append(Integer.toHexString(((int)bytes[i])&0xFF));
-            result.append(',');
-        }
-        return String.format("(%s)", result);
-    }
-
-    public int getType(){
-        return mType;
     }
 
     public int getTag(){
@@ -49,6 +23,6 @@ public class StyxMessage {
     @Override
     public String toString() {
         return String.format("Type: %d\tTag: %d",
-                getType(), getTag());
+                type, getTag());
     }
 }

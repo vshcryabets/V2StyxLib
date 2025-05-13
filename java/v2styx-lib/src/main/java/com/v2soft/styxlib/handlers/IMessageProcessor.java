@@ -12,6 +12,4 @@ import java.io.Closeable;
 public interface IMessageProcessor extends Closeable {
     void onClientRemoved(int clientId);
     void onClientMessage(StyxMessage message, int clientId);
-    int getReceivedPacketsCount();
-    int getReceivedErrorPacketsCount();
 }

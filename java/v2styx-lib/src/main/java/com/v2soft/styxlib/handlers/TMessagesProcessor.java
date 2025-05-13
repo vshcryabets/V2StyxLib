@@ -12,7 +12,7 @@ import com.v2soft.styxlib.library.types.ConnectionDetails;
 import com.v2soft.styxlib.library.types.Credentials;
 import com.v2soft.styxlib.library.types.impl.CredentialsImpl;
 import com.v2soft.styxlib.server.ClientsRepo;
-import com.v2soft.styxlib.utils.MetricsAndStats;
+import com.v2soft.styxlib.l5.dev.MetricsAndStats;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -22,7 +22,7 @@ import java.util.List;
  *
  * @author V.Shcriyabets (vshcryabets@gmail.com)
  */
-public class TMessagesProcessor extends QueueMessagesProcessor implements IMessageProcessor {
+public class TMessagesProcessor extends QueueMessagesProcessor {
     protected ConnectionDetails mConnectionDetails;
     private static final int DEFAULT_PACKET_HEADER_SIZE = 24;
     private IVirtualStyxFile mRoot;
@@ -57,7 +57,7 @@ public class TMessagesProcessor extends QueueMessagesProcessor implements IMessa
         IVirtualStyxFile file;
         long fid;
         try {
-            switch (message.getType()) {
+            switch (message.type) {
                 case MessageType.Tversion:
                     answer = new StyxRVersionMessage(mConnectionDetails.ioUnit(), mConnectionDetails.protocol());
                     break;
@@ -114,16 +114,6 @@ public class TMessagesProcessor extends QueueMessagesProcessor implements IMessa
             mAnswerPackets++;
             mClientsRepo.getDriver(clientId).sendMessage(answer, clientId, 0);
         }
-    }
-
-    @Override
-    public int getReceivedPacketsCount() {
-        return mHandledPackets;
-    }
-
-    @Override
-    public int getReceivedErrorPacketsCount() {
-        return mErrorPackets;
     }
 
     private StyxRAttachMessage processAttach(int clientId, StyxTAttachMessage msg) {

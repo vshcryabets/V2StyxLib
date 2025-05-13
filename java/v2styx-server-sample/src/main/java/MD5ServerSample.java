@@ -1,9 +1,14 @@
 import com.v2soft.styxlib.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.exceptions.StyxException;
+import com.v2soft.styxlib.l5.serialization.IDataDeserializer;
+import com.v2soft.styxlib.l5.serialization.IDataSerializer;
+import com.v2soft.styxlib.l5.serialization.impl.StyxDeserializerImpl;
+import com.v2soft.styxlib.l5.serialization.impl.StyxSerializerImpl;
 import com.v2soft.styxlib.l6.vfs.MemoryStyxDirectory;
 import com.v2soft.styxlib.l6.vfs.MemoryStyxFile;
 import com.v2soft.styxlib.server.ClientsRepoImpl;
 import com.v2soft.styxlib.server.StyxServerManager;
+import com.v2soft.styxlib.server.tcp.TCPChannelDriver;
 import com.v2soft.styxlib.server.tcp.TCPServerChannelDriver;
 
 import java.io.IOException;
@@ -21,6 +26,8 @@ import java.util.List;
 public class MD5ServerSample {
     private static final int PORT = 10234;
     private static final String FILE_NAME = "md5file";
+    private IDataSerializer serializer = new StyxSerializerImpl();
+    private IDataDeserializer deserializer = new StyxDeserializerImpl();
 
     public static void main(String[] args) throws IOException, InterruptedException, StyxException {
         MemoryStyxFile md5 = new MemoryStyxFile(FILE_NAME){
@@ -65,17 +72,30 @@ public class MD5ServerSample {
             }
         };
         var clientsRepo = new ClientsRepoImpl();
-        var driver = new TCPServerChannelDriver(
-                InetAddress.getByName("127.0.0.1"),
-                PORT,
+        IDataSerializer serializer = new StyxSerializerImpl();
+        IDataDeserializer deserializer = new StyxDeserializerImpl();
+        var driver = new TCPServerChannelDriver(clientsRepo);
+        driver.prepare(new TCPChannelDriver.InitConfiguration(
+                serializer,
+                deserializer,
+                StyxServerManager.DEFAULT_IOUNIT,
                 false,
-                clientsRepo);
-        MemoryStyxDirectory root = new MemoryStyxDirectory("root", driver.getSerializer());
+                InetAddress.getByName("127.0.0.1"),
+                PORT
+        ));
+
+        MemoryStyxDirectory root = new MemoryStyxDirectory("root", serializer);
         root.addFile(md5);
-        StyxServerManager mServer = new StyxServerManager(
+
+        var serverConfiguration = new StyxServerManager.Configuration(
                 root,
                 List.of(driver),
-                clientsRepo);
+                clientsRepo,
+                serializer,
+                deserializer,
+                StyxServerManager.DEFAULT_IOUNIT);
+
+        var mServer = new StyxServerManager(serverConfiguration);
         mServer.start();
         System.out.println("Test server listen on 127.0.0.1:" + PORT);
         mServer.joinThreads();

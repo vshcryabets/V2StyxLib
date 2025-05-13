@@ -3,6 +3,7 @@ package com.v2soft.styxlib.l6;
 import com.v2soft.styxlib.exceptions.StyxEOFException;
 import com.v2soft.styxlib.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.exceptions.StyxException;
+import com.v2soft.styxlib.l5.enums.Constants;
 import com.v2soft.styxlib.l5.enums.FileMode;
 import com.v2soft.styxlib.l5.serialization.IDataDeserializer;
 import com.v2soft.styxlib.l5.serialization.impl.StyxSerializerImpl;
@@ -36,7 +37,7 @@ import java.util.List;
  */
 public class StyxFile {
     public static final String SEPARATOR = "/";
-    private long mFID = StyxMessage.NOFID;
+    private long mFID = Constants.NOFID;
     private long mParentFID;
     private final String mPath;
     private final IMessageTransmitter mTransmitter;
@@ -72,7 +73,7 @@ public class StyxFile {
      */
     public long getFID()
             throws StyxException {
-        if (mFID == StyxMessage.NOFID) {
+        if (mFID == Constants.NOFID) {
             mFID = sendWalkMessage(mParentFID, mPath);
         }
         return mFID;
@@ -86,7 +87,7 @@ public class StyxFile {
     }
 
     public void close() throws StyxException {
-        if (mFID == StyxMessage.NOFID) {
+        if (mFID == Constants.NOFID) {
             return;
         }
         // send Tclunk
@@ -94,7 +95,7 @@ public class StyxFile {
         var feature = mTransmitter.sendMessage(tClunk, mClientId, mTimeout);
         feature.getResult();
 
-        mFID = StyxMessage.NOFID;
+        mFID = Constants.NOFID;
     }
 
     public List<StyxStat> listStat()
@@ -189,7 +190,7 @@ public class StyxFile {
     }
 
     public boolean exists() throws StyxException {
-        return (getFID() != StyxMessage.NOFID);
+        return (getFID() != Constants.NOFID);
     }
 
     /**
@@ -209,7 +210,7 @@ public class StyxFile {
             }
         }
         long fid = getFID();
-        mFID = StyxMessage.NOFID;
+        mFID = Constants.NOFID;
         var tRemove = new StyxTMessageFID(MessageType.Tremove, MessageType.Rremove, fid);
         mTransmitter
             .sendMessage(tRemove, mClientId, mTimeout)
@@ -333,7 +334,7 @@ public class StyxFile {
         final var feature = mTransmitter.sendMessage(tWalk, mClientId, mTimeout);
         final StyxMessage rWalk = feature.getResult();
         StyxErrorMessageException.doException(rWalk, mPath);
-        if (((StyxRWalkMessage) rWalk).getQIDListLength() != tWalk.getPathLength())
+        if (((StyxRWalkMessage) rWalk).qidList.size() != tWalk.getPathLength())
             throw new StyxException("File not found " + mPath);
         return newFID;
     }

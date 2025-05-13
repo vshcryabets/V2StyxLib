@@ -10,15 +10,5 @@ public class EmptyMessagesProcessor implements IMessageProcessor {
     public void onClientMessage(StyxMessage message, int clientId) {}
 
     @Override
-    public int getReceivedPacketsCount() {
-        return 0;
-    }
-
-    @Override
-    public int getReceivedErrorPacketsCount() {
-        return 0;
-    }
-
-    @Override
     public void close() { }
 }

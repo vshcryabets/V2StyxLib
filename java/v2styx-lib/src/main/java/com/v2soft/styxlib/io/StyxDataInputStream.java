@@ -3,7 +3,7 @@ package com.v2soft.styxlib.io;
 import com.v2soft.styxlib.exceptions.StyxEOFException;
 import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.l5.serialization.IBufferReader;
-import com.v2soft.styxlib.utils.MetricsAndStats;
+import com.v2soft.styxlib.l5.dev.MetricsAndStats;
 
 import java.io.FilterInputStream;
 import java.io.IOException;

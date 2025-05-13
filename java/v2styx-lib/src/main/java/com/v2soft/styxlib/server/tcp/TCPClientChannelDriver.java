@@ -79,7 +79,7 @@ public class TCPClientChannelDriver extends TCPChannelDriver {
                             final long packetSize = reader.getUInt32();
                             if ( buffer.remainsToRead() >= packetSize ) {
                                 var message = mInitConfiguration.deserializer.deserializeMessage(reader, mInitConfiguration.iounit);
-                                if ( Checks.isTMessage(message.getType())) {
+                                if ( Checks.isTMessage(message.type)) {
                                     mStartConfiguration.getTProcessor().onClientMessage(message, mServerClientDetails.getId());
                                 } else {
                                     mStartConfiguration.getRProcessor().onClientMessage(message, mServerClientDetails.getId());

@@ -12,7 +12,7 @@ import java.util.Map;
 /**
  * @author V.Shcryabets <a>vshcryabets@gmail.com</a>
  */
-public class RMessagesProcessor extends QueueMessagesProcessor implements IMessageProcessor {
+public class RMessagesProcessor extends QueueMessagesProcessor {
     protected int mReceivedCount, mErrorCount;
     protected String mTag;
     protected ClientsRepo mClientsRepo;
@@ -43,8 +43,8 @@ public class RMessagesProcessor extends QueueMessagesProcessor implements IMessa
         }
         final StyxTMessage tMessage = clientMessagesMap.get(tag);
         // TODO i'm not sure that this is proper place for that logic
-        if (tMessage.getType() == MessageType.Tclunk ||
-                tMessage.getType() == MessageType.Tremove) {
+        if (tMessage.type == MessageType.Tclunk ||
+                tMessage.type == MessageType.Tremove) {
             polls.releaseFID((StyxTMessageFID) tMessage);
         }
         try {
@@ -52,19 +52,9 @@ public class RMessagesProcessor extends QueueMessagesProcessor implements IMessa
         } catch (StyxException e) {
             e.printStackTrace();
         }
-        if (message.getType() == MessageType.Rerror) {
+        if (message.type == MessageType.Rerror) {
             mErrorCount++;
         }
         polls.releaseTag(tag);
-    }
-
-    @Override
-    public int getReceivedPacketsCount() {
-        return mReceivedCount;
-    }
-
-    @Override
-    public int getReceivedErrorPacketsCount() {
-        return mErrorCount;
     }
 }

@@ -76,7 +76,7 @@ public class StyxDeserializerImplTest {
         var bufferReader = new BufferReaderImpl(buffer);
         var message = (StyxROpenMessage) deserializer.deserializeMessage(bufferReader, 8192);
         Assertions.assertNotNull(message);
-        Assertions.assertEquals(MessageType.Rcreate, message.getType());
+        Assertions.assertEquals(MessageType.Rcreate, message.type);
         Assertions.assertEquals(1, message.getTag());
         var qid = message.getQID();
         Assertions.assertEquals(0, qid.type());
