@@ -5,10 +5,16 @@ import com.v2soft.styxlib.client.UploadFileUseCaseImpl;
 import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.l5.Connection;
 import com.v2soft.styxlib.l5.enums.QidType;
+import com.v2soft.styxlib.l5.serialization.IDataDeserializer;
+import com.v2soft.styxlib.l5.serialization.IDataSerializer;
+import com.v2soft.styxlib.l5.serialization.impl.StyxDeserializerImpl;
+import com.v2soft.styxlib.l5.serialization.impl.StyxSerializerImpl;
 import com.v2soft.styxlib.l5.structs.StyxStat;
 import com.v2soft.styxlib.library.types.impl.CredentialsImpl;
 import com.v2soft.styxlib.server.ClientsRepoImpl;
+import com.v2soft.styxlib.server.StyxServerManager;
 import com.v2soft.styxlib.server.tcp.TCPClientChannelDriver;
+import com.v2soft.styxlib.server.tcp.TCPServerChannelDriver;
 import org.jline.reader.LineReader;
 import org.jline.reader.LineReaderBuilder;
 import org.jline.terminal.Terminal;
@@ -41,6 +47,8 @@ public class StyxConsoleClient {
     private static final String DIR_PARENT = "..";
 
     private static Logger log = Logger.getLogger(StyxConsoleClient.class.getSimpleName());
+    private IDataSerializer serializer = new StyxSerializerImpl();
+    private IDataDeserializer deserializer = new StyxDeserializerImpl();
 
     public static void main(String[] args) {
         try {
@@ -144,8 +152,23 @@ public class StyxConsoleClient {
         terminal.writer().println("Connection to the " + host + ":" + port);
         try {
             var clientsRepo = new ClientsRepoImpl();
-            var driver = new TCPClientChannelDriver(InetAddress.getByName(host), port, false, clientsRepo);
-            var connection = new Connection(new CredentialsImpl("", ""), driver, clientsRepo);
+            var driver = new TCPClientChannelDriver(clientsRepo);
+            var initConfiguration = new TCPServerChannelDriver.InitConfiguration(
+                    serializer,
+                    deserializer,
+                    StyxServerManager.DEFAULT_IOUNIT,
+                    false,
+                    InetAddress.getByName(host),
+                    port
+            );
+            driver.prepare(initConfiguration);
+            var connectionConfiguration = new Connection.Configuration(
+                    new CredentialsImpl("", ""),
+                    driver,
+                    clientsRepo,
+                    serializer,
+                    deserializer);
+            var connection = new Connection(connectionConfiguration);
             connection.connect();
             terminal.writer().println("Connected");
             File currentLocalDirectory = new File("");

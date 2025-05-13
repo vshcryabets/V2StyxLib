@@ -2,10 +2,16 @@ package com.v2soft.folderserver;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.v2soft.styxlib.l5.serialization.IDataDeserializer;
+import com.v2soft.styxlib.l5.serialization.IDataSerializer;
+import com.v2soft.styxlib.l5.serialization.impl.StyxDeserializerImpl;
+import com.v2soft.styxlib.l5.serialization.impl.StyxSerializerImpl;
 import com.v2soft.styxlib.l6.vfs.DiskStyxDirectory;
 import com.v2soft.styxlib.server.ClientsRepo;
 import com.v2soft.styxlib.server.ClientsRepoImpl;
+import com.v2soft.styxlib.server.IChannelDriver;
 import com.v2soft.styxlib.server.StyxServerManager;
+import com.v2soft.styxlib.server.tcp.TCPChannelDriver;
 import com.v2soft.styxlib.server.tcp.TCPClientDetails;
 import com.v2soft.styxlib.server.tcp.TCPServerChannelDriver;
 import org.jline.reader.LineReader;
@@ -19,6 +25,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
 
@@ -62,13 +69,28 @@ public class FolderServerSample {
                 .terminal(terminal)
                 .build();
         var clientsRepo = new ClientsRepoImpl();
-        var driver = new TCPServerChannelDriver(
-                InetAddress.getByName(configuration.interfaces().get(0)),
-                configuration.port(),
+        IDataSerializer serializer = new StyxSerializerImpl();
+        IDataDeserializer deserializer = new StyxDeserializerImpl();
+        var driver = new TCPServerChannelDriver(clientsRepo);
+        driver.prepare(new TCPChannelDriver.InitConfiguration(
+                serializer,
+                deserializer,
+                StyxServerManager.DEFAULT_IOUNIT,
                 false,
-                clientsRepo);
-        var root = new DiskStyxDirectory(new File(configuration.exportPath()), driver.getSerializer());
-        var mServer = new StyxServerManager(root, List.of(driver), clientsRepo);
+                InetAddress.getByName(configuration.interfaces().get(0)),
+                configuration.port()
+        ));
+        var root = new DiskStyxDirectory(new File(configuration.exportPath()), serializer);
+        List<IChannelDriver<?>> driversList = List.of(driver);
+        var serverConfiguration = new StyxServerManager.Configuration(
+                root,
+                driversList,
+                clientsRepo,
+                serializer,
+                deserializer,
+                StyxServerManager.DEFAULT_IOUNIT);
+
+        var mServer = new StyxServerManager(serverConfiguration);
         mServer.start();
         System.out.println("Test server listening on " + configuration.interfaces().get(0) + ":"
                 + configuration.port() + " share folder " + configuration.exportPath());
@@ -81,7 +103,7 @@ public class FolderServerSample {
                 showCommandsHelp(terminal);
                 continue;
             } else if (cmd.equalsIgnoreCase(CMD_CLIENTS)) {
-                listClients(terminal, mServer, clientsRepo);
+                listClients(terminal, mServer, clientsRepo, driversList);
                 continue;
             } else if (cmd.equalsIgnoreCase(CMD_IP)) {
                 showInterfaces(terminal, mServer);
@@ -96,8 +118,9 @@ public class FolderServerSample {
         mServer.joinThreads();
     }
 
-    private static void listClients(Terminal terminal, StyxServerManager server, ClientsRepo clientsRepo) {
-        for (var driver : server.getDrivers()) {
+    private static void listClients(Terminal terminal, StyxServerManager server, ClientsRepo clientsRepo,
+                                    List<IChannelDriver<?>> drivers) {
+        for (var driver : drivers) {
             terminal.writer().println("ID\tName\tAddress");
             for (var clientId : driver.getClients()) {
                 var client = clientsRepo.getClient(clientId);
