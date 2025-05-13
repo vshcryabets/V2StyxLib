@@ -5,9 +5,8 @@ import com.v2soft.styxlib.l5.messages.StyxRWriteMessage;
 import com.v2soft.styxlib.l5.messages.StyxTWriteMessage;
 import com.v2soft.styxlib.l5.messages.base.StyxTMessageFID;
 import com.v2soft.styxlib.l5.enums.MessageType;
-import com.v2soft.styxlib.server.ClientDetails;
 import com.v2soft.styxlib.handlers.IMessageTransmitter;
-import com.v2soft.styxlib.utils.MetricsAndStats;
+import com.v2soft.styxlib.l5.dev.MetricsAndStats;
 
 import java.io.IOException;
 import java.io.OutputStream;

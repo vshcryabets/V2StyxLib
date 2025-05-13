@@ -14,15 +14,9 @@ public class StyxRWalkMessage extends StyxMessage {
 		qidList = qids;
 	}
 
-	public int getQIDListLength()
-	{
-		return qidList.size();
-	}
-
 	@Override
 	public String toString() {
         String result = super.toString()+"\nNumber of walks: "+ qidList.size()+"\n"; int num = 0;
-
         for (var qid : qidList)
         {
             num++;

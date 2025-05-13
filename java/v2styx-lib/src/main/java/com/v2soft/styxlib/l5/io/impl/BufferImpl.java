@@ -3,7 +3,7 @@ package com.v2soft.styxlib.l5.io.impl;
 import com.v2soft.styxlib.l5.io.Buffer;
 import com.v2soft.styxlib.l5.io.BufferLoader;
 import com.v2soft.styxlib.l5.io.InChannel;
-import com.v2soft.styxlib.utils.MetricsAndStats;
+import com.v2soft.styxlib.l5.dev.MetricsAndStats;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;

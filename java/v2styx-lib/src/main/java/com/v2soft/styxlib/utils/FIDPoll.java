@@ -2,6 +2,7 @@ package com.v2soft.styxlib.utils;
 
 import com.v2soft.styxlib.Config;
 import com.v2soft.styxlib.Logger;
+import com.v2soft.styxlib.l5.enums.Constants;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
 
 /**
@@ -24,7 +25,7 @@ public class FIDPoll extends AbstractPoll<Long> {
 
     @Override
     public boolean release(Long id) {
-        if (id == StyxMessage.NOFID)
+        if (id == Constants.NOFID)
             return false;
         if (Config.DEBUG_FID_POLL)
             Logger.DEBUG.println("Release " + id);

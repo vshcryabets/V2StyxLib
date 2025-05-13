@@ -5,9 +5,8 @@ import com.v2soft.styxlib.l5.messages.StyxRReadMessage;
 import com.v2soft.styxlib.l5.messages.StyxTReadMessage;
 import com.v2soft.styxlib.l5.messages.base.StyxTMessageFID;
 import com.v2soft.styxlib.l5.enums.MessageType;
-import com.v2soft.styxlib.server.ClientDetails;
 import com.v2soft.styxlib.handlers.IMessageTransmitter;
-import com.v2soft.styxlib.utils.MetricsAndStats;
+import com.v2soft.styxlib.l5.dev.MetricsAndStats;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -62,9 +61,9 @@ public class StyxUnbufferedInputStream extends InputStream {
             final StyxTReadMessage tRead = new StyxTReadMessage(mFID, mFileOffset, len);
             final var rRead = mMessenger.<StyxRReadMessage>sendMessage(tRead, mRecepient, mTimeout)
                     .getResult();
-            read = rRead.getDataLength();
+            read = rRead.dataLength;
             if ( read > 0 ) {
-                System.arraycopy(rRead.getDataBuffer(), 0, b, 0, read);
+                System.arraycopy(rRead.data, 0, b, 0, read);
                 mFileOffset += read;
             } else {
                 read = -1;

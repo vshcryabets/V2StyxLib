@@ -11,7 +11,7 @@ public class StyxWrongMessageException extends StyxException {
 
     public StyxWrongMessageException(StyxMessage received, int needed) {
         super(String.format("Recived massage of type %d when needed %d.",
-                received.getType(), needed));
+                received.type, needed));
     }
 
 }

@@ -1,5 +1,6 @@
 package com.v2soft.styxlib.utils;
 
+import com.v2soft.styxlib.l5.enums.Constants;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
 
 /**
@@ -21,7 +22,7 @@ public class MessageTagPoll extends AbstractPoll<Integer> {
 
     @Override
     public boolean release(Integer id) {
-        if (id == StyxMessage.NOTAG)
+        if (id == Constants.NOTAG)
             return false;
         return super.release(id);
     }

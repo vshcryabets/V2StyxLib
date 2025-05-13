@@ -2,6 +2,7 @@ package com.v2soft.styxlib.l5;
 
 import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.handlers.*;
+import com.v2soft.styxlib.l5.enums.Constants;
 import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.l5.messages.*;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
@@ -87,10 +88,10 @@ public class Connection
     private String mMountPoint;
     private int mTimeout = DEFAULT_TIMEOUT;
     private boolean isAttached;
-    private long mAuthFID = StyxMessage.NOFID;
+    private long mAuthFID = Constants.NOFID;
     private StyxQID mAuthQID;
     private StyxQID mQID;
-    private long mRootFid = StyxMessage.NOFID;
+    private long mRootFid = Constants.NOFID;
 
     protected ConnectionDetails mDetails;
     protected boolean isAutoStartDriver = false;
@@ -186,10 +187,10 @@ public class Connection
     public void sendVersionMessage()
             throws StyxException {
         // release attached FID
-        if (mRootFid != StyxMessage.NOFID) {
+        if (mRootFid != Constants.NOFID) {
             final StyxTMessageFID tClunk = new StyxTMessageFID(MessageType.Tclunk, MessageType.Rclunk, mRootFid);
             mConfiguration.transmitter.sendMessage(tClunk, mClientId, mTimeout).getResult();
-            mRootFid = StyxMessage.NOFID;
+            mRootFid = Constants.NOFID;
         }
         StyxMessage rMessage = mConfiguration.transmitter.sendMessage(
                 new StyxTVersionMessage(mDetails.ioUnit(), getProtocol()),

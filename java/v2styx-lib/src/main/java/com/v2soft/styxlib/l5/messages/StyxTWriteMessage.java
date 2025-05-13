@@ -1,13 +1,11 @@
 package com.v2soft.styxlib.l5.messages;
 
 import com.v2soft.styxlib.Config;
+import com.v2soft.styxlib.l5.dev.Operations;
 import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
 import com.v2soft.styxlib.l5.messages.base.StyxTMessageFID;
-import com.v2soft.styxlib.l5.serialization.IBufferReader;
-import com.v2soft.styxlib.utils.MetricsAndStats;
-
-import java.io.IOException;
+import com.v2soft.styxlib.l5.dev.MetricsAndStats;
 
 public class StyxTWriteMessage extends StyxTMessageFID {
     private final long mOffset;
@@ -31,7 +29,7 @@ public class StyxTWriteMessage extends StyxTMessageFID {
     public String toString() {
         if ( Config.LOG_DATA_FIELDS ) {
             return String.format("%s\nOffset: %d\nData: %s",
-                    super.toString(), getOffset(), StyxMessage.toString(getData()));
+                    super.toString(), getOffset(), Operations.toString(getData()));
         } else {
             return String.format("%s\nOffset: %d",
                     super.toString(), getOffset());

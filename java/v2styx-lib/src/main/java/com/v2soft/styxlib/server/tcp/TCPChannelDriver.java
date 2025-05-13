@@ -161,7 +161,7 @@ public abstract class TCPChannelDriver implements
             if (inBuffer >= packetSize) {
                 var message = mInitConfiguration.deserializer.deserializeMessage(client.getInputReader(),
                         mInitConfiguration.iounit);
-                if (Checks.isTMessage(message.getType())) {
+                if (Checks.isTMessage(message.type)) {
                     mStartConfiguration.getTProcessor().onClientMessage(message, clientId);
                 } else {
                     mStartConfiguration.getRProcessor().onClientMessage(message, clientId);

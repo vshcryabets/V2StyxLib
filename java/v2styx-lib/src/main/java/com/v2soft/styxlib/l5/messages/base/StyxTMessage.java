@@ -4,6 +4,7 @@ import com.v2soft.styxlib.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.exceptions.StyxInterruptedException;
 import com.v2soft.styxlib.exceptions.StyxWrongMessageException;
+import com.v2soft.styxlib.l5.enums.Constants;
 import com.v2soft.styxlib.l5.enums.MessageType;
 
 import java.util.concurrent.TimeoutException;
@@ -13,7 +14,7 @@ public class StyxTMessage extends StyxMessage {
     private final int mRequiredAnswerType;
 
     public StyxTMessage(int type, int answer) {
-        super(type, NOTAG);
+        super(type, Constants.NOTAG);
         mRequiredAnswerType = answer;
     }
 
@@ -36,14 +37,14 @@ public class StyxTMessage extends StyxMessage {
         }
         if ( mAnswer == null )
             throw new StyxException("Don't receive answer for "+this.toString());
-        if (mAnswer.getType() == MessageType.Rerror) {
+        if (mAnswer.type == MessageType.Rerror) {
             StyxErrorMessageException.doException(mAnswer, null);
         }
         return mAnswer;
     }
 
     protected boolean checkAnswer(StyxMessage answer) {
-        final int received = answer.getType();
+        final int received = answer.type;
         return (mRequiredAnswerType == received || received == MessageType.Rerror);
     }
 }
