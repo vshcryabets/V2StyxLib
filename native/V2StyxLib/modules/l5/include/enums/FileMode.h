@@ -5,7 +5,6 @@
 #include <cstdint>
 
 namespace styxlib::enums {
-
     // Constants FileMode
     const int64_t Directory = 2147483648; ;
     const int64_t AppendOnly = 1073741824; ;

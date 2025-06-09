@@ -7,17 +7,19 @@ import com.v2soft.styxlib.l5.dev.MetricsAndStats;
 import java.nio.BufferOverflowException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 public class BufferWritterImpl implements IBufferWritter {
     private static final int sDataBufferSize = 16;
-    protected static final Charset sUTFCharset = Charset.forName("utf-8");
-    private byte[] mInternalBuffer;
-    protected ByteBuffer mBuffer;
+    protected static final Charset sUTFCharset = StandardCharsets.UTF_8;
+    private final byte[] mInternalBuffer;
+    private final ByteBuffer mBuffer;
 
-    public BufferWritterImpl(ByteBuffer buffer) {
+    public BufferWritterImpl(int size) {
         mInternalBuffer = new byte[sDataBufferSize];
         MetricsAndStats.byteArrayAllocationIo++;
-        mBuffer = buffer;
+        mBuffer = ByteBuffer.allocate(size);
+        MetricsAndStats.byteBufferAllocation++;
     }
 
     @Override
@@ -80,5 +82,10 @@ public class BufferWritterImpl implements IBufferWritter {
     public void prepareBuffer(int bufferSize) {
         mBuffer.clear();
         mBuffer.limit(bufferSize);
+    }
+
+    @Override
+    public ByteBuffer getBuffer() {
+        return mBuffer;
     }
 }

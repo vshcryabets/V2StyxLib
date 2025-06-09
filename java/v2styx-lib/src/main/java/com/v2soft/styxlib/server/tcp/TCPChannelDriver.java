@@ -7,7 +7,6 @@ import com.v2soft.styxlib.l5.serialization.IDataDeserializer;
 import com.v2soft.styxlib.l5.serialization.IDataSerializer;
 import com.v2soft.styxlib.server.ClientsRepo;
 import com.v2soft.styxlib.server.StyxServerManager;
-import com.v2soft.styxlib.handlers.IMessageProcessor;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
 import com.v2soft.styxlib.server.IChannelDriver;
 import com.v2soft.styxlib.utils.Future;

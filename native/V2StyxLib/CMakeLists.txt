@@ -1,6 +1,8 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.22)
 
-PROJECT(V2StyxLib)
+project(V2StyxLib LANGUAGES CXX)
+
+option(BUILD_MODULE_L5 "Build the L5 module" ON)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
@@ -15,7 +17,11 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(Catch2)
 
-include_directories(include) 
+if (BUILD_MODULE_L5)
+    add_subdirectory(modules/l5)
+endif()
+#include_directories(include) 
 
-ADD_SUBDIRECTORY( lib out/lib )
+#ADD_SUBDIRECTORY( lib out/lib )
+
 #ADD_SUBDIRECTORY( testserver out/testserver )

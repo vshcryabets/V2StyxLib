@@ -155,8 +155,8 @@ class StyxSerializerImplTest {
                 0x04, 0x51, (byte) 0x9E, 0x04, 0x51, (byte) 0x9E, 0x30, 0x12 //13: qid.path[8] 0x12309E51049E5104L
         };
 
-        var buffer = ByteBuffer.allocate(8192);
-        var outputBuffer = new BufferWritterImpl(buffer);
+        var outputBuffer = new BufferWritterImpl(8192);
+        var buffer = outputBuffer.getBuffer();
         outputBuffer.prepareBuffer(serializer.getQidSize());
         serializer.serializeQid(qid, outputBuffer);
         byte[] data = new byte[buffer.limit()];
