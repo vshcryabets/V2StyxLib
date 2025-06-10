@@ -20,8 +20,8 @@ import java.util.Date;
 
 public class MessageSerializerImplTest {
     final StyxSerializerImpl serializer = new StyxSerializerImpl();
-    ByteBuffer buffer = ByteBuffer.allocate(8192);
-    BufferWritterImpl outputBuffer = new BufferWritterImpl(buffer);
+    BufferWritterImpl outputBuffer = new BufferWritterImpl(8192);
+    final ByteBuffer buffer = outputBuffer.getBuffer();
 
     @Test
     public void testTVersion() throws StyxException {

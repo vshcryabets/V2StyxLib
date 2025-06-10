@@ -5,20 +5,14 @@ import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.l5.enums.FileMode;
 import com.v2soft.styxlib.l5.enums.ModeType;
 import com.v2soft.styxlib.l5.enums.QidType;
+import com.v2soft.styxlib.l5.serialization.IBufferWritter;
 import com.v2soft.styxlib.l5.serialization.IDataSerializer;
 import com.v2soft.styxlib.l5.serialization.impl.BufferWritterImpl;
 import com.v2soft.styxlib.l5.structs.StyxQID;
 import com.v2soft.styxlib.l5.structs.StyxStat;
-import com.v2soft.styxlib.l5.dev.MetricsAndStats;
 
 import java.io.File;
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Disk directory
@@ -27,7 +21,7 @@ import java.util.Map;
  */
 public class DiskStyxDirectory
 extends DiskStyxFile {
-    private Map<Integer, ByteBuffer> mBuffersMap;
+    private Map<Integer, IBufferWritter> mBuffersMap;
     protected List<IVirtualStyxFile> mVirtualFiles;
     protected List<IVirtualStyxFile> mRealFiles;
     private IDataSerializer mSerializer;
@@ -105,10 +99,9 @@ extends DiskStyxFile {
             }
 
             // allocate buffer
-            final ByteBuffer buffer = ByteBuffer.allocate(size);
-            MetricsAndStats.byteBufferAllocation++;
+            var buffer = new BufferWritterImpl(size);
             for (StyxStat state : stats) {
-                mSerializer.serializeStat(state, new BufferWritterImpl(buffer));
+                mSerializer.serializeStat(state, buffer);
             }
             mBuffersMap.put(clientId, buffer);
             return true;
@@ -121,7 +114,7 @@ extends DiskStyxFile {
         if ( !mBuffersMap.containsKey(clientId)) {
             throw StyxErrorMessageException.newInstance("This file isn't open");
         }
-        final ByteBuffer buffer = mBuffersMap.get(clientId);
+        var buffer = mBuffersMap.get(clientId).getBuffer();
         int boffset = buffer.limit();
         if ( offset > boffset ) return 0;
         buffer.position((int) offset);

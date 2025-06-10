@@ -27,7 +27,7 @@ import java.util.Map;
 public class MemoryStyxDirectory
 extends MemoryStyxFile {
     private final IDataSerializer mSerializer;
-    private Map<Integer, ByteBuffer> mBuffersMap;
+    private Map<Integer, IBufferWritter> mBuffersMap;
     private List<IVirtualStyxFile> mFiles;
 
     public MemoryStyxDirectory(String name, IDataSerializer serializer) {
@@ -35,7 +35,7 @@ extends MemoryStyxFile {
         mQID = new StyxQID(QidType.QTDIR, 0, mName.hashCode());
         mSerializer = serializer;
         mFiles = new LinkedList<IVirtualStyxFile>();
-        mBuffersMap = new HashMap<Integer, ByteBuffer>();
+        mBuffersMap = new HashMap<>();
     }
 
     @Override
@@ -72,13 +72,11 @@ extends MemoryStyxFile {
                 stats.add(stat);
             }
             // allocate buffer
-            ByteBuffer buffer = ByteBuffer.allocate(size);
-            MetricsAndStats.byteBufferAllocation++;
-            IBufferWritter writer = new BufferWritterImpl(buffer);
+            IBufferWritter writer = new BufferWritterImpl(size);
             for (StyxStat state : stats) {
                 mSerializer.serializeStat(state, writer);
             }
-            mBuffersMap.put(clientId, buffer);
+            mBuffersMap.put(clientId, writer);
         }
         return result;
     }
@@ -87,7 +85,7 @@ extends MemoryStyxFile {
     public int read(int clientId, byte[] outbuffer, long offset, int count) throws StyxErrorMessageException {
         if ( !mBuffersMap.containsKey(clientId))
             throw StyxErrorMessageException.newInstance("This file isn't open");
-        final ByteBuffer buffer = mBuffersMap.get(clientId);
+        final ByteBuffer buffer = mBuffersMap.get(clientId).getBuffer();
         int boffset = buffer.limit();
         if ( offset > boffset ) return 0;
         buffer.position((int) offset);

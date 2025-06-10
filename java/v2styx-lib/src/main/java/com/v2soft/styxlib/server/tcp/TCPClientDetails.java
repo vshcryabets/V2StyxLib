@@ -11,10 +11,8 @@ import com.v2soft.styxlib.l5.serialization.impl.BufferReaderImpl;
 import com.v2soft.styxlib.l5.serialization.impl.BufferWritterImpl;
 import com.v2soft.styxlib.server.ClientDetails;
 import com.v2soft.styxlib.server.IChannelDriver;
-import com.v2soft.styxlib.l5.dev.MetricsAndStats;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 
 /**
@@ -24,7 +22,6 @@ import java.nio.channels.SocketChannel;
  */
 public class TCPClientDetails extends ClientDetails {
     private SocketChannel mTcpChannel;
-    private final ByteBuffer mOutputBuffer;
     private final IBufferWritter mOutputWriter;
     protected Buffer mBuffer;
     protected BufferLoader mBufferLoader;
@@ -37,13 +34,11 @@ public class TCPClientDetails extends ClientDetails {
         mTcpChannel = channel;
         mChannel = dst -> mTcpChannel.read(dst);
 
-        mOutputBuffer = ByteBuffer.allocate(iounit);
-        MetricsAndStats.byteBufferAllocation++;
         var impl = new BufferImpl(iounit * 2);
         mBuffer = impl;
         mBufferLoader = impl;
         mReader = new BufferReaderImpl(mBuffer);
-        mOutputWriter = new BufferWritterImpl(mOutputBuffer);
+        mOutputWriter = new BufferWritterImpl(iounit);
     }
 
     public IBufferWritter getOutputWriter() {
@@ -85,9 +80,9 @@ public class TCPClientDetails extends ClientDetails {
     }
 
     public void sendOutputBuffer() throws StyxException {
-        mOutputBuffer.flip();
+        mOutputWriter.getBuffer().flip();
         try {
-            mTcpChannel.write(mOutputBuffer);
+            mTcpChannel.write(mOutputWriter.getBuffer());
         } catch (IOException error) {
             throw new StyxException(error.getMessage());
         }

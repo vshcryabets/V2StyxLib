@@ -82,7 +82,9 @@
         "typeindex": "cpp",
         "valarray": "cpp",
         "regex": "cpp",
-        "stack": "cpp"
+        "stack": "cpp",
+        "__node_handle": "cpp",
+        "__bit_reference": "cpp"
     },
     "cmake.sourceDirectory": "${workspaceFolder}/linux/"
 }

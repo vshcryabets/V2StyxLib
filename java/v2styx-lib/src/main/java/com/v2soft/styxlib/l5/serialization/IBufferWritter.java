@@ -2,7 +2,7 @@ package com.v2soft.styxlib.l5.serialization;
 
 import com.v2soft.styxlib.exceptions.StyxException;
 
-import java.io.IOException;
+import java.nio.ByteBuffer;
 
 public interface IBufferWritter {
     void writeUInt8(short val) throws StyxException;
@@ -13,4 +13,5 @@ public interface IBufferWritter {
     int write(byte[] data, int offset, int count);
     // clean output and prepare to receieve data
     void prepareBuffer(int bufferSize);
+    ByteBuffer getBuffer();
 }
