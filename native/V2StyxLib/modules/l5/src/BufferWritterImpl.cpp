@@ -46,8 +46,13 @@ void BufferWritterImpl::writeUInt64(uint64_t value) {
     mBuffer[position++] = static_cast<uint8_t>(value >> 56);
 }
 void BufferWritterImpl::writeUTFString(StyxString string) {
+    size_t len = string.length();
+    if (len > bufferSize - position - sizeof(uint16_t)) {
+        throw std::out_of_range("Buffer overflow");
+    }
     
 }
+
 Styx::Size BufferWritterImpl::write(const uint8_t* data, Styx::Size count) {
     if (position + count > limit) {
         throw std::out_of_range("Buffer overflow");

@@ -23,7 +23,7 @@ buildscript {
     }
     dependencies {
         classpath("org.codehaus.groovy:groovy-jsr223:3.0.17")
-        classpath("com.github.vshcryabets:codegen:644bb1b7e7")
+        classpath("com.github.vshcryabets:codegen:a06e23e001")
     }
 }
 
