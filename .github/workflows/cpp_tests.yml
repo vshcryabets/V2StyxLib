@@ -3,9 +3,9 @@ name: CMake test C++
 on:
   workflow_dispatch:
   push:
-    branches: [ "main" ]
+    branches: [ "master" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "master" ]
 
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
@@ -32,7 +32,7 @@ jobs:
       run: cmake -B ${{github.workspace}}/build -S ${{github.workspace}}/native/V2StyxLib -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
 
     - name: Build
-      working-directory: ${{github.workspace}}/8bit
+      working-directory: ${{github.workspace}}/
       # Build your program with the given configuration
       run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
 
