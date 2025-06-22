@@ -7,8 +7,6 @@ BufferReaderImpl::BufferReaderImpl(const StyxBuffer &buf, Styx::Size size)
     if (buf == nullptr) {
         throw std::invalid_argument("Buffer cannot be null");
     }
-    position = 0;
-    limit = size;
 }
 
 BufferReaderImpl::~BufferReaderImpl()
