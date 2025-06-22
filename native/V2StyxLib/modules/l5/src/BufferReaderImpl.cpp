@@ -1,13 +1,12 @@
 #include "serialization/BufferReaderImpl.h"
 #include <stdexcept>
 
-BufferReaderImpl::BufferReaderImpl(const StyxBuffer buf, Styx::Size size)
+BufferReaderImpl::BufferReaderImpl(const StyxBuffer &buf, Styx::Size size)
     : buffer(buf), position(0), limit(size)
 {
     if (buf == nullptr) {
         throw std::invalid_argument("Buffer cannot be null");
     }
-    buffer = buf;
     position = 0;
     limit = size;
 }

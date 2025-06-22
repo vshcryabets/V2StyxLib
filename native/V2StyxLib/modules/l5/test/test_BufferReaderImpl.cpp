@@ -32,6 +32,6 @@ TEST_CASE("readUInt64", "[BufferReaderImpl]") {
     uint8_t testData[] = {0x05, 0x06, 0x07, 0x08, 0x10, 0x11, 0x12, 0x13,
                 0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27};
     BufferReaderImpl impl(testData, sizeof(testData));
-    REQUIRE(0x1312111008070605L == impl.readUInt64());
-    REQUIRE(0x2726252423222120L == impl.readUInt64());
+    REQUIRE(0x1312111008070605ULL == impl.readUInt64());
+    REQUIRE(0x2726252423222120ULL == impl.readUInt64());
 }

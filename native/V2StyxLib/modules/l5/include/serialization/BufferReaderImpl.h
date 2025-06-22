@@ -3,11 +3,11 @@
 
 class BufferReaderImpl : public IBufferReader {
 private:
-    StyxBuffer buffer;
+    const StyxBuffer buffer;
     Styx::Size position;
     Styx::Size limit;
 public:
-    BufferReaderImpl(const StyxBuffer buf, Styx::Size size);
+    BufferReaderImpl(const StyxBuffer &buf, Styx::Size size);
     virtual ~BufferReaderImpl();
     uint8_t readUInt8() override;
     uint16_t readUInt16() override;
