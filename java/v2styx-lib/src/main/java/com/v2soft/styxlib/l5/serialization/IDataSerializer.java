@@ -8,9 +8,9 @@ import com.v2soft.styxlib.l5.structs.StyxStat;
 public interface IDataSerializer {
     int BASE_BINARY_SIZE = 7;
 
-    void serialize(StyxMessage message, IBufferWritter output) throws StyxException;
-    void serializeStat(StyxStat stat, IBufferWritter output) throws StyxException;
+    void serialize(StyxMessage message, IBufferWriter output) throws StyxException;
+    void serializeStat(StyxStat stat, IBufferWriter output) throws StyxException;
     int getStatSerializedSize(StyxStat stat);
     int getQidSize();
-    void serializeQid(StyxQID qid, IBufferWritter output) throws StyxException;
+    void serializeQid(StyxQID qid, IBufferWriter output) throws StyxException;
 }

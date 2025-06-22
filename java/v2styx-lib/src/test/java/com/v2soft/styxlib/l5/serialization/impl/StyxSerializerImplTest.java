@@ -11,7 +11,6 @@ import com.v2soft.styxlib.l5.structs.StyxQID;
 import com.v2soft.styxlib.l5.structs.StyxStat;
 import org.junit.jupiter.api.Test;
 
-import java.nio.ByteBuffer;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -155,7 +154,7 @@ class StyxSerializerImplTest {
                 0x04, 0x51, (byte) 0x9E, 0x04, 0x51, (byte) 0x9E, 0x30, 0x12 //13: qid.path[8] 0x12309E51049E5104L
         };
 
-        var outputBuffer = new BufferWritterImpl(8192);
+        var outputBuffer = new BufferWriterImpl(8192);
         var buffer = outputBuffer.getBuffer();
         outputBuffer.prepareBuffer(serializer.getQidSize());
         serializer.serializeQid(qid, outputBuffer);

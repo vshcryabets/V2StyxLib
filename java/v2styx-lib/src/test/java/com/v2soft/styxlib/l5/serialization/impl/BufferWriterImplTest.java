@@ -1,24 +1,26 @@
 package com.v2soft.styxlib.l5.serialization.impl;
 
 import com.v2soft.styxlib.exceptions.StyxException;
+import com.v2soft.styxlib.l5.serialization.BufferOverflowException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-class BufferWritterImplTest {
-    private BufferWritterImpl writer;
+class BufferWriterImplTest {
+    private BufferWriterImpl writer;
 
     @BeforeEach
     void setUp() {
-        writer = new BufferWritterImpl(32);
+        writer = new BufferWriterImpl(32);
     }
 
     @Test
-    void testWriteUInt8() {
+    void testWriteUInt8() throws StyxException {
         writer.writeUInt8((short) 0xAB);
         ByteBuffer buf = writer.getBuffer();
         buf.flip();
@@ -26,7 +28,7 @@ class BufferWritterImplTest {
     }
 
     @Test
-    void testWriteUInt16() {
+    void testWriteUInt16() throws StyxException {
         writer.writeUInt16(0xBEEF);
         ByteBuffer buf = writer.getBuffer();
         buf.flip();
@@ -35,7 +37,7 @@ class BufferWritterImplTest {
     }
 
     @Test
-    void testWriteUInt32() {
+    void testWriteUInt32() throws StyxException {
         writer.writeUInt32(0xCAFEBABE);
         ByteBuffer buf = writer.getBuffer();
         buf.flip();
@@ -46,7 +48,7 @@ class BufferWritterImplTest {
     }
 
     @Test
-    void testWriteUInt64() {
+    void testWriteUInt64() throws StyxException {
         writer.writeUInt64(0x1122334455667788L);
         ByteBuffer buf = writer.getBuffer();
         buf.flip();
@@ -74,17 +76,17 @@ class BufferWritterImplTest {
     }
 
     @Test
-    void testWriteAndPrepareBuffer() {
+    void testWriteAndPrepareBuffer() throws StyxException {
         writer.writeUInt8((short) 0x01);
         writer.prepareBuffer(2);
-        assertEquals(0, writer.getBuffer().position());
-        assertEquals(2, writer.getBuffer().limit());
+        assertEquals(0, writer.getPosition());
+        assertEquals(2, writer.getLimit());
     }
 
     @Test
     void testWriteBufferOverflow() {
-        BufferWritterImpl smallWriter = new BufferWritterImpl(2);
+        BufferWriterImpl smallWriter = new BufferWriterImpl(2);
         byte[] data = {1, 2, 3};
-        assertThrows(java.nio.BufferOverflowException.class, () -> smallWriter.write(data, 0, data.length));
+        assertThrows(BufferOverflowException.class, () -> smallWriter.write(data, 0, data.length));
     }
 }

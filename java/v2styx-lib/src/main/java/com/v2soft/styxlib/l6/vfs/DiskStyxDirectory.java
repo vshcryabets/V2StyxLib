@@ -5,9 +5,9 @@ import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.l5.enums.FileMode;
 import com.v2soft.styxlib.l5.enums.ModeType;
 import com.v2soft.styxlib.l5.enums.QidType;
-import com.v2soft.styxlib.l5.serialization.IBufferWritter;
+import com.v2soft.styxlib.l5.serialization.IBufferWriter;
 import com.v2soft.styxlib.l5.serialization.IDataSerializer;
-import com.v2soft.styxlib.l5.serialization.impl.BufferWritterImpl;
+import com.v2soft.styxlib.l5.serialization.impl.BufferWriterImpl;
 import com.v2soft.styxlib.l5.structs.StyxQID;
 import com.v2soft.styxlib.l5.structs.StyxStat;
 
@@ -21,7 +21,7 @@ import java.util.*;
  */
 public class DiskStyxDirectory
 extends DiskStyxFile {
-    private Map<Integer, IBufferWritter> mBuffersMap;
+    private Map<Integer, IBufferWriter> mBuffersMap;
     protected List<IVirtualStyxFile> mVirtualFiles;
     protected List<IVirtualStyxFile> mRealFiles;
     private IDataSerializer mSerializer;
@@ -99,7 +99,7 @@ extends DiskStyxFile {
             }
 
             // allocate buffer
-            var buffer = new BufferWritterImpl(size);
+            var buffer = new BufferWriterImpl(size);
             for (StyxStat state : stats) {
                 mSerializer.serializeStat(state, buffer);
             }

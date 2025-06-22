@@ -1,7 +1,7 @@
 package com.v2soft.styxlib.l5.serialization.impl;
 
 import com.v2soft.styxlib.exceptions.StyxException;
-import com.v2soft.styxlib.l5.serialization.IBufferWritter;
+import com.v2soft.styxlib.l5.serialization.IBufferWriter;
 import com.v2soft.styxlib.l5.dev.MetricsAndStats;
 
 import java.nio.BufferOverflowException;
@@ -9,13 +9,13 @@ import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
-public class BufferWritterImpl implements IBufferWritter {
+public class BufferWriterImpl implements IBufferWriter {
     private static final int sDataBufferSize = 16;
     protected static final Charset sUTFCharset = StandardCharsets.UTF_8;
     private final byte[] mInternalBuffer;
     private final ByteBuffer mBuffer;
 
-    public BufferWritterImpl(int size) {
+    public BufferWriterImpl(int size) {
         mInternalBuffer = new byte[sDataBufferSize];
         MetricsAndStats.byteArrayAllocationIo++;
         mBuffer = ByteBuffer.allocate(size);
@@ -23,20 +23,20 @@ public class BufferWritterImpl implements IBufferWritter {
     }
 
     @Override
-    public void writeUInt8(short val) {
+    public void writeUInt8(short val) throws StyxException {
         mInternalBuffer[0] = (byte) val;
         write(mInternalBuffer, 0, 1);
     }
 
     @Override
-    public void writeUInt16(int val) {
+    public void writeUInt16(int val) throws StyxException {
         mInternalBuffer[0] = (byte) ((byte) val & 0xFF);
         mInternalBuffer[1] = (byte) ((byte) (val >> 8) & 0xFF);
         write(mInternalBuffer, 0, 2);
     }
 
     @Override
-    public void writeUInt32(long val) {
+    public void writeUInt32(long val) throws StyxException {
         mInternalBuffer[0] = (byte) ((byte) val & 0xFF);
         mInternalBuffer[1] = (byte) ((byte) (val >> 8) & 0xFF);
         mInternalBuffer[2] = (byte) ((byte) (val >> 16) & 0xFF);
@@ -45,7 +45,7 @@ public class BufferWritterImpl implements IBufferWritter {
     }
 
     @Override
-    public void writeUInt64(long val) {
+    public void writeUInt64(long val) throws StyxException {
         mInternalBuffer[0] = (byte) ((byte) val & 0xFF);
         mInternalBuffer[1] = (byte) ((byte) (val >> 8) & 0xFF);
         mInternalBuffer[2] = (byte) ((byte) (val >> 16) & 0xFF);
@@ -65,15 +65,15 @@ public class BufferWritterImpl implements IBufferWritter {
     }
 
     @Override
-    public int write(byte[] data, int offset, int count) {
+    public int write(byte[] data, int offset, int count) throws StyxException {
         try {
             mBuffer.put(data, offset, count);
         } catch (BufferOverflowException err) {
-            System.err.printf("Buffer: c=%d, p=%d, l=%d\n", mBuffer.capacity(),
-                    mBuffer.position(), mBuffer.limit());
-            System.err.printf("Write: c=%d, o=%d, l=%d\n", count,
-                    offset, data.length);
-            throw err;
+            String message = String.format(
+                    "Buffer overflow: Buffer: c=%d, p=%d, l=%d, Write: c=%d, o=%d, l=%d",
+                    mBuffer.capacity(), mBuffer.position(), mBuffer.limit(),
+                    count, offset, data.length);
+            throw new com.v2soft.styxlib.l5.serialization.BufferOverflowException(message);
         }
         return count;
     }
@@ -87,5 +87,15 @@ public class BufferWritterImpl implements IBufferWritter {
     @Override
     public ByteBuffer getBuffer() {
         return mBuffer;
+    }
+
+    @Override
+    public int getPosition() {
+        return mBuffer.position();
+    }
+
+    @Override
+    public int getLimit() {
+        return mBuffer.limit();
     }
 }

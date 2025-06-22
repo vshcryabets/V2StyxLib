@@ -7,7 +7,7 @@ import com.v2soft.styxlib.l5.enums.QidType;
 import com.v2soft.styxlib.l5.messages.StyxROpenMessage;
 import com.v2soft.styxlib.l5.messages.StyxRReadMessage;
 import com.v2soft.styxlib.l5.messages.StyxTVersionMessage;
-import com.v2soft.styxlib.l5.serialization.impl.BufferWritterImpl;
+import com.v2soft.styxlib.l5.serialization.impl.BufferWriterImpl;
 import com.v2soft.styxlib.l5.serialization.impl.StyxSerializerImpl;
 import com.v2soft.styxlib.l5.structs.StyxQID;
 import com.v2soft.styxlib.l5.structs.StyxStat;
@@ -20,7 +20,7 @@ import java.util.Date;
 
 public class MessageSerializerImplTest {
     final StyxSerializerImpl serializer = new StyxSerializerImpl();
-    BufferWritterImpl outputBuffer = new BufferWritterImpl(8192);
+    BufferWriterImpl outputBuffer = new BufferWriterImpl(8192);
     final ByteBuffer buffer = outputBuffer.getBuffer();
 
     @Test
