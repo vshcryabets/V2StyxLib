@@ -1,4 +1,5 @@
 #include "serialization/BufferWriterImpl.h"
+#include <stdexcept>
 
 BufferWriterImpl::BufferWriterImpl(size_t bufferSize) {
     buffer = new uint8_t[bufferSize];
