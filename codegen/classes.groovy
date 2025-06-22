@@ -1,5 +1,6 @@
 import static ce.defs.FuncsKt.target
 import static ce.defs.FuncsKt.namespace
+import static ce.defs.FuncsKt.setOutputBasePath
 import ce.defs.DataType
 
 def nsL5 = namespace("styxlib")
@@ -7,12 +8,17 @@ switch (target()) {
     case ce.defs.Target.Kotlin:
     case ce.defs.Target.Java:
         nsL5 = namespace("com.v2soft.styxlib.l5")
+        break;
+    case ce.defs.Target.Cpp:
+        setOutputBasePath("../native/V2StyxLib/modules/l5/")
+        break;
 }
 
 def nsEnums = nsL5.getNamespace("enums")
 def nsStructs = nsL5.getNamespace("structs")
 
 def modeType = nsEnums.constantsBlock("ModeType")
+modeType.setOutputFile("include/enums/ModeType")
 modeType.addBlockComment("File mode types")
 modeType.defaultType(DataType.int32.INSTANCE)
 modeType.add("OREAD", 0)
@@ -37,6 +43,7 @@ styxQidType.with {
 }
 
 def messageType = nsEnums.constantsBlock("MessageType")
+messageType.setOutputFile("include/enums/MessageType")
 messageType.with {
     defaultType(DataType.int32.INSTANCE)
     add("Unspecified",0)
@@ -70,6 +77,7 @@ messageType.with {
 }
 
 def fileMode = nsEnums.constantsBlock("FileMode")
+fileMode.setOutputFile("include/enums/FileMode")
 fileMode.with {
     defaultType(DataType.int64.INSTANCE)
     preferredRadix(16)

@@ -7,7 +7,7 @@ import com.v2soft.styxlib.l5.messages.*;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
 import com.v2soft.styxlib.l5.messages.base.StyxRSingleQIDMessage;
 import com.v2soft.styxlib.l5.messages.base.StyxTMessageFID;
-import com.v2soft.styxlib.l5.serialization.IBufferWritter;
+import com.v2soft.styxlib.l5.serialization.IBufferWriter;
 import com.v2soft.styxlib.l5.serialization.IDataSerializer;
 import com.v2soft.styxlib.l5.serialization.UTF;
 import com.v2soft.styxlib.l5.structs.StyxQID;
@@ -71,7 +71,7 @@ public class StyxSerializerImpl implements IDataSerializer {
     }
 
     @Override
-    public void serialize(StyxMessage message, IBufferWritter output) throws StyxException {
+    public void serialize(StyxMessage message, IBufferWriter output) throws StyxException {
         int packetSize = getMessageSize(message);
         output.prepareBuffer(packetSize);
         output.writeUInt32(packetSize);
@@ -84,7 +84,7 @@ public class StyxSerializerImpl implements IDataSerializer {
         }
     }
 
-    private void serializeTMessage(StyxMessage message, IBufferWritter output) throws StyxException {
+    private void serializeTMessage(StyxMessage message, IBufferWriter output) throws StyxException {
         if (message instanceof StyxTMessageFID) {
             StyxTMessageFID msg = (StyxTMessageFID) message;
             output.writeUInt32(msg.getFID());
@@ -150,7 +150,7 @@ public class StyxSerializerImpl implements IDataSerializer {
         }
     }
 
-    private void serializeRMessage(StyxMessage message, IBufferWritter output) throws StyxException {
+    private void serializeRMessage(StyxMessage message, IBufferWriter output) throws StyxException {
         if (message instanceof StyxRSingleQIDMessage) {
             StyxRSingleQIDMessage msg = (StyxRSingleQIDMessage) message;
             serializeQid(msg.getQID(), output);
@@ -201,7 +201,7 @@ public class StyxSerializerImpl implements IDataSerializer {
     }
 
     @Override
-    public void serializeStat(StyxStat stat, IBufferWritter output)
+    public void serializeStat(StyxStat stat, IBufferWriter output)
             throws StyxException {
         int size = getStatSerializedSize(stat);
         output.writeUInt16(size - 2); // total size except first 2 bytes with size
@@ -234,7 +234,7 @@ public class StyxSerializerImpl implements IDataSerializer {
     }
 
     @Override
-    public void serializeQid(StyxQID qid, IBufferWritter output) throws StyxException {
+    public void serializeQid(StyxQID qid, IBufferWriter output) throws StyxException {
         output.writeUInt8((short) qid.type());
         output.writeUInt32(qid.version());
         output.writeUInt64(qid.path());

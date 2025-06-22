@@ -5,9 +5,9 @@
 
 class IDataSerializer {
 public:
-    virtual void serialize(const StyxMessage &message, IBufferWritter *output) = 0;
-    virtual void serializeStat(const StyxStat &stat, IBufferWritter *output) = 0;
+    virtual void serialize(const StyxMessage &message, IBufferWriter *output) = 0;
+    virtual void serializeStat(const StyxStat &stat, IBufferWriter *output) = 0;
     virtual int getStatSerializedSize(const StyxStat &stat) = 0;
     virtual int getQidSize() = 0;
-    virtual void serializeQid(const StyxQID &qid, IBufferWritter *output) = 0;
+    virtual void serializeQid(const StyxQID &qid, IBufferWriter *output) = 0;
 };

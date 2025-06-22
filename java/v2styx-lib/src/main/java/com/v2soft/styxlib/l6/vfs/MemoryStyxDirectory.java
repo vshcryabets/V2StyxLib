@@ -4,13 +4,12 @@ import com.v2soft.styxlib.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.l5.enums.FileMode;
 import com.v2soft.styxlib.l5.enums.QidType;
-import com.v2soft.styxlib.l5.serialization.IBufferWritter;
+import com.v2soft.styxlib.l5.serialization.IBufferWriter;
 import com.v2soft.styxlib.l5.serialization.IDataSerializer;
-import com.v2soft.styxlib.l5.serialization.impl.BufferWritterImpl;
+import com.v2soft.styxlib.l5.serialization.impl.BufferWriterImpl;
 import com.v2soft.styxlib.l5.enums.ModeType;
 import com.v2soft.styxlib.l5.structs.StyxQID;
 import com.v2soft.styxlib.l5.structs.StyxStat;
-import com.v2soft.styxlib.l5.dev.MetricsAndStats;
 
 import java.nio.ByteBuffer;
 import java.util.HashMap;
@@ -27,7 +26,7 @@ import java.util.Map;
 public class MemoryStyxDirectory
 extends MemoryStyxFile {
     private final IDataSerializer mSerializer;
-    private Map<Integer, IBufferWritter> mBuffersMap;
+    private Map<Integer, IBufferWriter> mBuffersMap;
     private List<IVirtualStyxFile> mFiles;
 
     public MemoryStyxDirectory(String name, IDataSerializer serializer) {
@@ -72,7 +71,7 @@ extends MemoryStyxFile {
                 stats.add(stat);
             }
             // allocate buffer
-            IBufferWritter writer = new BufferWritterImpl(size);
+            IBufferWriter writer = new BufferWriterImpl(size);
             for (StyxStat state : stats) {
                 mSerializer.serializeStat(state, writer);
             }

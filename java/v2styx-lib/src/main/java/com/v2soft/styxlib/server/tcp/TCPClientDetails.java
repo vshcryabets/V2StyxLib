@@ -6,9 +6,9 @@ import com.v2soft.styxlib.l5.io.BufferLoader;
 import com.v2soft.styxlib.l5.io.InChannel;
 import com.v2soft.styxlib.l5.io.impl.BufferImpl;
 import com.v2soft.styxlib.l5.serialization.IBufferReader;
-import com.v2soft.styxlib.l5.serialization.IBufferWritter;
+import com.v2soft.styxlib.l5.serialization.IBufferWriter;
 import com.v2soft.styxlib.l5.serialization.impl.BufferReaderImpl;
-import com.v2soft.styxlib.l5.serialization.impl.BufferWritterImpl;
+import com.v2soft.styxlib.l5.serialization.impl.BufferWriterImpl;
 import com.v2soft.styxlib.server.ClientDetails;
 import com.v2soft.styxlib.server.IChannelDriver;
 
@@ -22,7 +22,7 @@ import java.nio.channels.SocketChannel;
  */
 public class TCPClientDetails extends ClientDetails {
     private SocketChannel mTcpChannel;
-    private final IBufferWritter mOutputWriter;
+    private final IBufferWriter mOutputWriter;
     protected Buffer mBuffer;
     protected BufferLoader mBufferLoader;
     protected BufferReaderImpl mReader;
@@ -38,10 +38,10 @@ public class TCPClientDetails extends ClientDetails {
         mBuffer = impl;
         mBufferLoader = impl;
         mReader = new BufferReaderImpl(mBuffer);
-        mOutputWriter = new BufferWritterImpl(iounit);
+        mOutputWriter = new BufferWriterImpl(iounit);
     }
 
-    public IBufferWritter getOutputWriter() {
+    public IBufferWriter getOutputWriter() {
         return mOutputWriter;
     }
 
