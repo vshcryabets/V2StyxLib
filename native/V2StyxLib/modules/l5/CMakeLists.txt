@@ -3,6 +3,7 @@ CMAKE_MINIMUM_REQUIRED(VERSION 3.22)
 if(BUILD_MODULE_L5)
     add_library(module_l5 STATIC
         src/BufferWriterImpl.cpp
+        src/BufferReaderImpl.cpp
         src/StyxMessage.cpp
     )
     target_include_directories(module_l5 PUBLIC
