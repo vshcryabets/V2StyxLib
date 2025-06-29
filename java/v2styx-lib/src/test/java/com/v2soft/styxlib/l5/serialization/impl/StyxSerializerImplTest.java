@@ -163,4 +163,54 @@ class StyxSerializerImplTest {
         buffer.get(data);
         assertArrayEquals(expected, data);
     }
+
+    @Test
+    void testSerializeStat() throws StyxException {
+        StyxStat stat = new StyxStat(
+                (short) 1,
+                2,
+                new StyxQID(QidType.QTFILE, 0x80, 0x90),
+                0x01,
+                new Date(1717171717L * 1000), // fixed date for reproducibility
+                new Date(1717171717L * 1000),
+                0x123,
+                "file",
+                "user",
+                "group",
+                "editor"
+        );
+        BufferWriterImpl output = new BufferWriterImpl(8192);
+        serializer.serializeStat(stat, output);
+
+        // Validate buffer size and some expected values
+        var buffer = output.getBuffer();
+        assertEquals(serializer.getStatSerializedSize(stat), output.getPosition());
+
+        byte[] expected = {
+                66, 0x00, // size - 2
+                1, 0x00, // type
+                0x02, 0x00, 0x00, 0x00, // dev
+                (byte) QidType.QTFILE,
+                (byte)0x80, 0x00, 0x00, 0x00, //9: qid.version[4]
+                (byte)0x90, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, //13: qid.path[8] 0x12309E51049E5104L
+                0x01, 0x00, 0x00, 0x00, // mode
+                0x05, (byte)0xF6, 89, 102, // atime
+                0x05, (byte)0xF6, 89, 102, // mtime
+                0x23, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // length
+                0x04, 0x00, // name length
+                'f', 'i', 'l', 'e', // name
+                0x04, 0x00, // uid length
+                'u', 's', 'e', 'r', // uid
+                0x05, 0x00, // gid length
+                'g', 'r', 'o', 'u', 'p', // gid
+                0x06, 0x00, // muid length
+                'e', 'd', 'i', 't', 'o', 'r' // muid
+        };
+
+        buffer.flip();
+        byte[] data = new byte[buffer.limit()];
+//        buffer.position(0);
+        buffer.get(data);
+        assertArrayEquals(expected, data);
+    }
 }

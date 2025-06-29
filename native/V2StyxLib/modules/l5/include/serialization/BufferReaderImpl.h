@@ -1,7 +1,7 @@
 #pragma once
 #include "serialization/IBufferReader.h"
 
-class BufferReaderImpl : public IBufferReader {
+class BufferReaderImpl : public styxlib::serialization::IBufferReader {
 private:
     const StyxBuffer buffer;
     Styx::Size position;
