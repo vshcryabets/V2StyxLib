@@ -1,6 +1,6 @@
 #pragma once
-#include "l5/structs/StyxQID.h"
-#include "l5/data.h"
+#include "structs/StyxQID.h"
+#include "data.h"
 
 struct StyxStat {
     int type; //for kernel use
@@ -14,4 +14,6 @@ struct StyxStat {
     StyxString userName; //owner name
     StyxString groupName; //group name
     StyxString modificationUser; //name of the user who last modified the file
+
+    const static StyxStat EMPTY;
 };
