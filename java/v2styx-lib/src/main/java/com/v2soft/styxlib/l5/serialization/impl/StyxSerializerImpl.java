@@ -51,7 +51,7 @@ public class StyxSerializerImpl implements IDataSerializer {
                 var createMessage = (StyxTCreateMessage)message;
                 size += 5 + UTF.getUTFSize(createMessage.name);
             }
-            case MessageType.Twstat -> size += getStatSerializedSize(((StyxTWStatMessage)message).getStat());
+            case MessageType.Twstat -> size += getStatSerializedSize(((StyxTWStatMessage)message).stat);
             case MessageType.Twrite -> size += 12 + ((StyxTWriteMessage)message).dataLength;
             case MessageType.Tread -> size += 8 + 4;
             case MessageType.Rwrite -> size += 4;
@@ -130,8 +130,9 @@ public class StyxSerializerImpl implements IDataSerializer {
                 break;
             case MessageType.Twstat:
                 StyxTWStatMessage twStatMessage = (StyxTWStatMessage) message;
-                output.writeUInt16(getStatSerializedSize(twStatMessage.getStat()));
-                serializeStat(twStatMessage.getStat(), output);
+                // TODO something wrong with size
+                output.writeUInt16(getStatSerializedSize(twStatMessage.stat));
+                serializeStat(twStatMessage.stat, output);
                 break;
             case MessageType.Tflush:
                 StyxTFlushMessage tFlushMessage = (StyxTFlushMessage) message;

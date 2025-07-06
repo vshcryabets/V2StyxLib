@@ -6,13 +6,12 @@ import com.v2soft.styxlib.l5.enums.ModeType;
 import com.v2soft.styxlib.l5.enums.QidType;
 import com.v2soft.styxlib.l5.structs.StyxQID;
 import com.v2soft.styxlib.l5.structs.StyxStat;
-import com.v2soft.styxlib.server.ClientDetails;
+import com.v2soft.styxlib.utils.OwnDI;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
+import java.util.Queue;
 
 /**
  * In-Memory file
@@ -20,15 +19,18 @@ import java.util.List;
  * @author vshcryabets@gmail.com
  */
 public class MemoryStyxFile implements IVirtualStyxFile {
-    protected String mName;
+    protected final OwnDI mDI;
+    protected final String mName;
     protected StyxQID mQID;
     protected StyxStat mStat;
     protected static final int ALL_MODES = 0x000001FF;
 
-    public MemoryStyxFile(String name) {
+    public MemoryStyxFile(String name,
+                          OwnDI di) {
         if (name == null) {
             throw new NullPointerException("Filename is null");
         }
+        mDI = di;
         mName = name;
         mQID = new StyxQID(QidType.QTFILE, 0, mName.hashCode());
     }
@@ -98,13 +100,14 @@ public class MemoryStyxFile implements IVirtualStyxFile {
 
     @Override
     public boolean open(int clientId, int mode) throws StyxException {
+
         return ( ( mode == ModeType.OREAD ) ||
                 ( mode == ModeType.OWRITE ) ||
                 ( mode == ModeType.ORDWR ) );
     }
 
     @Override
-    public IVirtualStyxFile walk(Iterator<String> pathElements, List<StyxQID> qids)
+    public IVirtualStyxFile walk(Queue<String> pathElements, List<StyxQID> qids)
             throws StyxErrorMessageException {
         return this;
     }
@@ -122,29 +125,6 @@ public class MemoryStyxFile implements IVirtualStyxFile {
 
     @Override
     public void close(int clientId) {
-    }
-
-    protected int stringReply(String value, byte[] buffer, Charset charset) {
-        byte[] bytes = value.getBytes(charset);
-        System.arraycopy(bytes, 0, buffer, 0, bytes.length);
-        return bytes.length;
-    }
-
-    protected int stringReplyWithOffset(String value, byte[] buffer, Charset charset,
-                                        long offset, int count) {
-        return byteReplyWithOffset(value.getBytes(charset), buffer, offset, count);
-    }
-
-    protected int byteReplyWithOffset(byte[] reply, byte[] buffer, long offset, int count) {
-        if (offset >= reply.length) {
-            return 0;
-        } else {
-            if (offset + count > reply.length) {
-                count = (int) ( reply.length - offset );
-            }
-            System.arraycopy(reply, 0, buffer, 0, count);
-            return count;
-        }
     }
 
     @Override

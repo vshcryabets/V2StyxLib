@@ -29,16 +29,14 @@ public class TCPDualLinkServerManager extends StyxServerManager {
 
     public synchronized  IClient getReverseConnectionForClient(int clientId, Credentials credentials) {
         if ( mReverseAnswerProcessor == null ) {
-            mReverseAnswerProcessor = new RMessagesProcessor("RC"+clientId, mConfiguration.clientsRepo);
-            mReverseTransmitter = new TMessageTransmitter(null, mConfiguration.clientsRepo);
+            mReverseAnswerProcessor = new RMessagesProcessor("RC"+clientId, mConfiguration.di.getClientsRepo());
+            mReverseTransmitter = new TMessageTransmitter(null, mConfiguration.di.getClientsRepo());
         }
-        var driver = mConfiguration.clientsRepo.getChannelDriver(clientId);
+        var driver = mConfiguration.di.getClientsRepo().getChannelDriver(clientId);
         return new Connection(new Connection.Configuration(
                 credentials,
                 driver,
-                mConfiguration.clientsRepo,
-                mConfiguration.serializer,
-                mConfiguration.deserializer,
+                mConfiguration.di,
                 mReverseAnswerProcessor,
                 mReverseTransmitter
         ));

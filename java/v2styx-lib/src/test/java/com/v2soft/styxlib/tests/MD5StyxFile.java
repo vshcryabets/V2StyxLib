@@ -3,6 +3,7 @@ package com.v2soft.styxlib.tests;
 import com.v2soft.styxlib.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.l6.vfs.MemoryStyxFile;
+import com.v2soft.styxlib.utils.OwnDI;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -18,8 +19,8 @@ public class MD5StyxFile extends MemoryStyxFile {
 
     protected HashMap<Integer, MessageDigest> mClientsMap = new HashMap<>();
 
-    public MD5StyxFile() {
-        super(FILE_NAME);
+    public MD5StyxFile(OwnDI di) {
+        super(FILE_NAME, di);
     }
 
     @Override

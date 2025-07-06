@@ -19,10 +19,4 @@ public class StyxMessage {
     public void setTag(int tag){
         mTag = (tag & 0xFFFF);
     }
-
-    @Override
-    public String toString() {
-        return String.format("Type: %d\tTag: %d",
-                type, getTag());
-    }
 }

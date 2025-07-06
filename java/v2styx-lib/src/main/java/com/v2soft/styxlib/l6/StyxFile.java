@@ -3,30 +3,24 @@ package com.v2soft.styxlib.l6;
 import com.v2soft.styxlib.exceptions.StyxEOFException;
 import com.v2soft.styxlib.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.exceptions.StyxException;
+import com.v2soft.styxlib.handlers.IMessageTransmitter;
+import com.v2soft.styxlib.io.StyxDataInputStream;
 import com.v2soft.styxlib.l5.enums.Constants;
 import com.v2soft.styxlib.l5.enums.FileMode;
-import com.v2soft.styxlib.l5.serialization.IDataDeserializer;
+import com.v2soft.styxlib.l5.enums.MessageType;
+import com.v2soft.styxlib.l5.enums.ModeType;
+import com.v2soft.styxlib.l5.messages.*;
+import com.v2soft.styxlib.l5.messages.base.StyxMessage;
+import com.v2soft.styxlib.l5.messages.base.StyxTMessageFID;
 import com.v2soft.styxlib.l5.serialization.impl.StyxSerializerImpl;
-import com.v2soft.styxlib.io.StyxDataInputStream;
+import com.v2soft.styxlib.l5.structs.StyxStat;
 import com.v2soft.styxlib.l6.io.StyxFileBufferedInputStream;
 import com.v2soft.styxlib.l6.io.StyxUnbufferedInputStream;
 import com.v2soft.styxlib.l6.io.StyxUnbufferedOutputStream;
-import com.v2soft.styxlib.l5.messages.StyxROpenMessage;
-import com.v2soft.styxlib.l5.messages.StyxRStatMessage;
-import com.v2soft.styxlib.l5.messages.StyxRWalkMessage;
-import com.v2soft.styxlib.l5.messages.StyxTCreateMessage;
-import com.v2soft.styxlib.l5.messages.StyxTOpenMessage;
-import com.v2soft.styxlib.l5.messages.StyxTWStatMessage;
-import com.v2soft.styxlib.l5.messages.StyxTWalkMessage;
-import com.v2soft.styxlib.l5.messages.base.StyxMessage;
-import com.v2soft.styxlib.l5.messages.base.StyxTMessageFID;
-import com.v2soft.styxlib.l5.enums.MessageType;
-import com.v2soft.styxlib.l5.enums.ModeType;
-import com.v2soft.styxlib.l5.structs.StyxStat;
-import com.v2soft.styxlib.handlers.IMessageTransmitter;
-import com.v2soft.styxlib.server.ClientsRepo;
+import com.v2soft.styxlib.utils.OwnDI;
 
-import java.io.*;
+import java.io.BufferedOutputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -42,23 +36,20 @@ public class StyxFile {
     private final IMessageTransmitter mTransmitter;
     private final int mTimeout;
     private final int mClientId;
-    private final ClientsRepo mClientsRepo;
-    private final IDataDeserializer mDeserializer;
+    private final OwnDI mDI;
 
     public StyxFile(String path,
                     long parentFid,
-                    ClientsRepo clientsRepo,
                     int clientId,
                     IMessageTransmitter transmitter,
                     int timeout,
-                    IDataDeserializer deserializer) throws StyxException {
-        mClientsRepo = clientsRepo;
+                    OwnDI di) throws StyxException {
+        mDI = di;
         mTransmitter = transmitter;
         mClientId = clientId;
         mTimeout = timeout;
         mPath = path;
         mParentFID = parentFid;
-        mDeserializer = deserializer;
     }
 
     /**
@@ -104,7 +95,7 @@ public class StyxFile {
             var is = new StyxFileBufferedInputStream(mTransmitter, tempFID, iounit, mClientId);
             var sis = new StyxDataInputStream(is);
             while (true) {
-                stats.add(mDeserializer.deserializeStat(sis));
+                stats.add(mDI.getDataDeserializer().deserializeStat(sis));
             }
         } catch (StyxEOFException e) {
             // That's ok
@@ -195,11 +186,10 @@ public class StyxFile {
             for (var stat : listStat()) {
                 var file = new StyxFile(stat.name(),
                         mFID,
-                        mClientsRepo,
                         mClientId,
                         mTransmitter,
                         mTimeout,
-                        mDeserializer);
+                        mDI);
                 file.delete(true);
             }
         }
@@ -322,7 +312,7 @@ public class StyxFile {
 
     private long sendWalkMessage(long parentFID, String path)
             throws StyxException {
-        long newFID = mClientsRepo.getFidPoll(mClientId).getFreeItem();
+        long newFID = mDI.getClientsRepo().getFidPoll(mClientId).getFreeItem();
         final StyxTWalkMessage tWalk = new StyxTWalkMessage(parentFID,
                 newFID, StyxSerializerImpl.splitPath(path));
         final var feature = mTransmitter.sendMessage(tWalk, mClientId, mTimeout);
@@ -351,11 +341,10 @@ public class StyxFile {
         return new StyxFile(
                 path,
                 getFID(),
-                mClientsRepo,
                 mClientId,
                 mTransmitter,
                 mTimeout,
-                mDeserializer
+                mDI
         );
     }
 }

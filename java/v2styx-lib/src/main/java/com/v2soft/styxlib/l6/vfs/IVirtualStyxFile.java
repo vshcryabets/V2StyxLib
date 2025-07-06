@@ -7,8 +7,8 @@ import com.v2soft.styxlib.l5.structs.StyxStat;
 
 import java.io.IOException;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
+import java.util.Queue;
 
 /**
  * Virtual styx file interface
@@ -62,7 +62,7 @@ public interface IVirtualStyxFile {
      * @return number of bytes that was readed into the buffer
      */
     int read(int clientId, byte[] buffer, long offset, int count) throws StyxErrorMessageException;
-    IVirtualStyxFile walk(Iterator<String> pathElements, List<StyxQID> qids)
+    IVirtualStyxFile walk(Queue<String> pathElements, List<StyxQID> qids)
             throws StyxErrorMessageException;
     /**
      * Writes data to file at the position offset.

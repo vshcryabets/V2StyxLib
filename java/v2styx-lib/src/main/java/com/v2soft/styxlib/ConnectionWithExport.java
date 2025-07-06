@@ -35,8 +35,10 @@ public class ConnectionWithExport extends Connection {
     @Override
     public boolean connect() throws IOException, StyxException,
             InterruptedException, TimeoutException {
-        mConfiguration.requestProcessor = new TMessagesProcessor(getConnectionDetails(), mExportedRoot,
-                mConfiguration.clientsRepo);
+        mConfiguration.requestProcessor = new TMessagesProcessor(
+                getConnectionDetails(),
+                mExportedRoot,
+                mConfiguration.di.getClientsRepo());
         return super.connect();
     }
 

@@ -140,7 +140,7 @@ public class TMessagesProcessor extends QueueMessagesProcessor {
         long fid = msg.getFID();
         final List<StyxQID> qidsList = new LinkedList<StyxQID>();
         final IVirtualStyxFile walkFile = mClientsRepo.getAssignedFile(clientId, fid).walk(
-                msg.getPathElements().iterator(),
+                new LinkedList<>(msg.getPathElements()),
                 qidsList);
         if (walkFile != null) {
             mClientsRepo.getClient(clientId).registerOpenedFile(msg.getNewFID(), walkFile);

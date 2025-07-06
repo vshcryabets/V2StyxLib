@@ -10,14 +10,12 @@ import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.l5.messages.*;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
 import com.v2soft.styxlib.l5.messages.base.StyxTMessageFID;
-import com.v2soft.styxlib.l5.serialization.IDataDeserializer;
-import com.v2soft.styxlib.l5.serialization.IDataSerializer;
 import com.v2soft.styxlib.l5.structs.StyxQID;
 import com.v2soft.styxlib.l6.StyxFile;
 import com.v2soft.styxlib.library.types.ConnectionDetails;
 import com.v2soft.styxlib.library.types.Credentials;
-import com.v2soft.styxlib.server.ClientsRepo;
 import com.v2soft.styxlib.server.IChannelDriver;
+import com.v2soft.styxlib.utils.OwnDI;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -33,23 +31,17 @@ public class Connection
     public static class Configuration {
         public Credentials credentials;
         public IChannelDriver<?> driver;
-        public ClientsRepo clientsRepo;
-        public IDataSerializer serializer;
-        public IDataDeserializer deserializer;
+        public OwnDI di;
         public RMessagesProcessor answerProcessor; // handle RMessages from server
         public IMessageProcessor requestProcessor; // handle TMessages from server
         public TMessageTransmitter transmitter; //send messages to server
 
         public Configuration(Credentials credentials,
                              IChannelDriver<?> driver,
-                             ClientsRepo clientsRepo,
-                             IDataSerializer serializer,
-                             IDataDeserializer deserializer) {
+                             OwnDI di) {
             this(credentials,
                     driver,
-                    clientsRepo,
-                    serializer,
-                    deserializer,
+                    di,
                     null,
                     null);
         }
@@ -57,9 +49,7 @@ public class Connection
         public Configuration(
                 Credentials credentials,
                 IChannelDriver<?> driver,
-                ClientsRepo clientsRepo,
-                IDataSerializer serializer,
-                IDataDeserializer deserializer,
+                OwnDI di,
                 RMessagesProcessor answerProcessor,
                 TMessageTransmitter transmitter) {
             if (driver == null) {
@@ -71,9 +61,7 @@ public class Connection
 
             this.credentials = credentials;
             this.driver = driver;
-            this.clientsRepo = clientsRepo;
-            this.serializer = serializer;
-            this.deserializer = deserializer;
+            this.di = di;
             this.answerProcessor = answerProcessor;
             this.transmitter = transmitter;
         }
@@ -107,11 +95,12 @@ public class Connection
         mConfiguration = configuration;
         mDetails = new ConnectionDetails(getProtocol(), getIOBufSize());
         if ( configuration.answerProcessor == null ) {
-            configuration.answerProcessor = new RMessagesProcessor("RH" + configuration.driver.toString(), configuration.clientsRepo);
+            configuration.answerProcessor = new RMessagesProcessor("RH" + configuration.driver.toString(),
+                    configuration.di.getClientsRepo());
             shouldCloseAnswerProcessor = true;
         }
         if ( mConfiguration.transmitter == null ) {
-            mConfiguration.transmitter = new TMessageTransmitter(mTransmitterListener, configuration.clientsRepo);
+            mConfiguration.transmitter = new TMessageTransmitter(mTransmitterListener, configuration.di.getClientsRepo());
             shouldCloseTransmitter = true;
         }
         if (mConfiguration.requestProcessor == null)
@@ -149,11 +138,10 @@ public class Connection
         if (mRoot == null) {
             mRoot = new StyxFile( "",
                     getRootFID(),
-                    mConfiguration.clientsRepo,
                     mClientId,
                     mConfiguration.transmitter,
                     getTimeout(),
-                    mConfiguration.deserializer);
+                    mConfiguration.di);
         }
         return mRoot;
     }
@@ -203,7 +191,7 @@ public class Connection
         if (rVersion.maxPacketSize < mDetails.ioUnit()) {
             mDetails = new ConnectionDetails(getProtocol(), (int) rVersion.maxPacketSize);
         }
-        mConfiguration.clientsRepo.getFidPoll(mClientId).clean();
+        mConfiguration.di.getClientsRepo().getFidPoll(mClientId).clean();
         sendAuthMessage();
     }
 
@@ -211,7 +199,7 @@ public class Connection
             throws StyxException {
         var credentials = mConfiguration.credentials;
         if (!credentials.getUserName().isEmpty() && !credentials.getPassword().isEmpty()) {
-            mAuthFID = mConfiguration.clientsRepo.getFidPoll(mClientId).getFreeItem();
+            mAuthFID = mConfiguration.di.getClientsRepo().getFidPoll(mClientId).getFreeItem();
 
             StyxTAuthMessage tAuth = new StyxTAuthMessage(mAuthFID, mConfiguration.credentials.getUserName(), getMountPoint());
             StyxMessage rMessage = mConfiguration.transmitter.sendMessage(tAuth, mClientId, mTimeout).getResult();
@@ -225,7 +213,7 @@ public class Connection
             //        output.flush();
         }
 
-        mRootFid = mConfiguration.clientsRepo.getFidPoll(mClientId).getFreeItem();
+        mRootFid = mConfiguration.di.getClientsRepo().getFidPoll(mClientId).getFreeItem();
         StyxTAttachMessage tAttach = new StyxTAttachMessage(mRootFid, getAuthFID(),
                 mConfiguration.credentials.getUserName(),
                 getMountPoint());
@@ -300,10 +288,9 @@ public class Connection
     public StyxFile open(String filename) throws StyxException {
         return new StyxFile(filename,
                 getRootFID(),
-                mConfiguration.clientsRepo,
                 mClientId,
                 mConfiguration.transmitter,
                 getTimeout(),
-                mConfiguration.deserializer);
+                mConfiguration.di);
     }
 }

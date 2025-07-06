@@ -2,6 +2,8 @@ package com.v2soft.styxlib.l6.disk;
 
 import com.v2soft.styxlib.l5.enums.ModeType;
 import com.v2soft.styxlib.l6.vfs.DiskStyxFile;
+import com.v2soft.styxlib.utils.OwnDI;
+import com.v2soft.styxlib.utils.OwnDIImpl;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -11,6 +13,8 @@ import java.io.IOException;
 import java.util.UUID;
 
 public class DiskStyxFileTest {
+    private OwnDI di = new OwnDIImpl();
+
     @Test
     void testFileReading() throws IOException {
         var fileName = UUID.randomUUID().toString();
@@ -20,7 +24,7 @@ public class DiskStyxFileTest {
         for (int i = 0; i< 512; i++)
             outputStream.write(i);
         outputStream.close();
-        var styxFile = new DiskStyxFile(testFile);
+        var styxFile = new DiskStyxFile(testFile, di);
         var clientId = 1;
         styxFile.open(clientId, ModeType.OREAD);
         var buffer = new byte[8192];

@@ -2,14 +2,13 @@ package com.v2soft.styxlib.server.tcp;
 
 import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.l5.enums.Checks;
-import com.v2soft.styxlib.l5.messages.base.StyxTMessage;
-import com.v2soft.styxlib.l5.serialization.IDataDeserializer;
-import com.v2soft.styxlib.l5.serialization.IDataSerializer;
-import com.v2soft.styxlib.server.ClientsRepo;
-import com.v2soft.styxlib.server.StyxServerManager;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
+import com.v2soft.styxlib.l5.messages.base.StyxTMessage;
+import com.v2soft.styxlib.server.ClientsRepo;
 import com.v2soft.styxlib.server.IChannelDriver;
+import com.v2soft.styxlib.server.StyxServerManager;
 import com.v2soft.styxlib.utils.Future;
+import com.v2soft.styxlib.utils.OwnDI;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -30,14 +29,14 @@ public abstract class TCPChannelDriver implements
         public final InetAddress address;
         public final int port;
 
-        public InitConfiguration(IDataSerializer serializer,
-                                 IDataDeserializer deserializer,
+        public InitConfiguration(
                                  int iounit,
                                  boolean ssl,
                                  InetAddress address,
-                                 int port
+                                 int port,
+                                 OwnDI di
         ) {
-            super(serializer, deserializer, iounit);
+            super(di, iounit);
             this.ssl = ssl;
             this.address = address;
             this.port = port;
@@ -96,7 +95,7 @@ public abstract class TCPChannelDriver implements
         }
         final var client = (TCPClientDetails) mClientsRepo.getClient(clientId);
         try {
-            mInitConfiguration.serializer.serialize(message, client.getOutputWriter());
+            mInitConfiguration.di.getDataSerializer().serialize(message, client.getOutputWriter());
             client.sendOutputBuffer();
             mTransmittedPacketsCount++;
         } catch (StyxException e) {
@@ -128,8 +127,6 @@ public abstract class TCPChannelDriver implements
 
     /**
      * Read data from assigned SocketChannel
-     *
-     * @throws IOException
      */
     protected boolean readSocket(int clientId) throws StyxException {
         int read = 0;
@@ -158,7 +155,7 @@ public abstract class TCPChannelDriver implements
         if (inBuffer > 4) {
             long packetSize = client.getInputReader().getUInt32();
             if (inBuffer >= packetSize) {
-                var message = mInitConfiguration.deserializer.deserializeMessage(client.getInputReader(),
+                var message = mInitConfiguration.di.getDataDeserializer().deserializeMessage(client.getInputReader(),
                         mInitConfiguration.iounit);
                 if (Checks.isTMessage(message.type)) {
                     mStartConfiguration.getTProcessor().onClientMessage(message, clientId);

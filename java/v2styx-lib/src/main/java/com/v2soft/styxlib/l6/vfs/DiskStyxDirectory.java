@@ -6,10 +6,10 @@ import com.v2soft.styxlib.l5.enums.FileMode;
 import com.v2soft.styxlib.l5.enums.ModeType;
 import com.v2soft.styxlib.l5.enums.QidType;
 import com.v2soft.styxlib.l5.serialization.IBufferWriter;
-import com.v2soft.styxlib.l5.serialization.IDataSerializer;
 import com.v2soft.styxlib.l5.serialization.impl.BufferWriterImpl;
 import com.v2soft.styxlib.l5.structs.StyxQID;
 import com.v2soft.styxlib.l5.structs.StyxStat;
+import com.v2soft.styxlib.utils.OwnDI;
 
 import java.io.File;
 import java.util.*;
@@ -24,12 +24,10 @@ extends DiskStyxFile {
     private Map<Integer, IBufferWriter> mBuffersMap;
     protected List<IVirtualStyxFile> mVirtualFiles;
     protected List<IVirtualStyxFile> mRealFiles;
-    private IDataSerializer mSerializer;
 
-    public DiskStyxDirectory(File directory, IDataSerializer serializer) throws StyxException {
-        super(directory);
+    public DiskStyxDirectory(File directory, OwnDI di) throws StyxException {
+        super(directory, di);
         mQID = new StyxQID(QidType.QTDIR, 0, mName.hashCode());
-        mSerializer = serializer;
         mVirtualFiles = new ArrayList<>();
         mRealFiles = new ArrayList<>();
         mBuffersMap = new HashMap<>();
@@ -41,10 +39,10 @@ extends DiskStyxFile {
     }
 
     @Override
-    public IVirtualStyxFile walk(Iterator<String> pathElements, List<StyxQID> qids)
+    public IVirtualStyxFile walk(Queue<String> pathElements, List<StyxQID> qids)
             throws StyxErrorMessageException {
-        if ( pathElements.hasNext() ) {
-            String filename = pathElements.next();
+        if ( !pathElements.isEmpty() ) {
+            String filename = pathElements.poll();
             for (IVirtualStyxFile file : mVirtualFiles) {
                 if ( file.getName().equals(filename)) {
                     qids.add(file.getQID());
@@ -58,9 +56,9 @@ extends DiskStyxFile {
                     DiskStyxFile styxFile;
                     try {
                         if ( file.isDirectory() ) {
-                            styxFile = new DiskStyxDirectory(file, mSerializer);
+                            styxFile = new DiskStyxDirectory(file, mDI);
                         } else {
-                            styxFile = new DiskStyxFile(file);
+                            styxFile = new DiskStyxFile(file, mDI);
                         }
                         qids.add(styxFile.getQID());
                         return styxFile.walk(pathElements, qids);
@@ -84,24 +82,24 @@ extends DiskStyxFile {
             final List<StyxStat> stats = new LinkedList<StyxStat>();
             for (IVirtualStyxFile file : mVirtualFiles) {
                 final StyxStat stat = file.getStat();
-                size += mSerializer.getStatSerializedSize(stat);
+                size += mDI.getDataSerializer().getStatSerializedSize(stat);
                 stats.add(stat);
             }
             // reload disk files
             mRealFiles.clear();
             for (File file : mFile.listFiles()) {
-                final var item = file.isDirectory() ? new DiskStyxDirectory(file, mSerializer)
-                        : new DiskStyxFile(file);
+                final var item = file.isDirectory() ? new DiskStyxDirectory(file, mDI)
+                        : new DiskStyxFile(file, mDI);
                 mRealFiles.add(item);
                 final StyxStat stat = item.getStat();
-                size += mSerializer.getStatSerializedSize(stat);
+                size += mDI.getDataSerializer().getStatSerializedSize(stat);
                 stats.add(stat);
             }
 
             // allocate buffer
             var buffer = new BufferWriterImpl(size);
             for (StyxStat state : stats) {
-                mSerializer.serializeStat(state, buffer);
+                mDI.getDataSerializer().serializeStat(state, buffer);
             }
             mBuffersMap.put(clientId, buffer);
             return true;
@@ -162,14 +160,14 @@ extends DiskStyxFile {
                 if ( !newFile.mkdir() ) {
                     throw StyxErrorMessageException.newInstance("Can't create directory, unknown error.");
                 }
-                DiskStyxDirectory file = new DiskStyxDirectory(newFile, mSerializer);
+                DiskStyxDirectory file = new DiskStyxDirectory(newFile, mDI);
                 return file.getQID();
             } else {
                 // create file
                 if ( !newFile.createNewFile() ) {
                     throw StyxErrorMessageException.newInstance("Can't create file, unknown error.");
                 }
-                DiskStyxFile file = new DiskStyxFile(newFile);
+                DiskStyxFile file = new DiskStyxFile(newFile, mDI);
                 return file.getQID();
             }
         } catch (Exception e) {
