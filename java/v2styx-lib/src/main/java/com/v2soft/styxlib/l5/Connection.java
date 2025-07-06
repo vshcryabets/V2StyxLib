@@ -22,7 +22,7 @@ import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 
 /**
- * Styx client conection
+ * Styx client connection
  *
  * @author V.Shcryabets <a>vshcryabets@gmail.com</a>
  */

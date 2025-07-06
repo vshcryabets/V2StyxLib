@@ -1,6 +1,7 @@
 package com.v2soft.styxlib.server;
 
 import com.v2soft.styxlib.exceptions.StyxErrorMessageException;
+import com.v2soft.styxlib.exceptions.StyxUnknownClientIdException;
 import com.v2soft.styxlib.utils.Polls;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,17 +28,21 @@ class ClientsRepoImplTest {
     }
 
     @Test
-    void removeClientShouldRemoveClientById() {
+    void removeClientShouldRemoveClientById() throws StyxUnknownClientIdException {
         int clientId = clientsRepo.addClient(mockClient);
         clientsRepo.removeClient(clientId);
-        assertNull(clientsRepo.getClient(clientId));
+        assertThrows(StyxUnknownClientIdException.class, () -> clientsRepo.getClient(clientId));
     }
 
     @Test
-    void getClientShouldReturnCorrectClient() {
+    void getClientShouldReturnCorrectClient() throws StyxUnknownClientIdException {
         int clientId = clientsRepo.addClient(mockClient);
-
         assertEquals(mockClient, clientsRepo.getClient(clientId));
+    }
+
+    @Test
+    void getUnknownClientShouldThrowException() {
+        assertThrows(StyxUnknownClientIdException.class, () -> clientsRepo.getClient(9999));
     }
 
     @Test

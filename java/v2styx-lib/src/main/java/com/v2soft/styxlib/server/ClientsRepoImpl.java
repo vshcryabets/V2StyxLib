@@ -1,6 +1,7 @@
 package com.v2soft.styxlib.server;
 
 import com.v2soft.styxlib.exceptions.StyxErrorMessageException;
+import com.v2soft.styxlib.exceptions.StyxUnknownClientIdException;
 import com.v2soft.styxlib.handlers.IMessageTransmitter;
 import com.v2soft.styxlib.l6.vfs.IVirtualStyxFile;
 import com.v2soft.styxlib.utils.FIDPoll;
@@ -31,7 +32,10 @@ public class ClientsRepoImpl implements ClientsRepo {
     }
 
     @Override
-    public ClientDetails getClient(int id) {
+    public ClientDetails getClient(int id) throws StyxUnknownClientIdException {
+        if (!mClients.containsKey(id)) {
+            throw new StyxUnknownClientIdException();
+        }
         return mClients.get(id);
     }
 

@@ -2,6 +2,7 @@ package com.v2soft.styxlib.l6.vfs;
 
 import com.v2soft.styxlib.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.exceptions.StyxException;
+import com.v2soft.styxlib.exceptions.StyxNotAuthorizedException;
 import com.v2soft.styxlib.l5.enums.FileMode;
 import com.v2soft.styxlib.l5.enums.ModeType;
 import com.v2soft.styxlib.l5.enums.QidType;
@@ -74,6 +75,9 @@ extends DiskStyxFile {
 
     @Override
     public boolean open(int clientId, int mode) throws StyxException {
+        if (!mDI.getIsClientAuthorizedUseCase().isClientAuthorized(clientId)) {
+            throw new StyxNotAuthorizedException();
+        }
         boolean result = ((mode&0x0F) == ModeType.OREAD);
         if ( result && mFile.canRead() ) {
             // load files

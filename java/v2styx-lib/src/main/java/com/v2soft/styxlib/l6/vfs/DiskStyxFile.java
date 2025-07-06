@@ -2,6 +2,7 @@ package com.v2soft.styxlib.l6.vfs;
 
 import com.v2soft.styxlib.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.exceptions.StyxException;
+import com.v2soft.styxlib.exceptions.StyxNotAuthorizedException;
 import com.v2soft.styxlib.l5.enums.ModeType;
 import com.v2soft.styxlib.utils.OwnDI;
 
@@ -71,6 +72,9 @@ public class DiskStyxFile extends MemoryStyxFile {
 
     @Override
     public boolean open(int clientId, int mode) throws StyxException {
+        if (!mDI.getIsClientAuthorizedUseCase().isClientAuthorized(clientId)) {
+            throw new StyxNotAuthorizedException();
+        }
         boolean canOpen = false;
         String ramode = null;
         switch (mode) {

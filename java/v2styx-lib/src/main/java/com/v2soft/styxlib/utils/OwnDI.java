@@ -7,7 +7,9 @@ import com.v2soft.styxlib.server.ClientsRepo;
 
 public interface OwnDI {
     IsClientAuthorizedUseCase getIsClientAuthorizedUseCase();
+
     IDataDeserializer getDataDeserializer();
     IDataSerializer getDataSerializer();
+
     ClientsRepo getClientsRepo();
 }

@@ -2,6 +2,7 @@ package com.v2soft.styxlib.l6.vfs;
 
 import com.v2soft.styxlib.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.exceptions.StyxException;
+import com.v2soft.styxlib.exceptions.StyxNotAuthorizedException;
 import com.v2soft.styxlib.l5.enums.ModeType;
 import com.v2soft.styxlib.l5.enums.QidType;
 import com.v2soft.styxlib.l5.structs.StyxQID;
@@ -100,7 +101,9 @@ public class MemoryStyxFile implements IVirtualStyxFile {
 
     @Override
     public boolean open(int clientId, int mode) throws StyxException {
-
+        if (!mDI.getIsClientAuthorizedUseCase().isClientAuthorized(clientId)) {
+            throw new StyxNotAuthorizedException();
+        }
         return ( ( mode == ModeType.OREAD ) ||
                 ( mode == ModeType.OWRITE ) ||
                 ( mode == ModeType.ORDWR ) );

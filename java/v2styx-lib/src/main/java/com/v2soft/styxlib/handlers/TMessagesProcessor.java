@@ -2,6 +2,7 @@ package com.v2soft.styxlib.handlers;
 
 import com.v2soft.styxlib.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.exceptions.StyxException;
+import com.v2soft.styxlib.exceptions.StyxUnknownClientIdException;
 import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.l5.messages.*;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
@@ -114,7 +115,7 @@ public class TMessagesProcessor extends QueueMessagesProcessor {
         }
     }
 
-    private StyxRAttachMessage processAttach(int clientId, StyxTAttachMessage msg) {
+    private StyxRAttachMessage processAttach(int clientId, StyxTAttachMessage msg) throws StyxUnknownClientIdException {
         var clientDetails = mClientsRepo.getClient(clientId);
         clientDetails.setUsername(msg.userName);
         String mountPoint = msg.mountPoint;
@@ -125,7 +126,7 @@ public class TMessagesProcessor extends QueueMessagesProcessor {
         return answer;
     }
 
-    private StyxMessage processAuth(int clientId, StyxTAuthMessage msg) {
+    private StyxMessage processAuth(int clientId, StyxTAuthMessage msg) throws StyxUnknownClientIdException {
         mClientsRepo.getClient(clientId).setUsername(msg.mUserName);
         // TODO handle auth packet
         return new StyxRAuthMessage(msg.getTag(), StyxQID.EMPTY);
