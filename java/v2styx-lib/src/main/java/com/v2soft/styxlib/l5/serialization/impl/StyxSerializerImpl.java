@@ -32,8 +32,8 @@ public class StyxSerializerImpl implements IDataSerializer {
             case MessageType.Rerror -> size += UTF.getUTFSize(((StyxRErrorMessage)message).mError);
             case MessageType.Tattach -> {
                 var attachMessage = (StyxTAttachMessage)message;
-                size += 2 + 2 + UTF.getUTFSize(attachMessage.getUserName()) +
-                        UTF.getUTFSize(attachMessage.getMountPoint());
+                size += 2 + 2 + UTF.getUTFSize(attachMessage.userName) +
+                        UTF.getUTFSize(attachMessage.mountPoint);
             }
             case MessageType.Tauth -> {
                 var authMessage = (StyxTAuthMessage)message;
@@ -49,10 +49,10 @@ public class StyxSerializerImpl implements IDataSerializer {
             case MessageType.Topen -> size++;
             case MessageType.Tcreate -> {
                 var createMessage = (StyxTCreateMessage)message;
-                size += 5 + UTF.getUTFSize(createMessage.getName());
+                size += 5 + UTF.getUTFSize(createMessage.name);
             }
             case MessageType.Twstat -> size += getStatSerializedSize(((StyxTWStatMessage)message).getStat());
-            case MessageType.Twrite -> size += 12 + ((StyxTWriteMessage)message).getDataLength();
+            case MessageType.Twrite -> size += 12 + ((StyxTWriteMessage)message).dataLength;
             case MessageType.Tread -> size += 8 + 4;
             case MessageType.Rwrite -> size += 4;
             case MessageType.Rstat -> size += 2 + getStatSerializedSize(((StyxRStatMessage)message).stat);
@@ -60,7 +60,7 @@ public class StyxSerializerImpl implements IDataSerializer {
             case MessageType.Tflush -> size += 2;
             case MessageType.Rcreate -> size += 4;
             case MessageType.Ropen -> size += 4;
-            case MessageType.Tversion -> size += 4 + UTF.getUTFSize(((StyxTVersionMessage)message).getProtocolVersion());
+            case MessageType.Tversion -> size += 4 + UTF.getUTFSize(((StyxTVersionMessage)message).protocolVersion);
             case MessageType.Rversion -> size += 4 + UTF.getUTFSize(((StyxRVersionMessage)message).protocolVersion);
             case MessageType.Rwalk -> {
                 var walkMessage = (StyxRWalkMessage)message;
@@ -92,14 +92,14 @@ public class StyxSerializerImpl implements IDataSerializer {
         switch (message.type) {
             case MessageType.Tversion:
                 StyxTVersionMessage tVersionMessage = (StyxTVersionMessage) message;
-                output.writeUInt32(tVersionMessage.getMaxPacketSize());
-                output.writeUTFString(tVersionMessage.getProtocolVersion());
+                output.writeUInt32(tVersionMessage.maxPacketSize);
+                output.writeUTFString(tVersionMessage.protocolVersion);
                 break;
             case MessageType.Tcreate:
                 StyxTCreateMessage tCreate = (StyxTCreateMessage) message;
-                output.writeUTFString(tCreate.getName());
-                output.writeUInt32(tCreate.getPermissions());
-                output.writeUInt8((short) tCreate.getMode());
+                output.writeUTFString(tCreate.name);
+                output.writeUInt32(tCreate.permissions);
+                output.writeUInt8((short) tCreate.mode);
                 break;
             case MessageType.Twalk:
                 StyxTWalkMessage tWalk = (StyxTWalkMessage) message;
@@ -114,9 +114,9 @@ public class StyxSerializerImpl implements IDataSerializer {
                 break;
             case MessageType.Twrite:
                 StyxTWriteMessage tWriteMessage = (StyxTWriteMessage) message;
-                output.writeUInt64(tWriteMessage.getOffset());
-                output.writeUInt32(tWriteMessage.getDataLength());
-                output.write(tWriteMessage.getData(), tWriteMessage.getDataOffset(), tWriteMessage.getDataLength());
+                output.writeUInt64(tWriteMessage.offset);
+                output.writeUInt32(tWriteMessage.dataLength);
+                output.write(tWriteMessage.data, tWriteMessage.dataOffset, tWriteMessage.dataLength);
                 break;
             case MessageType.Tauth:
                 StyxTAuthMessage tAuthMessage = (StyxTAuthMessage) message;
@@ -125,8 +125,8 @@ public class StyxSerializerImpl implements IDataSerializer {
                 break;
             case MessageType.Tread:
                 StyxTReadMessage tReadMessage = (StyxTReadMessage) message;
-                output.writeUInt64(tReadMessage.getOffset());
-                output.writeUInt32(tReadMessage.getCount());
+                output.writeUInt64(tReadMessage.offset);
+                output.writeUInt32(tReadMessage.count);
                 break;
             case MessageType.Twstat:
                 StyxTWStatMessage twStatMessage = (StyxTWStatMessage) message;
@@ -139,13 +139,13 @@ public class StyxSerializerImpl implements IDataSerializer {
                 break;
             case MessageType.Topen:
                 StyxTOpenMessage tOpenMessage = (StyxTOpenMessage) message;
-                output.writeUInt8((short) tOpenMessage.getMode());
+                output.writeUInt8((short) tOpenMessage.mode);
                 break;
             case MessageType.Tattach:
                 StyxTAttachMessage tAttachMessage = (StyxTAttachMessage) message;
-                output.writeUInt32(tAttachMessage.getAuthFID());
-                output.writeUTFString(tAttachMessage.getUserName());
-                output.writeUTFString(tAttachMessage.getMountPoint());
+                output.writeUInt32(tAttachMessage.authFID);
+                output.writeUTFString(tAttachMessage.userName);
+                output.writeUTFString(tAttachMessage.mountPoint);
                 break;
         }
     }

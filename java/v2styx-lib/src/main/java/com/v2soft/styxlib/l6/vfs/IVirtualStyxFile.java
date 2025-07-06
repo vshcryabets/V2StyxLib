@@ -4,7 +4,6 @@ import com.v2soft.styxlib.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.l5.structs.StyxQID;
 import com.v2soft.styxlib.l5.structs.StyxStat;
-import com.v2soft.styxlib.server.ClientDetails;
 
 import java.io.IOException;
 import java.util.Date;
@@ -68,7 +67,7 @@ public interface IVirtualStyxFile {
     /**
      * Writes data to file at the position offset.
      * @param data the data
-     * @param offset offset from begining of the file
+     * @param offset offset from beginning of the file
      * @return return the number of bytes written
      * @throws StyxErrorMessageException
      */

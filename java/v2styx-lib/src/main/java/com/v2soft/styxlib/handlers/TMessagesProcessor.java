@@ -116,8 +116,8 @@ public class TMessagesProcessor extends QueueMessagesProcessor {
 
     private StyxRAttachMessage processAttach(int clientId, StyxTAttachMessage msg) {
         var clientDetails = mClientsRepo.getClient(clientId);
-        clientDetails.setUsername(msg.getUserName());
-        String mountPoint = msg.getMountPoint();
+        clientDetails.setUsername(msg.userName);
+        String mountPoint = msg.mountPoint;
         mRoot.onConnectionOpened(clientId);
         IVirtualStyxFile root = mRoot; // TODO .getDirectory(mountPoint); there should be some logic with mountPoint?
         StyxRAttachMessage answer = new StyxRAttachMessage(msg.getTag(), root.getQID());
@@ -155,7 +155,7 @@ public class TMessagesProcessor extends QueueMessagesProcessor {
             throws StyxException {
         long fid = msg.getFID();
         IVirtualStyxFile file = mClientsRepo.getAssignedFile(clientId, fid);
-        if (file.open(clientId, msg.getMode())) {
+        if (file.open(clientId, msg.mode)) {
             return new StyxROpenMessage(msg.getTag(), file.getQID(),
                     mConnectionDetails.ioUnit() - DEFAULT_PACKET_HEADER_SIZE, false);
         } else {
@@ -175,7 +175,7 @@ public class TMessagesProcessor extends QueueMessagesProcessor {
     private StyxMessage processCreate(int clientId, StyxTCreateMessage msg)
             throws StyxErrorMessageException {
         final IVirtualStyxFile file = mClientsRepo.getAssignedFile(clientId, msg.getFID());
-        StyxQID qid = file.create(msg.getName(), msg.getPermissions(), msg.getMode());
+        StyxQID qid = file.create(msg.name, msg.permissions, msg.mode);
         return new StyxROpenMessage(msg.getTag(), qid, mConnectionDetails.ioUnit(), true);
     }
 
@@ -187,20 +187,20 @@ public class TMessagesProcessor extends QueueMessagesProcessor {
     private StyxMessage processWrite(int clientId, StyxTWriteMessage msg) throws StyxErrorMessageException {
         long fid = msg.getFID();
         return new StyxRWriteMessage(msg.getTag(),
-                mClientsRepo.getAssignedFile(clientId, fid).write(clientId, msg.getData(), msg.getOffset()));
+                mClientsRepo.getAssignedFile(clientId, fid).write(clientId, msg.data, msg.offset));
     }
 
     private StyxMessage processRead(int clientId, StyxTReadMessage msg) throws StyxErrorMessageException {
-        if (msg.getCount() > mConnectionDetails.ioUnit()) {
+        if (msg.count > mConnectionDetails.ioUnit()) {
             return new StyxRErrorMessage(msg.getTag(), "IOUnit overflow");
         }
         long fid = msg.getFID();
-        byte[] buffer = new byte[(int) msg.getCount()];
+        byte[] buffer = new byte[(int) msg.count];
         MetricsAndStats.byteArrayAllocationRRead++;
         return new StyxRReadMessage(msg.getTag(), buffer,
-                (int) mClientsRepo
+                mClientsRepo
                         .getAssignedFile(clientId, fid)
-                        .read(clientId, buffer, msg.getOffset(), msg.getCount()));
+                        .read(clientId, buffer, msg.offset, msg.count));
     }
 
     public IVirtualStyxFile getRoot() {
