@@ -37,8 +37,8 @@ public class StyxSerializerImpl implements IDataSerializer {
             }
             case MessageType.Tauth -> {
                 var authMessage = (StyxTAuthMessage)message;
-                size += UTF.getUTFSize(authMessage.getUserName())
-                    + UTF.getUTFSize(authMessage.getMountPoint());
+                size += UTF.getUTFSize(authMessage.mUserName)
+                    + UTF.getUTFSize(authMessage.mMountPoint);
             }
             case MessageType.Twalk -> {
                 var walkMessage = (StyxTWalkMessage)message;
@@ -120,8 +120,8 @@ public class StyxSerializerImpl implements IDataSerializer {
                 break;
             case MessageType.Tauth:
                 StyxTAuthMessage tAuthMessage = (StyxTAuthMessage) message;
-                output.writeUTFString(tAuthMessage.getUserName());
-                output.writeUTFString(tAuthMessage.getMountPoint());
+                output.writeUTFString(tAuthMessage.mUserName);
+                output.writeUTFString(tAuthMessage.mMountPoint);
                 break;
             case MessageType.Tread:
                 StyxTReadMessage tReadMessage = (StyxTReadMessage) message;

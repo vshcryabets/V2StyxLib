@@ -17,5 +17,5 @@ public interface ClientsRepo {
     void closeFile(int clientId, long fid) throws StyxErrorMessageException;
     FIDPoll getFidPoll(int clientId);
     Polls getPolls(int clientId);
-    IChannelDriver getChannelDriver(int clientId);
+    IChannelDriver<?> getChannelDriver(int clientId);
 }

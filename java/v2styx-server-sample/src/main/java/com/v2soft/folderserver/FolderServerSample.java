@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
-import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
 
@@ -61,7 +60,6 @@ public class FolderServerSample {
         var projectJson = new FileInputStream(configFilePath);
         ServerConfig configuration = mapper.readValue(projectJson, ServerConfig.class);
         projectJson.close();
-
 
         Terminal terminal = TerminalBuilder.builder()
                 .system(true).build();
@@ -118,7 +116,8 @@ public class FolderServerSample {
         mServer.joinThreads();
     }
 
-    private static void listClients(Terminal terminal, StyxServerManager server, ClientsRepo clientsRepo,
+    private static void listClients(Terminal terminal, StyxServerManager server,
+                                    ClientsRepo clientsRepo,
                                     List<IChannelDriver<?>> drivers) {
         for (var driver : drivers) {
             terminal.writer().println("ID\tName\tAddress");
@@ -126,7 +125,7 @@ public class FolderServerSample {
                 var client = clientsRepo.getClient(clientId);
                 terminal.writer().print(client.getId());
                 terminal.writer().print("\t");
-                terminal.writer().print(client.getCredentials().getUserName());
+                terminal.writer().print(client.getUserName());
                 terminal.writer().print("\t");
                 if (client instanceof TCPClientDetails) {
                     terminal.writer().print(client);

@@ -8,13 +8,10 @@ import com.v2soft.styxlib.l5.serialization.IDataSerializer;
 import com.v2soft.styxlib.l5.serialization.impl.StyxDeserializerImpl;
 import com.v2soft.styxlib.l5.serialization.impl.StyxSerializerImpl;
 import com.v2soft.styxlib.l6.StyxFile;
-import com.v2soft.styxlib.l6.io.DualStreams;
-import com.v2soft.styxlib.l6.vfs.DiskStyxDirectory;
 import com.v2soft.styxlib.l6.vfs.MemoryStyxDirectory;
 import com.v2soft.styxlib.library.types.impl.CredentialsImpl;
 import com.v2soft.styxlib.server.ClientsRepo;
 import com.v2soft.styxlib.server.ClientsRepoImpl;
-import com.v2soft.styxlib.server.IChannelDriver;
 import com.v2soft.styxlib.server.StyxServerManager;
 import com.v2soft.styxlib.server.tcp.TCPChannelDriver;
 import com.v2soft.styxlib.server.tcp.TCPClientChannelDriver;
@@ -24,11 +21,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.InetAddress;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Random;
 import java.util.concurrent.TimeoutException;
 
@@ -104,15 +102,21 @@ public class ClientServerTest {
         Random random = new Random();
         byte[] someData = new byte[1024];
         random.nextBytes(someData);
+
         MessageDigest digest = MessageDigest.getInstance("MD5");
         byte [] localHash = digest.digest(someData);
         byte [] remoteHash = new byte[16];
+
         final StyxFile newFile = connection.open(MD5StyxFile.FILE_NAME);
-        DualStreams streams = newFile.openForReadAndWrite();
-        streams.output.write(someData);
-        streams.output.flush();
-        int read = streams.input.read(remoteHash);
-        streams.close();
+        OutputStream outStream = newFile.openForWrite();
+        InputStream inStream = newFile.openForRead();
+
+        outStream.write(someData);
+        outStream.flush();
+        int read = inStream.read(remoteHash);
+
+        inStream.close();
+        outStream.close();
         newFile.close();
         assertEquals(16, read, "Wrong remote hash size");
         assertArrayEquals(localHash, remoteHash, "Wrong remote hash");
