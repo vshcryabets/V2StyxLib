@@ -48,9 +48,8 @@ extends MemoryStyxFile {
                     return file.walk(clientId, pathElements, qids);
                 }
             }
-            return null;
         }
-        return super.walk(clientId, pathElements, qids);
+        throw StyxErrorMessageException.newInstance("File not found: " + pathElements.peek());
     }
 
     @Override

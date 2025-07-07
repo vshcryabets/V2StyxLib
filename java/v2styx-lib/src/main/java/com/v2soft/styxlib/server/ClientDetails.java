@@ -12,7 +12,7 @@ import java.util.HashMap;
  *
  */
 public class ClientDetails {
-    public final int NOT_ASSIGNED = -1;
+    public static final int NOT_ASSIGNED = -1;
     protected final HashMap<Long, IVirtualStyxFile> mAssignedFiles;
     protected final IChannelDriver<?> mDriver; // TODO move to map
     protected int mId = NOT_ASSIGNED;
