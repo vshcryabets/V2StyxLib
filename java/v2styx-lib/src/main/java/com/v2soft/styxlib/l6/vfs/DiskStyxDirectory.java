@@ -10,7 +10,7 @@ import com.v2soft.styxlib.l5.serialization.IBufferWriter;
 import com.v2soft.styxlib.l5.serialization.impl.BufferWriterImpl;
 import com.v2soft.styxlib.l5.structs.StyxQID;
 import com.v2soft.styxlib.l5.structs.StyxStat;
-import com.v2soft.styxlib.utils.OwnDI;
+import com.v2soft.styxlib.utils.StyxSessionDI;
 
 import java.io.File;
 import java.util.*;
@@ -26,7 +26,7 @@ extends DiskStyxFile {
     protected List<IVirtualStyxFile> mVirtualFiles;
     protected List<IVirtualStyxFile> mRealFiles;
 
-    public DiskStyxDirectory(File directory, OwnDI di) throws StyxException {
+    public DiskStyxDirectory(File directory, StyxSessionDI di) throws StyxException {
         super(directory, di);
         mQID = new StyxQID(QidType.QTDIR, 0, mName.hashCode());
         mVirtualFiles = new ArrayList<>();
@@ -40,14 +40,14 @@ extends DiskStyxFile {
     }
 
     @Override
-    public IVirtualStyxFile walk(Queue<String> pathElements, List<StyxQID> qids)
-            throws StyxErrorMessageException {
+    public IVirtualStyxFile walk(int clienId, Queue<String> pathElements, List<StyxQID> qids)
+            throws StyxException {
         if ( !pathElements.isEmpty() ) {
             String filename = pathElements.poll();
             for (IVirtualStyxFile file : mVirtualFiles) {
                 if ( file.getName().equals(filename)) {
                     qids.add(file.getQID());
-                    return file.walk(pathElements, qids);
+                    return file.walk(clienId, pathElements, qids);
                 }
             }
             // look at disk
@@ -62,7 +62,7 @@ extends DiskStyxFile {
                             styxFile = new DiskStyxFile(file, mDI);
                         }
                         qids.add(styxFile.getQID());
-                        return styxFile.walk(pathElements, qids);
+                        return styxFile.walk(clienId, pathElements, qids);
                     } catch (StyxException e) {
                         throw StyxErrorMessageException.newInstance(e.toString());
                     }
@@ -70,7 +70,7 @@ extends DiskStyxFile {
             }
             return null;
         }
-        return super.walk(pathElements, qids);
+        return super.walk(clienId, pathElements, qids);
     }
 
     @Override
@@ -152,7 +152,7 @@ extends DiskStyxFile {
     }
 
     @Override
-    public StyxQID create(String name, long permissions, int mode)
+    public StyxQID create(int clientId, String name, long permissions, int mode)
             throws StyxErrorMessageException {
         File newFile = new File(mFile, name);
         if ( newFile.exists() ) {

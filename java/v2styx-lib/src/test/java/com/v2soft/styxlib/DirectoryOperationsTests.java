@@ -9,8 +9,8 @@ import com.v2soft.styxlib.server.StyxServerManager;
 import com.v2soft.styxlib.server.tcp.TCPChannelDriver;
 import com.v2soft.styxlib.server.tcp.TCPClientChannelDriver;
 import com.v2soft.styxlib.server.tcp.TCPServerChannelDriver;
-import com.v2soft.styxlib.utils.OwnDI;
-import com.v2soft.styxlib.utils.OwnDIImpl;
+import com.v2soft.styxlib.utils.StyxSessionDI;
+import com.v2soft.styxlib.utils.StyxSessionDIImpl;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,7 +35,7 @@ public class DirectoryOperationsTests {
     private static final int PORT = 10234;
     private Connection mConnection;
     private StyxServerManager mServer;
-    private OwnDI di = new OwnDIImpl();
+    private StyxSessionDI di = new StyxSessionDIImpl(false);
 
     @BeforeEach
     public void setUp() throws Exception {
@@ -50,7 +50,7 @@ public class DirectoryOperationsTests {
                 di);
 
         // Server side
-        var serverDriver = new TCPServerChannelDriver(di.getClientsRepo());
+        var serverDriver = new TCPServerChannelDriver(di);
         mServer = new StyxServerManager(new StyxServerManager.Configuration(
                 new DiskStyxDirectory(testDirectory, di),
                 Arrays.asList(serverDriver),
@@ -60,7 +60,7 @@ public class DirectoryOperationsTests {
         mServer.start();
 
         // client side
-        var driver = new TCPClientChannelDriver(di.getClientsRepo());
+        var driver = new TCPClientChannelDriver(di);
         var connectionConfiguration = new Connection.Configuration(
                 new CredentialsImpl("user", ""),
                 driver,

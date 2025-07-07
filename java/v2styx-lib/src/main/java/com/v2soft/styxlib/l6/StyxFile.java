@@ -17,7 +17,7 @@ import com.v2soft.styxlib.l5.structs.StyxStat;
 import com.v2soft.styxlib.l6.io.StyxFileBufferedInputStream;
 import com.v2soft.styxlib.l6.io.StyxUnbufferedInputStream;
 import com.v2soft.styxlib.l6.io.StyxUnbufferedOutputStream;
-import com.v2soft.styxlib.utils.OwnDI;
+import com.v2soft.styxlib.utils.StyxSessionDI;
 
 import java.io.BufferedOutputStream;
 import java.io.OutputStream;
@@ -36,14 +36,14 @@ public class StyxFile {
     private final IMessageTransmitter mTransmitter;
     private final int mTimeout;
     private final int mClientId;
-    private final OwnDI mDI;
+    private final StyxSessionDI mDI;
 
     public StyxFile(String path,
                     long parentFid,
                     int clientId,
                     IMessageTransmitter transmitter,
                     int timeout,
-                    OwnDI di) throws StyxException {
+                    StyxSessionDI di) throws StyxException {
         mDI = di;
         mTransmitter = transmitter;
         mClientId = clientId;

@@ -15,7 +15,7 @@ import com.v2soft.styxlib.l6.StyxFile;
 import com.v2soft.styxlib.library.types.ConnectionDetails;
 import com.v2soft.styxlib.library.types.Credentials;
 import com.v2soft.styxlib.server.IChannelDriver;
-import com.v2soft.styxlib.utils.OwnDI;
+import com.v2soft.styxlib.utils.StyxSessionDI;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -31,14 +31,14 @@ public class Connection
     public static class Configuration {
         public Credentials credentials;
         public IChannelDriver<?> driver;
-        public OwnDI di;
+        public StyxSessionDI di;
         public RMessagesProcessor answerProcessor; // handle RMessages from server
         public IMessageProcessor requestProcessor; // handle TMessages from server
         public TMessageTransmitter transmitter; //send messages to server
 
         public Configuration(Credentials credentials,
                              IChannelDriver<?> driver,
-                             OwnDI di) {
+                             StyxSessionDI di) {
             this(credentials,
                     driver,
                     di,
@@ -49,7 +49,7 @@ public class Connection
         public Configuration(
                 Credentials credentials,
                 IChannelDriver<?> driver,
-                OwnDI di,
+                StyxSessionDI di,
                 RMessagesProcessor answerProcessor,
                 TMessageTransmitter transmitter) {
             if (driver == null) {

@@ -10,8 +10,8 @@ import com.v2soft.styxlib.server.StyxServerManager;
 import com.v2soft.styxlib.server.tcp.TCPChannelDriver;
 import com.v2soft.styxlib.server.tcp.TCPClientChannelDriver;
 import com.v2soft.styxlib.server.tcp.TCPServerChannelDriver;
-import com.v2soft.styxlib.utils.OwnDI;
-import com.v2soft.styxlib.utils.OwnDIImpl;
+import com.v2soft.styxlib.utils.StyxSessionDI;
+import com.v2soft.styxlib.utils.StyxSessionDIImpl;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -36,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class ClientServerTest {
     private static final int PORT = 10234;
     private StyxServerManager mServer;
-    private OwnDI di = new OwnDIImpl();
+    private StyxSessionDI di = new StyxSessionDIImpl(false);
     private StyxServerManager.Configuration serverConfiguration;
     private TCPChannelDriver.InitConfiguration initConfiguration = new TCPChannelDriver.InitConfiguration(
             StyxServerManager.DEFAULT_IOUNIT,
@@ -57,7 +57,7 @@ public class ClientServerTest {
 
     private void startServer() throws IOException {
         var md5 = new MD5StyxFile(di);
-        var serverDriver = new TCPServerChannelDriver(di.getClientsRepo());
+        var serverDriver = new TCPServerChannelDriver(di);
         var root = new MemoryStyxDirectory("root", di);
         root.addFile(md5);
         serverConfiguration = new StyxServerManager.Configuration(
@@ -75,7 +75,7 @@ public class ClientServerTest {
     @Test
     public void testMD5() throws IOException, StyxException, InterruptedException, TimeoutException,
             NoSuchAlgorithmException {
-        var driver = new TCPClientChannelDriver(di.getClientsRepo());
+        var driver = new TCPClientChannelDriver(di);
         var connection = new Connection(new Connection.Configuration(
                 new CredentialsImpl("user", ""),
                 driver,
@@ -113,7 +113,7 @@ public class ClientServerTest {
 
     @Test
     public void testStat() throws IOException, InterruptedException, TimeoutException {
-        var driver = new TCPClientChannelDriver(di.getClientsRepo());
+        var driver = new TCPClientChannelDriver(di);
         var clientConfiguration = new Connection.Configuration(
                 new CredentialsImpl("user", ""),
                 driver,

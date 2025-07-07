@@ -7,7 +7,7 @@ import com.v2soft.styxlib.l5.enums.ModeType;
 import com.v2soft.styxlib.l5.enums.QidType;
 import com.v2soft.styxlib.l5.structs.StyxQID;
 import com.v2soft.styxlib.l5.structs.StyxStat;
-import com.v2soft.styxlib.utils.OwnDI;
+import com.v2soft.styxlib.utils.StyxSessionDI;
 
 import java.io.IOException;
 import java.util.Date;
@@ -20,14 +20,14 @@ import java.util.Queue;
  * @author vshcryabets@gmail.com
  */
 public class MemoryStyxFile implements IVirtualStyxFile {
-    protected final OwnDI mDI;
+    protected final StyxSessionDI mDI;
     protected final String mName;
     protected StyxQID mQID;
     protected StyxStat mStat;
     protected static final int ALL_MODES = 0x000001FF;
 
     public MemoryStyxFile(String name,
-                          OwnDI di) {
+                          StyxSessionDI di) {
         if (name == null) {
             throw new NullPointerException("Filename is null");
         }
@@ -110,8 +110,11 @@ public class MemoryStyxFile implements IVirtualStyxFile {
     }
 
     @Override
-    public IVirtualStyxFile walk(Queue<String> pathElements, List<StyxQID> qids)
-            throws StyxErrorMessageException {
+    public IVirtualStyxFile walk(int clientId, Queue<String> pathElements, List<StyxQID> qids)
+            throws StyxException {
+        if (!mDI.getIsClientAuthorizedUseCase().isClientAuthorized(clientId)) {
+            throw new StyxNotAuthorizedException();
+        }
         return this;
     }
 
@@ -122,7 +125,10 @@ public class MemoryStyxFile implements IVirtualStyxFile {
 
     @Override
     public int read(int clientId, byte[] outbuffer, long offset,
-                     int count) throws StyxErrorMessageException {
+                     int count) throws StyxException {
+        if (!mDI.getIsClientAuthorizedUseCase().isClientAuthorized(clientId)) {
+            throw new StyxNotAuthorizedException();
+        }
         return 0;
     }
 
@@ -136,7 +142,7 @@ public class MemoryStyxFile implements IVirtualStyxFile {
     }
 
     @Override
-    public StyxQID create(String name, long permissions, int mode)
+    public StyxQID create(int clientId, String name, long permissions, int mode)
             throws StyxErrorMessageException {
         throw StyxErrorMessageException.newInstance("Can't create file, this is read-only file system.");
     }

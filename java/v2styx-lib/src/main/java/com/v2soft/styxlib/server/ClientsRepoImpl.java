@@ -11,11 +11,16 @@ import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class ClientsRepoImpl implements ClientsRepo {
+    public record Configuration(
+            boolean noAuthenticationRequired
+    ){}
     private final HashMap<Integer, ClientDetails> mClients;
     private final AtomicInteger mIdCounter = new AtomicInteger(1);
+    private final Configuration mConfiguration;
 
-    public ClientsRepoImpl() {
+    public ClientsRepoImpl(Configuration configuration) {
         mClients = new HashMap<>();
+        mConfiguration = configuration;
     }
 
     @Override
@@ -23,6 +28,9 @@ public class ClientsRepoImpl implements ClientsRepo {
         int id = mIdCounter.getAndIncrement();
         mClients.put(id, client);
         client.setId(id);
+        if (mConfiguration.noAuthenticationRequired) {
+            client.setAuthenticated();
+        }
         return id;
     }
 
@@ -40,34 +48,35 @@ public class ClientsRepoImpl implements ClientsRepo {
     }
 
     @Override
-    public IVirtualStyxFile getAssignedFile(int clientId, long fid) throws StyxErrorMessageException {
-        return mClients.get(clientId).getAssignedFile(fid);
+    public IVirtualStyxFile getAssignedFile(int clientId, long fid) throws StyxErrorMessageException,
+            StyxUnknownClientIdException {
+        return getClient(clientId).getAssignedFile(fid);
     }
 
     @Override
-    public IMessageTransmitter getDriver(int clientId) {
-        return mClients.get(clientId).getDriver();
+    public IMessageTransmitter getDriver(int clientId) throws StyxUnknownClientIdException {
+        return getClient(clientId).getDriver();
     }
 
     @Override
-    public void closeFile(int clientId, long fid) throws StyxErrorMessageException {
-        var client = mClients.get(clientId);
+    public void closeFile(int clientId, long fid) throws StyxErrorMessageException, StyxUnknownClientIdException {
+        var client = getClient(clientId);
         client.getAssignedFile(fid).close(clientId);
         client.closeFile(fid);
     }
 
     @Override
-    public FIDPoll getFidPoll(int clientId) {
-        return mClients.get(clientId).getPolls().getFIDPoll();
+    public FIDPoll getFidPoll(int clientId) throws StyxUnknownClientIdException {
+        return getClient(clientId).getPolls().getFIDPoll();
     }
 
     @Override
-    public Polls getPolls(int clientId) {
-        return mClients.get(clientId).getPolls();
+    public Polls getPolls(int clientId) throws StyxUnknownClientIdException {
+        return getClient(clientId).getPolls();
     }
 
     @Override
-    public IChannelDriver getChannelDriver(int clientId) {
-        return mClients.get(clientId).getDriver();
+    public IChannelDriver<?> getChannelDriver(int clientId) throws StyxUnknownClientIdException {
+        return getClient(clientId).getDriver();
     }
 }

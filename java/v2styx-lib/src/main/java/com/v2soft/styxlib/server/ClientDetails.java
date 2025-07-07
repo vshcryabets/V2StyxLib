@@ -38,6 +38,10 @@ public class ClientDetails {
         return isAuthenticated;
     }
 
+    public void setAuthenticated() {
+        isAuthenticated = true;
+    }
+
     /**
      * Get polls assigned to this client.
      * @return polls assigned to this client.

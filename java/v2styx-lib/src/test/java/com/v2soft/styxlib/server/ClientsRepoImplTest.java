@@ -15,7 +15,7 @@ class ClientsRepoImplTest {
 
     @BeforeEach
     void setUp() {
-        clientsRepo = new ClientsRepoImpl();
+        clientsRepo = new ClientsRepoImpl(new ClientsRepoImpl.Configuration(false));
         mockChannelDriver = new EmptyChannelDriver();
         mockClient = new ClientDetails(mockChannelDriver);
     }
@@ -52,21 +52,28 @@ class ClientsRepoImplTest {
     }
 
     @Test
-    void getFidPollShouldReturnCorrectPoll() {
+    void getFidPollShouldReturnCorrectPoll() throws StyxUnknownClientIdException {
         int clientId = clientsRepo.addClient(mockClient);
         assertEquals(mockClient.getPolls().getFIDPoll(), clientsRepo.getFidPoll(clientId));
     }
 
     @Test
-    void getPollsShouldReturnCorrectPolls() {
+    void getPollsShouldReturnCorrectPolls() throws StyxUnknownClientIdException {
         int clientId = clientsRepo.addClient(mockClient);
         Polls mockPolls = mockClient.getPolls();
         assertEquals(mockPolls, clientsRepo.getPolls(clientId));
     }
 
     @Test
-    void getChannelDriverShouldReturnCorrectDriver() {
+    void getChannelDriverShouldReturnCorrectDriver() throws StyxUnknownClientIdException {
         int clientId = clientsRepo.addClient(mockClient);
         assertEquals(mockChannelDriver, clientsRepo.getChannelDriver(clientId));
+    }
+
+    @Test
+    void clientShouldBeAuthorizedWhenAuthorizationDisabled() throws StyxUnknownClientIdException {
+        ClientsRepoImpl repo = new ClientsRepoImpl(new ClientsRepoImpl.Configuration(true));
+        int clientId = repo.addClient(mockClient);
+        assertTrue(repo.getClient(clientId).isAuthenticated());
     }
 }

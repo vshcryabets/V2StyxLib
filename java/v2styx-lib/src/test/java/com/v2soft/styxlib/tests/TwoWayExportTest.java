@@ -14,8 +14,8 @@ import com.v2soft.styxlib.server.tcp.TCPChannelDriver;
 import com.v2soft.styxlib.server.tcp.TCPClientChannelDriver;
 import com.v2soft.styxlib.server.tcp.TCPDualLinkServerManager;
 import com.v2soft.styxlib.server.tcp.TCPServerChannelDriver;
-import com.v2soft.styxlib.utils.OwnDI;
-import com.v2soft.styxlib.utils.OwnDIImpl;
+import com.v2soft.styxlib.utils.StyxSessionDI;
+import com.v2soft.styxlib.utils.StyxSessionDIImpl;
 import org.junit.jupiter.api.*;
 
 import java.io.IOException;
@@ -40,7 +40,7 @@ public class TwoWayExportTest {
     private static final int PORT = 10234;
     private TCPDualLinkServerManager mServer;
     private final Charset mCharset = StandardCharsets.UTF_8;
-    private OwnDI di = new OwnDIImpl();
+    private StyxSessionDI di = new StyxSessionDIImpl(false);
     private StyxServerManager.Configuration serverConfiguration;
     private TCPServerChannelDriver mServerDriver;
     private TCPChannelDriver.InitConfiguration initConfiguration = new TCPChannelDriver.InitConfiguration(
@@ -62,7 +62,7 @@ public class TwoWayExportTest {
 
     private void startServer() throws IOException, StyxException {
         MemoryStyxFile md5 = new MD5StyxFile(di);
-        mServerDriver = new TCPServerChannelDriver(di.getClientsRepo());
+        mServerDriver = new TCPServerChannelDriver(di);
         MemoryStyxDirectory root = new MemoryStyxDirectory("root", di);
         root.addFile(md5);
         serverConfiguration = new StyxServerManager.Configuration(
@@ -79,7 +79,7 @@ public class TwoWayExportTest {
     @Test
     @Disabled
     public void testTwoWayExport() throws IOException, StyxException, InterruptedException, TimeoutException, NoSuchAlgorithmException {
-        var driver = new TCPClientChannelDriver(di.getClientsRepo());
+        var driver = new TCPClientChannelDriver(di);
         MemoryStyxFile md5 = new MD5StyxFile(di);
         MemoryStyxDirectory root = new MemoryStyxDirectory("clientroot", di);
         root.addFile(md5);
@@ -118,7 +118,7 @@ public class TwoWayExportTest {
 
     @Test
     public void testGetClientsFromClient() throws IOException, InterruptedException, TimeoutException, StyxException {
-        var driver = new TCPClientChannelDriver(di.getClientsRepo());
+        var driver = new TCPClientChannelDriver(di);
         var clientConfiguration = new Connection.Configuration(
                 new CredentialsImpl("user", ""),
                 driver,
@@ -139,7 +139,7 @@ public class TwoWayExportTest {
 
     @Test
     public void testGetClientsFromServer() throws IOException, InterruptedException, TimeoutException, StyxException {
-        var driver = new TCPClientChannelDriver(di.getClientsRepo());
+        var driver = new TCPClientChannelDriver(di);
         var clientConfiguration = new Connection.Configuration(
                 new CredentialsImpl("user", ""),
                 driver,
@@ -148,7 +148,7 @@ public class TwoWayExportTest {
         ConnectionWithExport connection = new ConnectionWithExport(clientConfiguration);
         Assertions.assertTrue(connection.connect());
 
-        var driver2 = new TCPClientChannelDriver(di.getClientsRepo());
+        var driver2 = new TCPClientChannelDriver(di);
         var clientConfiguration2 = new Connection.Configuration(
                 new CredentialsImpl("user", ""),
                 driver2,
@@ -262,7 +262,7 @@ public class TwoWayExportTest {
         protected Thread mWorker;
         protected boolean isWorking;
 
-        public ChatServerFile(OutputStream[] outputs, OwnDI di) {
+        public ChatServerFile(OutputStream[] outputs, StyxSessionDI di) {
             super("chat", di);
             mOutputs = outputs;
             mQueue = new LinkedBlockingQueue<String>();
@@ -336,7 +336,7 @@ public class TwoWayExportTest {
                             String marker,
                             AtomicInteger syncObject,
                             String prefix,
-                            OwnDI di) {
+                            StyxSessionDI di) {
             super(filename, di);
             mMessage = message;
             mMarker = marker;

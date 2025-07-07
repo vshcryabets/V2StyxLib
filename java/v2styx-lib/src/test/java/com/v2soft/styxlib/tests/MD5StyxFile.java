@@ -3,7 +3,7 @@ package com.v2soft.styxlib.tests;
 import com.v2soft.styxlib.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.l6.vfs.MemoryStyxFile;
-import com.v2soft.styxlib.utils.OwnDI;
+import com.v2soft.styxlib.utils.StyxSessionDI;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -19,7 +19,7 @@ public class MD5StyxFile extends MemoryStyxFile {
 
     protected HashMap<Integer, MessageDigest> mClientsMap = new HashMap<>();
 
-    public MD5StyxFile(OwnDI di) {
+    public MD5StyxFile(StyxSessionDI di) {
         super(FILE_NAME, di);
     }
 
@@ -51,7 +51,7 @@ public class MD5StyxFile extends MemoryStyxFile {
     }
     @Override
     public int read(int clientId, byte[] outbuffer, long offset, int count)
-            throws StyxErrorMessageException {
+            throws StyxException {
         if ( mClientsMap.containsKey(clientId) ) {
             MessageDigest md = mClientsMap.get(clientId);
             byte[] digest = md.digest();

@@ -10,7 +10,7 @@ import com.v2soft.styxlib.l5.serialization.IBufferWriter;
 import com.v2soft.styxlib.l5.serialization.impl.BufferWriterImpl;
 import com.v2soft.styxlib.l5.structs.StyxQID;
 import com.v2soft.styxlib.l5.structs.StyxStat;
-import com.v2soft.styxlib.utils.OwnDI;
+import com.v2soft.styxlib.utils.StyxSessionDI;
 
 import java.nio.ByteBuffer;
 import java.util.*;
@@ -25,7 +25,7 @@ extends MemoryStyxFile {
     private Map<Integer, IBufferWriter> mBuffersMap;
     private List<IVirtualStyxFile> mFiles;
 
-    public MemoryStyxDirectory(String name, OwnDI di) {
+    public MemoryStyxDirectory(String name, StyxSessionDI di) {
         super(name, di);
         mQID = new StyxQID(QidType.QTDIR, 0, mName.hashCode());
         mFiles = new LinkedList<IVirtualStyxFile>();
@@ -38,19 +38,19 @@ extends MemoryStyxFile {
     }
 
     @Override
-    public IVirtualStyxFile walk(Queue<String> pathElements, List<StyxQID> qids)
-            throws StyxErrorMessageException {
+    public IVirtualStyxFile walk(int clientId, Queue<String> pathElements, List<StyxQID> qids)
+            throws StyxException {
         if (!pathElements.isEmpty() ) {
             String filename = pathElements.poll();
             for (IVirtualStyxFile file : mFiles) {
                 if ( file.getName().equals(filename)) {
                     qids.add(file.getQID());
-                    return file.walk(pathElements, qids);
+                    return file.walk(clientId, pathElements, qids);
                 }
             }
             return null;
         }
-        return super.walk(pathElements, qids);
+        return super.walk(clientId, pathElements, qids);
     }
 
     @Override

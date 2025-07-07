@@ -2,6 +2,7 @@ package com.v2soft.styxlib.handlers;
 
 import com.v2soft.styxlib.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.exceptions.StyxException;
+import com.v2soft.styxlib.exceptions.StyxNotAuthorizedException;
 import com.v2soft.styxlib.exceptions.StyxUnknownClientIdException;
 import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.l5.messages.*;
@@ -108,6 +109,15 @@ public class TMessagesProcessor extends QueueMessagesProcessor {
             answer = e.getErrorMessage();
             answer.setTag(message.getTag());
             mErrorPackets++;
+        } catch (StyxNotAuthorizedException e) {
+            answer = new StyxRErrorMessage(message.getTag(), "Not authorized");
+            mErrorPackets++;
+        } catch (StyxUnknownClientIdException e) {
+            answer = new StyxRErrorMessage(message.getTag(), "Unknown client ID, try to reconnect");
+            mErrorPackets++;
+        } catch (StyxException e) {
+            answer = new StyxRErrorMessage(message.getTag(), e.getMessage());
+            mErrorPackets++;
         }
         if (answer != null) {
             mAnswerPackets++;
@@ -132,7 +142,8 @@ public class TMessagesProcessor extends QueueMessagesProcessor {
         return new StyxRAuthMessage(msg.getTag(), StyxQID.EMPTY);
     }
 
-    private StyxMessage processClunk(int clientId, StyxTMessageFID msg) throws StyxErrorMessageException {
+    private StyxMessage processClunk(int clientId, StyxTMessageFID msg)
+            throws StyxException {
         mClientsRepo.closeFile(clientId, msg.getFID());
         return new StyxMessage(MessageType.Rclunk, msg.getTag());
     }
@@ -141,6 +152,7 @@ public class TMessagesProcessor extends QueueMessagesProcessor {
         long fid = msg.getFID();
         final List<StyxQID> qidsList = new LinkedList<StyxQID>();
         final IVirtualStyxFile walkFile = mClientsRepo.getAssignedFile(clientId, fid).walk(
+                clientId,
                 new LinkedList<>(msg.getPathElements()),
                 qidsList);
         if (walkFile != null) {
@@ -165,7 +177,7 @@ public class TMessagesProcessor extends QueueMessagesProcessor {
     }
 
     private StyxMessage processRemove(int clientId, StyxTMessageFID msg)
-            throws StyxErrorMessageException {
+            throws StyxException {
         if (mClientsRepo.getAssignedFile(clientId, msg.getFID()).delete(clientId)) {
             return new StyxMessage(MessageType.Rremove, msg.getTag());
         } else {
@@ -174,9 +186,9 @@ public class TMessagesProcessor extends QueueMessagesProcessor {
     }
 
     private StyxMessage processCreate(int clientId, StyxTCreateMessage msg)
-            throws StyxErrorMessageException {
+            throws StyxException {
         final IVirtualStyxFile file = mClientsRepo.getAssignedFile(clientId, msg.getFID());
-        StyxQID qid = file.create(msg.name, msg.permissions, msg.mode);
+        StyxQID qid = file.create(clientId, msg.name, msg.permissions, msg.mode);
         return new StyxROpenMessage(msg.getTag(), qid, mConnectionDetails.ioUnit(), true);
     }
 
@@ -185,13 +197,13 @@ public class TMessagesProcessor extends QueueMessagesProcessor {
         return new StyxMessage(MessageType.Rwstat, msg.getTag());
     }
 
-    private StyxMessage processWrite(int clientId, StyxTWriteMessage msg) throws StyxErrorMessageException {
+    private StyxMessage processWrite(int clientId, StyxTWriteMessage msg) throws StyxException {
         long fid = msg.getFID();
         return new StyxRWriteMessage(msg.getTag(),
                 mClientsRepo.getAssignedFile(clientId, fid).write(clientId, msg.data, msg.offset));
     }
 
-    private StyxMessage processRead(int clientId, StyxTReadMessage msg) throws StyxErrorMessageException {
+    private StyxMessage processRead(int clientId, StyxTReadMessage msg) throws StyxException {
         if (msg.count > mConnectionDetails.ioUnit()) {
             return new StyxRErrorMessage(msg.getTag(), "IOUnit overflow");
         }

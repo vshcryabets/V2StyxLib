@@ -1,7 +1,7 @@
 package com.v2soft.styxlib.server.tcp;
 
 import com.v2soft.styxlib.exceptions.StyxException;
-import com.v2soft.styxlib.server.ClientsRepo;
+import com.v2soft.styxlib.utils.StyxSessionDI;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -22,8 +22,8 @@ public class TCPServerChannelDriver extends TCPChannelDriver {
     protected Selector mSelector;
     protected Map<SocketChannel, Integer> mClientStatesMap;
 
-    public TCPServerChannelDriver(ClientsRepo clientsRepo) throws StyxException {
-        super(clientsRepo);
+    public TCPServerChannelDriver(StyxSessionDI di) throws StyxException {
+        super(di);
         mClientStatesMap = new HashMap<>();
     }
 
@@ -126,7 +126,8 @@ public class TCPServerChannelDriver extends TCPChannelDriver {
             } catch (IOException error) {
                 throw new StyxException(error.getMessage());
             }
-            int id = mClientsRepo.addClient(new TCPClientDetails(channel, this, mInitConfiguration.iounit));
+            var clientDetails = new TCPClientDetails(channel, this, mInitConfiguration.iounit);
+            int id = mDI.getClientsRepo().addClient(clientDetails);
             mClientStatesMap.put(channel, id);
         }
         // new readables
@@ -143,7 +144,7 @@ public class TCPServerChannelDriver extends TCPChannelDriver {
         var clientId = mClientStatesMap.get(channel);
         mStartConfiguration.getTProcessor().onClientRemoved(clientId);
         mStartConfiguration.getRProcessor().onClientRemoved(clientId);
-        mClientsRepo.removeClient(clientId);
+        mDI.getClientsRepo().removeClient(clientId);
         mClientStatesMap.remove(channel);
         try {
             channel.close();

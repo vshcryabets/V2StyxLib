@@ -13,8 +13,8 @@ import com.v2soft.styxlib.server.StyxServerManager;
 import com.v2soft.styxlib.server.tcp.TCPChannelDriver;
 import com.v2soft.styxlib.server.tcp.TCPClientChannelDriver;
 import com.v2soft.styxlib.server.tcp.TCPServerChannelDriver;
-import com.v2soft.styxlib.utils.OwnDI;
-import com.v2soft.styxlib.utils.OwnDIImpl;
+import com.v2soft.styxlib.utils.StyxSessionDI;
+import com.v2soft.styxlib.utils.StyxSessionDIImpl;
 import org.junit.jupiter.api.*;
 
 import java.io.File;
@@ -41,7 +41,7 @@ public class ConnectionTest {
     private static final int PORT = 10234;
     private Connection mConnection;
     private StyxServerManager mServer;
-    private OwnDI di = new OwnDIImpl();
+    private StyxSessionDI di = new StyxSessionDIImpl(false);
     private Connection.Configuration clientConfiguration;
     private StyxServerManager.Configuration serverConfiguration;
     private TCPChannelDriver.InitConfiguration initConfiguration = new TCPServerChannelDriver.InitConfiguration(
@@ -59,7 +59,7 @@ public class ConnectionTest {
         if (!testDirectory.exists()) {
             testDirectory.mkdirs();
         }
-        var serverDriver = new TCPServerChannelDriver(di.getClientsRepo());
+        var serverDriver = new TCPServerChannelDriver(di);
         serverDriver.prepare(initConfiguration);
         serverConfiguration = new StyxServerManager.Configuration(
                 new DiskStyxDirectory(testDirectory, di),
@@ -68,7 +68,7 @@ public class ConnectionTest {
                 StyxServerManager.DEFAULT_IOUNIT);
         mServer = new StyxServerManager(serverConfiguration);
         mServer.start();
-        var clientDriver = new TCPClientChannelDriver(di.getClientsRepo());
+        var clientDriver = new TCPClientChannelDriver(di);
         clientDriver.prepare(initConfiguration);
         clientConfiguration = new Connection.Configuration(
                 new CredentialsImpl("user", ""),

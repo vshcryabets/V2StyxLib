@@ -4,7 +4,7 @@ import com.v2soft.styxlib.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.exceptions.StyxNotAuthorizedException;
 import com.v2soft.styxlib.l5.enums.ModeType;
-import com.v2soft.styxlib.utils.OwnDI;
+import com.v2soft.styxlib.utils.StyxSessionDI;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -23,7 +23,7 @@ public class DiskStyxFile extends MemoryStyxFile {
     protected File mFile;
     protected Map<Integer, RandomAccessFile> mFilesMap;
 
-    public DiskStyxFile(File file, OwnDI di) throws StyxException {
+    public DiskStyxFile(File file, StyxSessionDI di) throws StyxException {
         super(file.getName(), di);
         if ( !file.exists() ) {
             throw new StyxException("File not exists");

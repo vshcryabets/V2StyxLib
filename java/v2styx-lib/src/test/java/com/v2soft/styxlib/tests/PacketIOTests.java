@@ -11,8 +11,8 @@ import com.v2soft.styxlib.server.StyxServerManager;
 import com.v2soft.styxlib.server.tcp.TCPChannelDriver;
 import com.v2soft.styxlib.server.tcp.TCPClientChannelDriver;
 import com.v2soft.styxlib.server.tcp.TCPServerChannelDriver;
-import com.v2soft.styxlib.utils.OwnDI;
-import com.v2soft.styxlib.utils.OwnDIImpl;
+import com.v2soft.styxlib.utils.StyxSessionDI;
+import com.v2soft.styxlib.utils.StyxSessionDIImpl;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -41,7 +41,7 @@ public class PacketIOTests {
     private static final int PORT = 10234;
     private static final String FILE_NAME = "md5file";
     private StyxServerManager mServer;
-    private OwnDI di = new OwnDIImpl();
+    private StyxSessionDI di = new StyxSessionDIImpl(false);
     private StyxServerManager.Configuration serverConfiguration;
     private TCPChannelDriver.InitConfiguration initConfiguration = new TCPChannelDriver.InitConfiguration(
             StyxServerManager.DEFAULT_IOUNIT,
@@ -90,7 +90,7 @@ public class PacketIOTests {
             }
             @Override
             public int read(int clientId, byte[] outbuffer, long offset, int count)
-                    throws StyxErrorMessageException {
+                    throws StyxException {
                 if ( mClientsMap.containsKey(clientId) ) {
                     byte[] digest = mClientsMap.get(clientId).digest();
                     if (count < digest.length) {
@@ -103,7 +103,7 @@ public class PacketIOTests {
                 return super.read(clientId, outbuffer, offset, count);
             }
         };
-        var serverDriver = new TCPServerChannelDriver(di.getClientsRepo());
+        var serverDriver = new TCPServerChannelDriver(di);
         var root = new MemoryStyxDirectory("root", di);
         root.addFile(md5);
         serverConfiguration = new StyxServerManager.Configuration(
@@ -120,7 +120,7 @@ public class PacketIOTests {
     public void testMD5() throws IOException, StyxException, InterruptedException, TimeoutException, NoSuchAlgorithmException {
         Random random = new Random();
         MessageDigest digest = MessageDigest.getInstance("MD5");
-        var driver = new TCPClientChannelDriver(di.getClientsRepo());
+        var driver = new TCPClientChannelDriver(di);
         var clientConfiguration = new Connection.Configuration(
                 new CredentialsImpl("user", ""),
                 driver,

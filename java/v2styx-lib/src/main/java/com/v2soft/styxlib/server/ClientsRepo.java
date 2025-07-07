@@ -12,11 +12,11 @@ public interface ClientsRepo {
     void removeClient(int id);
     ClientDetails getClient(int id) throws StyxUnknownClientIdException;
 
-    IVirtualStyxFile getAssignedFile(int clientId, long fid) throws StyxErrorMessageException;
-    IMessageTransmitter getDriver(int clientId);
+    IVirtualStyxFile getAssignedFile(int clientId, long fid) throws StyxErrorMessageException, StyxUnknownClientIdException;
+    IMessageTransmitter getDriver(int clientId) throws StyxUnknownClientIdException;
 
-    void closeFile(int clientId, long fid) throws StyxErrorMessageException;
-    FIDPoll getFidPoll(int clientId);
-    Polls getPolls(int clientId);
-    IChannelDriver<?> getChannelDriver(int clientId);
+    void closeFile(int clientId, long fid) throws StyxErrorMessageException, StyxUnknownClientIdException;
+    FIDPoll getFidPoll(int clientId) throws StyxUnknownClientIdException;
+    Polls getPolls(int clientId) throws StyxUnknownClientIdException;
+    IChannelDriver<?> getChannelDriver(int clientId) throws StyxUnknownClientIdException;
 }

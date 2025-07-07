@@ -4,7 +4,7 @@ import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.handlers.TMessagesProcessor;
 import com.v2soft.styxlib.l6.vfs.IVirtualStyxFile;
 import com.v2soft.styxlib.library.types.ConnectionDetails;
-import com.v2soft.styxlib.utils.OwnDI;
+import com.v2soft.styxlib.utils.StyxSessionDI;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -18,11 +18,11 @@ public class StyxServerManager
     public static class Configuration {
         public final IVirtualStyxFile root;
         public final List<IChannelDriver<?>> drivers;
-        public final OwnDI di;
+        public final StyxSessionDI di;
         public final int iounit;
         public Configuration(IVirtualStyxFile root,
                              List<IChannelDriver<?>> drivers,
-                             OwnDI di,
+                             StyxSessionDI di,
                              int iounit) {
             this.root = root;
             this.drivers = drivers;

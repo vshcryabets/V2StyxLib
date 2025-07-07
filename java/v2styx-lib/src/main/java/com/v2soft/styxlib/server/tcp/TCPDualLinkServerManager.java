@@ -1,5 +1,6 @@
 package com.v2soft.styxlib.server.tcp;
 
+import com.v2soft.styxlib.exceptions.StyxUnknownClientIdException;
 import com.v2soft.styxlib.handlers.RMessagesProcessor;
 import com.v2soft.styxlib.handlers.TMessageTransmitter;
 import com.v2soft.styxlib.l5.Connection;
@@ -27,7 +28,8 @@ public class TCPDualLinkServerManager extends StyxServerManager {
         return DUAL_LINK_PROTO;
     }
 
-    public synchronized  IClient getReverseConnectionForClient(int clientId, Credentials credentials) {
+    public synchronized IClient getReverseConnectionForClient(int clientId, Credentials credentials)
+            throws StyxUnknownClientIdException {
         if ( mReverseAnswerProcessor == null ) {
             mReverseAnswerProcessor = new RMessagesProcessor("RC"+clientId, mConfiguration.di.getClientsRepo());
             mReverseTransmitter = new TMessageTransmitter(null, mConfiguration.di.getClientsRepo());

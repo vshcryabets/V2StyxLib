@@ -2,18 +2,16 @@ package com.v2soft.folderserver;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.v2soft.styxlib.l5.serialization.IDataDeserializer;
-import com.v2soft.styxlib.l5.serialization.IDataSerializer;
-import com.v2soft.styxlib.l5.serialization.impl.StyxDeserializerImpl;
-import com.v2soft.styxlib.l5.serialization.impl.StyxSerializerImpl;
+import com.v2soft.styxlib.exceptions.StyxUnknownClientIdException;
 import com.v2soft.styxlib.l6.vfs.DiskStyxDirectory;
-import com.v2soft.styxlib.server.ClientsRepo;
-import com.v2soft.styxlib.server.ClientsRepoImpl;
+import com.v2soft.styxlib.server.ClientDetails;
 import com.v2soft.styxlib.server.IChannelDriver;
 import com.v2soft.styxlib.server.StyxServerManager;
 import com.v2soft.styxlib.server.tcp.TCPChannelDriver;
 import com.v2soft.styxlib.server.tcp.TCPClientDetails;
 import com.v2soft.styxlib.server.tcp.TCPServerChannelDriver;
+import com.v2soft.styxlib.utils.StyxSessionDI;
+import com.v2soft.styxlib.utils.StyxSessionDIImpl;
 import org.jline.reader.LineReader;
 import org.jline.reader.LineReaderBuilder;
 import org.jline.terminal.Terminal;
@@ -66,26 +64,21 @@ public class FolderServerSample {
         LineReader lineReader = LineReaderBuilder.builder()
                 .terminal(terminal)
                 .build();
-        var clientsRepo = new ClientsRepoImpl();
-        IDataSerializer serializer = new StyxSerializerImpl();
-        IDataDeserializer deserializer = new StyxDeserializerImpl();
-        var driver = new TCPServerChannelDriver(clientsRepo);
+        StyxSessionDI di = new StyxSessionDIImpl(false);
+        var driver = new TCPServerChannelDriver(di);
         driver.prepare(new TCPChannelDriver.InitConfiguration(
-                serializer,
-                deserializer,
                 StyxServerManager.DEFAULT_IOUNIT,
                 false,
                 InetAddress.getByName(configuration.interfaces().get(0)),
-                configuration.port()
+                configuration.port(),
+                di
         ));
-        var root = new DiskStyxDirectory(new File(configuration.exportPath()), serializer);
+        var root = new DiskStyxDirectory(new File(configuration.exportPath()), di);
         List<IChannelDriver<?>> driversList = List.of(driver);
         var serverConfiguration = new StyxServerManager.Configuration(
                 root,
                 driversList,
-                clientsRepo,
-                serializer,
-                deserializer,
+                di,
                 StyxServerManager.DEFAULT_IOUNIT);
 
         var mServer = new StyxServerManager(serverConfiguration);
@@ -101,7 +94,7 @@ public class FolderServerSample {
                 showCommandsHelp(terminal);
                 continue;
             } else if (cmd.equalsIgnoreCase(CMD_CLIENTS)) {
-                listClients(terminal, mServer, clientsRepo, driversList);
+                listClients(terminal, mServer, di, driversList);
                 continue;
             } else if (cmd.equalsIgnoreCase(CMD_IP)) {
                 showInterfaces(terminal, mServer);
@@ -117,20 +110,24 @@ public class FolderServerSample {
     }
 
     private static void listClients(Terminal terminal, StyxServerManager server,
-                                    ClientsRepo clientsRepo,
+                                    StyxSessionDI di,
                                     List<IChannelDriver<?>> drivers) {
         for (var driver : drivers) {
             terminal.writer().println("ID\tName\tAddress");
             for (var clientId : driver.getClients()) {
-                var client = clientsRepo.getClient(clientId);
-                terminal.writer().print(client.getId());
-                terminal.writer().print("\t");
-                terminal.writer().print(client.getUserName());
-                terminal.writer().print("\t");
-                if (client instanceof TCPClientDetails) {
-                    terminal.writer().print(client);
+                try {
+                    ClientDetails client = di.getClientsRepo().getClient(clientId);
+                    terminal.writer().print(client.getId());
+                    terminal.writer().print("\t");
+                    terminal.writer().print(client.getUserName());
+                    terminal.writer().print("\t");
+                    if (client instanceof TCPClientDetails) {
+                        terminal.writer().print(client);
+                    }
+                    terminal.writer().println(" .");
+                } catch (StyxUnknownClientIdException e) {
+                    // skip unknown client
                 }
-                terminal.writer().println(" .");
             }
         }
     }

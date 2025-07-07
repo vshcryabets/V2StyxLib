@@ -9,12 +9,16 @@ import com.v2soft.styxlib.l6.IsClientAuthorizedUseCaseImpl;
 import com.v2soft.styxlib.server.ClientsRepo;
 import com.v2soft.styxlib.server.ClientsRepoImpl;
 
-public class OwnDIImpl implements OwnDI {
-    private ClientsRepo mClientsRepo = new ClientsRepoImpl();
+public class StyxSessionDIImpl implements StyxSessionDI {
+    private ClientsRepo mClientsRepo;
     private IDataSerializer serializer = new StyxSerializerImpl();
     private IDataDeserializer deserializer = new StyxDeserializerImpl();
-    private IsClientAuthorizedUseCaseImpl isClientAuthorizedUseCase =
-            new IsClientAuthorizedUseCaseImpl(mClientsRepo);
+    private IsClientAuthorizedUseCaseImpl isClientAuthorizedUseCase;
+
+    public StyxSessionDIImpl(boolean authRequired) {
+        mClientsRepo = new ClientsRepoImpl(new ClientsRepoImpl.Configuration(!authRequired));
+        isClientAuthorizedUseCase = new IsClientAuthorizedUseCaseImpl(mClientsRepo);
+    }
 
     @Override
     public IsClientAuthorizedUseCase getIsClientAuthorizedUseCase() {
