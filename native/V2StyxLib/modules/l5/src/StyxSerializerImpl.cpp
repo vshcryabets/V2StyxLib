@@ -1,10 +1,9 @@
 #include "serialization/StyxSerializerImpl.h"
 
-
 void StyxSerializerImpl::serialize(const styxlib::messages::StyxMessage &message, 
     IBufferWriter &output) {
 
-    }
+}
 
 void StyxSerializerImpl::serializeStat(const StyxStat &stat, IBufferWriter &output)
 {
