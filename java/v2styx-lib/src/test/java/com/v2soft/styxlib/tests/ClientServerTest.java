@@ -3,32 +3,26 @@ package com.v2soft.styxlib.tests;
 import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.l5.Connection;
 import com.v2soft.styxlib.l5.IClient;
-import com.v2soft.styxlib.l5.serialization.IDataDeserializer;
-import com.v2soft.styxlib.l5.serialization.IDataSerializer;
-import com.v2soft.styxlib.l5.serialization.impl.StyxDeserializerImpl;
-import com.v2soft.styxlib.l5.serialization.impl.StyxSerializerImpl;
 import com.v2soft.styxlib.l6.StyxFile;
-import com.v2soft.styxlib.l6.io.DualStreams;
-import com.v2soft.styxlib.l6.vfs.DiskStyxDirectory;
 import com.v2soft.styxlib.l6.vfs.MemoryStyxDirectory;
 import com.v2soft.styxlib.library.types.impl.CredentialsImpl;
-import com.v2soft.styxlib.server.ClientsRepo;
-import com.v2soft.styxlib.server.ClientsRepoImpl;
-import com.v2soft.styxlib.server.IChannelDriver;
 import com.v2soft.styxlib.server.StyxServerManager;
 import com.v2soft.styxlib.server.tcp.TCPChannelDriver;
 import com.v2soft.styxlib.server.tcp.TCPClientChannelDriver;
 import com.v2soft.styxlib.server.tcp.TCPServerChannelDriver;
+import com.v2soft.styxlib.utils.StyxSessionDI;
+import com.v2soft.styxlib.utils.StyxSessionDIImpl;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.InetAddress;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Random;
 import java.util.concurrent.TimeoutException;
 
@@ -42,17 +36,14 @@ import static org.junit.jupiter.api.Assertions.*;
 public class ClientServerTest {
     private static final int PORT = 10234;
     private StyxServerManager mServer;
-    private ClientsRepo mClientsRepo = new ClientsRepoImpl();
-    private IDataSerializer serializer = new StyxSerializerImpl();
-    private IDataDeserializer deserializer = new StyxDeserializerImpl();
+    private StyxSessionDI di = new StyxSessionDIImpl(false);
     private StyxServerManager.Configuration serverConfiguration;
     private TCPChannelDriver.InitConfiguration initConfiguration = new TCPChannelDriver.InitConfiguration(
-            serializer,
-            deserializer,
             StyxServerManager.DEFAULT_IOUNIT,
             false,
             InetAddress.getLoopbackAddress(),
-            PORT);
+            PORT,
+            di);
 
     @BeforeEach
     public void setUp() throws Exception {
@@ -65,16 +56,14 @@ public class ClientServerTest {
     }
 
     private void startServer() throws IOException {
-        var md5 = new MD5StyxFile();
-        var serverDriver = new TCPServerChannelDriver(mClientsRepo);
-        var root = new MemoryStyxDirectory("root", serializer);
+        var md5 = new MD5StyxFile(di);
+        var serverDriver = new TCPServerChannelDriver(di);
+        var root = new MemoryStyxDirectory("root", di);
         root.addFile(md5);
         serverConfiguration = new StyxServerManager.Configuration(
                 root,
                 Arrays.asList(serverDriver),
-                mClientsRepo,
-                serializer,
-                deserializer,
+                di,
                 StyxServerManager.DEFAULT_IOUNIT);
 
         mServer = new StyxServerManager(serverConfiguration);
@@ -86,13 +75,11 @@ public class ClientServerTest {
     @Test
     public void testMD5() throws IOException, StyxException, InterruptedException, TimeoutException,
             NoSuchAlgorithmException {
-        var driver = new TCPClientChannelDriver(mClientsRepo);
+        var driver = new TCPClientChannelDriver(di);
         var connection = new Connection(new Connection.Configuration(
                 new CredentialsImpl("user", ""),
                 driver,
-                mClientsRepo,
-                serializer,
-                deserializer));
+                di));
         driver.prepare(initConfiguration);
         assertTrue(connection.connect());
         checkMD5Hash(connection);
@@ -104,15 +91,21 @@ public class ClientServerTest {
         Random random = new Random();
         byte[] someData = new byte[1024];
         random.nextBytes(someData);
+
         MessageDigest digest = MessageDigest.getInstance("MD5");
         byte [] localHash = digest.digest(someData);
         byte [] remoteHash = new byte[16];
+
         final StyxFile newFile = connection.open(MD5StyxFile.FILE_NAME);
-        DualStreams streams = newFile.openForReadAndWrite();
-        streams.output.write(someData);
-        streams.output.flush();
-        int read = streams.input.read(remoteHash);
-        streams.close();
+        OutputStream outStream = newFile.openForWrite();
+        InputStream inStream = newFile.openForRead();
+
+        outStream.write(someData);
+        outStream.flush();
+        int read = inStream.read(remoteHash);
+
+        inStream.close();
+        outStream.close();
         newFile.close();
         assertEquals(16, read, "Wrong remote hash size");
         assertArrayEquals(localHash, remoteHash, "Wrong remote hash");
@@ -120,13 +113,11 @@ public class ClientServerTest {
 
     @Test
     public void testStat() throws IOException, InterruptedException, TimeoutException {
-        var driver = new TCPClientChannelDriver(mClientsRepo);
+        var driver = new TCPClientChannelDriver(di);
         var clientConfiguration = new Connection.Configuration(
                 new CredentialsImpl("user", ""),
                 driver,
-                mClientsRepo,
-                serializer,
-                deserializer);
+                di);
         Connection connection = new Connection(clientConfiguration);
         driver.prepare(initConfiguration);
         assertTrue(connection.connect());

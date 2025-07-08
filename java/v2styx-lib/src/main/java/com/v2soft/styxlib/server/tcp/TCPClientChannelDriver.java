@@ -5,7 +5,7 @@ import com.v2soft.styxlib.l5.enums.Checks;
 import com.v2soft.styxlib.l5.io.impl.BufferImpl;
 import com.v2soft.styxlib.l5.serialization.IBufferReader;
 import com.v2soft.styxlib.l5.serialization.impl.BufferReaderImpl;
-import com.v2soft.styxlib.server.ClientsRepo;
+import com.v2soft.styxlib.utils.StyxSessionDI;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -25,8 +25,8 @@ public class TCPClientChannelDriver extends TCPChannelDriver {
     protected TCPClientDetails mServerClientDetails;
     protected SocketChannel mChannel;
 
-    public TCPClientChannelDriver(ClientsRepo clientsRepo) throws StyxException {
-        super(clientsRepo);
+    public TCPClientChannelDriver(StyxSessionDI di) throws StyxException {
+        super(di);
     }
 
     @Override
@@ -35,7 +35,7 @@ public class TCPClientChannelDriver extends TCPChannelDriver {
             mChannel = SocketChannel.open(socketAddress);
             mChannel.configureBlocking(true);
             mServerClientDetails = new TCPClientDetails(mChannel, this, mInitConfiguration.iounit);
-            mClientsRepo.addClient(mServerClientDetails);
+            mDI.getClientsRepo().addClient(mServerClientDetails);
             Socket socket = mChannel.socket();
             socket.setSoTimeout(getTimeout());
         } catch (Exception err) {
@@ -78,7 +78,8 @@ public class TCPClientChannelDriver extends TCPChannelDriver {
                             // try to decode
                             final long packetSize = reader.getUInt32();
                             if ( buffer.remainsToRead() >= packetSize ) {
-                                var message = mInitConfiguration.deserializer.deserializeMessage(reader, mInitConfiguration.iounit);
+                                var message = mInitConfiguration.di.getDataDeserializer().deserializeMessage(reader,
+                                        mInitConfiguration.iounit);
                                 if ( Checks.isTMessage(message.type)) {
                                     mStartConfiguration.getTProcessor().onClientMessage(message, mServerClientDetails.getId());
                                 } else {

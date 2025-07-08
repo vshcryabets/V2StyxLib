@@ -1,6 +1,5 @@
 package com.v2soft.styxlib;
 
-import java.io.OutputStream;
 import java.io.PrintStream;
 
 public class Logger {

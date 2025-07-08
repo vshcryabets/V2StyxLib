@@ -1,15 +1,12 @@
 import com.v2soft.styxlib.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.exceptions.StyxException;
-import com.v2soft.styxlib.l5.serialization.IDataDeserializer;
-import com.v2soft.styxlib.l5.serialization.IDataSerializer;
-import com.v2soft.styxlib.l5.serialization.impl.StyxDeserializerImpl;
-import com.v2soft.styxlib.l5.serialization.impl.StyxSerializerImpl;
 import com.v2soft.styxlib.l6.vfs.MemoryStyxDirectory;
 import com.v2soft.styxlib.l6.vfs.MemoryStyxFile;
-import com.v2soft.styxlib.server.ClientsRepoImpl;
 import com.v2soft.styxlib.server.StyxServerManager;
 import com.v2soft.styxlib.server.tcp.TCPChannelDriver;
 import com.v2soft.styxlib.server.tcp.TCPServerChannelDriver;
+import com.v2soft.styxlib.utils.StyxSessionDI;
+import com.v2soft.styxlib.utils.StyxSessionDIImpl;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -26,11 +23,10 @@ import java.util.List;
 public class MD5ServerSample {
     private static final int PORT = 10234;
     private static final String FILE_NAME = "md5file";
-    private IDataSerializer serializer = new StyxSerializerImpl();
-    private IDataDeserializer deserializer = new StyxDeserializerImpl();
 
     public static void main(String[] args) throws IOException, InterruptedException, StyxException {
-        MemoryStyxFile md5 = new MemoryStyxFile(FILE_NAME){
+        StyxSessionDI di = new StyxSessionDIImpl(false);
+        MemoryStyxFile md5 = new MemoryStyxFile(FILE_NAME, di){
             protected HashMap<Integer, MessageDigest> mClientsMap = new HashMap<>();
             @Override
             public boolean open(int clientId, int mode)
@@ -58,7 +54,7 @@ public class MD5ServerSample {
             }
             @Override
             public int read(int clientId, byte[] outbuffer, long offset, int count)
-                    throws StyxErrorMessageException {
+                    throws StyxException {
                 if ( mClientsMap.containsKey(clientId) ) {
                     byte[] digest = mClientsMap.get(clientId).digest();
                     if (count < digest.length) {
@@ -71,28 +67,22 @@ public class MD5ServerSample {
                 return super.read(clientId, outbuffer, offset, count);
             }
         };
-        var clientsRepo = new ClientsRepoImpl();
-        IDataSerializer serializer = new StyxSerializerImpl();
-        IDataDeserializer deserializer = new StyxDeserializerImpl();
-        var driver = new TCPServerChannelDriver(clientsRepo);
+        var driver = new TCPServerChannelDriver(di);
         driver.prepare(new TCPChannelDriver.InitConfiguration(
-                serializer,
-                deserializer,
                 StyxServerManager.DEFAULT_IOUNIT,
                 false,
                 InetAddress.getByName("127.0.0.1"),
-                PORT
+                PORT,
+                di
         ));
 
-        MemoryStyxDirectory root = new MemoryStyxDirectory("root", serializer);
+        MemoryStyxDirectory root = new MemoryStyxDirectory("root", di);
         root.addFile(md5);
 
         var serverConfiguration = new StyxServerManager.Configuration(
                 root,
                 List.of(driver),
-                clientsRepo,
-                serializer,
-                deserializer,
+                di,
                 StyxServerManager.DEFAULT_IOUNIT);
 
         var mServer = new StyxServerManager(serverConfiguration);

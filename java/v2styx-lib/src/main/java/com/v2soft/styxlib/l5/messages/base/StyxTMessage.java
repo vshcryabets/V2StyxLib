@@ -7,8 +7,6 @@ import com.v2soft.styxlib.exceptions.StyxWrongMessageException;
 import com.v2soft.styxlib.l5.enums.Constants;
 import com.v2soft.styxlib.l5.enums.MessageType;
 
-import java.util.concurrent.TimeoutException;
-
 public class StyxTMessage extends StyxMessage {
     private StyxMessage mAnswer;
     private final int mRequiredAnswerType;

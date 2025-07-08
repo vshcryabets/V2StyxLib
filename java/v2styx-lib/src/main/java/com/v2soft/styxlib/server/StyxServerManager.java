@@ -2,10 +2,9 @@ package com.v2soft.styxlib.server;
 
 import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.handlers.TMessagesProcessor;
-import com.v2soft.styxlib.l5.serialization.IDataDeserializer;
-import com.v2soft.styxlib.l5.serialization.IDataSerializer;
-import com.v2soft.styxlib.library.types.ConnectionDetails;
 import com.v2soft.styxlib.l6.vfs.IVirtualStyxFile;
+import com.v2soft.styxlib.library.types.ConnectionDetails;
+import com.v2soft.styxlib.utils.StyxSessionDI;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -19,21 +18,15 @@ public class StyxServerManager
     public static class Configuration {
         public final IVirtualStyxFile root;
         public final List<IChannelDriver<?>> drivers;
-        public final ClientsRepo clientsRepo;
-        public final IDataDeserializer deserializer;
-        public final IDataSerializer serializer;
+        public final StyxSessionDI di;
         public final int iounit;
         public Configuration(IVirtualStyxFile root,
                              List<IChannelDriver<?>> drivers,
-                             ClientsRepo clientsRepo,
-                             IDataSerializer serializer,
-                             IDataDeserializer deserializer,
+                             StyxSessionDI di,
                              int iounit) {
             this.root = root;
             this.drivers = drivers;
-            this.clientsRepo = clientsRepo;
-            this.serializer = serializer;
-            this.deserializer = deserializer;
+            this.di = di;
             this.iounit = iounit;
         }
     }
@@ -53,7 +46,7 @@ public class StyxServerManager
     public StyxServerManager(Configuration configuration) {
         mConfiguration = configuration;
         var details = new ConnectionDetails(getProtocol(), getIOUnit());
-        mBalancer = new TMessagesProcessor(details, configuration.root, configuration.clientsRepo);
+        mBalancer = new TMessagesProcessor(details, configuration.root, configuration.di.getClientsRepo());
     }
 
     public void start() throws StyxException {

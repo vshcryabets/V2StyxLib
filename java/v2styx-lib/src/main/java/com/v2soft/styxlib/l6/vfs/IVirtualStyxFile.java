@@ -1,15 +1,13 @@
 package com.v2soft.styxlib.l6.vfs;
 
-import com.v2soft.styxlib.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.l5.structs.StyxQID;
 import com.v2soft.styxlib.l5.structs.StyxStat;
-import com.v2soft.styxlib.server.ClientDetails;
 
 import java.io.IOException;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
+import java.util.Queue;
 
 /**
  * Virtual styx file interface
@@ -48,7 +46,6 @@ public interface IVirtualStyxFile {
      *  OCEXEC  = 32 // or'ed in, close on exec
      *  ORCLOSE = 64 // or'ed in, remove on close
      *  Flags for the mode field in Topen and Tcreate messages
-     * @throws StyxException
      * @return true if file was successfully opened
      */
     boolean open(int clientId, int mode) throws StyxException;
@@ -58,25 +55,23 @@ public interface IVirtualStyxFile {
     void close(int clientId);
     /**
      * Read from file
-     * @param offset offset from begining of the file
+     * @param offset offset from beginning of the file
      * @param count number of bytes to read
-     * @return number of bytes that was readed into the buffer
+     * @return number of bytes that was read into the buffer
      */
-    int read(int clientId, byte[] buffer, long offset, int count) throws StyxErrorMessageException;
-    IVirtualStyxFile walk(Iterator<String> pathElements, List<StyxQID> qids)
-            throws StyxErrorMessageException;
+    int read(int clientId, byte[] buffer, long offset, int count) throws StyxException;
+    IVirtualStyxFile walk(int clientId, Queue<String> pathElements, List<StyxQID> qids)
+            throws StyxException;
     /**
      * Writes data to file at the position offset.
      * @param data the data
-     * @param offset offset from begining of the file
+     * @param offset offset from beginning of the file
      * @return return the number of bytes written
-     * @throws StyxErrorMessageException
      */
-    int write(int clientId, byte[] data, long offset) throws StyxErrorMessageException;
+    int write(int clientId, byte[] data, long offset) throws StyxException;
 
     /**
      * Will be fired when client connect to this server
-     * @param client client information
      */
     void onConnectionOpened(int clientId);
 
@@ -87,12 +82,12 @@ public interface IVirtualStyxFile {
      * @param mode create mode
      * @return QID of new file
      */
-    StyxQID create(String name, long permissions, int mode)
-            throws StyxErrorMessageException;
+    StyxQID create(int clientId, String name, long permissions, int mode)
+            throws StyxException;
     /**
      * Delete this file
      */
-    boolean delete(int clientId);
+    boolean delete(int clientId) throws StyxException;
 
     /**
      * Release all resources.

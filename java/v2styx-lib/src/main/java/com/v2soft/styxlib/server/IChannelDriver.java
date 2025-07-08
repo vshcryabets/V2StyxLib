@@ -3,8 +3,7 @@ package com.v2soft.styxlib.server;
 import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.handlers.IMessageProcessor;
 import com.v2soft.styxlib.handlers.IMessageTransmitter;
-import com.v2soft.styxlib.l5.serialization.IDataDeserializer;
-import com.v2soft.styxlib.l5.serialization.IDataSerializer;
+import com.v2soft.styxlib.utils.StyxSessionDI;
 
 import java.io.Closeable;
 import java.util.Collection;
@@ -17,15 +16,13 @@ import java.util.Collection;
 public interface IChannelDriver<IC extends IChannelDriver.InitConfiguration> extends Closeable, IMessageTransmitter {
     class InitConfiguration {
         public final int iounit;
-        public final IDataSerializer serializer;
-        public final IDataDeserializer deserializer;
+        public final StyxSessionDI di;
 
-        public InitConfiguration(IDataSerializer serializer,
-                          IDataDeserializer deserializer,
-                          int iounit) {
+
+        public InitConfiguration(StyxSessionDI di,
+                                 int iounit) {
             this.iounit = iounit;
-            this.serializer = serializer;
-            this.deserializer = deserializer;
+            this.di = di;
         }
     }
     class StartConfiguration {

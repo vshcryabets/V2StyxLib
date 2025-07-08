@@ -1,17 +1,12 @@
 package com.v2soft.styxlib.server.tcp;
 
+import com.v2soft.styxlib.exceptions.StyxUnknownClientIdException;
 import com.v2soft.styxlib.handlers.RMessagesProcessor;
 import com.v2soft.styxlib.handlers.TMessageTransmitter;
 import com.v2soft.styxlib.l5.Connection;
 import com.v2soft.styxlib.l5.IClient;
-import com.v2soft.styxlib.l6.vfs.IVirtualStyxFile;
 import com.v2soft.styxlib.library.types.Credentials;
-import com.v2soft.styxlib.server.ClientsRepo;
-import com.v2soft.styxlib.server.IChannelDriver;
 import com.v2soft.styxlib.server.StyxServerManager;
-
-import java.net.InetAddress;
-import java.util.List;
 
 /**
  * Created by V.Shcryabets on 5/22/14.
@@ -33,18 +28,17 @@ public class TCPDualLinkServerManager extends StyxServerManager {
         return DUAL_LINK_PROTO;
     }
 
-    public synchronized  IClient getReverseConnectionForClient(int clientId, Credentials credentials) {
+    public synchronized IClient getReverseConnectionForClient(int clientId, Credentials credentials)
+            throws StyxUnknownClientIdException {
         if ( mReverseAnswerProcessor == null ) {
-            mReverseAnswerProcessor = new RMessagesProcessor("RC"+clientId, mConfiguration.clientsRepo);
-            mReverseTransmitter = new TMessageTransmitter(null, mConfiguration.clientsRepo);
+            mReverseAnswerProcessor = new RMessagesProcessor("RC"+clientId, mConfiguration.di.getClientsRepo());
+            mReverseTransmitter = new TMessageTransmitter(null, mConfiguration.di.getClientsRepo());
         }
-        var driver = mConfiguration.clientsRepo.getChannelDriver(clientId);
+        var driver = mConfiguration.di.getClientsRepo().getChannelDriver(clientId);
         return new Connection(new Connection.Configuration(
                 credentials,
                 driver,
-                mConfiguration.clientsRepo,
-                mConfiguration.serializer,
-                mConfiguration.deserializer,
+                mConfiguration.di,
                 mReverseAnswerProcessor,
                 mReverseTransmitter
         ));

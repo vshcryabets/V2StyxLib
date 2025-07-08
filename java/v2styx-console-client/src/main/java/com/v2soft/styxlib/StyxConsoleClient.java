@@ -11,10 +11,11 @@ import com.v2soft.styxlib.l5.serialization.impl.StyxDeserializerImpl;
 import com.v2soft.styxlib.l5.serialization.impl.StyxSerializerImpl;
 import com.v2soft.styxlib.l5.structs.StyxStat;
 import com.v2soft.styxlib.library.types.impl.CredentialsImpl;
-import com.v2soft.styxlib.server.ClientsRepoImpl;
 import com.v2soft.styxlib.server.StyxServerManager;
 import com.v2soft.styxlib.server.tcp.TCPClientChannelDriver;
 import com.v2soft.styxlib.server.tcp.TCPServerChannelDriver;
+import com.v2soft.styxlib.utils.StyxSessionDI;
+import com.v2soft.styxlib.utils.StyxSessionDIImpl;
 import org.jline.reader.LineReader;
 import org.jline.reader.LineReaderBuilder;
 import org.jline.terminal.Terminal;
@@ -151,23 +152,20 @@ public class StyxConsoleClient {
                 .build();
         terminal.writer().println("Connection to the " + host + ":" + port);
         try {
-            var clientsRepo = new ClientsRepoImpl();
-            var driver = new TCPClientChannelDriver(clientsRepo);
+            StyxSessionDI di = new StyxSessionDIImpl(false);
+            var driver = new TCPClientChannelDriver(di);
             var initConfiguration = new TCPServerChannelDriver.InitConfiguration(
-                    serializer,
-                    deserializer,
                     StyxServerManager.DEFAULT_IOUNIT,
                     false,
                     InetAddress.getByName(host),
-                    port
+                    port,
+                    di
             );
             driver.prepare(initConfiguration);
             var connectionConfiguration = new Connection.Configuration(
                     new CredentialsImpl("", ""),
                     driver,
-                    clientsRepo,
-                    serializer,
-                    deserializer);
+                    di);
             var connection = new Connection(connectionConfiguration);
             connection.connect();
             terminal.writer().println("Connected");
