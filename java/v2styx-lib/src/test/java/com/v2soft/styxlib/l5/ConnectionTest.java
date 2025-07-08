@@ -2,23 +2,19 @@ package com.v2soft.styxlib.l5;
 
 import com.v2soft.styxlib.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.exceptions.StyxException;
+import com.v2soft.styxlib.l5.dev.MetricsAndStats;
 import com.v2soft.styxlib.l5.enums.FileMode;
-import com.v2soft.styxlib.l5.serialization.IDataDeserializer;
-import com.v2soft.styxlib.l5.serialization.IDataSerializer;
-import com.v2soft.styxlib.l5.serialization.impl.StyxDeserializerImpl;
-import com.v2soft.styxlib.l5.serialization.impl.StyxSerializerImpl;
 import com.v2soft.styxlib.l6.StyxFile;
 import com.v2soft.styxlib.l6.io.StyxFileBufferedInputStream;
 import com.v2soft.styxlib.l6.vfs.DiskStyxDirectory;
 import com.v2soft.styxlib.l6.vfs.MemoryStyxFile;
 import com.v2soft.styxlib.library.types.impl.CredentialsImpl;
-import com.v2soft.styxlib.server.ClientsRepo;
-import com.v2soft.styxlib.server.ClientsRepoImpl;
 import com.v2soft.styxlib.server.StyxServerManager;
 import com.v2soft.styxlib.server.tcp.TCPChannelDriver;
 import com.v2soft.styxlib.server.tcp.TCPClientChannelDriver;
 import com.v2soft.styxlib.server.tcp.TCPServerChannelDriver;
-import com.v2soft.styxlib.l5.dev.MetricsAndStats;
+import com.v2soft.styxlib.utils.StyxSessionDI;
+import com.v2soft.styxlib.utils.StyxSessionDIImpl;
 import org.junit.jupiter.api.*;
 
 import java.io.File;
@@ -45,18 +41,15 @@ public class ConnectionTest {
     private static final int PORT = 10234;
     private Connection mConnection;
     private StyxServerManager mServer;
-    private ClientsRepo mClientsRepo = new ClientsRepoImpl();
-    private IDataSerializer serializer = new StyxSerializerImpl();
-    private IDataDeserializer deserializer = new StyxDeserializerImpl();
+    private StyxSessionDI di = new StyxSessionDIImpl(false);
     private Connection.Configuration clientConfiguration;
     private StyxServerManager.Configuration serverConfiguration;
     private TCPChannelDriver.InitConfiguration initConfiguration = new TCPServerChannelDriver.InitConfiguration(
-            serializer,
-            deserializer,
             StyxServerManager.DEFAULT_IOUNIT,
             false,
             InetAddress.getLoopbackAddress(),
-            PORT
+            PORT,
+            di
     );
 
     @BeforeEach
@@ -66,25 +59,21 @@ public class ConnectionTest {
         if (!testDirectory.exists()) {
             testDirectory.mkdirs();
         }
-        var serverDriver = new TCPServerChannelDriver(mClientsRepo);
+        var serverDriver = new TCPServerChannelDriver(di);
         serverDriver.prepare(initConfiguration);
         serverConfiguration = new StyxServerManager.Configuration(
-                new DiskStyxDirectory(testDirectory, serializer),
+                new DiskStyxDirectory(testDirectory, di),
                 Arrays.asList(serverDriver),
-                mClientsRepo,
-                serializer,
-                deserializer,
+                di,
                 StyxServerManager.DEFAULT_IOUNIT);
         mServer = new StyxServerManager(serverConfiguration);
         mServer.start();
-        var clientDriver = new TCPClientChannelDriver(mClientsRepo);
+        var clientDriver = new TCPClientChannelDriver(di);
         clientDriver.prepare(initConfiguration);
         clientConfiguration = new Connection.Configuration(
                 new CredentialsImpl("user", ""),
                 clientDriver,
-                mClientsRepo,
-                serializer,
-                deserializer);
+                di);
         mConnection = new Connection(clientConfiguration);
         assertTrue(mConnection.connect());
     }
@@ -276,7 +265,7 @@ public class ConnectionTest {
         long blocksCount = 1024 * 1024;
         final String filename = "write";
         final long[] stat = new long[1];
-        ((DiskStyxDirectory) serverConfiguration.root).addFile(new MemoryStyxFile(filename) {
+        ((DiskStyxDirectory) serverConfiguration.root).addFile(new MemoryStyxFile(filename, di) {
             @Override
             public int write(int clientId, byte[] data, long offset) {
                 stat[0] += data.length;

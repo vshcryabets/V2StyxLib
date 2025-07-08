@@ -3,7 +3,6 @@ package com.v2soft.styxlib.utils;
 import com.v2soft.styxlib.Config;
 import com.v2soft.styxlib.Logger;
 import com.v2soft.styxlib.l5.enums.Constants;
-import com.v2soft.styxlib.l5.messages.base.StyxMessage;
 
 /**
  * @author V.Shcryabets <a>vshcryabets@gmail.com</a>
@@ -12,7 +11,7 @@ public class FIDPoll extends AbstractPoll<Long> {
     public static final long MAXUNINT = 0xFFFFFFFFL;
 
     public FIDPoll() {
-        mLast = Long.valueOf(1);
+        mLast = 1L;
     }
 
     @Override

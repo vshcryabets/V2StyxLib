@@ -2,7 +2,6 @@ package com.v2soft.styxlib.server;
 
 import com.v2soft.styxlib.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.l6.vfs.IVirtualStyxFile;
-import com.v2soft.styxlib.library.types.Credentials;
 import com.v2soft.styxlib.utils.Polls;
 
 import java.util.HashMap;
@@ -13,26 +12,36 @@ import java.util.HashMap;
  *
  */
 public class ClientDetails {
-    public final int NOT_ASSIGNED = -1;
-    protected HashMap<Long, IVirtualStyxFile> mAssignedFiles;
-    protected IChannelDriver mDriver; // TODO move to map
+    public static final int NOT_ASSIGNED = -1;
+    protected final HashMap<Long, IVirtualStyxFile> mAssignedFiles;
+    protected final IChannelDriver<?> mDriver; // TODO move to map
     protected int mId = NOT_ASSIGNED;
     protected Polls mPolls;
-    protected Credentials mCredentials;
+    protected String mUsername;
+    private boolean isAuthenticated = false;
 
-    public ClientDetails(IChannelDriver driver) {
+    public ClientDetails(IChannelDriver<?> driver) {
         if ( driver == null ) throw new NullPointerException("Driver is null");
         mAssignedFiles = new HashMap<>();
         mDriver = driver;
     }
 
-    public void setCredentials(Credentials credential) {
-        mCredentials = credential;
+    public void setUsername(String username) {
+        mUsername = username;
     }
 
-    public Credentials getCredentials() {
-        return mCredentials;
+    public String getUserName() {
+        return mUsername;
     }
+
+    public boolean isAuthenticated() {
+        return isAuthenticated;
+    }
+
+    public void setAuthenticated() {
+        isAuthenticated = true;
+    }
+
     /**
      * Get polls assigned to this client.
      * @return polls assigned to this client.

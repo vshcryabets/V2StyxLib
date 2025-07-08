@@ -2,21 +2,18 @@ package com.v2soft.styxlib.l6.vfs;
 
 import com.v2soft.styxlib.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.exceptions.StyxException;
+import com.v2soft.styxlib.exceptions.StyxNotAuthorizedException;
 import com.v2soft.styxlib.l5.enums.FileMode;
+import com.v2soft.styxlib.l5.enums.ModeType;
 import com.v2soft.styxlib.l5.enums.QidType;
 import com.v2soft.styxlib.l5.serialization.IBufferWriter;
-import com.v2soft.styxlib.l5.serialization.IDataSerializer;
 import com.v2soft.styxlib.l5.serialization.impl.BufferWriterImpl;
-import com.v2soft.styxlib.l5.enums.ModeType;
 import com.v2soft.styxlib.l5.structs.StyxQID;
 import com.v2soft.styxlib.l5.structs.StyxStat;
+import com.v2soft.styxlib.utils.StyxSessionDI;
 
 import java.nio.ByteBuffer;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * In-Memory directory
@@ -25,14 +22,12 @@ import java.util.Map;
  */
 public class MemoryStyxDirectory
 extends MemoryStyxFile {
-    private final IDataSerializer mSerializer;
     private Map<Integer, IBufferWriter> mBuffersMap;
     private List<IVirtualStyxFile> mFiles;
 
-    public MemoryStyxDirectory(String name, IDataSerializer serializer) {
-        super(name);
+    public MemoryStyxDirectory(String name, StyxSessionDI di) {
+        super(name, di);
         mQID = new StyxQID(QidType.QTDIR, 0, mName.hashCode());
-        mSerializer = serializer;
         mFiles = new LinkedList<IVirtualStyxFile>();
         mBuffersMap = new HashMap<>();
     }
@@ -43,23 +38,26 @@ extends MemoryStyxFile {
     }
 
     @Override
-    public IVirtualStyxFile walk(Iterator<String> pathElements, List<StyxQID> qids)
-            throws StyxErrorMessageException {
-        if ( pathElements.hasNext() ) {
-            String filename = pathElements.next();
+    public IVirtualStyxFile walk(int clientId, Queue<String> pathElements, List<StyxQID> qids)
+            throws StyxException {
+        if (!pathElements.isEmpty() ) {
+            String filename = pathElements.poll();
             for (IVirtualStyxFile file : mFiles) {
                 if ( file.getName().equals(filename)) {
                     qids.add(file.getQID());
-                    return file.walk(pathElements, qids);
+                    return file.walk(clientId, pathElements, qids);
                 }
             }
-            return null;
+            throw StyxErrorMessageException.newInstance("File not found: " + pathElements.peek());
         }
-        return super.walk(pathElements, qids);
+        return super.walk(clientId, pathElements, qids);
     }
 
     @Override
     public boolean open(int clientId, int mode) throws StyxException {
+        if (!mDI.getIsClientAuthorizedUseCase().isClientAuthorized(clientId)) {
+            throw new StyxNotAuthorizedException();
+        }
         boolean result = ((mode&0x0F) == ModeType.OREAD);
         if ( result ) {
             // prepare binary structure of the directory
@@ -67,13 +65,13 @@ extends MemoryStyxFile {
             final List<StyxStat> stats = new LinkedList<StyxStat>();
             for (IVirtualStyxFile file : mFiles) {
                 final StyxStat stat = file.getStat();
-                size += mSerializer.getStatSerializedSize(stat);
+                size += mDI.getDataSerializer().getStatSerializedSize(stat);
                 stats.add(stat);
             }
             // allocate buffer
             IBufferWriter writer = new BufferWriterImpl(size);
             for (StyxStat state : stats) {
-                mSerializer.serializeStat(state, writer);
+                mDI.getDataSerializer().serializeStat(state, writer);
             }
             mBuffersMap.put(clientId, writer);
         }

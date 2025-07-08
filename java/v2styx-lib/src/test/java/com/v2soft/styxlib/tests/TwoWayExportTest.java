@@ -5,22 +5,17 @@ import com.v2soft.styxlib.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.l5.Connection;
 import com.v2soft.styxlib.l5.IClient;
-import com.v2soft.styxlib.l5.serialization.IDataDeserializer;
-import com.v2soft.styxlib.l5.serialization.IDataSerializer;
-import com.v2soft.styxlib.l5.serialization.impl.StyxDeserializerImpl;
-import com.v2soft.styxlib.l5.serialization.impl.StyxSerializerImpl;
 import com.v2soft.styxlib.l6.StyxFile;
 import com.v2soft.styxlib.l6.vfs.MemoryStyxDirectory;
 import com.v2soft.styxlib.l6.vfs.MemoryStyxFile;
 import com.v2soft.styxlib.library.types.impl.CredentialsImpl;
-import com.v2soft.styxlib.server.ClientsRepo;
-import com.v2soft.styxlib.server.ClientsRepoImpl;
-import com.v2soft.styxlib.server.IChannelDriver;
 import com.v2soft.styxlib.server.StyxServerManager;
 import com.v2soft.styxlib.server.tcp.TCPChannelDriver;
 import com.v2soft.styxlib.server.tcp.TCPClientChannelDriver;
 import com.v2soft.styxlib.server.tcp.TCPDualLinkServerManager;
 import com.v2soft.styxlib.server.tcp.TCPServerChannelDriver;
+import com.v2soft.styxlib.utils.StyxSessionDI;
+import com.v2soft.styxlib.utils.StyxSessionDIImpl;
 import org.junit.jupiter.api.*;
 
 import java.io.IOException;
@@ -45,18 +40,15 @@ public class TwoWayExportTest {
     private static final int PORT = 10234;
     private TCPDualLinkServerManager mServer;
     private final Charset mCharset = StandardCharsets.UTF_8;
-    private ClientsRepo mClientsRepo = new ClientsRepoImpl();
-    private IDataSerializer serializer = new StyxSerializerImpl();
-    private IDataDeserializer deserializer = new StyxDeserializerImpl();
+    private StyxSessionDI di = new StyxSessionDIImpl(false);
     private StyxServerManager.Configuration serverConfiguration;
     private TCPServerChannelDriver mServerDriver;
     private TCPChannelDriver.InitConfiguration initConfiguration = new TCPChannelDriver.InitConfiguration(
-            serializer,
-            deserializer,
             StyxServerManager.DEFAULT_IOUNIT,
             false,
             InetAddress.getLoopbackAddress(),
-            PORT);
+            PORT,
+            di);
 
     @BeforeEach
     public void setUp() throws Exception {
@@ -69,16 +61,14 @@ public class TwoWayExportTest {
     }
 
     private void startServer() throws IOException, StyxException {
-        MemoryStyxFile md5 = new MD5StyxFile();
-        mServerDriver = new TCPServerChannelDriver(mClientsRepo);
-        MemoryStyxDirectory root = new MemoryStyxDirectory("root", serializer);
+        MemoryStyxFile md5 = new MD5StyxFile(di);
+        mServerDriver = new TCPServerChannelDriver(di);
+        MemoryStyxDirectory root = new MemoryStyxDirectory("root", di);
         root.addFile(md5);
         serverConfiguration = new StyxServerManager.Configuration(
                 root,
                 Arrays.asList(mServerDriver),
-                mClientsRepo,
-                serializer,
-                deserializer,
+                di,
                 StyxServerManager.DEFAULT_IOUNIT);
         mServer = new TCPDualLinkServerManager(serverConfiguration);
         mServerDriver.prepare(initConfiguration);
@@ -89,16 +79,14 @@ public class TwoWayExportTest {
     @Test
     @Disabled
     public void testTwoWayExport() throws IOException, StyxException, InterruptedException, TimeoutException, NoSuchAlgorithmException {
-        var driver = new TCPClientChannelDriver(mClientsRepo);
-        MemoryStyxFile md5 = new MD5StyxFile();
-        MemoryStyxDirectory root = new MemoryStyxDirectory("clientroot", serializer);
+        var driver = new TCPClientChannelDriver(di);
+        MemoryStyxFile md5 = new MD5StyxFile(di);
+        MemoryStyxDirectory root = new MemoryStyxDirectory("clientroot", di);
         root.addFile(md5);
         var clientConfiguration = new Connection.Configuration(
                 new CredentialsImpl("user", ""),
                 driver,
-                mClientsRepo,
-                serializer,
-                deserializer);
+                di);
         driver.prepare(initConfiguration);
         ConnectionWithExport connection = new ConnectionWithExport(clientConfiguration);
         connection.export(root);
@@ -130,13 +118,11 @@ public class TwoWayExportTest {
 
     @Test
     public void testGetClientsFromClient() throws IOException, InterruptedException, TimeoutException, StyxException {
-        var driver = new TCPClientChannelDriver(mClientsRepo);
+        var driver = new TCPClientChannelDriver(di);
         var clientConfiguration = new Connection.Configuration(
                 new CredentialsImpl("user", ""),
                 driver,
-                mClientsRepo,
-                serializer,
-                deserializer);
+                di);
         driver.prepare(initConfiguration);
         ConnectionWithExport connection = new ConnectionWithExport(clientConfiguration);
         Assertions.assertTrue(connection.connect());
@@ -144,7 +130,7 @@ public class TwoWayExportTest {
         Assertions.assertNotNull(clientDetailses);
         Assertions.assertEquals(1, clientDetailses.size());
         Integer clientId = clientDetailses.iterator().next();
-        var pseudoClientDetails = mClientsRepo.getClient(clientId);
+        var pseudoClientDetails = di.getClientsRepo().getClient(clientId);
         Assertions.assertNotNull(pseudoClientDetails);
         Assertions.assertNotNull(pseudoClientDetails.getDriver());
         Assertions.assertEquals(driver, pseudoClientDetails.getDriver());
@@ -153,24 +139,20 @@ public class TwoWayExportTest {
 
     @Test
     public void testGetClientsFromServer() throws IOException, InterruptedException, TimeoutException, StyxException {
-        var driver = new TCPClientChannelDriver(mClientsRepo);
+        var driver = new TCPClientChannelDriver(di);
         var clientConfiguration = new Connection.Configuration(
                 new CredentialsImpl("user", ""),
                 driver,
-                mClientsRepo,
-                serializer,
-                deserializer);
+                di);
         driver.prepare(initConfiguration);
         ConnectionWithExport connection = new ConnectionWithExport(clientConfiguration);
         Assertions.assertTrue(connection.connect());
 
-        var driver2 = new TCPClientChannelDriver(mClientsRepo);
+        var driver2 = new TCPClientChannelDriver(di);
         var clientConfiguration2 = new Connection.Configuration(
                 new CredentialsImpl("user", ""),
                 driver2,
-                mClientsRepo,
-                serializer,
-                deserializer);
+                di);
         driver2.prepare(initConfiguration);
         ConnectionWithExport connection2 = new ConnectionWithExport(clientConfiguration2);
         Assertions.assertTrue(connection2.connect());
@@ -280,8 +262,8 @@ public class TwoWayExportTest {
         protected Thread mWorker;
         protected boolean isWorking;
 
-        public ChatServerFile(OutputStream[] outputs) {
-            super("chat");
+        public ChatServerFile(OutputStream[] outputs, StyxSessionDI di) {
+            super("chat", di);
             mOutputs = outputs;
             mQueue = new LinkedBlockingQueue<String>();
             mWorker = new Thread(mRunnable);
@@ -349,8 +331,13 @@ public class TwoWayExportTest {
         protected String mPrefix;
         protected final AtomicInteger mSyncObject;
 
-        public ChatStyxFile(String filename, String message, String marker, AtomicInteger syncObject, String prefix) {
-            super(filename);
+        public ChatStyxFile(String filename,
+                            String message,
+                            String marker,
+                            AtomicInteger syncObject,
+                            String prefix,
+                            StyxSessionDI di) {
+            super(filename, di);
             mMessage = message;
             mMarker = marker;
             mSyncObject = syncObject;

@@ -1,6 +1,7 @@
 name: Java CI with Gradle
 
 on:
+  workflow_dispatch:
   push:
     branches: [ "master" ]
   pull_request:
@@ -28,3 +29,10 @@ jobs:
 
     - name: Build with Gradle Wrapper
       run: cd java && ./gradlew build test
+
+    - name: Upload report artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: TestReport # The name of the artifact
+        path: /home/runner/work/V2StyxLib/V2StyxLib/java/v2styx-lib/build/reports/tests/test/index.html
+        retention-days: 30
