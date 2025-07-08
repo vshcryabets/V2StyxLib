@@ -20,7 +20,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class StyxSerializerImpl implements IDataSerializer {
-    protected int getMessageSize(StyxMessage message) {
+    @Override
+    public int getMessageSize(StyxMessage message) {
         var size = IDataSerializer.BASE_BINARY_SIZE;
         if (message instanceof StyxTMessageFID) {
             size += 4;
@@ -209,7 +210,6 @@ public class StyxSerializerImpl implements IDataSerializer {
         output.writeUInt16(stat.type());
         output.writeUInt32(stat.dev());
         serializeQid(stat.QID(), output);
-//        stat.QID().writeBinaryTo(output);
         output.writeUInt32(stat.mode());
         output.writeUInt32(DateToInt(stat.accessTime()));
         output.writeUInt32(DateToInt(stat.modificationTime()));

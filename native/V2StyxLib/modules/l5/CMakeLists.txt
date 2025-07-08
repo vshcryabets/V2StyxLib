@@ -5,6 +5,9 @@ if(BUILD_MODULE_L5)
         src/BufferWriterImpl.cpp
         src/BufferReaderImpl.cpp
         src/StyxMessage.cpp
+        src/StyxSerializerImpl.cpp
+        src/StyxQID.cpp
+        src/StyxStat.cpp
     )
     target_include_directories(module_l5 PUBLIC
         $<INSTALL_INTERFACE:include>
@@ -14,6 +17,7 @@ if(BUILD_MODULE_L5)
     add_executable(module_l5_tests
         test/test_BufferWriterImpl.cpp
         test/test_BufferReaderImpl.cpp
+        test/test_StyxSerializerImpl.cpp
         )
     target_include_directories(module_l5_tests PRIVATE ./include/)
     target_link_libraries(module_l5_tests PRIVATE Catch2::Catch2WithMain module_l5)
