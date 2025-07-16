@@ -1,6 +1,5 @@
 package com.v2soft.styxlib.server.tcp;
 
-import com.v2soft.styxlib.Logger;
 import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.exceptions.StyxUnknownClientIdException;
 import com.v2soft.styxlib.utils.StyxSessionDI;
@@ -149,7 +148,6 @@ public class TCPServerChannelDriver extends TCPChannelDriver {
         var clientId = mClientStatesMap.get(channel);
         mStartConfiguration.getTProcessor().onClientRemoved(clientId);
         mStartConfiguration.getRProcessor().onClientRemoved(clientId);
-        Logger.d("TCPServerChannelDriver", "removeClient called for " + clientId);
         mDI.getClientsRepo().removeClient(clientId);
         mClientStatesMap.remove(channel);
         try {

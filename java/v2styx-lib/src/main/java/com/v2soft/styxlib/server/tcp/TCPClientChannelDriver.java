@@ -116,8 +116,6 @@ public class TCPClientChannelDriver extends TCPChannelDriver {
     @Override
     public void close() {
         super.close();
-        Logger.d("TCPClientChannelDriver", "close() called");
-//        Operations.printStacktrace("TCPClientChannelDriver");
         mDI.getClientsRepo().removeClient(mServerClientDetails.getId());
         mAcceptorThread.interrupt();
     }

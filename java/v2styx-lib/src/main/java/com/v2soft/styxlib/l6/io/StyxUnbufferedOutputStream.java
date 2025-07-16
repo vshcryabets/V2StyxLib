@@ -1,6 +1,5 @@
 package com.v2soft.styxlib.l6.io;
 
-import com.v2soft.styxlib.Logger;
 import com.v2soft.styxlib.l5.Connection;
 import com.v2soft.styxlib.l5.messages.StyxRWriteMessage;
 import com.v2soft.styxlib.l5.messages.StyxTWriteMessage;
@@ -77,7 +76,6 @@ public class StyxUnbufferedOutputStream extends OutputStream {
     public void close() throws IOException {
         super.close();
         try {
-            Logger.d("StyxUnbufferedOutputStream", "close called for " + mFID);
             mMessenger.sendMessage(new StyxTMessageFID(MessageType.Tclunk, MessageType.Rclunk, mFID),
                     mRecipient,
                     mTimeout).getResult();

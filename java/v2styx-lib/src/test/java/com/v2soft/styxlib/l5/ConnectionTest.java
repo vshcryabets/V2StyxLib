@@ -225,9 +225,7 @@ public class ConnectionTest {
         Logger.d("ConnectionTest", String.format("Write %d bytes", filessize));
         // close it
         out.close();
-        Logger.d("ConnectionTest", "A01");
         file.close();
-        Logger.d("ConnectionTest", "A02");
 
         long writeTime = System.currentTimeMillis();
         System.out.println("Read from server...");
@@ -247,7 +245,6 @@ public class ConnectionTest {
             crcounter.update(buffer, 0, readed);
             assertEquals(crc32, crcounter.getValue());
         }
-        com.v2soft.styxlib.Logger.d("ConnectionTest", "A03");
         // close it
         in.close();
 
