@@ -1,5 +1,6 @@
 package com.v2soft.styxlib.l5.dev;
 
+import com.v2soft.styxlib.Logger;
 import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.l5.messages.StyxTWStatMessage;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
@@ -43,5 +44,13 @@ public class Operations {
             }
         }
         return result.toString();
+    }
+
+    public static void printStacktrace(String tag) {
+        var stackTrace = Thread.currentThread().getStackTrace();
+        Logger.d(tag, "Stack trace:");
+        for (StackTraceElement element : stackTrace) {
+            Logger.d(tag, element.toString());
+        }
     }
 }

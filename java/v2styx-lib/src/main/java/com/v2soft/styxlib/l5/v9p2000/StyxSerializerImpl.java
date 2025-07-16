@@ -1,4 +1,4 @@
-package com.v2soft.styxlib.l5.serialization.impl;
+package com.v2soft.styxlib.l5.v9p2000;
 
 import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.l5.enums.Checks;

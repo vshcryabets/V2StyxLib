@@ -7,19 +7,20 @@ import com.v2soft.styxlib.l6.vfs.IVirtualStyxFile;
 import com.v2soft.styxlib.utils.FIDPoll;
 import com.v2soft.styxlib.utils.Polls;
 
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class ClientsRepoImpl implements ClientsRepo {
+    private static final String TAG = "ClientsRepoImpl";
     public record Configuration(
             boolean noAuthenticationRequired
     ){}
-    private final HashMap<Integer, ClientDetails> mClients;
+    private final ConcurrentHashMap<Integer, ClientDetails> mClients;
     private final AtomicInteger mIdCounter = new AtomicInteger(1);
     private final Configuration mConfiguration;
 
     public ClientsRepoImpl(Configuration configuration) {
-        mClients = new HashMap<>();
+        mClients = new ConcurrentHashMap<>();
         mConfiguration = configuration;
     }
 
@@ -42,7 +43,7 @@ public class ClientsRepoImpl implements ClientsRepo {
     @Override
     public ClientDetails getClient(int id) throws StyxUnknownClientIdException {
         if (!mClients.containsKey(id)) {
-            throw new StyxUnknownClientIdException();
+            throw new StyxUnknownClientIdException("No client with id " + id + " found " + mClients);
         }
         return mClients.get(id);
     }

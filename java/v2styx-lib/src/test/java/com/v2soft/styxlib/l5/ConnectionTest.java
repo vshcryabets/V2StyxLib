@@ -1,8 +1,10 @@
 package com.v2soft.styxlib.l5;
 
+import com.v2soft.styxlib.Logger;
 import com.v2soft.styxlib.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.l5.dev.MetricsAndStats;
+import com.v2soft.styxlib.l5.dev.Operations;
 import com.v2soft.styxlib.l5.enums.FileMode;
 import com.v2soft.styxlib.l6.StyxFile;
 import com.v2soft.styxlib.l6.io.StyxFileBufferedInputStream;
@@ -26,7 +28,6 @@ import java.util.Arrays;
 import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.TimeoutException;
-import java.util.logging.Logger;
 import java.util.zip.CRC32;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -37,7 +38,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author V.Shcriyabets (vshcryabets@gmail.com)
  */
 public class ConnectionTest {
-    private static Logger log = Logger.getLogger(ConnectionTest.class.getSimpleName());
+    private static final String TAG = ConnectionTest.class.getSimpleName();
     private static final int PORT = 10234;
     private Connection mConnection;
     private StyxServerManager mServer;
@@ -80,6 +81,7 @@ public class ConnectionTest {
 
     @AfterEach
     public void shutDown() throws InterruptedException, IOException {
+        com.v2soft.styxlib.Logger.d(TAG, "shutDown 01");
         mConnection.close();
         mServer.closeAndWait();
     }
@@ -87,7 +89,7 @@ public class ConnectionTest {
     // TVersion & TAttach
     @Test
     @Tag("dev")
-    public void testConnection() throws IOException, InterruptedException, TimeoutException {
+    public void testConnection() throws IOException {
         int count = 1000;
         clientConfiguration.transmitter.clearStatistics();
         long startTime = System.currentTimeMillis();
@@ -97,7 +99,7 @@ public class ConnectionTest {
         assertEquals(count * 3, clientConfiguration.transmitter.getTransmittedCount()); // TVersion, Tattach, TClunk
         assertEquals(0, clientConfiguration.transmitter.getErrorsCount());
         long diff = System.currentTimeMillis() - startTime;
-        log.info(String.format("\tTransmited %d messages\n\t" +
+        Logger.info(TAG, String.format("\tTransmited %d messages\n\t" +
                         //"Received %d messages\n\t" +
                         "Error %d messages\n\t" +
                         "Average time for connection %f ms",
@@ -193,7 +195,7 @@ public class ConnectionTest {
 
     @Test
     public void testBigFileTransmition()
-            throws IOException {
+            throws IOException, InterruptedException {
         byte[] buffer = new byte[156];
         System.out.println("Generating pattern...");
         Random random = new Random();
@@ -220,6 +222,7 @@ public class ConnectionTest {
             out.write(buffer);
         }
         out.write(buffer, 0, (int) last);
+        Logger.d("ConnectionTest", String.format("Write %d bytes", filessize));
         // close it
         out.close();
         file.close();
@@ -242,7 +245,6 @@ public class ConnectionTest {
             crcounter.update(buffer, 0, readed);
             assertEquals(crc32, crcounter.getValue());
         }
-
         // close it
         in.close();
 

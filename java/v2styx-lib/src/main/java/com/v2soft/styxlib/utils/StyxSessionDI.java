@@ -1,5 +1,6 @@
 package com.v2soft.styxlib.utils;
 
+import com.v2soft.styxlib.l5.dev.StringSerializer;
 import com.v2soft.styxlib.l5.serialization.IDataDeserializer;
 import com.v2soft.styxlib.l5.serialization.IDataSerializer;
 import com.v2soft.styxlib.l6.IsClientAuthorizedUseCase;
@@ -10,6 +11,7 @@ public interface StyxSessionDI {
 
     IDataDeserializer getDataDeserializer();
     IDataSerializer getDataSerializer();
+    StringSerializer getStringSerializer();
 
     ClientsRepo getClientsRepo();
 }

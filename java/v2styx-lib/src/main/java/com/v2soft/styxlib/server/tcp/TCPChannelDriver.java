@@ -1,5 +1,6 @@
 package com.v2soft.styxlib.server.tcp;
 
+import com.v2soft.styxlib.Logger;
 import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.l5.enums.Checks;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
@@ -128,7 +129,7 @@ public abstract class TCPChannelDriver implements
      * Read data from assigned SocketChannel
      */
     protected boolean readSocket(int clientId) throws StyxException {
-        int read = 0;
+        int read;
         final var client = (TCPClientDetails) mDI.getClientsRepo().getClient(clientId);
         try {
             read = client.getBufferLoader().readFromChannelToBuffer(client.getChannel());
