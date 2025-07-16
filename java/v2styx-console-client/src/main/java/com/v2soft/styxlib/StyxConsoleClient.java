@@ -5,10 +5,6 @@ import com.v2soft.styxlib.client.UploadFileUseCaseImpl;
 import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.l5.Connection;
 import com.v2soft.styxlib.l5.enums.QidType;
-import com.v2soft.styxlib.l5.serialization.IDataDeserializer;
-import com.v2soft.styxlib.l5.serialization.IDataSerializer;
-import com.v2soft.styxlib.l5.v9p2000.StyxDeserializerImpl;
-import com.v2soft.styxlib.l5.v9p2000.StyxSerializerImpl;
 import com.v2soft.styxlib.l5.structs.StyxStat;
 import com.v2soft.styxlib.library.types.impl.CredentialsImpl;
 import com.v2soft.styxlib.server.StyxServerManager;
@@ -48,8 +44,6 @@ public class StyxConsoleClient {
     private static final String DIR_PARENT = "..";
 
     private static Logger log = Logger.getLogger(StyxConsoleClient.class.getSimpleName());
-    private IDataSerializer serializer = new StyxSerializerImpl();
-    private IDataDeserializer deserializer = new StyxDeserializerImpl();
 
     public static void main(String[] args) {
         try {
