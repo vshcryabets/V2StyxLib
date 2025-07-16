@@ -1,6 +1,8 @@
 package com.v2soft.styxlib.server.tcp;
 
+import com.v2soft.styxlib.Logger;
 import com.v2soft.styxlib.exceptions.StyxException;
+import com.v2soft.styxlib.l5.dev.Operations;
 import com.v2soft.styxlib.l5.enums.Checks;
 import com.v2soft.styxlib.l5.io.impl.BufferImpl;
 import com.v2soft.styxlib.l5.serialization.IBufferReader;
@@ -114,6 +116,9 @@ public class TCPClientChannelDriver extends TCPChannelDriver {
     @Override
     public void close() {
         super.close();
+        Logger.d("TCPClientChannelDriver", "close() called");
+//        Operations.printStacktrace("TCPClientChannelDriver");
+        mDI.getClientsRepo().removeClient(mServerClientDetails.getId());
         mAcceptorThread.interrupt();
     }
 

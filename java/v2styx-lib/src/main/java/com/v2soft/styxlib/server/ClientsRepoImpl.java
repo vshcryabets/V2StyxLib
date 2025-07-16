@@ -1,31 +1,36 @@
 package com.v2soft.styxlib.server;
 
+import com.v2soft.styxlib.Logger;
 import com.v2soft.styxlib.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.exceptions.StyxUnknownClientIdException;
 import com.v2soft.styxlib.handlers.IMessageTransmitter;
+import com.v2soft.styxlib.l5.dev.Operations;
 import com.v2soft.styxlib.l6.vfs.IVirtualStyxFile;
 import com.v2soft.styxlib.utils.FIDPoll;
 import com.v2soft.styxlib.utils.Polls;
 
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class ClientsRepoImpl implements ClientsRepo {
+    private static final String TAG = "ClientsRepoImpl";
     public record Configuration(
             boolean noAuthenticationRequired
     ){}
-    private final HashMap<Integer, ClientDetails> mClients;
+    private final ConcurrentHashMap<Integer, ClientDetails> mClients;
     private final AtomicInteger mIdCounter = new AtomicInteger(1);
     private final Configuration mConfiguration;
 
     public ClientsRepoImpl(Configuration configuration) {
-        mClients = new HashMap<>();
+        mClients = new ConcurrentHashMap<>();
         mConfiguration = configuration;
     }
 
     @Override
     public int addClient(ClientDetails client) {
         int id = mIdCounter.getAndIncrement();
+        Logger.d(TAG,"New client added: " + id);
         mClients.put(id, client);
         client.setId(id);
         if (mConfiguration.noAuthenticationRequired) {
@@ -36,13 +41,15 @@ public class ClientsRepoImpl implements ClientsRepo {
 
     @Override
     public void removeClient(int id) {
+        Logger.d(TAG, "removeClient: " + id);
         mClients.remove(id);
     }
 
     @Override
     public ClientDetails getClient(int id) throws StyxUnknownClientIdException {
         if (!mClients.containsKey(id)) {
-            throw new StyxUnknownClientIdException();
+            Logger.e(TAG, "getClient failed " + id + " map=" + mClients.toString());
+            throw new StyxUnknownClientIdException("No client with id " + id + " found " + mClients);
         }
         return mClients.get(id);
     }

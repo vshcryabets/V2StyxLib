@@ -1,6 +1,8 @@
 package com.v2soft.styxlib.server.tcp;
 
+import com.v2soft.styxlib.Logger;
 import com.v2soft.styxlib.exceptions.StyxException;
+import com.v2soft.styxlib.exceptions.StyxUnknownClientIdException;
 import com.v2soft.styxlib.utils.StyxSessionDI;
 
 import java.io.IOException;
@@ -91,6 +93,9 @@ public class TCPServerChannelDriver extends TCPChannelDriver {
                     processEventsQueue(newConnections, readable);
                     newConnections.clear();
                     readable.clear();
+                } catch (StyxUnknownClientIdException e) {
+                    e.printStackTrace();
+                    break;
                 } catch (IOException e) {
                     // this is ok
                     e.printStackTrace();
@@ -144,6 +149,7 @@ public class TCPServerChannelDriver extends TCPChannelDriver {
         var clientId = mClientStatesMap.get(channel);
         mStartConfiguration.getTProcessor().onClientRemoved(clientId);
         mStartConfiguration.getRProcessor().onClientRemoved(clientId);
+        Logger.d("TCPServerChannelDriver", "removeClient called for " + clientId);
         mDI.getClientsRepo().removeClient(clientId);
         mClientStatesMap.remove(channel);
         try {
