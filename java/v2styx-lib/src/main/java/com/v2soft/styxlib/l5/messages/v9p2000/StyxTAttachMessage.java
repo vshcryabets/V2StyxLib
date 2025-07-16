@@ -1,4 +1,4 @@
-package com.v2soft.styxlib.l5.messages;
+package com.v2soft.styxlib.l5.messages.v9p2000;
 
 import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.l5.messages.base.StyxTMessageFID;
@@ -13,14 +13,5 @@ public class StyxTAttachMessage extends StyxTMessageFID {
         authFID = afid;
         userName = username;
         mountPoint = mountpoint;
-    }
-
-    @Override
-    public String toString() {
-        return String.format("%s\nAuthFID: %d\nUserName: %s\nMountPoint: %s",
-                super.toString(),
-                authFID,
-                userName,
-                mountPoint);
     }
 }

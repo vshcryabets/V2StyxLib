@@ -12,10 +12,4 @@ public class StyxTAuthMessage extends StyxTMessageFID {
 		mUserName = userName;
 		mMountPoint = mountPoint;
 	}
-
-	@Override
-    public String toString() {
-		return String.format("%s\nUserName: %s\nMountPoint: %s",
-				super.toString(), mUserName, mMountPoint);
-	}
 }

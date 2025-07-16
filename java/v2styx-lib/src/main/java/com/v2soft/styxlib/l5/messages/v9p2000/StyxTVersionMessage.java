@@ -1,4 +1,4 @@
-package com.v2soft.styxlib.l5.messages;
+package com.v2soft.styxlib.l5.messages.v9p2000;
 
 import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.l5.messages.base.StyxTMessage;
@@ -11,13 +11,5 @@ public class StyxTVersionMessage extends StyxTMessage {
         super(MessageType.Tversion, MessageType.Rversion);
 		this.maxPacketSize = maxPacketSize;
 		this.protocolVersion = protocolVersion;
-	}
-
-	@Override
-    public String toString() {
-		return String.format("%s\nMaxPocketSize: %d;\nProtocolVersion: %s",
-		        super.toString(),
-				maxPacketSize,
-				protocolVersion);
 	}
 }

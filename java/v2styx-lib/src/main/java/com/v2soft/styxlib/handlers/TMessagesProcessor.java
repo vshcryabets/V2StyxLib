@@ -9,6 +9,7 @@ import com.v2soft.styxlib.l5.messages.*;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
 import com.v2soft.styxlib.l5.messages.base.StyxTMessageFID;
 import com.v2soft.styxlib.l5.messages.v9p2000.BaseMessage;
+import com.v2soft.styxlib.l5.messages.v9p2000.StyxTAttachMessage;
 import com.v2soft.styxlib.l5.structs.StyxQID;
 import com.v2soft.styxlib.l6.vfs.IVirtualStyxFile;
 import com.v2soft.styxlib.library.types.ConnectionDetails;

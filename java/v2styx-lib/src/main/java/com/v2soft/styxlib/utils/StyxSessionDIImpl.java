@@ -1,6 +1,7 @@
 package com.v2soft.styxlib.utils;
 
 import com.v2soft.styxlib.l5.dev.StringSerializer;
+import com.v2soft.styxlib.l5.messages.base.Factory;
 import com.v2soft.styxlib.l5.serialization.IDataDeserializer;
 import com.v2soft.styxlib.l5.serialization.IDataSerializer;
 import com.v2soft.styxlib.l5.v9p2000.StyxDeserializerImpl;
@@ -14,9 +15,10 @@ import com.v2soft.styxlib.server.ClientsRepoImpl;
 public class StyxSessionDIImpl implements StyxSessionDI {
     private final ClientsRepo mClientsRepo;
     private final IDataSerializer serializer = new StyxSerializerImpl();
-    private final IDataDeserializer deserializer = new StyxDeserializerImpl();
     private final IsClientAuthorizedUseCaseImpl isClientAuthorizedUseCase;
     private final StringSerializer stringSerializer;
+    private final Factory messageFactory = new com.v2soft.styxlib.l5.messages.v9p2000.FactoryImpl();
+    private final IDataDeserializer deserializer = new StyxDeserializerImpl(messageFactory);
 
     public StyxSessionDIImpl(boolean authRequired) {
         mClientsRepo = new ClientsRepoImpl(new ClientsRepoImpl.Configuration(!authRequired));
@@ -47,5 +49,10 @@ public class StyxSessionDIImpl implements StyxSessionDI {
     @Override
     public StringSerializer getStringSerializer() {
         return stringSerializer;
+    }
+
+    @Override
+    public Factory getMessageFactory() {
+        return messageFactory;
     }
 }
