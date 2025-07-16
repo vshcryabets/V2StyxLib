@@ -6,12 +6,12 @@ import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.l5.enums.QidType;
 import com.v2soft.styxlib.l5.messages.StyxROpenMessage;
 import com.v2soft.styxlib.l5.messages.StyxRReadMessage;
-import com.v2soft.styxlib.l5.messages.StyxTVersionMessage;
+import com.v2soft.styxlib.l5.messages.base.Factory;
+import com.v2soft.styxlib.l5.messages.v9p2000.FactoryImpl;
 import com.v2soft.styxlib.l5.serialization.impl.BufferWriterImpl;
-import com.v2soft.styxlib.l5.v9p2000.StyxSerializerImpl;
 import com.v2soft.styxlib.l5.structs.StyxQID;
 import com.v2soft.styxlib.l5.structs.StyxStat;
-
+import com.v2soft.styxlib.l5.v9p2000.StyxSerializerImpl;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -19,13 +19,14 @@ import java.nio.ByteBuffer;
 import java.util.Date;
 
 public class MessageSerializerImplTest {
+    final Factory messageFactory = new FactoryImpl();
     final StyxSerializerImpl serializer = new StyxSerializerImpl();
     BufferWriterImpl outputBuffer = new BufferWriterImpl(8192);
     final ByteBuffer buffer = outputBuffer.getBuffer();
 
     @Test
     public void testTVersion() throws StyxException {
-        serializer.serialize(new StyxTVersionMessage(128, "9P2000"), outputBuffer);
+        serializer.serialize(messageFactory.constructTVersion(128, "9P2000"), outputBuffer);
         byte[] data = new byte[buffer.limit()];
         buffer.position(0);
         buffer.get(data);

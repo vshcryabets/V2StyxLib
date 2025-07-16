@@ -1,18 +1,20 @@
-package com.v2soft.styxlib.l5.serialization;
+package com.v2soft.styxlib.l5.v9p2000;
 
 import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.l5.enums.QidType;
 import com.v2soft.styxlib.l5.io.impl.BufferImpl;
 import com.v2soft.styxlib.l5.messages.StyxROpenMessage;
+import com.v2soft.styxlib.l5.messages.base.Factory;
 import com.v2soft.styxlib.l5.messages.base.StyxTMessageFID;
+import com.v2soft.styxlib.l5.messages.v9p2000.FactoryImpl;
 import com.v2soft.styxlib.l5.serialization.impl.BufferReaderImpl;
-import com.v2soft.styxlib.l5.serialization.impl.StyxDeserializerImpl;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 public class StyxDeserializerImplTest {
-    StyxDeserializerImpl deserializer = new StyxDeserializerImpl();
+    Factory messageFactory = new FactoryImpl();
+    StyxDeserializerImpl deserializer = new StyxDeserializerImpl(messageFactory);
 
     @Test
     public void testDeserializationStyxStat() throws StyxException {
@@ -52,7 +54,6 @@ public class StyxDeserializerImplTest {
         var buffer = new BufferImpl(dataBuffer.length);
         buffer.write(dataBuffer, 0, dataBuffer.length);
         var bufferReader = new BufferReaderImpl(buffer);
-        var deserializer = new StyxDeserializerImpl();
         var message = deserializer.deserializeMessage(bufferReader, 8192);
         Assertions.assertNotNull(message);
         Assertions.assertEquals(0xFF11, message.getTag());

@@ -184,7 +184,7 @@ public class Connection
             mRootFid = Constants.NOFID;
         }
         StyxMessage rMessage = mConfiguration.transmitter.sendMessage(
-                new StyxTVersionMessage(mDetails.ioUnit(), getProtocol()),
+                mConfiguration.di.getMessageFactory().constructTVersion(mDetails.ioUnit(), getProtocol()),
                 mClientId,
                 mTimeout).getResult();
         StyxRVersionMessage rVersion = (StyxRVersionMessage) rMessage;
@@ -201,7 +201,8 @@ public class Connection
         if (!credentials.getUserName().isEmpty() && !credentials.getPassword().isEmpty()) {
             mAuthFID = mConfiguration.di.getClientsRepo().getFidPoll(mClientId).getFreeItem();
 
-            StyxTAuthMessage tAuth = new StyxTAuthMessage(mAuthFID, mConfiguration.credentials.getUserName(), getMountPoint());
+            StyxMessage tAuth = mConfiguration.di.getMessageFactory().constructTAuth(mAuthFID,
+                    mConfiguration.credentials.getUserName(), getMountPoint());
             StyxMessage rMessage = mConfiguration.transmitter.sendMessage(tAuth, mClientId, mTimeout).getResult();
             StyxRAuthMessage rAuth = (StyxRAuthMessage) rMessage;
             mAuthQID = rAuth.getQID();
@@ -214,7 +215,7 @@ public class Connection
         }
 
         mRootFid = mConfiguration.di.getClientsRepo().getFidPoll(mClientId).getFreeItem();
-        StyxTAttachMessage tAttach = new StyxTAttachMessage(mRootFid, getAuthFID(),
+        StyxMessage tAttach = mConfiguration.di.getMessageFactory().constructTAttach(mRootFid, getAuthFID(),
                 mConfiguration.credentials.getUserName(),
                 getMountPoint());
         var rAttach = (StyxRAttachMessage)mConfiguration.transmitter.sendMessage(tAttach, mClientId, mTimeout)

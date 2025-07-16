@@ -1,6 +1,5 @@
 package com.v2soft.styxlib.server.tcp;
 
-import com.v2soft.styxlib.Logger;
 import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.l5.enums.Checks;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
@@ -157,7 +156,7 @@ public abstract class TCPChannelDriver implements
             if (inBuffer >= packetSize) {
                 var message = mInitConfiguration.di.getDataDeserializer().deserializeMessage(client.getInputReader(),
                         mInitConfiguration.iounit);
-                if (Checks.isTMessage(message.type)) {
+                if (Checks.isTMessage(message.getType())) {
                     mStartConfiguration.getTProcessor().onClientMessage(message, clientId);
                 } else {
                     mStartConfiguration.getRProcessor().onClientMessage(message, clientId);

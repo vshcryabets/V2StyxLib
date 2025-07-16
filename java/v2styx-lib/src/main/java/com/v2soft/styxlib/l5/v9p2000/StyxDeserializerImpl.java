@@ -1,10 +1,12 @@
-package com.v2soft.styxlib.l5.serialization.impl;
+package com.v2soft.styxlib.l5.v9p2000;
 
 import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.l5.messages.*;
+import com.v2soft.styxlib.l5.messages.base.Factory;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
 import com.v2soft.styxlib.l5.messages.base.StyxTMessageFID;
+import com.v2soft.styxlib.l5.messages.v9p2000.BaseMessage;
 import com.v2soft.styxlib.l5.serialization.IBufferReader;
 import com.v2soft.styxlib.l5.serialization.IDataDeserializer;
 import com.v2soft.styxlib.l5.structs.StyxQID;
@@ -15,6 +17,12 @@ import java.util.Date;
 import java.util.LinkedList;
 
 public class StyxDeserializerImpl implements IDataDeserializer {
+    public final Factory messageFactory;
+
+    public StyxDeserializerImpl(Factory messageFactory) {
+        this.messageFactory = messageFactory;
+    }
+
     @Override
     public StyxMessage deserializeMessage(IBufferReader buffer, int io_unit) throws StyxException {
         // get common packet data
@@ -27,14 +35,14 @@ public class StyxDeserializerImpl implements IDataDeserializer {
         // load other data
         StyxMessage result = null;
         switch (typeId) {
-            case MessageType.Tversion -> result = new StyxTVersionMessage(buffer.readUInt32(), buffer.readUTFString());
+            case MessageType.Tversion -> result = messageFactory.constructTVersion(buffer.readUInt32(), buffer.readUTFString());
             case MessageType.Rversion -> result = new StyxRVersionMessage(buffer.readUInt32(), buffer.readUTFString());
-            case MessageType.Tauth -> result = new StyxTAuthMessage(
+            case MessageType.Tauth -> result = messageFactory.constructTAuth(
                     buffer.readUInt32(),
                     buffer.readUTFString(),
                     buffer.readUTFString());
             case MessageType.Tflush -> result = new StyxTFlushMessage(buffer.readUInt16());
-            case MessageType.Tattach -> result = new StyxTAttachMessage(buffer.readUInt32(),
+            case MessageType.Tattach -> result = messageFactory.constructTAttach(buffer.readUInt32(),
                     buffer.readUInt32(),
                     buffer.readUTFString(),
                     buffer.readUTFString());
@@ -52,7 +60,7 @@ public class StyxDeserializerImpl implements IDataDeserializer {
             }
             case MessageType.Rauth -> result = new StyxRAuthMessage(tag, deserializeQid(buffer));
             case MessageType.Rerror -> result = new StyxRErrorMessage(tag, buffer.readUTFString());
-            case MessageType.Rflush -> result = new StyxMessage(MessageType.Rflush, tag);
+            case MessageType.Rflush -> result = new BaseMessage(MessageType.Rflush, tag, null);
             case MessageType.Rattach -> result = new StyxRAttachMessage(tag, deserializeQid(buffer));
             case MessageType.Rwalk -> {
                 var count = buffer.readUInt16();
@@ -106,10 +114,10 @@ public class StyxDeserializerImpl implements IDataDeserializer {
                     MessageType.Tclunk,
                     MessageType.Rclunk,
                     buffer.readUInt32());
-            case MessageType.Rclunk -> result = new StyxMessage(MessageType.Rclunk, tag);
+            case MessageType.Rclunk -> result = new BaseMessage(MessageType.Rclunk, tag, null);
             case MessageType.Tremove -> result = new StyxTMessageFID(MessageType.Tremove, MessageType.Rremove,
                     buffer.readUInt32());
-            case MessageType.Rremove -> result = new StyxMessage(MessageType.Rremove, tag);
+            case MessageType.Rremove -> result = new BaseMessage(MessageType.Rremove, tag, null);
             case MessageType.Tstat -> result = new StyxTMessageFID(MessageType.Tstat, MessageType.Rstat,
                     buffer.readUInt32());
             case MessageType.Rstat -> {
@@ -122,7 +130,7 @@ public class StyxDeserializerImpl implements IDataDeserializer {
                 var stat = deserializeStat(buffer);
                 result = new StyxTWStatMessage(fid, stat);
             }
-            case MessageType.Rwstat -> result = new StyxMessage(MessageType.Rwstat, tag);
+            case MessageType.Rwstat -> result = new BaseMessage(MessageType.Rwstat, tag, null);
             default ->
                 throw new StyxException("Type is null, can't decode message ps=" +
                         packet_size + " typeId=" + typeId);

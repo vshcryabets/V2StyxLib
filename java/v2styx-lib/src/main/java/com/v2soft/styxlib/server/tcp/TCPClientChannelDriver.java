@@ -1,8 +1,6 @@
 package com.v2soft.styxlib.server.tcp;
 
-import com.v2soft.styxlib.Logger;
 import com.v2soft.styxlib.exceptions.StyxException;
-import com.v2soft.styxlib.l5.dev.Operations;
 import com.v2soft.styxlib.l5.enums.Checks;
 import com.v2soft.styxlib.l5.io.impl.BufferImpl;
 import com.v2soft.styxlib.l5.serialization.IBufferReader;
@@ -82,7 +80,7 @@ public class TCPClientChannelDriver extends TCPChannelDriver {
                             if ( buffer.remainsToRead() >= packetSize ) {
                                 var message = mInitConfiguration.di.getDataDeserializer().deserializeMessage(reader,
                                         mInitConfiguration.iounit);
-                                if ( Checks.isTMessage(message.type)) {
+                                if ( Checks.isTMessage(message.getType())) {
                                     mStartConfiguration.getTProcessor().onClientMessage(message, mServerClientDetails.getId());
                                 } else {
                                     mStartConfiguration.getRProcessor().onClientMessage(message, mServerClientDetails.getId());

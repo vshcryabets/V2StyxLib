@@ -53,7 +53,7 @@ public class RMessagesProcessor extends QueueMessagesProcessor {
         } catch (StyxException e) {
             e.printStackTrace();
         }
-        if (message.type == MessageType.Rerror) {
+        if (message.getType() == MessageType.Rerror) {
             mErrorCount++;
         }
     }

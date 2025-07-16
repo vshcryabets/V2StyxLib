@@ -8,6 +8,8 @@ import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.l5.messages.*;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
 import com.v2soft.styxlib.l5.messages.base.StyxTMessageFID;
+import com.v2soft.styxlib.l5.messages.v9p2000.BaseMessage;
+import com.v2soft.styxlib.l5.messages.v9p2000.StyxTAttachMessage;
 import com.v2soft.styxlib.l5.structs.StyxQID;
 import com.v2soft.styxlib.l6.vfs.IVirtualStyxFile;
 import com.v2soft.styxlib.library.types.ConnectionDetails;
@@ -57,7 +59,7 @@ public class TMessagesProcessor extends QueueMessagesProcessor {
         IVirtualStyxFile file;
         long fid;
         try {
-            switch (message.type) {
+            switch (message.getType()) {
                 case MessageType.Tversion:
                     answer = new StyxRVersionMessage(mConnectionDetails.ioUnit(), mConnectionDetails.protocol());
                     break;
@@ -77,7 +79,7 @@ public class TMessagesProcessor extends QueueMessagesProcessor {
                     break;
                 case MessageType.Tflush:
                     // TODO do something there
-                    answer = new StyxMessage(MessageType.Rflush, message.getTag());
+                    answer = new BaseMessage(MessageType.Rflush, message.getTag(), null);
                     break;
                 case MessageType.Twalk:
                     answer = processWalk(clientId, (StyxTWalkMessage) message);
@@ -145,7 +147,7 @@ public class TMessagesProcessor extends QueueMessagesProcessor {
     private StyxMessage processClunk(int clientId, StyxTMessageFID msg)
             throws StyxException {
         mClientsRepo.closeFile(clientId, msg.getFID());
-        return new StyxMessage(MessageType.Rclunk, msg.getTag());
+        return new BaseMessage(MessageType.Rclunk, msg.getTag(), null);
     }
 
     private StyxMessage processWalk(int clientId, StyxTWalkMessage msg) throws StyxException {
@@ -179,7 +181,7 @@ public class TMessagesProcessor extends QueueMessagesProcessor {
     private StyxMessage processRemove(int clientId, StyxTMessageFID msg)
             throws StyxException {
         if (mClientsRepo.getAssignedFile(clientId, msg.getFID()).delete(clientId)) {
-            return new StyxMessage(MessageType.Rremove, msg.getTag());
+            return new BaseMessage(MessageType.Rremove, msg.getTag(), null);
         } else {
             return new StyxRErrorMessage(msg.getTag(), "Can't delete file");
         }
@@ -194,7 +196,7 @@ public class TMessagesProcessor extends QueueMessagesProcessor {
 
     private StyxMessage processWStat(StyxTWStatMessage msg) {
         // TODO handle Twstat
-        return new StyxMessage(MessageType.Rwstat, msg.getTag());
+        return new BaseMessage(MessageType.Rwstat, msg.getTag(), null);
     }
 
     private StyxMessage processWrite(int clientId, StyxTWriteMessage msg) throws StyxException {
