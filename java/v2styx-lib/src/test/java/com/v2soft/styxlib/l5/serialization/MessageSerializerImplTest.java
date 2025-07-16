@@ -8,7 +8,7 @@ import com.v2soft.styxlib.l5.messages.StyxROpenMessage;
 import com.v2soft.styxlib.l5.messages.StyxRReadMessage;
 import com.v2soft.styxlib.l5.messages.StyxTVersionMessage;
 import com.v2soft.styxlib.l5.serialization.impl.BufferWriterImpl;
-import com.v2soft.styxlib.l5.serialization.impl.StyxSerializerImpl;
+import com.v2soft.styxlib.l5.v9p2000.StyxSerializerImpl;
 import com.v2soft.styxlib.l5.structs.StyxQID;
 import com.v2soft.styxlib.l5.structs.StyxStat;
 

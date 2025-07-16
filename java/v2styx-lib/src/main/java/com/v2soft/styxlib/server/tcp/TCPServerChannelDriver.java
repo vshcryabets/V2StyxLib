@@ -1,6 +1,7 @@
 package com.v2soft.styxlib.server.tcp;
 
 import com.v2soft.styxlib.exceptions.StyxException;
+import com.v2soft.styxlib.exceptions.StyxUnknownClientIdException;
 import com.v2soft.styxlib.utils.StyxSessionDI;
 
 import java.io.IOException;
@@ -91,6 +92,9 @@ public class TCPServerChannelDriver extends TCPChannelDriver {
                     processEventsQueue(newConnections, readable);
                     newConnections.clear();
                     readable.clear();
+                } catch (StyxUnknownClientIdException e) {
+                    e.printStackTrace();
+                    break;
                 } catch (IOException e) {
                     // this is ok
                     e.printStackTrace();

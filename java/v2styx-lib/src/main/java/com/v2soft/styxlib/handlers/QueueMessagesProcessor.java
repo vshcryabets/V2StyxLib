@@ -11,16 +11,16 @@ import java.util.concurrent.TimeUnit;
  * @author V.Shcryabets <a>vshcryabets@gmail.com</a>
  */
 public abstract class QueueMessagesProcessor implements IMessageProcessor {
-    protected LinkedBlockingQueue<Pair> mQueue;
-    protected Thread mThread;
-
-    private static class Pair {
+    public static class Pair {
         public StyxMessage mMessage;
         public int mClientId;
     }
 
+    protected LinkedBlockingQueue<Pair> mQueue;
+    protected Thread mThread;
+
     public QueueMessagesProcessor() {
-        mQueue = new LinkedBlockingQueue<Pair>();
+        mQueue = new LinkedBlockingQueue<>();
         mThread = new Thread(mRunnable, toString());
         mThread.start();
     }

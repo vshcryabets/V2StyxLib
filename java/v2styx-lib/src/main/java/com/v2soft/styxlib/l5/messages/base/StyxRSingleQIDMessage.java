@@ -1,10 +1,6 @@
 package com.v2soft.styxlib.l5.messages.base;
 
-import com.v2soft.styxlib.l5.enums.MessageType;
-import com.v2soft.styxlib.l5.serialization.IBufferReader;
 import com.v2soft.styxlib.l5.structs.StyxQID;
-
-import java.io.IOException;
 
 public class StyxRSingleQIDMessage extends StyxMessage {
     protected final StyxQID mQID;

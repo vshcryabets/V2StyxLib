@@ -13,7 +13,7 @@ import java.util.Collection;
  *
  * @author V.Shcryabets (vshcryabets@gmail.com)
  */
-public interface IChannelDriver<IC extends IChannelDriver.InitConfiguration> extends Closeable, IMessageTransmitter {
+public interface IChannelDriver<IC extends IChannelDriver.InitConfiguration> extends IMessageTransmitter {
     class InitConfiguration {
         public final int iounit;
         public final StyxSessionDI di;
