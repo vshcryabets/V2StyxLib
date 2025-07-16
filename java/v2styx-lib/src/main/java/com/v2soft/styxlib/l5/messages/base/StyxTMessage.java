@@ -6,13 +6,14 @@ import com.v2soft.styxlib.exceptions.StyxInterruptedException;
 import com.v2soft.styxlib.exceptions.StyxWrongMessageException;
 import com.v2soft.styxlib.l5.enums.Constants;
 import com.v2soft.styxlib.l5.enums.MessageType;
+import com.v2soft.styxlib.l5.messages.v9p2000.BaseMessage;
 
-public class StyxTMessage extends StyxMessage {
+public class StyxTMessage extends BaseMessage {
     private StyxMessage mAnswer;
     private final int mRequiredAnswerType;
 
     public StyxTMessage(int type, int answer) {
-        super(type, Constants.NOTAG);
+        super(type, Constants.NOTAG, null);
         mRequiredAnswerType = answer;
     }
 
@@ -35,14 +36,14 @@ public class StyxTMessage extends StyxMessage {
         }
         if ( mAnswer == null )
             throw new StyxException("Don't receive answer for "+this.toString());
-        if (mAnswer.type == MessageType.Rerror) {
+        if (mAnswer.getType() == MessageType.Rerror) {
             StyxErrorMessageException.doException(mAnswer, null);
         }
         return mAnswer;
     }
 
     protected boolean checkAnswer(StyxMessage answer) {
-        final int received = answer.type;
+        final int received = answer.getType();
         return (mRequiredAnswerType == received || received == MessageType.Rerror);
     }
 }

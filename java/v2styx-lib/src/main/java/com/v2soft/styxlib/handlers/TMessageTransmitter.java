@@ -34,7 +34,7 @@ public class TMessageTransmitter implements IMessageTransmitter {
             long timeout
             )
             throws StyxException {
-        if ( !Checks.isTMessage(message.type)) {
+        if ( !Checks.isTMessage(message.getType())) {
             throw new StyxException("Can't sent RMessage");
         }
         if (clientId < 0) {
@@ -46,7 +46,7 @@ public class TMessageTransmitter implements IMessageTransmitter {
 
         // set message tag
         int tag = Constants.NOTAG;
-        if (message.type != MessageType.Tversion) {
+        if (message.getType() != MessageType.Tversion) {
             tag = mClientsRepo.getPolls(clientId).getTagPoll().getFreeItem();
         }
         message.setTag((short) tag);

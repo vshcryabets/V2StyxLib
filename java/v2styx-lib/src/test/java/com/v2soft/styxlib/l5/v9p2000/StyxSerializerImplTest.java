@@ -4,8 +4,8 @@ import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.l5.enums.QidType;
 import com.v2soft.styxlib.l5.messages.*;
-import com.v2soft.styxlib.l5.messages.base.StyxRSingleQIDMessage;
 import com.v2soft.styxlib.l5.messages.base.StyxTMessageFID;
+import com.v2soft.styxlib.l5.messages.v9p2000.BaseMessage;
 import com.v2soft.styxlib.l5.serialization.IDataSerializer;
 import com.v2soft.styxlib.l5.serialization.impl.BufferWriterImpl;
 import com.v2soft.styxlib.l5.structs.StyxQID;
@@ -40,7 +40,7 @@ class StyxSerializerImplTest {
                         "mountpoint")));
 
         assertEquals(IDataSerializer.BASE_BINARY_SIZE + serializer.getQidSize(),
-                serializer.getMessageSize(new StyxRSingleQIDMessage(
+                serializer.getMessageSize(new BaseMessage(
                         MessageType.Unspecified,
                         0x10,
                         new StyxQID(QidType.QTFILE, 1, 2))));

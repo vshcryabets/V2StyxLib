@@ -1,4 +1,4 @@
-package com.v2soft.styxlib.l5.serialization;
+package com.v2soft.styxlib.l5.v9p2000;
 
 import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.l5.enums.MessageType;
@@ -7,7 +7,6 @@ import com.v2soft.styxlib.l5.io.impl.BufferImpl;
 import com.v2soft.styxlib.l5.messages.StyxROpenMessage;
 import com.v2soft.styxlib.l5.messages.base.StyxTMessageFID;
 import com.v2soft.styxlib.l5.serialization.impl.BufferReaderImpl;
-import com.v2soft.styxlib.l5.serialization.impl.StyxDeserializerImpl;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

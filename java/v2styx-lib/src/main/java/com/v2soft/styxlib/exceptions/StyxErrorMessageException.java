@@ -27,7 +27,7 @@ public class StyxErrorMessageException extends StyxException {
             throws StyxErrorMessageException {
         if (rMessage == null)
             throw new NullPointerException();
-        if (rMessage.type != MessageType.Rerror)
+        if (rMessage.getType() != MessageType.Rerror)
             return;
 
         StyxRErrorMessage rError = (StyxRErrorMessage) rMessage;

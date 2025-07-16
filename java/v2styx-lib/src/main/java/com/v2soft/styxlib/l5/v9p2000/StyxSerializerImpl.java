@@ -5,8 +5,8 @@ import com.v2soft.styxlib.l5.enums.Checks;
 import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.l5.messages.*;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
-import com.v2soft.styxlib.l5.messages.base.StyxRSingleQIDMessage;
 import com.v2soft.styxlib.l5.messages.base.StyxTMessageFID;
+import com.v2soft.styxlib.l5.messages.v9p2000.BaseMessage;
 import com.v2soft.styxlib.l5.serialization.IBufferWriter;
 import com.v2soft.styxlib.l5.serialization.IDataSerializer;
 import com.v2soft.styxlib.l5.serialization.UTF;
@@ -26,10 +26,10 @@ public class StyxSerializerImpl implements IDataSerializer {
         if (message instanceof StyxTMessageFID) {
             size += 4;
         }
-        if (message instanceof StyxRSingleQIDMessage) {
+        if (message instanceof BaseMessage && ((BaseMessage) message).mQID != null) {
             size += getQidSize();
         }
-        switch (message.type) {
+        switch (message.getType()) {
             case MessageType.Rerror -> size += UTF.getUTFSize(((StyxRErrorMessage)message).mError);
             case MessageType.Tattach -> {
                 var attachMessage = (StyxTAttachMessage)message;
@@ -76,9 +76,9 @@ public class StyxSerializerImpl implements IDataSerializer {
         int packetSize = getMessageSize(message);
         output.prepareBuffer(packetSize);
         output.writeUInt32(packetSize);
-        output.writeUInt8((short) message.type);
+        output.writeUInt8((short) message.getType());
         output.writeUInt16(message.getTag());
-        if (Checks.isTMessage(message.type)) {
+        if (Checks.isTMessage(message.getType())) {
             serializeTMessage(message, output);
         } else {
             serializeRMessage(message, output);
@@ -90,7 +90,7 @@ public class StyxSerializerImpl implements IDataSerializer {
             StyxTMessageFID msg = (StyxTMessageFID) message;
             output.writeUInt32(msg.getFID());
         }
-        switch (message.type) {
+        switch (message.getType()) {
             case MessageType.Tversion:
                 StyxTVersionMessage tVersionMessage = (StyxTVersionMessage) message;
                 output.writeUInt32(tVersionMessage.maxPacketSize);
@@ -153,11 +153,10 @@ public class StyxSerializerImpl implements IDataSerializer {
     }
 
     private void serializeRMessage(StyxMessage message, IBufferWriter output) throws StyxException {
-        if (message instanceof StyxRSingleQIDMessage) {
-            StyxRSingleQIDMessage msg = (StyxRSingleQIDMessage) message;
-            serializeQid(msg.getQID(), output);
+        if (message instanceof BaseMessage && ((BaseMessage) message).mQID != null) {
+            serializeQid(((BaseMessage) message).mQID, output);
         }
-        switch (message.type) {
+        switch (message.getType()) {
             case MessageType.Rerror:
                 output.writeUTFString(((StyxRErrorMessage)message).mError);
                 break;

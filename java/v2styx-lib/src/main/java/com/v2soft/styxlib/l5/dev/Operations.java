@@ -27,7 +27,7 @@ public class Operations {
     public static String toString(StyxMessage message) {
         StringBuilder result = new StringBuilder();
         result.append("Message Type: ");
-        result.append(message.type);
+        result.append(message.getType());
         result.append(" Tag: ");
         result.append(message.getTag());
 
@@ -37,7 +37,7 @@ public class Operations {
             result.append(fidMessage.getFID());
         }
 
-        switch (message.type) {
+        switch (message.getType()) {
             case MessageType.Twstat: {
                 result.append(" Stat: ");
                 result.append(((StyxTWStatMessage) message).stat.toString());
