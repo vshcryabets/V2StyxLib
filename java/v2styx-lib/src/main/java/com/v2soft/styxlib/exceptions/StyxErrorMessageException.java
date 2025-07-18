@@ -12,6 +12,6 @@ public class StyxErrorMessageException extends StyxException {
         return new StyxErrorMessageException(message, null);
     }
     private StyxErrorMessageException(String message, String fileName) {
-        super(String.format("%s %s", message, fileName));
+        super(String.format("%s %s", message, fileName == null ? "[No File]" : fileName));
     }
 }
