@@ -12,8 +12,9 @@ import com.v2soft.styxlib.l5.enums.ModeType;
 import com.v2soft.styxlib.l5.messages.*;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
 import com.v2soft.styxlib.l5.messages.base.StyxTMessageFID;
-import com.v2soft.styxlib.l5.v9p2000.StyxSerializerImpl;
+import com.v2soft.styxlib.l5.messages.v9p2000.StyxRErrorMessage;
 import com.v2soft.styxlib.l5.structs.StyxStat;
+import com.v2soft.styxlib.l5.v9p2000.StyxSerializerImpl;
 import com.v2soft.styxlib.l6.io.StyxFileBufferedInputStream;
 import com.v2soft.styxlib.l6.io.StyxUnbufferedInputStream;
 import com.v2soft.styxlib.l6.io.StyxUnbufferedOutputStream;
@@ -317,7 +318,8 @@ public class StyxFile {
                 newFID, StyxSerializerImpl.splitPath(path));
         final var feature = mTransmitter.sendMessage(tWalk, mClientId, mTimeout);
         final StyxMessage rWalk = feature.getResult();
-        StyxErrorMessageException.doException(rWalk, mPath);
+        if (rWalk.getType() == MessageType.Rerror)
+            throw StyxErrorMessageException.newInstance(((StyxRErrorMessage) rWalk).mError + " at " + mPath);
         if (((StyxRWalkMessage) rWalk).qidList.size() != tWalk.getPathLength())
             throw new StyxException("File not found " + mPath);
         return newFID;

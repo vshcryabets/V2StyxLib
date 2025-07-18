@@ -46,7 +46,7 @@ public class StyxServerManager
     public StyxServerManager(Configuration configuration) {
         mConfiguration = configuration;
         var details = new ConnectionDetails(getProtocol(), getIOUnit());
-        mBalancer = new TMessagesProcessor(details, configuration.root, configuration.di.getClientsRepo());
+        mBalancer = new TMessagesProcessor(details, configuration.root, configuration.di);
     }
 
     public void start() throws StyxException {

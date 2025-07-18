@@ -7,6 +7,7 @@ import com.v2soft.styxlib.exceptions.StyxWrongMessageException;
 import com.v2soft.styxlib.l5.enums.Constants;
 import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.l5.messages.v9p2000.BaseMessage;
+import com.v2soft.styxlib.l5.messages.v9p2000.StyxRErrorMessage;
 
 public class StyxTMessage extends BaseMessage {
     private StyxMessage mAnswer;
@@ -37,7 +38,8 @@ public class StyxTMessage extends BaseMessage {
         if ( mAnswer == null )
             throw new StyxException("Don't receive answer for "+this.toString());
         if (mAnswer.getType() == MessageType.Rerror) {
-            StyxErrorMessageException.doException(mAnswer, null);
+            StyxRErrorMessage errorMessage = (StyxRErrorMessage) mAnswer;
+            throw StyxErrorMessageException.newInstance(errorMessage.mError);
         }
         return mAnswer;
     }

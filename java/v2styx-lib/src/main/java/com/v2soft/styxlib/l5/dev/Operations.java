@@ -2,7 +2,8 @@ package com.v2soft.styxlib.l5.dev;
 
 import com.v2soft.styxlib.Logger;
 import com.v2soft.styxlib.l5.enums.MessageType;
-import com.v2soft.styxlib.l5.messages.StyxTAuthMessage;
+import com.v2soft.styxlib.l5.messages.v9p2000.StyxRErrorMessage;
+import com.v2soft.styxlib.l5.messages.v9p2000.StyxTAuthMessage;
 import com.v2soft.styxlib.l5.messages.v9p2000.StyxTAttachMessage;
 import com.v2soft.styxlib.l5.messages.v9p2000.StyxTVersionMessage;
 import com.v2soft.styxlib.l5.messages.StyxTWStatMessage;
@@ -40,6 +41,10 @@ public class Operations {
         }
 
         switch (message.getType()) {
+            case MessageType.Rerror:
+                result.append(" Error:");
+                result.append(((StyxRErrorMessage)message).mError);
+                break;
             case MessageType.Twstat: {
                 result.append(" Stat: ");
                 result.append(((StyxTWStatMessage) message).stat.toString());

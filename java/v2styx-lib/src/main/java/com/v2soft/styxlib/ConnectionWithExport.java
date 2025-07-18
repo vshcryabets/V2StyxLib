@@ -38,7 +38,7 @@ public class ConnectionWithExport extends Connection {
         mConfiguration.requestProcessor = new TMessagesProcessor(
                 getConnectionDetails(),
                 mExportedRoot,
-                mConfiguration.di.getClientsRepo());
+                mConfiguration.di);
         return super.connect();
     }
 
