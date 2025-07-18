@@ -28,7 +28,7 @@ class StyxSerializerImplTest {
     @Test
     void testGetSize() {
         assertEquals(IDataSerializer.BASE_BINARY_SIZE + 2 + 2,
-                serializer.getMessageSize(new StyxRErrorMessage(0, "AB")));
+                serializer.getMessageSize(messageFactory.constructRerror(0, "AB")));
 
         assertEquals(IDataSerializer.BASE_BINARY_SIZE + 4,
                 serializer.getMessageSize(new StyxTMessageFID(MessageType.Unspecified,

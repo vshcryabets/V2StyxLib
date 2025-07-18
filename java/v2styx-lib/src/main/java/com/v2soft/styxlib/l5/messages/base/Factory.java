@@ -4,4 +4,5 @@ public interface Factory {
     StyxMessage constructTVersion(long iounit, String version);
     StyxMessage constructTAuth(long fid, String userName, String mountPoint);
     StyxMessage constructTAttach(long fid, long afid, String userName, String mountPoint);
+    StyxMessage constructRerror(int tag, String error);
 }

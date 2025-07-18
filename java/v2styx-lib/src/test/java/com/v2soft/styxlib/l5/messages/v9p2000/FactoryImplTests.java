@@ -1,6 +1,5 @@
 package com.v2soft.styxlib.l5.messages.v9p2000;
 
-import com.v2soft.styxlib.l5.messages.StyxTAuthMessage;
 import com.v2soft.styxlib.l5.messages.base.Factory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -33,5 +32,14 @@ public class FactoryImplTests {
         Assertions.assertEquals(2, ((StyxTAttachMessage) message).authFID);
         Assertions.assertEquals("user", ((StyxTAttachMessage) message).userName);
         Assertions.assertEquals("test", ((StyxTAttachMessage) message).mountPoint);
+    }
+
+    @Test
+    public void testCreateRerror() {
+        var message = factory.constructRerror(1, "Test error");
+        Assertions.assertNotNull(message);
+        Assertions.assertEquals(1, message.getTag());
+        Assertions.assertTrue(message instanceof StyxRErrorMessage);
+        Assertions.assertEquals("Test error", ((StyxRErrorMessage) message).mError);
     }
 }

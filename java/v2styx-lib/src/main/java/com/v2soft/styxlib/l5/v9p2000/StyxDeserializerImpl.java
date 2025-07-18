@@ -1,6 +1,7 @@
 package com.v2soft.styxlib.l5.v9p2000;
 
 import com.v2soft.styxlib.exceptions.StyxException;
+import com.v2soft.styxlib.l5.dev.MetricsAndStats;
 import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.l5.messages.*;
 import com.v2soft.styxlib.l5.messages.base.Factory;
@@ -11,7 +12,6 @@ import com.v2soft.styxlib.l5.serialization.IBufferReader;
 import com.v2soft.styxlib.l5.serialization.IDataDeserializer;
 import com.v2soft.styxlib.l5.structs.StyxQID;
 import com.v2soft.styxlib.l5.structs.StyxStat;
-import com.v2soft.styxlib.l5.dev.MetricsAndStats;
 
 import java.util.Date;
 import java.util.LinkedList;
@@ -59,7 +59,7 @@ public class StyxDeserializerImpl implements IDataDeserializer {
                         pathElements);
             }
             case MessageType.Rauth -> result = new StyxRAuthMessage(tag, deserializeQid(buffer));
-            case MessageType.Rerror -> result = new StyxRErrorMessage(tag, buffer.readUTFString());
+            case MessageType.Rerror -> result = messageFactory.constructRerror(tag, buffer.readUTFString());
             case MessageType.Rflush -> result = new BaseMessage(MessageType.Rflush, tag, null);
             case MessageType.Rattach -> result = new StyxRAttachMessage(tag, deserializeQid(buffer));
             case MessageType.Rwalk -> {
