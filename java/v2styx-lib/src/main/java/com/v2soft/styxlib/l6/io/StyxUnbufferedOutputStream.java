@@ -38,7 +38,7 @@ public class StyxUnbufferedOutputStream extends OutputStream {
         if ( recipient < 0 ) {
             throw new NullPointerException("recipient negative");
         }
-        getMessagesFactoryUseCase = getMessagesFactoryUseCase;
+        this.getMessagesFactoryUseCase = getMessagesFactoryUseCase;
         mSingleByteArray = new byte[1];
         MetricsAndStats.byteArrayAllocation++;
         mRecipient = recipient;
