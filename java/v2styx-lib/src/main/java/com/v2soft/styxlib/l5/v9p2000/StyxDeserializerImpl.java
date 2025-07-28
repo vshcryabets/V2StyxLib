@@ -70,7 +70,7 @@ public class StyxDeserializerImpl implements IDataDeserializer {
             case MessageType.Rauth -> result = messageFactory.constructRAuthMessage(tag, deserializeQid(buffer));
             case MessageType.Rerror -> result = messageFactory.constructRerror(tag, buffer.readUTFString());
             case MessageType.Rflush -> result = new BaseMessage(MessageType.Rflush, tag, null);
-            case MessageType.Rattach -> result =messageFactory.constructRAttachMessage(tag, deserializeQid(buffer));
+            case MessageType.Rattach -> result = messageFactory.constructRAttachMessage(tag, deserializeQid(buffer));
             case MessageType.Rwalk -> {
                 var count = buffer.readUInt16();
                 var qids = new LinkedList<StyxQID>();
