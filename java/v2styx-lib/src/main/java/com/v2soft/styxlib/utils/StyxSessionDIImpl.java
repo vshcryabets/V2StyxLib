@@ -47,6 +47,11 @@ public class StyxSessionDIImpl implements StyxSessionDI {
     }
 
     @Override
+    public GetMessagesFactoryUseCase getGetMessagesFactoryUseCase() {
+        return () -> messageFactory;
+    }
+
+    @Override
     public StringSerializer getStringSerializer() {
         return stringSerializer;
     }

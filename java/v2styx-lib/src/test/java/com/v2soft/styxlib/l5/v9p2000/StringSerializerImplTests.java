@@ -110,4 +110,16 @@ public class StringSerializerImplTests {
         Assertions.assertTrue(str.contains("QID {type: 0, version: 0, path: 0}"));
         Assertions.assertTrue(str.contains("Tag:123"));
     }
+
+    @Test
+    public void testSerializeTWrite() {
+        var message = messageFactory.constructTWriteMessage(1080, 23432,
+                new byte[]{0x01, 0x02, 0x03}, 0, 3);
+        message.setTag(123);
+        var str = serializer.serializeMessage(message);
+        Assertions.assertTrue(str.contains("Message Type:118"));
+        Assertions.assertTrue(str.contains("fileOffset:23432"));
+        Assertions.assertTrue(str.contains("dataLength:3"));
+        Assertions.assertTrue(str.contains("Tag:123"));
+    }
 }

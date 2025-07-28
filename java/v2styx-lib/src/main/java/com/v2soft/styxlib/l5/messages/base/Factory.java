@@ -12,4 +12,5 @@ public interface Factory {
     StyxMessage constructRAuthMessage(int tag, StyxQID qid);
     StyxMessage constructROpenMessage(int tag, StyxQID qid, long iounit);
     StyxMessage constructRCreateMessage(int tag, StyxQID qid, long iounit);
+    StyxMessage constructTWriteMessage(long fid, long fileOffset, byte[] data, int dataOffset, int dataLength);
 }

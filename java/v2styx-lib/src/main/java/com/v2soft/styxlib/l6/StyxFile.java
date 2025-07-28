@@ -148,7 +148,8 @@ public class StyxFile {
         return new StyxUnbufferedOutputStream(clonedFID,
                 mTransmitter,
                 mClientId,
-                open(ModeType.OWRITE, clonedFID)
+                open(ModeType.OWRITE, clonedFID),
+                mDI.getGetMessagesFactoryUseCase()
         );
     }
 

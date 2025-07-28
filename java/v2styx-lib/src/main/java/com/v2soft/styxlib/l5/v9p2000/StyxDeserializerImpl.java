@@ -13,7 +13,6 @@ import com.v2soft.styxlib.l5.messages.StyxTOpenMessage;
 import com.v2soft.styxlib.l5.messages.StyxTReadMessage;
 import com.v2soft.styxlib.l5.messages.StyxTWStatMessage;
 import com.v2soft.styxlib.l5.messages.StyxTWalkMessage;
-import com.v2soft.styxlib.l5.messages.StyxTWriteMessage;
 import com.v2soft.styxlib.l5.messages.base.Factory;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
 import com.v2soft.styxlib.l5.messages.base.StyxTMessageFID;
@@ -113,7 +112,7 @@ public class StyxDeserializerImpl implements IDataDeserializer {
                 var data = new byte[dataLength];
                 MetricsAndStats.byteArrayAllocationTWrite++;
                 buffer.readData(data, 0, dataLength);
-                result = new StyxTWriteMessage(fid,
+                result = messageFactory.constructTWriteMessage(fid,
                         offset,
                         data,
                         0,

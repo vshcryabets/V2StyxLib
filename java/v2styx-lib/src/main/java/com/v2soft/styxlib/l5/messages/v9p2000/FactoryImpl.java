@@ -49,4 +49,9 @@ public class FactoryImpl implements Factory  {
     public StyxMessage constructRCreateMessage(int tag, StyxQID qid, long iounit) {
         return new StyxROpenMessage(tag, qid, iounit, true);
     }
+
+    @Override
+    public StyxMessage constructTWriteMessage(long fid, long fileOffset, byte[] data, int dataOffset, int dataLength) {
+        return new StyxTWriteMessage(fid, fileOffset, data, dataOffset, dataLength);
+    }
 }

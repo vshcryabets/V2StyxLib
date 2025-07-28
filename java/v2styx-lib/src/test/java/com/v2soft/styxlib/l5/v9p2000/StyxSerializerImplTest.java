@@ -16,7 +16,6 @@ import com.v2soft.styxlib.l5.messages.StyxTOpenMessage;
 import com.v2soft.styxlib.l5.messages.StyxTReadMessage;
 import com.v2soft.styxlib.l5.messages.StyxTWStatMessage;
 import com.v2soft.styxlib.l5.messages.StyxTWalkMessage;
-import com.v2soft.styxlib.l5.messages.StyxTWriteMessage;
 import com.v2soft.styxlib.l5.messages.base.Factory;
 import com.v2soft.styxlib.l5.messages.base.StyxTMessageFID;
 import com.v2soft.styxlib.l5.messages.v9p2000.BaseMessage;
@@ -108,7 +107,7 @@ class StyxSerializerImplTest {
                         )));
 
         assertEquals(IDataSerializer.BASE_BINARY_SIZE + 4 + 8 + 4 + 4,
-                serializer.getMessageSize(new StyxTWriteMessage(0x1234, 0x3333,
+                serializer.getMessageSize(messageFactory.constructTWriteMessage(0x1234, 0x3333,
                         new byte[]{0x1, 0x2, 0x3, 0x4},
                         0,
                         4
