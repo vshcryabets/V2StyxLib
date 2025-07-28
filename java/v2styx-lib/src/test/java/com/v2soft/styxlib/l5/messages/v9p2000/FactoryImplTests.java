@@ -1,6 +1,7 @@
 package com.v2soft.styxlib.l5.messages.v9p2000;
 
 import com.v2soft.styxlib.l5.messages.base.Factory;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -41,5 +42,13 @@ public class FactoryImplTests {
         Assertions.assertEquals(1, message.getTag());
         Assertions.assertTrue(message instanceof StyxRErrorMessage);
         Assertions.assertEquals("Test error", ((StyxRErrorMessage) message).mError);
+    }
+
+    @Test
+    public void testCreateRVersion() {
+        var message = factory.constructRVersion(16384, "9P2000");
+        Assertions.assertNotNull(message);
+        Assertions.assertEquals(16384, ((StyxRVersionMessage) message).maxPacketSize);
+        Assertions.assertEquals("9P2000", ((StyxRVersionMessage) message).protocolVersion);
     }
 }

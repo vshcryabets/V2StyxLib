@@ -23,4 +23,9 @@ public class FactoryImpl implements Factory  {
     public StyxMessage constructRerror(int tag, String error) {
         return new StyxRErrorMessage(tag, error);
     }
+
+    @Override
+    public StyxMessage constructRVersion(long maxPacketSize, String protocolVersion) {
+        return new StyxRVersionMessage(maxPacketSize, protocolVersion);
+    }
 }

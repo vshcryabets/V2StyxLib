@@ -5,4 +5,5 @@ public interface Factory {
     StyxMessage constructTAuth(long fid, String userName, String mountPoint);
     StyxMessage constructTAttach(long fid, long afid, String userName, String mountPoint);
     StyxMessage constructRerror(int tag, String error);
+    StyxMessage constructRVersion(long maxPacketSize, String protocolVersion);
 }

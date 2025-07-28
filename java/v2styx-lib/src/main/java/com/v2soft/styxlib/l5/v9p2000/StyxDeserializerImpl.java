@@ -36,7 +36,7 @@ public class StyxDeserializerImpl implements IDataDeserializer {
         StyxMessage result = null;
         switch (typeId) {
             case MessageType.Tversion -> result = messageFactory.constructTVersion(buffer.readUInt32(), buffer.readUTFString());
-            case MessageType.Rversion -> result = new StyxRVersionMessage(buffer.readUInt32(), buffer.readUTFString());
+            case MessageType.Rversion -> result = messageFactory.constructRVersion(buffer.readUInt32(), buffer.readUTFString());
             case MessageType.Tauth -> result = messageFactory.constructTAuth(
                     buffer.readUInt32(),
                     buffer.readUTFString(),
