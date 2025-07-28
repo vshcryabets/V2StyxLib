@@ -1,6 +1,8 @@
 package com.v2soft.styxlib.l5.v9p2000;
 
 import com.v2soft.styxlib.exceptions.StyxException;
+import com.v2soft.styxlib.l5.messages.base.Factory;
+import com.v2soft.styxlib.l5.messages.v9p2000.FactoryImpl;
 import com.v2soft.styxlib.l5.structs.StyxQID;
 import com.v2soft.styxlib.l5.structs.StyxStat;
 
@@ -12,6 +14,7 @@ import java.util.TimeZone;
 
 public class StringSerializerImplTests {
     StringSerializerImpl serializer = new StringSerializerImpl();
+    Factory messageFactory = new FactoryImpl();
 
     @Test
     public void testSerializeQid() throws StyxException {
@@ -42,5 +45,58 @@ public class StringSerializerImplTests {
                         "atime=2001-06-04T12:30:23Z,mtime=2001-06-04T12:30:23Z," +
                         "length=123,name=testName,user=testUser,group=testGroup,modUser=testModUser",
                 serializer.serializeStat(stat));
+    }
+
+    @Test
+    public void testSerializeRVersion() {
+        var message = messageFactory.constructRVersion(1080, "9P2000.L");
+        message.setTag(123);
+        var str = serializer.serializeMessage(message);
+        Assertions.assertTrue(str.contains("Message Type:101"));
+        Assertions.assertTrue(str.contains("MaxPacketSize:1080"));
+        Assertions.assertTrue(str.contains("ProtocolVersion:9P2000.L"));
+        Assertions.assertTrue(str.contains("Tag:123"));
+    }
+
+    @Test
+    public void testSerializeRAttach() {
+        var message = messageFactory.constructRAttachMessage(1080, StyxQID.EMPTY);
+        message.setTag(123);
+        var str = serializer.serializeMessage(message);
+        Assertions.assertTrue(str.contains("Message Type:105"));
+        Assertions.assertTrue(str.contains("QID {type: 0, version: 0, path: 0}"));
+        Assertions.assertTrue(str.contains("Tag:123"));
+    }
+
+    @Test
+    public void testSerializeRAuth() {
+        var message = messageFactory.constructRAuthMessage(1080, StyxQID.EMPTY);
+        message.setTag(123);
+        var str = serializer.serializeMessage(message);
+        Assertions.assertTrue(str.contains("Message Type:103"));
+        Assertions.assertTrue(str.contains("QID {type: 0, version: 0, path: 0}"));
+        Assertions.assertTrue(str.contains("Tag:123"));
+    }
+
+    @Test
+    public void testSerializeRCreate() {
+        var message = messageFactory.constructRCreateMessage(1080, StyxQID.EMPTY, 46243);
+        message.setTag(123);
+        var str = serializer.serializeMessage(message);
+        Assertions.assertTrue(str.contains("Message Type:115"));
+        Assertions.assertTrue(str.contains("iounit:46243"));
+        Assertions.assertTrue(str.contains("QID {type: 0, version: 0, path: 0}"));
+        Assertions.assertTrue(str.contains("Tag:123"));
+    }
+
+    @Test
+    public void testSerializeROpen() {
+        var message = messageFactory.constructROpenMessage(1080, StyxQID.EMPTY, 46243);
+        message.setTag(123);
+        var str = serializer.serializeMessage(message);
+        Assertions.assertTrue(str.contains("Message Type:113"));
+        Assertions.assertTrue(str.contains("iounit:46243"));
+        Assertions.assertTrue(str.contains("QID {type: 0, version: 0, path: 0}"));
+        Assertions.assertTrue(str.contains("Tag:123"));
     }
 }

@@ -2,6 +2,7 @@ package com.v2soft.styxlib.l5.messages.v9p2000;
 
 import com.v2soft.styxlib.l5.messages.base.Factory;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
+import com.v2soft.styxlib.l5.structs.StyxQID;
 
 public class FactoryImpl implements Factory  {
     @Override
@@ -27,5 +28,25 @@ public class FactoryImpl implements Factory  {
     @Override
     public StyxMessage constructRVersion(long maxPacketSize, String protocolVersion) {
         return new StyxRVersionMessage(maxPacketSize, protocolVersion);
+    }
+
+    @Override
+    public StyxMessage constructRAttachMessage(int tag, StyxQID qid) {
+        return new StyxRAttachMessage(tag, qid);
+    }
+
+    @Override
+    public StyxMessage constructRAuthMessage(int tag, StyxQID qid) {
+        return new StyxRAuthMessage(tag, qid);
+    }
+
+    @Override
+    public StyxMessage constructROpenMessage(int tag, StyxQID qid, long iounit) {
+        return new StyxROpenMessage(tag, qid, iounit, false);
+    }
+
+    @Override
+    public StyxMessage constructRCreateMessage(int tag, StyxQID qid, long iounit) {
+        return new StyxROpenMessage(tag, qid, iounit, true);
     }
 }

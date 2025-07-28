@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.l5.enums.QidType;
-import com.v2soft.styxlib.l5.messages.StyxROpenMessage;
 import com.v2soft.styxlib.l5.messages.StyxRReadMessage;
 import com.v2soft.styxlib.l5.messages.StyxRStatMessage;
 import com.v2soft.styxlib.l5.messages.StyxRWalkMessage;
@@ -134,10 +133,10 @@ class StyxSerializerImplTest {
                 serializer.getMessageSize(messageFactory.constructTVersion(0x1111, "ABCD")));
 
         assertEquals(IDataSerializer.BASE_BINARY_SIZE + serializer.getQidSize() + 4,
-                serializer.getMessageSize(new StyxROpenMessage(0x1111, StyxQID.EMPTY, 0, false)));
+                serializer.getMessageSize(messageFactory.constructROpenMessage(0x1111, StyxQID.EMPTY, 0)));
 
         assertEquals(IDataSerializer.BASE_BINARY_SIZE + serializer.getQidSize() + 4,
-                serializer.getMessageSize(new StyxROpenMessage(0x1111, StyxQID.EMPTY, 0, true)));
+                serializer.getMessageSize(messageFactory.constructRCreateMessage(0x1111, StyxQID.EMPTY, 0)));
 
         assertEquals(IDataSerializer.BASE_BINARY_SIZE + 4 + 2 + 4,
                 serializer.getMessageSize(messageFactory.constructRVersion(0x1111, "ABCD")));

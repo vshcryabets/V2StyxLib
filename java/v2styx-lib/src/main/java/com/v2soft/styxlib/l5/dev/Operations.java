@@ -41,12 +41,6 @@ public class Operations {
         }
 
         switch (message.getType()) {
-            case MessageType.Rversion:
-                result.append(" MaxPocketSize:");
-                result.append(((StyxTVersionMessage) message).maxPacketSize);
-                result.append(" ProtocolVersion:");
-                result.append(((StyxTVersionMessage) message).protocolVersion);
-                break;
             case MessageType.Rerror:
                 result.append(" Error:");
                 result.append(((StyxRErrorMessage)message).mError);

@@ -7,7 +7,7 @@ import com.v2soft.styxlib.l5.structs.StyxStat;
 
 // String serialization for debug purposes
 public interface StringSerializer {
-    String serializeQid(StyxQID qid) throws StyxException;
+    String serializeQid(StyxQID qid);
     String serializeStat(StyxStat stat) throws StyxException;
     String serializeMessage(StyxMessage message);
 }

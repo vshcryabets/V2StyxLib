@@ -6,7 +6,16 @@ import com.v2soft.styxlib.exceptions.StyxNotAuthorizedException;
 import com.v2soft.styxlib.exceptions.StyxUnknownClientIdException;
 import com.v2soft.styxlib.l5.dev.MetricsAndStats;
 import com.v2soft.styxlib.l5.enums.MessageType;
-import com.v2soft.styxlib.l5.messages.*;
+import com.v2soft.styxlib.l5.messages.StyxRReadMessage;
+import com.v2soft.styxlib.l5.messages.StyxRStatMessage;
+import com.v2soft.styxlib.l5.messages.StyxRWalkMessage;
+import com.v2soft.styxlib.l5.messages.StyxRWriteMessage;
+import com.v2soft.styxlib.l5.messages.StyxTCreateMessage;
+import com.v2soft.styxlib.l5.messages.StyxTOpenMessage;
+import com.v2soft.styxlib.l5.messages.StyxTReadMessage;
+import com.v2soft.styxlib.l5.messages.StyxTWStatMessage;
+import com.v2soft.styxlib.l5.messages.StyxTWalkMessage;
+import com.v2soft.styxlib.l5.messages.StyxTWriteMessage;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
 import com.v2soft.styxlib.l5.messages.base.StyxTMessageFID;
 import com.v2soft.styxlib.l5.messages.v9p2000.BaseMessage;
@@ -124,13 +133,13 @@ public class TMessagesProcessor extends QueueMessagesProcessor {
         }
     }
 
-    private StyxRAttachMessage processAttach(int clientId, StyxTAttachMessage msg) throws StyxUnknownClientIdException {
+    private StyxMessage processAttach(int clientId, StyxTAttachMessage msg) throws StyxUnknownClientIdException {
         var clientDetails = mDi.getClientsRepo().getClient(clientId);
         clientDetails.setUsername(msg.userName);
         String mountPoint = msg.mountPoint;
         mRoot.onConnectionOpened(clientId);
         IVirtualStyxFile root = mRoot; // TODO .getDirectory(mountPoint); there should be some logic with mountPoint?
-        StyxRAttachMessage answer = new StyxRAttachMessage(msg.getTag(), root.getQID());
+        StyxMessage answer = mDi.getMessageFactory().constructRAttachMessage(msg.getTag(), root.getQID());
         clientDetails.registerOpenedFile(msg.getFID(), root);
         return answer;
     }
@@ -138,7 +147,7 @@ public class TMessagesProcessor extends QueueMessagesProcessor {
     private StyxMessage processAuth(int clientId, StyxTAuthMessage msg) throws StyxUnknownClientIdException {
         mDi.getClientsRepo().getClient(clientId).setUsername(msg.mUserName);
         // TODO handle auth packet
-        return new StyxRAuthMessage(msg.getTag(), StyxQID.EMPTY);
+        return mDi.getMessageFactory().constructRAuthMessage(msg.getTag(), StyxQID.EMPTY);
     }
 
     private StyxMessage processClunk(int clientId, StyxTMessageFID msg)
@@ -168,8 +177,8 @@ public class TMessagesProcessor extends QueueMessagesProcessor {
         long fid = msg.getFID();
         IVirtualStyxFile file = mDi.getClientsRepo().getAssignedFile(clientId, fid);
         if (file.open(clientId, msg.mode)) {
-            return new StyxROpenMessage(msg.getTag(), file.getQID(),
-                    mConnectionDetails.ioUnit() - DEFAULT_PACKET_HEADER_SIZE, false);
+            return mDi.getMessageFactory().constructROpenMessage(msg.getTag(), file.getQID(),
+                    mConnectionDetails.ioUnit() - DEFAULT_PACKET_HEADER_SIZE);
         } else {
             throw StyxErrorMessageException.newInstance("Not supported mode for specified file");
         }
@@ -188,7 +197,7 @@ public class TMessagesProcessor extends QueueMessagesProcessor {
             throws StyxException {
         final IVirtualStyxFile file = mDi.getClientsRepo().getAssignedFile(clientId, msg.getFID());
         StyxQID qid = file.create(clientId, msg.name, msg.permissions, msg.mode);
-        return new StyxROpenMessage(msg.getTag(), qid, mConnectionDetails.ioUnit(), true);
+        return mDi.getMessageFactory().constructRCreateMessage(msg.getTag(), qid, mConnectionDetails.ioUnit());
     }
 
     private StyxMessage processWStat(StyxTWStatMessage msg) {

@@ -13,6 +13,7 @@ import com.v2soft.styxlib.l5.messages.*;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
 import com.v2soft.styxlib.l5.messages.base.StyxTMessageFID;
 import com.v2soft.styxlib.l5.messages.v9p2000.StyxRErrorMessage;
+import com.v2soft.styxlib.l5.messages.v9p2000.StyxROpenMessage;
 import com.v2soft.styxlib.l5.structs.StyxStat;
 import com.v2soft.styxlib.l5.v9p2000.StyxSerializerImpl;
 import com.v2soft.styxlib.l6.io.StyxFileBufferedInputStream;
