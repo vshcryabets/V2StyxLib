@@ -23,12 +23,12 @@ buildscript {
     }
     dependencies {
         classpath("org.codehaus.groovy:groovy-jsr223:3.0.17")
-        classpath("com.github.vshcryabets:codegen:a06e23e001")
+        classpath("com.github.vshcryabets:codegen:ae6ec2d3b9")
     }
 }
 
 dependencies {
-    testImplementation(platform("org.junit:junit-bom:5.9.0"))
+    testImplementation(platform("org.junit:junit-bom:5.11.4"))
     testImplementation("org.junit.jupiter:junit-jupiter")
 }
 
