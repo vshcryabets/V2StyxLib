@@ -2,13 +2,12 @@ package com.v2soft.styxlib.l5.dev;
 
 import com.v2soft.styxlib.Logger;
 import com.v2soft.styxlib.l5.enums.MessageType;
-import com.v2soft.styxlib.l5.messages.v9p2000.StyxRErrorMessage;
-import com.v2soft.styxlib.l5.messages.v9p2000.StyxTAuthMessage;
-import com.v2soft.styxlib.l5.messages.v9p2000.StyxTAttachMessage;
-import com.v2soft.styxlib.l5.messages.v9p2000.StyxTVersionMessage;
 import com.v2soft.styxlib.l5.messages.StyxTWStatMessage;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
 import com.v2soft.styxlib.l5.messages.base.StyxTMessageFID;
+import com.v2soft.styxlib.l5.messages.v9p2000.StyxRErrorMessage;
+import com.v2soft.styxlib.l5.messages.v9p2000.StyxTAttachMessage;
+import com.v2soft.styxlib.l5.messages.v9p2000.StyxTAuthMessage;
 
 public class Operations {
     public static String toString(byte[] bytes) {
@@ -50,12 +49,6 @@ public class Operations {
                 result.append(((StyxTWStatMessage) message).stat.toString());
             }
             break;
-            case MessageType.Tversion:
-                result.append("MaxPocketSize:");
-                result.append(((StyxTVersionMessage) message).maxPacketSize);
-                result.append(" ProtocolVersion:");
-                result.append(((StyxTVersionMessage) message).protocolVersion);
-                break;
             case MessageType.Tattach:
                 result.append("AuthFID: ");
                 result.append(((StyxTAttachMessage) message).authFID);

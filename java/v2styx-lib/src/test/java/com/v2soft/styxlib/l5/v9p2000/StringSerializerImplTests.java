@@ -59,6 +59,17 @@ public class StringSerializerImplTests {
     }
 
     @Test
+    public void testSerializeTVersion() {
+        var message = messageFactory.constructTVersion(1080, "9P2000.L");
+        message.setTag(123);
+        var str = serializer.serializeMessage(message);
+        Assertions.assertTrue(str.contains("Message Type:100"));
+        Assertions.assertTrue(str.contains("MaxPacketSize:1080"));
+        Assertions.assertTrue(str.contains("ProtocolVersion:9P2000.L"));
+        Assertions.assertTrue(str.contains("Tag:123"));
+    }
+
+    @Test
     public void testSerializeRAttach() {
         var message = messageFactory.constructRAttachMessage(1080, StyxQID.EMPTY);
         message.setTag(123);
