@@ -16,4 +16,6 @@ public interface StyxSessionDI {
     Factory getMessageFactory();
 
     ClientsRepo getClientsRepo();
+
+    GetMessagesFactoryUseCase getGetMessagesFactoryUseCase();
 }

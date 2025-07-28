@@ -5,7 +5,7 @@ import com.v2soft.styxlib.l5.enums.MessageType;
 public class StyxRErrorMessage extends BaseMessage {
 	public final String mError;
 
-	public StyxRErrorMessage(int tag, String error) {
+	protected StyxRErrorMessage(int tag, String error) {
 		super(MessageType.Rerror, tag, null);
 		mError = error;
 	}

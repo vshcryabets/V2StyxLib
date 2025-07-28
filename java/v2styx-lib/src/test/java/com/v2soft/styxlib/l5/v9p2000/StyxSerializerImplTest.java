@@ -1,9 +1,21 @@
 package com.v2soft.styxlib.l5.v9p2000;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.l5.enums.QidType;
-import com.v2soft.styxlib.l5.messages.*;
+import com.v2soft.styxlib.l5.messages.StyxRReadMessage;
+import com.v2soft.styxlib.l5.messages.StyxRStatMessage;
+import com.v2soft.styxlib.l5.messages.StyxRWalkMessage;
+import com.v2soft.styxlib.l5.messages.StyxRWriteMessage;
+import com.v2soft.styxlib.l5.messages.StyxTCreateMessage;
+import com.v2soft.styxlib.l5.messages.StyxTFlushMessage;
+import com.v2soft.styxlib.l5.messages.StyxTOpenMessage;
+import com.v2soft.styxlib.l5.messages.StyxTReadMessage;
+import com.v2soft.styxlib.l5.messages.StyxTWStatMessage;
+import com.v2soft.styxlib.l5.messages.StyxTWalkMessage;
 import com.v2soft.styxlib.l5.messages.base.Factory;
 import com.v2soft.styxlib.l5.messages.base.StyxTMessageFID;
 import com.v2soft.styxlib.l5.messages.v9p2000.BaseMessage;
@@ -12,14 +24,12 @@ import com.v2soft.styxlib.l5.serialization.IDataSerializer;
 import com.v2soft.styxlib.l5.serialization.impl.BufferWriterImpl;
 import com.v2soft.styxlib.l5.structs.StyxQID;
 import com.v2soft.styxlib.l5.structs.StyxStat;
+
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class StyxSerializerImplTest {
     Factory messageFactory = new FactoryImpl();
@@ -97,7 +107,7 @@ class StyxSerializerImplTest {
                         )));
 
         assertEquals(IDataSerializer.BASE_BINARY_SIZE + 4 + 8 + 4 + 4,
-                serializer.getMessageSize(new StyxTWriteMessage(0x1234, 0x3333,
+                serializer.getMessageSize(messageFactory.constructTWriteMessage(0x1234, 0x3333,
                         new byte[]{0x1, 0x2, 0x3, 0x4},
                         0,
                         4
@@ -122,13 +132,13 @@ class StyxSerializerImplTest {
                 serializer.getMessageSize(messageFactory.constructTVersion(0x1111, "ABCD")));
 
         assertEquals(IDataSerializer.BASE_BINARY_SIZE + serializer.getQidSize() + 4,
-                serializer.getMessageSize(new StyxROpenMessage(0x1111, StyxQID.EMPTY, 0, false)));
+                serializer.getMessageSize(messageFactory.constructROpenMessage(0x1111, StyxQID.EMPTY, 0)));
 
         assertEquals(IDataSerializer.BASE_BINARY_SIZE + serializer.getQidSize() + 4,
-                serializer.getMessageSize(new StyxROpenMessage(0x1111, StyxQID.EMPTY, 0, true)));
+                serializer.getMessageSize(messageFactory.constructRCreateMessage(0x1111, StyxQID.EMPTY, 0)));
 
         assertEquals(IDataSerializer.BASE_BINARY_SIZE + 4 + 2 + 4,
-                serializer.getMessageSize(new StyxRVersionMessage(0x1111, "ABCD")));
+                serializer.getMessageSize(messageFactory.constructRVersion(0x1111, "ABCD")));
 
         assertEquals(IDataSerializer.BASE_BINARY_SIZE + 2 + serializer.getQidSize(),
                 serializer.getMessageSize(new StyxRWalkMessage(0x1111, Collections.singletonList(StyxQID.EMPTY))));

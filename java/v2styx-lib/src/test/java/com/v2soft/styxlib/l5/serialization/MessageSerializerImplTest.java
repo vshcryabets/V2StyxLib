@@ -4,7 +4,6 @@ import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.l5.enums.FileMode;
 import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.l5.enums.QidType;
-import com.v2soft.styxlib.l5.messages.StyxROpenMessage;
 import com.v2soft.styxlib.l5.messages.StyxRReadMessage;
 import com.v2soft.styxlib.l5.messages.base.Factory;
 import com.v2soft.styxlib.l5.messages.v9p2000.FactoryImpl;
@@ -12,6 +11,7 @@ import com.v2soft.styxlib.l5.serialization.impl.BufferWriterImpl;
 import com.v2soft.styxlib.l5.structs.StyxQID;
 import com.v2soft.styxlib.l5.structs.StyxStat;
 import com.v2soft.styxlib.l5.v9p2000.StyxSerializerImpl;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -88,7 +88,7 @@ public class MessageSerializerImplTest {
 
     @Test
     public void testRCreate() throws StyxException {
-        serializer.serialize(new StyxROpenMessage(128, StyxQID.EMPTY, 0x1234, true), outputBuffer);
+        serializer.serialize(messageFactory.constructRCreateMessage(128, StyxQID.EMPTY, 0x1234), outputBuffer);
         byte[] data = new byte[buffer.limit()];
         buffer.position(0);
         buffer.get(data);
