@@ -70,7 +70,8 @@ public class StyxFile {
     private int open(int mode, long fid)
             throws StyxException {
         final StyxTOpenMessage tOpen = new StyxTOpenMessage(fid, mode);
-        final var rOpen = (StyxROpenMessage) mTransmitter.sendMessage(tOpen, mClientId, mTimeout).getResult();
+        final var rOpen = (StyxROpenMessage) mTransmitter.sendMessage(tOpen, mClientId)
+                .getResult(mTimeout);
         return (int) rOpen.ioUnit;
     }
 
@@ -80,8 +81,8 @@ public class StyxFile {
         }
         // send Tclunk
         final StyxTMessageFID tClunk = new StyxTMessageFID(MessageType.Tclunk, mFID);
-        var feature = mTransmitter.sendMessage(tClunk, mClientId, mTimeout);
-        feature.getResult();
+        var feature = mTransmitter.sendMessage(tClunk, mClientId);
+        feature.getResult(mTimeout);
 
         mFID = Constants.NOFID;
     }
@@ -158,16 +159,16 @@ public class StyxFile {
         long tempFID = sendWalkMessage(mParentFID, "");
         var tCreate = new StyxTCreateMessage(tempFID, mPath, permissions, ModeType.OWRITE);
         mTransmitter
-            .sendMessage(tCreate, mClientId, mTimeout)
+            .sendMessage(tCreate, mClientId)
 //                .exceptionally()
-            .getResult();
+            .getResult(mTimeout);
         // TODO reuse FID
 //        mFID = tempFID;
         // close temp FID
         var tClunk = new StyxTMessageFID(MessageType.Tclunk, tempFID);
         mTransmitter
-            .sendMessage(tClunk, mClientId, mTimeout)
-            .getResult();
+            .sendMessage(tClunk, mClientId)
+            .getResult(mTimeout);
 //        mRecipient.getPolls().releaseFID(tCreate);
     }
 
@@ -200,8 +201,8 @@ public class StyxFile {
         mFID = Constants.NOFID;
         var tRemove = new StyxTMessageFID(MessageType.Tremove, fid);
         mTransmitter
-            .sendMessage(tRemove, mClientId, mTimeout)
-            .getResult();
+            .sendMessage(tRemove, mClientId)
+            .getResult(mTimeout);
     }
 
     public void renameTo(String name)
@@ -219,13 +220,13 @@ public class StyxFile {
                 stat.groupName(),
                 stat.modificationUser());
         StyxTWStatMessage tWStat = new StyxTWStatMessage(getFID(), newStat);
-        mTransmitter.sendMessage(tWStat, mClientId, mTimeout).getResult();
+        mTransmitter.sendMessage(tWStat, mClientId).getResult(mTimeout);
     }
 
     public void mkdir(long permissions) throws InterruptedException, StyxException {
         permissions = permissions & FileMode.PERMISSION_BITMASK | FileMode.Directory;
         StyxTCreateMessage tCreate = new StyxTCreateMessage(mParentFID, getName(), permissions, ModeType.OREAD);
-        mTransmitter.sendMessage(tCreate, mClientId, mTimeout).getResult();
+        mTransmitter.sendMessage(tCreate, mClientId).getResult(mTimeout);
     }
 
     public boolean checkFileMode(long mode)
@@ -318,8 +319,8 @@ public class StyxFile {
         long newFID = mDI.getClientsRepo().getFidPoll(mClientId).getFreeItem();
         final StyxTWalkMessage tWalk = new StyxTWalkMessage(parentFID,
                 newFID, StyxSerializerImpl.splitPath(path));
-        final var feature = mTransmitter.sendMessage(tWalk, mClientId, mTimeout);
-        final StyxMessage rWalk = feature.getResult();
+        final var feature = mTransmitter.sendMessage(tWalk, mClientId);
+        final StyxMessage rWalk = feature.getResult(mTimeout);
         if (rWalk.getType() == MessageType.Rerror)
             throw StyxErrorMessageException.newInstance(((StyxRErrorMessage) rWalk).mError + " at " + mPath);
         if (((StyxRWalkMessage) rWalk).qidList.size() != tWalk.getPathLength())
@@ -336,8 +337,7 @@ public class StyxFile {
             throws StyxException {
         final var rMessage = (StyxRStatMessage)mTransmitter.sendMessage(
                 new StyxTMessageFID(MessageType.Tstat, getFID()),
-                mClientId,
-                mTimeout).getResult();
+                mClientId).getResult(mTimeout);
         return rMessage.stat;
     }
 

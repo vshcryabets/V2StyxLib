@@ -50,8 +50,7 @@ public class EmptyChannelDriver implements IChannelDriver {
 
     @Override
     public <R extends StyxMessage> Future<R> sendMessage(StyxMessage answer,
-                                                         int recipient,
-                                                         long timeout) throws StyxException {
+                                                         int recipient) throws StyxException {
         throw new StyxException("Not implemented");
     }
 

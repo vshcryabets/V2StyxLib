@@ -182,13 +182,12 @@ public class Connection
         // release attached FID
         if (mRootFid != Constants.NOFID) {
             final StyxTMessageFID tClunk = new StyxTMessageFID(MessageType.Tclunk, mRootFid);
-            mConfiguration.transmitter.sendMessage(tClunk, mClientId, mTimeout).getResult();
+            mConfiguration.transmitter.sendMessage(tClunk, mClientId).getResult(mTimeout);
             mRootFid = Constants.NOFID;
         }
         StyxMessage rMessage = mConfiguration.transmitter.sendMessage(
                 mConfiguration.di.getMessageFactory().constructTVersion(mDetails.ioUnit(), getProtocol()),
-                mClientId,
-                mTimeout).getResult();
+                mClientId).getResult(mTimeout);
         StyxRVersionMessage rVersion = (StyxRVersionMessage) rMessage;
         if (rVersion.maxPacketSize < mDetails.ioUnit()) {
             mDetails = new ConnectionDetails(getProtocol(), (int) rVersion.maxPacketSize);
@@ -205,7 +204,7 @@ public class Connection
 
             StyxMessage tAuth = mConfiguration.di.getMessageFactory().constructTAuth(mAuthFID,
                     mConfiguration.credentials.getUserName(), getMountPoint());
-            StyxMessage rMessage = mConfiguration.transmitter.sendMessage(tAuth, mClientId, mTimeout).getResult();
+            StyxMessage rMessage = mConfiguration.transmitter.sendMessage(tAuth, mClientId).getResult(mTimeout);
             StyxRAuthMessage rAuth = (StyxRAuthMessage) rMessage;
             mAuthQID = rAuth.getQID();
 
@@ -220,8 +219,9 @@ public class Connection
         StyxMessage tAttach = mConfiguration.di.getMessageFactory().constructTAttach(mRootFid, getAuthFID(),
                 mConfiguration.credentials.getUserName(),
                 getMountPoint());
-        var rAttach = (StyxRAttachMessage)mConfiguration.transmitter.sendMessage(tAttach, mClientId, mTimeout)
-                .getResult();
+        var rAttach = (StyxRAttachMessage)mConfiguration.transmitter
+                .sendMessage(tAttach, mClientId)
+                .getResult(mTimeout);
         mQID = rAttach.getQID();
         setAttached(true);
     }

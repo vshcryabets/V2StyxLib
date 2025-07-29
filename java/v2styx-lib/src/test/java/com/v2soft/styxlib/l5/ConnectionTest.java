@@ -1,5 +1,11 @@
 package com.v2soft.styxlib.l5;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import com.v2soft.styxlib.Logger;
 import com.v2soft.styxlib.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.exceptions.StyxException;
@@ -16,7 +22,12 @@ import com.v2soft.styxlib.server.tcp.TCPClientChannelDriver;
 import com.v2soft.styxlib.server.tcp.TCPServerChannelDriver;
 import com.v2soft.styxlib.utils.StyxSessionDI;
 import com.v2soft.styxlib.utils.impl.StyxSessionDIImpl;
-import org.junit.jupiter.api.*;
+
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,8 +39,6 @@ import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.TimeoutException;
 import java.util.zip.CRC32;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Client JUnit tests
@@ -134,11 +143,11 @@ public class ConnectionTest {
         // create 2 directory and 4 sub-directories
         String nameA = UUID.randomUUID().toString();
         String nameB = UUID.randomUUID().toString();
-        String nameAA = nameA + StyxFile.SEPARATOR + UUID.randomUUID();
-        String nameAB = nameA + StyxFile.SEPARATOR + UUID.randomUUID();
+        String nameAA = nameA + StyxFile.SEPARATOR + UUID.randomUUID().toString();
+        String nameAB = nameA + StyxFile.SEPARATOR + UUID.randomUUID().toString();
         String nameBA = UUID.randomUUID().toString();
         String nameBB = UUID.randomUUID().toString();
-        String nameBC = nameB + StyxFile.SEPARATOR + UUID.randomUUID();
+        String nameBC = nameB + StyxFile.SEPARATOR + UUID.randomUUID().toString();
 
         StyxFile dirBC = null;
         try {

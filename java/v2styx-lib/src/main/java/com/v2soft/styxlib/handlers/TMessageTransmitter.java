@@ -5,7 +5,6 @@ import com.v2soft.styxlib.l5.enums.Checks;
 import com.v2soft.styxlib.l5.enums.Constants;
 import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
-import com.v2soft.styxlib.l5.messages.base.StyxTMessage;
 import com.v2soft.styxlib.server.ClientsRepo;
 import com.v2soft.styxlib.utils.Future;
 
@@ -30,9 +29,7 @@ public class TMessageTransmitter implements IMessageTransmitter {
     @Override
     public <R extends StyxMessage> Future<R> sendMessage(
             StyxMessage message,
-            int clientId,
-            long timeout
-            )
+            int clientId)
             throws StyxException {
         if ( !Checks.isTMessage(message.getType())) {
             throw new StyxException("Can't sent RMessage");
@@ -47,11 +44,11 @@ public class TMessageTransmitter implements IMessageTransmitter {
         // set message tag
         int tag = Constants.NOTAG;
         if (message.getType() != MessageType.Tversion) {
-            tag = mClientsRepo.getPolls(clientId).getTagPoll().getFreeItem();
+            tag = polls.getTagPoll().getFreeItem();
         }
         message.setTag((short) tag);
         mTransmittedCount++;
-        return driver.sendMessage(message, clientId, timeout);
+        return driver.sendMessage(message, clientId);
     }
 
     @Override
