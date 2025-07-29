@@ -11,7 +11,7 @@ import com.v2soft.styxlib.server.tcp.TCPChannelDriver;
 import com.v2soft.styxlib.server.tcp.TCPClientDetails;
 import com.v2soft.styxlib.server.tcp.TCPServerChannelDriver;
 import com.v2soft.styxlib.utils.StyxSessionDI;
-import com.v2soft.styxlib.utils.StyxSessionDIImpl;
+import com.v2soft.styxlib.utils.impl.StyxSessionDIImpl;
 import org.jline.reader.LineReader;
 import org.jline.reader.LineReaderBuilder;
 import org.jline.terminal.Terminal;

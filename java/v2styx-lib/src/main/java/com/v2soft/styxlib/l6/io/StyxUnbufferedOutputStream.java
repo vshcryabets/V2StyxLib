@@ -56,8 +56,8 @@ public class StyxUnbufferedOutputStream extends OutputStream {
         try {
             final StyxMessage tWrite = getMessagesFactoryUseCase.get()
                     .constructTWriteMessage(mFID, mFileOffset, data, dataOffset, dataLength);
-            final var rWrite = mMessenger.<StyxRWriteMessage>sendMessage(tWrite, mRecipient, mTimeout)
-                    .getResult();
+            final var rWrite = mMessenger.<StyxRWriteMessage>sendMessage(tWrite, mRecipient)
+                    .getResult(mTimeout);
             mFileOffset += rWrite.count;
         } catch (Exception e) {
             throw new IOException(e);
@@ -80,9 +80,8 @@ public class StyxUnbufferedOutputStream extends OutputStream {
     public void close() throws IOException {
         super.close();
         try {
-            mMessenger.sendMessage(new StyxTMessageFID(MessageType.Tclunk, MessageType.Rclunk, mFID),
-                    mRecipient,
-                    mTimeout).getResult();
+            mMessenger.sendMessage(new StyxTMessageFID(MessageType.Tclunk, mFID),
+                    mRecipient).getResult(mTimeout);
         } catch (Exception e) {
             throw new IOException(e);
         }

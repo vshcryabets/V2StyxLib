@@ -2,24 +2,23 @@ package com.v2soft.styxlib.utils;
 
 import com.v2soft.styxlib.Config;
 import com.v2soft.styxlib.Logger;
-import com.v2soft.styxlib.l5.messages.base.StyxTMessage;
-import com.v2soft.styxlib.l5.messages.base.StyxTMessageFID;
+import com.v2soft.styxlib.l5.messages.base.StyxMessage;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by vshcryabets on 12/10/14.
  */
-public class Polls {
-    protected Map<Integer, StyxTMessage> mMessagesMap;
+public class Polls implements CompletablesMap {
     protected MessageTagPoll mTags;
     protected FIDPoll mFids;
+    protected Map<Integer, CompletableFuture<StyxMessage>> mMessagesMap = new ConcurrentHashMap<>();
 
     public Polls() {
         mFids = new FIDPoll();
         mTags = new MessageTagPoll();
-        mMessagesMap = new HashMap<Integer, StyxTMessage>();
     }
 
     public FIDPoll getFIDPoll() {
@@ -30,8 +29,17 @@ public class Polls {
         return mTags;
     }
 
-    public Map<Integer, StyxTMessage> getMessagesMap() {
-        return mMessagesMap;
+    @Override
+    public void assignAnswer(int tag, StyxMessage answer) {
+        var completable = mMessagesMap.get(tag);
+        if (completable != null) {
+            completable.complete(answer);
+        }
+    }
+
+    @Override
+    public void addCompletable(int tag, CompletableFuture<StyxMessage> completable) {
+        mMessagesMap.put(tag, completable);
     }
 
     public void releaseTag(int tag) {
@@ -39,9 +47,9 @@ public class Polls {
         mTags.release(tag);
     }
 
-    public void releaseFID(StyxTMessageFID message) {
+    public void releaseFID(long fid) {
         if (Config.DEBUG_FID_POLL)
-            Logger.DEBUG.println("releaseFID " + message.getFID());
-        mFids.release(message.getFID());
+            Logger.DEBUG.println("releaseFID " + fid);
+        mFids.release(fid);
     }
 }

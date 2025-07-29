@@ -121,13 +121,12 @@ public class StyxDeserializerImpl implements IDataDeserializer {
             case MessageType.Rwrite -> result = new StyxRWriteMessage(tag, buffer.readUInt32());
             case MessageType.Tclunk -> result = new StyxTMessageFID(
                     MessageType.Tclunk,
-                    MessageType.Rclunk,
                     buffer.readUInt32());
             case MessageType.Rclunk -> result = new BaseMessage(MessageType.Rclunk, tag, null);
-            case MessageType.Tremove -> result = new StyxTMessageFID(MessageType.Tremove, MessageType.Rremove,
+            case MessageType.Tremove -> result = new StyxTMessageFID(MessageType.Tremove,
                     buffer.readUInt32());
             case MessageType.Rremove -> result = new BaseMessage(MessageType.Rremove, tag, null);
-            case MessageType.Tstat -> result = new StyxTMessageFID(MessageType.Tstat, MessageType.Rstat,
+            case MessageType.Tstat -> result = new StyxTMessageFID(MessageType.Tstat,
                     buffer.readUInt32());
             case MessageType.Rstat -> {
                 buffer.readUInt16(); //??

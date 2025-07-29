@@ -7,7 +7,7 @@ public class StyxTFlushMessage extends StyxTMessage {
 	public final int oldTag;
 
 	public StyxTFlushMessage(int tag){
-		super(MessageType.Tflush, MessageType.Rflush);
+		super(MessageType.Tflush);
 		oldTag = tag;
 	}
 

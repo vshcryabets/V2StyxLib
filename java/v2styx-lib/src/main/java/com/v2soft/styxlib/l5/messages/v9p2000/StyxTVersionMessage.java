@@ -8,7 +8,7 @@ public class StyxTVersionMessage extends StyxTMessage {
 	public final String protocolVersion;
 
 	protected StyxTVersionMessage(long maxPacketSize, String protocolVersion) {
-        super(MessageType.Tversion, MessageType.Rversion);
+        super(MessageType.Tversion);
 		this.maxPacketSize = maxPacketSize;
 		this.protocolVersion = protocolVersion;
 	}

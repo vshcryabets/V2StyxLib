@@ -15,7 +15,7 @@ import com.v2soft.styxlib.server.tcp.TCPClientChannelDriver;
 import com.v2soft.styxlib.server.tcp.TCPDualLinkServerManager;
 import com.v2soft.styxlib.server.tcp.TCPServerChannelDriver;
 import com.v2soft.styxlib.utils.StyxSessionDI;
-import com.v2soft.styxlib.utils.StyxSessionDIImpl;
+import com.v2soft.styxlib.utils.impl.StyxSessionDIImpl;
 import org.junit.jupiter.api.*;
 
 import java.io.IOException;

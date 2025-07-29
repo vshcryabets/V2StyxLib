@@ -8,7 +8,7 @@ public class StyxTReadMessage extends StyxTMessageFID {
 	public final int count;
 
 	public StyxTReadMessage(long fid, long offset, int count)	{
-		super(MessageType.Tread, MessageType.Rread, fid);
+		super(MessageType.Tread, fid);
 		this.offset = offset;
 		this.count = count;
 	}

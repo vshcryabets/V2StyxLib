@@ -14,7 +14,6 @@ public interface IMessageTransmitter {
     int getErrorsCount();
     void clearStatistics();
     void close();
-    <R extends StyxMessage> Future<R> sendMessage(StyxMessage answer,
-                                                  int clientId,
-                                                  long timeout) throws StyxException;
+    <R extends StyxMessage> Future<R> sendMessage(StyxMessage message,
+                                                  int clientId) throws StyxException;
 }

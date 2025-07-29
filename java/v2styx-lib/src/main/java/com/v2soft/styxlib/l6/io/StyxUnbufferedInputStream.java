@@ -59,8 +59,8 @@ public class StyxUnbufferedInputStream extends InputStream {
         try {
             // send Tread
             final StyxTReadMessage tRead = new StyxTReadMessage(mFID, mFileOffset, len);
-            final var rRead = mMessenger.<StyxRReadMessage>sendMessage(tRead, mRecepient, mTimeout)
-                    .getResult();
+            final var rRead = mMessenger.<StyxRReadMessage>sendMessage(tRead, mRecepient)
+                    .getResult(mTimeout);
             read = rRead.dataLength;
             if ( read > 0 ) {
                 System.arraycopy(rRead.data, 0, b, 0, read);
@@ -86,9 +86,9 @@ public class StyxUnbufferedInputStream extends InputStream {
     @Override
     public void close() throws IOException {
         // send Tclunk
-        final StyxTMessageFID tClunk = new StyxTMessageFID(MessageType.Tclunk, MessageType.Rclunk, mFID);
+        final StyxTMessageFID tClunk = new StyxTMessageFID(MessageType.Tclunk, mFID);
         try {
-            mMessenger.sendMessage(tClunk, mRecepient, mTimeout).getResult();
+            var future = mMessenger.sendMessage(tClunk, mRecepient).getResult(mTimeout);
         } catch (Exception e) {
             throw new IOException(e);
         }

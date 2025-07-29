@@ -1,10 +1,10 @@
 package com.v2soft.styxlib.l5.messages.base;
 
 public class StyxTMessageFID extends StyxTMessage {
-    private long mFID;
+    public final long mFID;
 
-    public StyxTMessageFID(int type, int answer, long fid) {
-        super(type, answer);
+    public StyxTMessageFID(int type, long fid) {
+        super(type);
         mFID = fid;
     }
 

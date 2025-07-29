@@ -19,7 +19,7 @@ extends StyxTMessageFID {
     private final List<String> mPathElements;
 
     public StyxTWalkMessage(long fid, long new_fid, List<String> path){
-        super(MessageType.Twalk, MessageType.Rwalk, fid);
+        super(MessageType.Twalk, fid);
         mNewFID = new_fid;
         mPathElements = path;
     }

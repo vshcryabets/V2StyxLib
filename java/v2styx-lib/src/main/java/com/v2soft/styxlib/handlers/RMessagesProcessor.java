@@ -1,13 +1,11 @@
 package com.v2soft.styxlib.handlers;
 
+import com.v2soft.styxlib.Logger;
 import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
-import com.v2soft.styxlib.l5.messages.base.StyxTMessage;
 import com.v2soft.styxlib.l5.messages.base.StyxTMessageFID;
 import com.v2soft.styxlib.server.ClientsRepo;
-
-import java.util.Map;
 
 /**
  * @author V.Shcryabets <a>vshcryabets@gmail.com</a>
@@ -34,21 +32,18 @@ public class RMessagesProcessor extends QueueMessagesProcessor {
         int tag = message.getTag();
         try {
             final var polls = mClientsRepo.getPolls(clientId);
-            final Map<Integer, StyxTMessage> clientMessagesMap = polls.getMessagesMap();
-            if (!clientMessagesMap.containsKey(tag)) {
-                // we didn't send T message with such tag, so ignore this R message
-                System.err.printf("%d\tGot (%s) unknown R message from client %d\n", System.currentTimeMillis(),
-                        mTag,
-                        clientId);
-                return;
+            polls.assignAnswer(tag, message);
+            if (message.getType() == MessageType.Rclunk ||
+                    message.getType() == MessageType.Rremove) {
+                if (message instanceof StyxTMessageFID) {
+                    polls.releaseFID(((StyxTMessageFID) message).mFID);
+                } else {
+                    // Log or handle the unexpected message type
+                    Logger.e(RMessagesProcessor.class.getSimpleName(),
+                            "Warning: Message type " + message.getType() +
+                            " does not support FID release.");
+                }
             }
-            final StyxTMessage tMessage = clientMessagesMap.get(tag);
-            // TODO i'm not sure that this is proper place for that logic
-            if (tMessage.type == MessageType.Tclunk ||
-                    tMessage.type == MessageType.Tremove) {
-                polls.releaseFID((StyxTMessageFID) tMessage);
-            }
-            tMessage.setAnswer(message);
             polls.releaseTag(tag);
         } catch (StyxException e) {
             e.printStackTrace();
