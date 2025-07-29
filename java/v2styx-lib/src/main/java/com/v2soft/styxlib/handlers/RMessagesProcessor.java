@@ -32,8 +32,8 @@ public class RMessagesProcessor extends QueueMessagesProcessor {
         try {
             final var polls = mClientsRepo.getPolls(clientId);
             polls.assignAnswer(tag, message);
-            if (message.getType() == MessageType.Tclunk ||
-                    message.getType() == MessageType.Tremove) {
+            if (message.getType() == MessageType.Rclunk ||
+                    message.getType() == MessageType.Rremove) {
                 polls.releaseFID(((StyxTMessageFID) message).mFID);
             }
             polls.releaseTag(tag);
