@@ -1,5 +1,6 @@
 package com.v2soft.styxlib.handlers;
 
+import com.v2soft.styxlib.Logger;
 import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
@@ -34,7 +35,14 @@ public class RMessagesProcessor extends QueueMessagesProcessor {
             polls.assignAnswer(tag, message);
             if (message.getType() == MessageType.Rclunk ||
                     message.getType() == MessageType.Rremove) {
-                polls.releaseFID(((StyxTMessageFID) message).mFID);
+                if (message instanceof StyxTMessageFID) {
+                    polls.releaseFID(((StyxTMessageFID) message).mFID);
+                } else {
+                    // Log or handle the unexpected message type
+                    Logger.e(RMessagesProcessor.class.getSimpleName(),
+                            "Warning: Message type " + message.getType() +
+                            " does not support FID release.");
+                }
             }
             polls.releaseTag(tag);
         } catch (StyxException e) {
