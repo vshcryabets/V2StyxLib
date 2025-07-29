@@ -14,7 +14,7 @@ public class StyxTWriteMessage extends StyxTMessageFID {
                              byte [] data,
                              int dataOffset,
                              int dataLength) {
-        super(MessageType.Twrite, MessageType.Rwrite, fid);
+        super(MessageType.Twrite, fid);
         this.offset = offset;
         this.data = data;
         this.dataLength = dataLength;

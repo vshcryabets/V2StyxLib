@@ -8,7 +8,7 @@ public class StyxTWStatMessage extends StyxTMessageFID {
     public final StyxStat stat;
 
     public StyxTWStatMessage(long fid, StyxStat stat) {
-        super(MessageType.Twstat, MessageType.Rwstat, fid);
+        super(MessageType.Twstat, fid);
         this.stat = stat;
     }
 }

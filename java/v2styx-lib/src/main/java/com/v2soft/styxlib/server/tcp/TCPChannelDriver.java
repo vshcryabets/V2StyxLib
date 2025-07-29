@@ -93,6 +93,8 @@ public abstract class TCPChannelDriver implements
             throw new StyxException("Client id is negative");
         }
         final var client = (TCPClientDetails) mDI.getClientsRepo().getClient(clientId);
+        final var innerFeature = new CompletableFuture<StyxMessage>();
+        mDI.getCompletablesMap(clientId).addCompletable(message.getTag(), innerFeature);
         try {
             mInitConfiguration.di.getDataSerializer().serialize(message, client.getOutputWriter());
             client.sendOutputBuffer();
@@ -101,14 +103,7 @@ public abstract class TCPChannelDriver implements
             mTransmissionErrorsCount++;
             throw e;
         }
-        return new Future<>(CompletableFuture.supplyAsync(() -> {
-            try {
-                return (R) ((StyxTMessage) message).waitForAnswer(timeout);
-            } catch (StyxException e) {
-                throw new CompletionException(e);
-            }
-        }));
-
+        return new Future<R>((CompletableFuture<R>) innerFeature);
     }
 
     @Override

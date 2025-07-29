@@ -6,7 +6,7 @@ import com.v2soft.styxlib.l5.enums.ModeType;
 import com.v2soft.styxlib.server.ClientDetails;
 import com.v2soft.styxlib.server.EmptyChannelDriver;
 import com.v2soft.styxlib.utils.StyxSessionDI;
-import com.v2soft.styxlib.utils.StyxSessionDIImpl;
+import com.v2soft.styxlib.utils.impl.StyxSessionDIImpl;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

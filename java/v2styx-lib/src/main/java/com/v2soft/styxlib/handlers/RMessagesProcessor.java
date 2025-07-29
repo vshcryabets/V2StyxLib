@@ -34,21 +34,13 @@ public class RMessagesProcessor extends QueueMessagesProcessor {
         int tag = message.getTag();
         try {
             final var polls = mClientsRepo.getPolls(clientId);
-            final Map<Integer, StyxTMessage> clientMessagesMap = polls.getMessagesMap();
-            if (!clientMessagesMap.containsKey(tag)) {
-                // we didn't send T message with such tag, so ignore this R message
-                System.err.printf("%d\tGot (%s) unknown R message from client %d\n", System.currentTimeMillis(),
-                        mTag,
-                        clientId);
-                return;
-            }
-            final StyxTMessage tMessage = clientMessagesMap.get(tag);
+            polls.assignAnswer(tag, message);
             // TODO i'm not sure that this is proper place for that logic
-            if (tMessage.type == MessageType.Tclunk ||
-                    tMessage.type == MessageType.Tremove) {
-                polls.releaseFID((StyxTMessageFID) tMessage);
-            }
-            tMessage.setAnswer(message);
+            // TODO restore before merge
+//            if (tMessage.type == MessageType.Tclunk ||
+//                    tMessage.type == MessageType.Tremove) {
+//                polls.releaseFID((StyxTMessageFID) tMessage);
+//            }
             polls.releaseTag(tag);
         } catch (StyxException e) {
             e.printStackTrace();

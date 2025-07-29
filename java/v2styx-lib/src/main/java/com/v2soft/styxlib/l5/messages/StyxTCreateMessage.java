@@ -9,7 +9,7 @@ public class StyxTCreateMessage extends StyxTMessageFID {
     public final int mode;
 
     public StyxTCreateMessage(long fid, String name, long permissions, int mode) {
-        super(MessageType.Tcreate, MessageType.Rcreate, fid);
+        super(MessageType.Tcreate, fid);
         this.name = name;
         this.permissions = permissions;
         this.mode = mode;

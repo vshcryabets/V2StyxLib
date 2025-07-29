@@ -4,7 +4,6 @@ import com.v2soft.styxlib.Logger;
 import com.v2soft.styxlib.exceptions.StyxErrorMessageException;
 import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.l5.dev.MetricsAndStats;
-import com.v2soft.styxlib.l5.dev.Operations;
 import com.v2soft.styxlib.l5.enums.FileMode;
 import com.v2soft.styxlib.l6.StyxFile;
 import com.v2soft.styxlib.l6.io.StyxFileBufferedInputStream;
@@ -16,7 +15,7 @@ import com.v2soft.styxlib.server.tcp.TCPChannelDriver;
 import com.v2soft.styxlib.server.tcp.TCPClientChannelDriver;
 import com.v2soft.styxlib.server.tcp.TCPServerChannelDriver;
 import com.v2soft.styxlib.utils.StyxSessionDI;
-import com.v2soft.styxlib.utils.StyxSessionDIImpl;
+import com.v2soft.styxlib.utils.impl.StyxSessionDIImpl;
 import org.junit.jupiter.api.*;
 
 import java.io.File;
@@ -135,11 +134,11 @@ public class ConnectionTest {
         // create 2 directory and 4 sub-directories
         String nameA = UUID.randomUUID().toString();
         String nameB = UUID.randomUUID().toString();
-        String nameAA = nameA + StyxFile.SEPARATOR + UUID.randomUUID().toString();
-        String nameAB = nameA + StyxFile.SEPARATOR + UUID.randomUUID().toString();
+        String nameAA = nameA + StyxFile.SEPARATOR + UUID.randomUUID();
+        String nameAB = nameA + StyxFile.SEPARATOR + UUID.randomUUID();
         String nameBA = UUID.randomUUID().toString();
         String nameBB = UUID.randomUUID().toString();
-        String nameBC = nameB + StyxFile.SEPARATOR + UUID.randomUUID().toString();
+        String nameBC = nameB + StyxFile.SEPARATOR + UUID.randomUUID();
 
         StyxFile dirBC = null;
         try {

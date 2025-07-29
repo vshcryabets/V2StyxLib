@@ -50,7 +50,6 @@ public class TMessageTransmitter implements IMessageTransmitter {
             tag = mClientsRepo.getPolls(clientId).getTagPoll().getFreeItem();
         }
         message.setTag((short) tag);
-        polls.getMessagesMap().put(tag, (StyxTMessage) message);
         mTransmittedCount++;
         return driver.sendMessage(message, clientId, timeout);
     }

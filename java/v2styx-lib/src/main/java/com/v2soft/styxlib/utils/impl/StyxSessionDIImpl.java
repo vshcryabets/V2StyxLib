@@ -1,5 +1,6 @@
-package com.v2soft.styxlib.utils;
+package com.v2soft.styxlib.utils.impl;
 
+import com.v2soft.styxlib.exceptions.StyxUnknownClientIdException;
 import com.v2soft.styxlib.l5.dev.StringSerializer;
 import com.v2soft.styxlib.l5.messages.base.Factory;
 import com.v2soft.styxlib.l5.serialization.IDataDeserializer;
@@ -11,6 +12,9 @@ import com.v2soft.styxlib.l6.IsClientAuthorizedUseCase;
 import com.v2soft.styxlib.l6.IsClientAuthorizedUseCaseImpl;
 import com.v2soft.styxlib.server.ClientsRepo;
 import com.v2soft.styxlib.server.ClientsRepoImpl;
+import com.v2soft.styxlib.utils.CompletablesMap;
+import com.v2soft.styxlib.utils.GetMessagesFactoryUseCase;
+import com.v2soft.styxlib.utils.StyxSessionDI;
 
 public class StyxSessionDIImpl implements StyxSessionDI {
     private final ClientsRepo mClientsRepo;
@@ -44,6 +48,11 @@ public class StyxSessionDIImpl implements StyxSessionDI {
     @Override
     public ClientsRepo getClientsRepo() {
         return mClientsRepo;
+    }
+
+    @Override
+    public CompletablesMap getCompletablesMap(int clientId) throws StyxUnknownClientIdException {
+        return mClientsRepo.getPolls(clientId);
     }
 
     @Override

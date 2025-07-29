@@ -80,7 +80,7 @@ public class StyxUnbufferedOutputStream extends OutputStream {
     public void close() throws IOException {
         super.close();
         try {
-            mMessenger.sendMessage(new StyxTMessageFID(MessageType.Tclunk, MessageType.Rclunk, mFID),
+            mMessenger.sendMessage(new StyxTMessageFID(MessageType.Tclunk, mFID),
                     mRecipient,
                     mTimeout).getResult();
         } catch (Exception e) {

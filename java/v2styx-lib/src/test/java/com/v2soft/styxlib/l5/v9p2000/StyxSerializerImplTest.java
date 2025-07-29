@@ -42,7 +42,6 @@ class StyxSerializerImplTest {
 
         assertEquals(IDataSerializer.BASE_BINARY_SIZE + 4,
                 serializer.getMessageSize(new StyxTMessageFID(MessageType.Unspecified,
-                        MessageType.Rread,
                         0x2345)));
 
         assertEquals(IDataSerializer.BASE_BINARY_SIZE + 4 + 2 + 2 + 6 + 12,

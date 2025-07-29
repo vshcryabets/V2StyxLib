@@ -79,7 +79,7 @@ public class StyxFile {
             return;
         }
         // send Tclunk
-        final StyxTMessageFID tClunk = new StyxTMessageFID(MessageType.Tclunk, MessageType.Rclunk, mFID);
+        final StyxTMessageFID tClunk = new StyxTMessageFID(MessageType.Tclunk, mFID);
         var feature = mTransmitter.sendMessage(tClunk, mClientId, mTimeout);
         feature.getResult();
 
@@ -164,7 +164,7 @@ public class StyxFile {
         // TODO reuse FID
 //        mFID = tempFID;
         // close temp FID
-        var tClunk = new StyxTMessageFID(MessageType.Tclunk, MessageType.Rclunk, tempFID);
+        var tClunk = new StyxTMessageFID(MessageType.Tclunk, tempFID);
         mTransmitter
             .sendMessage(tClunk, mClientId, mTimeout)
             .getResult();
@@ -198,7 +198,7 @@ public class StyxFile {
         }
         long fid = getFID();
         mFID = Constants.NOFID;
-        var tRemove = new StyxTMessageFID(MessageType.Tremove, MessageType.Rremove, fid);
+        var tRemove = new StyxTMessageFID(MessageType.Tremove, fid);
         mTransmitter
             .sendMessage(tRemove, mClientId, mTimeout)
             .getResult();
@@ -334,8 +334,8 @@ public class StyxFile {
      */
     public StyxStat getStat()
             throws StyxException {
-        final var rMessage = mTransmitter.<StyxRStatMessage>sendMessage(
-                new StyxTMessageFID(MessageType.Tstat, MessageType.Rstat, getFID()),
+        final var rMessage = (StyxRStatMessage)mTransmitter.sendMessage(
+                new StyxTMessageFID(MessageType.Tstat, getFID()),
                 mClientId,
                 mTimeout).getResult();
         return rMessage.stat;

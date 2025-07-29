@@ -181,7 +181,7 @@ public class Connection
             throws StyxException {
         // release attached FID
         if (mRootFid != Constants.NOFID) {
-            final StyxTMessageFID tClunk = new StyxTMessageFID(MessageType.Tclunk, MessageType.Rclunk, mRootFid);
+            final StyxTMessageFID tClunk = new StyxTMessageFID(MessageType.Tclunk, mRootFid);
             mConfiguration.transmitter.sendMessage(tClunk, mClientId, mTimeout).getResult();
             mRootFid = Constants.NOFID;
         }
