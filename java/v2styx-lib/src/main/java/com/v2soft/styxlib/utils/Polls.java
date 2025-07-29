@@ -3,7 +3,6 @@ package com.v2soft.styxlib.utils;
 import com.v2soft.styxlib.Config;
 import com.v2soft.styxlib.Logger;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
-import com.v2soft.styxlib.l5.messages.base.StyxTMessageFID;
 
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -48,9 +47,9 @@ public class Polls implements CompletablesMap {
         mTags.release(tag);
     }
 
-    public void releaseFID(StyxTMessageFID message) {
+    public void releaseFID(long fid) {
         if (Config.DEBUG_FID_POLL)
-            Logger.DEBUG.println("releaseFID " + message.getFID());
-        mFids.release(message.getFID());
+            Logger.DEBUG.println("releaseFID " + fid);
+        mFids.release(fid);
     }
 }
