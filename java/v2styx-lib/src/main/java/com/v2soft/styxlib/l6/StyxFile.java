@@ -9,7 +9,9 @@ import com.v2soft.styxlib.l5.enums.Constants;
 import com.v2soft.styxlib.l5.enums.FileMode;
 import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.l5.enums.ModeType;
-import com.v2soft.styxlib.l5.messages.*;
+import com.v2soft.styxlib.l5.messages.StyxRStatMessage;
+import com.v2soft.styxlib.l5.messages.StyxTCreateMessage;
+import com.v2soft.styxlib.l5.messages.StyxTOpenMessage;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
 import com.v2soft.styxlib.l5.messages.base.StyxTMessageFID;
 import com.v2soft.styxlib.l5.messages.v9p2000.StyxRErrorMessage;
@@ -219,7 +221,7 @@ public class StyxFile {
                 stat.userName(),
                 stat.groupName(),
                 stat.modificationUser());
-        StyxTWStatMessage tWStat = new StyxTWStatMessage(getFID(), newStat);
+        StyxMessage tWStat = mDI.getMessageFactory().constructTWStatMessage(getFID(), newStat);
         mTransmitter.sendMessage(tWStat, mClientId).getResult(mTimeout);
     }
 
@@ -317,14 +319,12 @@ public class StyxFile {
     private long sendWalkMessage(long parentFID, String path)
             throws StyxException {
         long newFID = mDI.getClientsRepo().getFidPoll(mClientId).getFreeItem();
-        final StyxTWalkMessage tWalk = new StyxTWalkMessage(parentFID,
+        final StyxMessage tWalk = mDI.getMessageFactory().constructTWalkMessage(parentFID,
                 newFID, StyxSerializerImpl.splitPath(path));
         final var feature = mTransmitter.sendMessage(tWalk, mClientId);
         final StyxMessage rWalk = feature.getResult(mTimeout);
         if (rWalk.getType() == MessageType.Rerror)
             throw StyxErrorMessageException.newInstance(((StyxRErrorMessage) rWalk).mError + " at " + mPath);
-        if (((StyxRWalkMessage) rWalk).qidList.size() != tWalk.getPathLength())
-            throw new StyxException("File not found " + mPath);
         return newFID;
     }
 

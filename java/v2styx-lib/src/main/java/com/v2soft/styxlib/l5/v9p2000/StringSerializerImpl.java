@@ -1,6 +1,5 @@
 package com.v2soft.styxlib.l5.v9p2000;
 
-import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.l5.dev.StringSerializer;
 import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
@@ -8,6 +7,8 @@ import com.v2soft.styxlib.l5.messages.v9p2000.BaseMessage;
 import com.v2soft.styxlib.l5.messages.v9p2000.StyxROpenMessage;
 import com.v2soft.styxlib.l5.messages.v9p2000.StyxRVersionMessage;
 import com.v2soft.styxlib.l5.messages.v9p2000.StyxTVersionMessage;
+import com.v2soft.styxlib.l5.messages.v9p2000.StyxTWStatMessage;
+import com.v2soft.styxlib.l5.messages.v9p2000.StyxTWalkMessage;
 import com.v2soft.styxlib.l5.messages.v9p2000.StyxTWriteMessage;
 import com.v2soft.styxlib.l5.structs.StyxQID;
 import com.v2soft.styxlib.l5.structs.StyxStat;
@@ -20,7 +21,7 @@ public class StringSerializerImpl implements StringSerializer {
     }
 
     @Override
-    public String serializeStat(StyxStat stat) throws StyxException {
+    public String serializeStat(StyxStat stat) {
         StringBuilder result = new StringBuilder();
         result.append("Stat ")
                 .append(String.format("0x%x,0x%x,", stat.type(), stat.dev()))
@@ -72,6 +73,20 @@ public class StringSerializerImpl implements StringSerializer {
             case MessageType.Rcreate:
                 result.append(",iounit:");
                 result.append(((StyxROpenMessage)message).ioUnit);
+                break;
+            case MessageType.Twalk:
+                result.append(",fid:");
+                result.append(((StyxTWalkMessage)message).mFID);
+                result.append(",newFid:");
+                result.append(((StyxTWalkMessage)message).mNewFID);
+                result.append(",pathElements:");
+                result.append(((StyxTWalkMessage)message).mPathElements);
+                break;
+            case MessageType.Twstat:
+                result.append(",fid:");
+                result.append(((StyxTWStatMessage)message).mFID);
+                result.append(",Stat:");
+                result.append(serializeStat(((StyxTWStatMessage)message).stat));
                 break;
             default:
                 result.append(" (not implemented for this message type)");

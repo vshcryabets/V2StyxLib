@@ -44,7 +44,7 @@ public class StyxSerializerImpl implements IDataSerializer {
             case MessageType.Twalk -> {
                 var walkMessage = (StyxTWalkMessage)message;
                 size += 4 + 2;
-                for (var pathElement : walkMessage.getPathElements())
+                for (var pathElement : walkMessage.mPathElements)
                     size += UTF.getUTFSize(pathElement);
             }
             case MessageType.Topen -> size++;
@@ -104,10 +104,10 @@ public class StyxSerializerImpl implements IDataSerializer {
                 break;
             case MessageType.Twalk:
                 StyxTWalkMessage tWalk = (StyxTWalkMessage) message;
-                output.writeUInt32(tWalk.getNewFID());
-                if (tWalk.getPathElements() != null) {
-                    output.writeUInt16(tWalk.getPathElements().size());
-                    for (String pathElement : tWalk.getPathElements())
+                output.writeUInt32(tWalk.mNewFID);
+                if (tWalk.mPathElements != null) {
+                    output.writeUInt16(tWalk.mPathElements.size());
+                    for (String pathElement : tWalk.mPathElements)
                         output.writeUTFString(pathElement);
                 } else {
                     output.writeUInt16(0);

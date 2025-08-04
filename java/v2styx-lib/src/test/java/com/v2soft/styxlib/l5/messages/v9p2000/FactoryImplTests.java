@@ -5,8 +5,11 @@ import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.l5.messages.base.Factory;
 import com.v2soft.styxlib.l5.structs.StyxQID;
 
+import com.v2soft.styxlib.l5.structs.StyxStat;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
 
 public class FactoryImplTests {
     final Factory factory = new FactoryImpl();
@@ -109,5 +112,29 @@ public class FactoryImplTests {
         Assertions.assertNull(((StyxTWriteMessage) message).mQID);
         Assertions.assertEquals(0x123, ((StyxTWriteMessage) message).offset);
         Assertions.assertArrayEquals(data, ((StyxTWriteMessage) message).data);
+    }
+
+    @Test
+    public void testCreateTWalk() {
+        var message = factory.constructTWalkMessage(1080, 23432,
+                List.of("path1", "path2", "path3"));
+        Assertions.assertNotNull(message);
+        Assertions.assertEquals(Constants.NOTAG, message.getTag());
+        Assertions.assertInstanceOf(StyxTWalkMessage.class, message);
+        Assertions.assertEquals(MessageType.Twalk, message.getType());
+        Assertions.assertEquals(1080, ((StyxTWalkMessage) message).mFID);
+        Assertions.assertEquals(23432, ((StyxTWalkMessage) message).mNewFID);
+        Assertions.assertEquals(3, ((StyxTWalkMessage) message).mPathElements.size());
+    }
+
+    @Test
+    public void testCreateTWStat() {
+        var message = factory.constructTWStatMessage(1080, StyxStat.EMPTY);
+        Assertions.assertNotNull(message);
+        Assertions.assertEquals(Constants.NOTAG, message.getTag());
+        Assertions.assertInstanceOf(StyxTWStatMessage.class, message);
+        Assertions.assertEquals(MessageType.Twstat, message.getType());
+        Assertions.assertEquals(1080, ((StyxTWStatMessage) message).mFID);
+        Assertions.assertEquals(StyxStat.EMPTY, ((StyxTWStatMessage) message).stat);
     }
 }
