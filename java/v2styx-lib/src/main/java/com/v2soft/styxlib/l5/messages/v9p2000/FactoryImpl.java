@@ -4,6 +4,8 @@ import com.v2soft.styxlib.l5.messages.base.Factory;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
 import com.v2soft.styxlib.l5.structs.StyxQID;
 
+import java.util.List;
+
 public class FactoryImpl implements Factory  {
     @Override
     public StyxMessage constructTVersion(long iounit, String version) {
@@ -53,5 +55,10 @@ public class FactoryImpl implements Factory  {
     @Override
     public StyxMessage constructTWriteMessage(long fid, long fileOffset, byte[] data, int dataOffset, int dataLength) {
         return new StyxTWriteMessage(fid, fileOffset, data, dataOffset, dataLength);
+    }
+
+    @Override
+    public StyxMessage constructTWalkMessage(long fid, long new_fid, List<String> path) {
+        return new StyxTWalkMessage(fid, new_fid, path);
     }
 }

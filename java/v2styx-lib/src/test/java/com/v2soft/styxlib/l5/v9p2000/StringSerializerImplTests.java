@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.Calendar;
+import java.util.List;
 import java.util.TimeZone;
 
 public class StringSerializerImplTests {
@@ -121,5 +122,17 @@ public class StringSerializerImplTests {
         Assertions.assertTrue(str.contains("fileOffset:23432"));
         Assertions.assertTrue(str.contains("dataLength:3"));
         Assertions.assertTrue(str.contains("Tag:123"));
+    }
+
+    @Test
+    public void testSerializeTWalk() {
+        var message = messageFactory.constructTWalkMessage(1080, 23432,
+                List.of("path1", "path2", "path3"));
+        message.setTag(123);
+        var str = serializer.serializeMessage(message);
+        Assertions.assertTrue(str.contains("Message Type:110"));
+        Assertions.assertTrue(str.contains("fid:1080"));
+        Assertions.assertTrue(str.contains("newFid:23432"));
+        Assertions.assertTrue(str.contains("pathElements:[path1, path2, path3]"));
     }
 }

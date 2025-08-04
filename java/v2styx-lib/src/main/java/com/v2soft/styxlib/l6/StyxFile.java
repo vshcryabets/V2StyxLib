@@ -317,14 +317,12 @@ public class StyxFile {
     private long sendWalkMessage(long parentFID, String path)
             throws StyxException {
         long newFID = mDI.getClientsRepo().getFidPoll(mClientId).getFreeItem();
-        final StyxTWalkMessage tWalk = new StyxTWalkMessage(parentFID,
+        final StyxMessage tWalk = mDI.getMessageFactory().constructTWalkMessage(parentFID,
                 newFID, StyxSerializerImpl.splitPath(path));
         final var feature = mTransmitter.sendMessage(tWalk, mClientId);
         final StyxMessage rWalk = feature.getResult(mTimeout);
         if (rWalk.getType() == MessageType.Rerror)
             throw StyxErrorMessageException.newInstance(((StyxRErrorMessage) rWalk).mError + " at " + mPath);
-        if (((StyxRWalkMessage) rWalk).qidList.size() != tWalk.getPathLength())
-            throw new StyxException("File not found " + mPath);
         return newFID;
     }
 

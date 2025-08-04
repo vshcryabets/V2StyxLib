@@ -2,6 +2,8 @@ package com.v2soft.styxlib.l5.messages.base;
 
 import com.v2soft.styxlib.l5.structs.StyxQID;
 
+import java.util.List;
+
 public interface Factory {
     StyxMessage constructTVersion(long iounit, String version);
     StyxMessage constructTAuth(long fid, String userName, String mountPoint);
@@ -13,4 +15,5 @@ public interface Factory {
     StyxMessage constructROpenMessage(int tag, StyxQID qid, long iounit);
     StyxMessage constructRCreateMessage(int tag, StyxQID qid, long iounit);
     StyxMessage constructTWriteMessage(long fid, long fileOffset, byte[] data, int dataOffset, int dataLength);
+    StyxMessage constructTWalkMessage(long fid, long new_fid, List<String> path);
 }

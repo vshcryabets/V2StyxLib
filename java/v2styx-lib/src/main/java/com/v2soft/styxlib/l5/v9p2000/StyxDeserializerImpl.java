@@ -12,7 +12,6 @@ import com.v2soft.styxlib.l5.messages.StyxTFlushMessage;
 import com.v2soft.styxlib.l5.messages.StyxTOpenMessage;
 import com.v2soft.styxlib.l5.messages.StyxTReadMessage;
 import com.v2soft.styxlib.l5.messages.StyxTWStatMessage;
-import com.v2soft.styxlib.l5.messages.StyxTWalkMessage;
 import com.v2soft.styxlib.l5.messages.base.Factory;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
 import com.v2soft.styxlib.l5.messages.base.StyxTMessageFID;
@@ -63,7 +62,7 @@ public class StyxDeserializerImpl implements IDataDeserializer {
                 for (int i = 0; i < count; i++) {
                     pathElements.add(buffer.readUTFString());
                 }
-                result = new StyxTWalkMessage(fid,
+                result = messageFactory.constructTWalkMessage(fid,
                         newFid,
                         pathElements);
             }

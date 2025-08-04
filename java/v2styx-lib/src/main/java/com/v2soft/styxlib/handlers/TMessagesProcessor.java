@@ -14,7 +14,7 @@ import com.v2soft.styxlib.l5.messages.StyxTCreateMessage;
 import com.v2soft.styxlib.l5.messages.StyxTOpenMessage;
 import com.v2soft.styxlib.l5.messages.StyxTReadMessage;
 import com.v2soft.styxlib.l5.messages.StyxTWStatMessage;
-import com.v2soft.styxlib.l5.messages.StyxTWalkMessage;
+import com.v2soft.styxlib.l5.messages.v9p2000.StyxTWalkMessage;
 import com.v2soft.styxlib.l5.messages.v9p2000.StyxTWriteMessage;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
 import com.v2soft.styxlib.l5.messages.base.StyxTMessageFID;
@@ -161,14 +161,14 @@ public class TMessagesProcessor extends QueueMessagesProcessor {
         final List<StyxQID> qidsList = new LinkedList<StyxQID>();
         final IVirtualStyxFile walkFile = mDi.getClientsRepo().getAssignedFile(clientId, fid).walk(
                 clientId,
-                new LinkedList<>(msg.getPathElements()),
+                new LinkedList<>(msg.mPathElements),
                 qidsList);
         if (walkFile != null) {
-            mDi.getClientsRepo().getClient(clientId).registerOpenedFile(msg.getNewFID(), walkFile);
+            mDi.getClientsRepo().getClient(clientId).registerOpenedFile(msg.mNewFID, walkFile);
             return new StyxRWalkMessage(msg.getTag(), qidsList);
         } else {
             return mDi.getMessageFactory().constructRerror(msg.getTag(),
-                    String.format("file \"%s\" does not exist", msg.getPathElements()));
+                    String.format("file \"%s\" does not exist", msg.mPathElements));
         }
     }
 
