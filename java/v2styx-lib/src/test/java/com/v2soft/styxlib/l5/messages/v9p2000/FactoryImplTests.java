@@ -5,6 +5,7 @@ import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.l5.messages.base.Factory;
 import com.v2soft.styxlib.l5.structs.StyxQID;
 
+import com.v2soft.styxlib.l5.structs.StyxStat;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -124,5 +125,16 @@ public class FactoryImplTests {
         Assertions.assertEquals(1080, ((StyxTWalkMessage) message).mFID);
         Assertions.assertEquals(23432, ((StyxTWalkMessage) message).mNewFID);
         Assertions.assertEquals(3, ((StyxTWalkMessage) message).mPathElements.size());
+    }
+
+    @Test
+    public void testCreateTWStat() {
+        var message = factory.constructTWStatMessage(1080, StyxStat.EMPTY);
+        Assertions.assertNotNull(message);
+        Assertions.assertEquals(Constants.NOTAG, message.getTag());
+        Assertions.assertInstanceOf(StyxTWStatMessage.class, message);
+        Assertions.assertEquals(MessageType.Twstat, message.getType());
+        Assertions.assertEquals(1080, ((StyxTWStatMessage) message).mFID);
+        Assertions.assertEquals(StyxStat.EMPTY, ((StyxTWStatMessage) message).stat);
     }
 }

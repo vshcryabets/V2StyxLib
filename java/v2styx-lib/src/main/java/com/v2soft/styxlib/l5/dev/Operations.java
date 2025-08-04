@@ -2,7 +2,6 @@ package com.v2soft.styxlib.l5.dev;
 
 import com.v2soft.styxlib.Logger;
 import com.v2soft.styxlib.l5.enums.MessageType;
-import com.v2soft.styxlib.l5.messages.StyxTWStatMessage;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
 import com.v2soft.styxlib.l5.messages.base.StyxTMessageFID;
 import com.v2soft.styxlib.l5.messages.v9p2000.StyxRErrorMessage;
@@ -44,11 +43,6 @@ public class Operations {
                 result.append(" Error:");
                 result.append(((StyxRErrorMessage)message).mError);
                 break;
-            case MessageType.Twstat: {
-                result.append(" Stat: ");
-                result.append(((StyxTWStatMessage) message).stat.toString());
-            }
-            break;
             case MessageType.Tattach:
                 result.append("AuthFID: ");
                 result.append(((StyxTAttachMessage) message).authFID);

@@ -135,4 +135,32 @@ public class StringSerializerImplTests {
         Assertions.assertTrue(str.contains("newFid:23432"));
         Assertions.assertTrue(str.contains("pathElements:[path1, path2, path3]"));
     }
+
+    @Test
+    public void testSerializeTWStat() {
+        Calendar utcCalendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+        utcCalendar.set(2001, 05, 04, 12, 30, 23);
+        utcCalendar.set(Calendar.MILLISECOND, 0);
+        var date = utcCalendar.getTime();
+        StyxStat stat = new StyxStat(
+                0x10,
+                0x20,
+                StyxQID.EMPTY,
+                0x123,
+                date, date,
+                123,
+                "testName",
+                "testUser",
+                "testGroup",
+                "testModUser"
+        );
+        var message = messageFactory.constructTWStatMessage(1080, stat);
+        message.setTag(123);
+        var str = serializer.serializeMessage(message);
+        Assertions.assertTrue(str.contains("Message Type:126"));
+        Assertions.assertTrue(str.contains("fid:1080"));
+        Assertions.assertTrue(str.contains("Stat 0x10,0x20,Qid=QID {type: 0, version: 0, path: 0},mode=0x123," +
+                        "atime=2001-06-04T12:30:23Z,mtime=2001-06-04T12:30:23Z," +
+                        "length=123,name=testName,user=testUser,group=testGroup,modUser=testModUser"));
+    }
 }

@@ -1,8 +1,5 @@
 package com.v2soft.styxlib.l5.v9p2000;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.l5.enums.QidType;
@@ -14,7 +11,6 @@ import com.v2soft.styxlib.l5.messages.StyxTCreateMessage;
 import com.v2soft.styxlib.l5.messages.StyxTFlushMessage;
 import com.v2soft.styxlib.l5.messages.StyxTOpenMessage;
 import com.v2soft.styxlib.l5.messages.StyxTReadMessage;
-import com.v2soft.styxlib.l5.messages.StyxTWStatMessage;
 import com.v2soft.styxlib.l5.messages.base.Factory;
 import com.v2soft.styxlib.l5.messages.base.StyxTMessageFID;
 import com.v2soft.styxlib.l5.messages.v9p2000.BaseMessage;
@@ -23,12 +19,14 @@ import com.v2soft.styxlib.l5.serialization.IDataSerializer;
 import com.v2soft.styxlib.l5.serialization.impl.BufferWriterImpl;
 import com.v2soft.styxlib.l5.structs.StyxQID;
 import com.v2soft.styxlib.l5.structs.StyxStat;
-
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class StyxSerializerImplTest {
     Factory messageFactory = new FactoryImpl();
@@ -87,7 +85,7 @@ class StyxSerializerImplTest {
                         0x22)));
 
         assertEquals(IDataSerializer.BASE_BINARY_SIZE + 4 + 68,
-                serializer.getMessageSize(new StyxTWStatMessage(
+                serializer.getMessageSize(messageFactory.constructTWStatMessage(
                         0x1234,
                         new StyxStat(
                                 (short)1,

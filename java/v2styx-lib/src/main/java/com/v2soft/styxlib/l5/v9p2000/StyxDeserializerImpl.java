@@ -11,7 +11,6 @@ import com.v2soft.styxlib.l5.messages.StyxTCreateMessage;
 import com.v2soft.styxlib.l5.messages.StyxTFlushMessage;
 import com.v2soft.styxlib.l5.messages.StyxTOpenMessage;
 import com.v2soft.styxlib.l5.messages.StyxTReadMessage;
-import com.v2soft.styxlib.l5.messages.StyxTWStatMessage;
 import com.v2soft.styxlib.l5.messages.base.Factory;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
 import com.v2soft.styxlib.l5.messages.base.StyxTMessageFID;
@@ -135,7 +134,7 @@ public class StyxDeserializerImpl implements IDataDeserializer {
                 var fid = buffer.readUInt32();
                 buffer.readUInt16(); // ???
                 var stat = deserializeStat(buffer);
-                result = new StyxTWStatMessage(fid, stat);
+                result = messageFactory.constructTWStatMessage(fid, stat);
             }
             case MessageType.Rwstat -> result = new BaseMessage(MessageType.Rwstat, tag, null);
             default ->

@@ -13,7 +13,7 @@ import com.v2soft.styxlib.l5.messages.StyxRWriteMessage;
 import com.v2soft.styxlib.l5.messages.StyxTCreateMessage;
 import com.v2soft.styxlib.l5.messages.StyxTOpenMessage;
 import com.v2soft.styxlib.l5.messages.StyxTReadMessage;
-import com.v2soft.styxlib.l5.messages.StyxTWStatMessage;
+import com.v2soft.styxlib.l5.messages.v9p2000.StyxTWStatMessage;
 import com.v2soft.styxlib.l5.messages.v9p2000.StyxTWalkMessage;
 import com.v2soft.styxlib.l5.messages.v9p2000.StyxTWriteMessage;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;

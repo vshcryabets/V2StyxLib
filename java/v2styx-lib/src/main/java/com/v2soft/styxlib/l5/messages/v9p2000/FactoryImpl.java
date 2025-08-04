@@ -3,6 +3,7 @@ package com.v2soft.styxlib.l5.messages.v9p2000;
 import com.v2soft.styxlib.l5.messages.base.Factory;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
 import com.v2soft.styxlib.l5.structs.StyxQID;
+import com.v2soft.styxlib.l5.structs.StyxStat;
 
 import java.util.List;
 
@@ -60,5 +61,10 @@ public class FactoryImpl implements Factory  {
     @Override
     public StyxMessage constructTWalkMessage(long fid, long new_fid, List<String> path) {
         return new StyxTWalkMessage(fid, new_fid, path);
+    }
+
+    @Override
+    public StyxMessage constructTWStatMessage(long fid, StyxStat stat) {
+        return new StyxTWStatMessage(fid, stat);
     }
 }
