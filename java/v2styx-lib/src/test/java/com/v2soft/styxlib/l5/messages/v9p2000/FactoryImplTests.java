@@ -1,11 +1,12 @@
 package com.v2soft.styxlib.l5.messages.v9p2000;
 
 import com.v2soft.styxlib.l5.enums.Constants;
+import com.v2soft.styxlib.l5.enums.FileMode;
 import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.l5.messages.base.Factory;
 import com.v2soft.styxlib.l5.structs.StyxQID;
-
 import com.v2soft.styxlib.l5.structs.StyxStat;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -136,5 +137,34 @@ public class FactoryImplTests {
         Assertions.assertEquals(MessageType.Twstat, message.getType());
         Assertions.assertEquals(1080, ((StyxTWStatMessage) message).mFID);
         Assertions.assertEquals(StyxStat.EMPTY, ((StyxTWStatMessage) message).stat);
+    }
+
+    @Test
+    public void testCreateRStat() {
+        var message = factory.constructRStatMessage(1, StyxStat.EMPTY);
+        Assertions.assertNotNull(message);
+        Assertions.assertEquals(1, message.getTag());
+        Assertions.assertInstanceOf(StyxRStatMessage.class, message);
+        Assertions.assertEquals(MessageType.Rstat, message.getType());
+        Assertions.assertEquals(StyxStat.EMPTY, ((StyxRStatMessage) message).stat);
+    }
+
+    @Test
+    public void testCreateTFlush() {
+        var message = factory.constructTFlushMessage(1);
+        Assertions.assertNotNull(message);
+        Assertions.assertEquals(1, ((StyxTFlushMessage)message).oldTag);
+        Assertions.assertInstanceOf(StyxTFlushMessage.class, message);
+        Assertions.assertEquals(MessageType.Tflush, message.getType());
+    }
+
+    @Test
+    public void testCreateTOpen() {
+        var message = factory.constructTOpenMessage(1, (int) FileMode.AppendOnly);
+        Assertions.assertNotNull(message);
+        Assertions.assertEquals(1, ((StyxTOpenMessage)message).getFID());
+        Assertions.assertEquals(FileMode.AppendOnly, ((StyxTOpenMessage)message).mode);
+        Assertions.assertInstanceOf(StyxTOpenMessage.class, message);
+        Assertions.assertEquals(MessageType.Topen, message.getType());
     }
 }

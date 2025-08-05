@@ -9,13 +9,12 @@ import com.v2soft.styxlib.l5.enums.Constants;
 import com.v2soft.styxlib.l5.enums.FileMode;
 import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.l5.enums.ModeType;
-import com.v2soft.styxlib.l5.messages.StyxRStatMessage;
 import com.v2soft.styxlib.l5.messages.StyxTCreateMessage;
-import com.v2soft.styxlib.l5.messages.StyxTOpenMessage;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
 import com.v2soft.styxlib.l5.messages.base.StyxTMessageFID;
 import com.v2soft.styxlib.l5.messages.v9p2000.StyxRErrorMessage;
 import com.v2soft.styxlib.l5.messages.v9p2000.StyxROpenMessage;
+import com.v2soft.styxlib.l5.messages.v9p2000.StyxRStatMessage;
 import com.v2soft.styxlib.l5.structs.StyxStat;
 import com.v2soft.styxlib.l5.v9p2000.StyxSerializerImpl;
 import com.v2soft.styxlib.l6.io.StyxFileBufferedInputStream;
@@ -71,7 +70,7 @@ public class StyxFile {
 
     private int open(int mode, long fid)
             throws StyxException {
-        final StyxTOpenMessage tOpen = new StyxTOpenMessage(fid, mode);
+        final StyxMessage tOpen = mDI.getMessageFactory().constructTOpenMessage(fid, mode);
         final var rOpen = (StyxROpenMessage) mTransmitter.sendMessage(tOpen, mClientId)
                 .getResult(mTimeout);
         return (int) rOpen.ioUnit;

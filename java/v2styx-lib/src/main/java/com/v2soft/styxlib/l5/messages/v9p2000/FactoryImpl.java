@@ -67,4 +67,19 @@ public class FactoryImpl implements Factory  {
     public StyxMessage constructTWStatMessage(long fid, StyxStat stat) {
         return new StyxTWStatMessage(fid, stat);
     }
+
+    @Override
+    public StyxMessage constructRStatMessage(int tag, StyxStat stat) {
+        return new StyxRStatMessage(tag, stat);
+    }
+
+    @Override
+    public StyxMessage constructTFlushMessage(int tag) {
+        return new StyxTFlushMessage(tag);
+    }
+
+    @Override
+    public StyxMessage constructTOpenMessage(long fid, int mode) {
+        return new StyxTOpenMessage(fid, mode);
+    }
 }

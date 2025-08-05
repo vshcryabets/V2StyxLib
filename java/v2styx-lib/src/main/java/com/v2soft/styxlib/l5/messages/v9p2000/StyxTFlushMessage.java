@@ -1,4 +1,4 @@
-package com.v2soft.styxlib.l5.messages;
+package com.v2soft.styxlib.l5.messages.v9p2000;
 
 import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.l5.messages.base.StyxTMessage;
@@ -6,7 +6,7 @@ import com.v2soft.styxlib.l5.messages.base.StyxTMessage;
 public class StyxTFlushMessage extends StyxTMessage {
 	public final int oldTag;
 
-	public StyxTFlushMessage(int tag){
+	protected StyxTFlushMessage(int tag){
 		super(MessageType.Tflush);
 		oldTag = tag;
 	}

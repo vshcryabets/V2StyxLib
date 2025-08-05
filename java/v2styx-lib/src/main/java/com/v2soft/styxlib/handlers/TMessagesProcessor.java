@@ -7,20 +7,19 @@ import com.v2soft.styxlib.exceptions.StyxUnknownClientIdException;
 import com.v2soft.styxlib.l5.dev.MetricsAndStats;
 import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.l5.messages.StyxRReadMessage;
-import com.v2soft.styxlib.l5.messages.StyxRStatMessage;
 import com.v2soft.styxlib.l5.messages.StyxRWalkMessage;
 import com.v2soft.styxlib.l5.messages.StyxRWriteMessage;
 import com.v2soft.styxlib.l5.messages.StyxTCreateMessage;
-import com.v2soft.styxlib.l5.messages.StyxTOpenMessage;
+import com.v2soft.styxlib.l5.messages.v9p2000.StyxTOpenMessage;
 import com.v2soft.styxlib.l5.messages.StyxTReadMessage;
-import com.v2soft.styxlib.l5.messages.v9p2000.StyxTWStatMessage;
-import com.v2soft.styxlib.l5.messages.v9p2000.StyxTWalkMessage;
-import com.v2soft.styxlib.l5.messages.v9p2000.StyxTWriteMessage;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
 import com.v2soft.styxlib.l5.messages.base.StyxTMessageFID;
 import com.v2soft.styxlib.l5.messages.v9p2000.BaseMessage;
 import com.v2soft.styxlib.l5.messages.v9p2000.StyxTAttachMessage;
 import com.v2soft.styxlib.l5.messages.v9p2000.StyxTAuthMessage;
+import com.v2soft.styxlib.l5.messages.v9p2000.StyxTWStatMessage;
+import com.v2soft.styxlib.l5.messages.v9p2000.StyxTWalkMessage;
+import com.v2soft.styxlib.l5.messages.v9p2000.StyxTWriteMessage;
 import com.v2soft.styxlib.l5.structs.StyxQID;
 import com.v2soft.styxlib.l6.vfs.IVirtualStyxFile;
 import com.v2soft.styxlib.library.types.ConnectionDetails;
@@ -82,7 +81,7 @@ public class TMessagesProcessor extends QueueMessagesProcessor {
                 case MessageType.Tstat:
                     fid = ((StyxTMessageFID)message).getFID();
                     file = mDi.getClientsRepo().getAssignedFile(clientId, fid);
-                    answer = new StyxRStatMessage(message.getTag(), file.getStat());
+                    answer = mDi.getMessageFactory().constructRStatMessage(message.getTag(), file.getStat());
                     break;
                 case MessageType.Tclunk:
                     answer = processClunk(clientId, (StyxTMessageFID)message);
