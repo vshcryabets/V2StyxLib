@@ -4,12 +4,9 @@ import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.l5.dev.MetricsAndStats;
 import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.l5.messages.StyxRReadMessage;
-import com.v2soft.styxlib.l5.messages.StyxRStatMessage;
 import com.v2soft.styxlib.l5.messages.StyxRWalkMessage;
 import com.v2soft.styxlib.l5.messages.StyxRWriteMessage;
 import com.v2soft.styxlib.l5.messages.StyxTCreateMessage;
-import com.v2soft.styxlib.l5.messages.StyxTFlushMessage;
-import com.v2soft.styxlib.l5.messages.StyxTOpenMessage;
 import com.v2soft.styxlib.l5.messages.StyxTReadMessage;
 import com.v2soft.styxlib.l5.messages.base.Factory;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
@@ -48,7 +45,7 @@ public class StyxDeserializerImpl implements IDataDeserializer {
                     buffer.readUInt32(),
                     buffer.readUTFString(),
                     buffer.readUTFString());
-            case MessageType.Tflush -> result = new StyxTFlushMessage(buffer.readUInt16());
+            case MessageType.Tflush -> result = messageFactory.constructTFlushMessage(buffer.readUInt16());
             case MessageType.Tattach -> result = messageFactory.constructTAttach(buffer.readUInt32(),
                     buffer.readUInt32(),
                     buffer.readUTFString(),
@@ -77,7 +74,7 @@ public class StyxDeserializerImpl implements IDataDeserializer {
                 }
                 result = new StyxRWalkMessage(tag, qids);
             }
-            case MessageType.Topen -> result = new StyxTOpenMessage(buffer.readUInt32(),
+            case MessageType.Topen -> result = messageFactory.constructTOpenMessage(buffer.readUInt32(),
                     buffer.readUInt8());
             case MessageType.Ropen -> result = messageFactory.constructROpenMessage(tag,
                     deserializeQid(buffer),
@@ -128,7 +125,7 @@ public class StyxDeserializerImpl implements IDataDeserializer {
                     buffer.readUInt32());
             case MessageType.Rstat -> {
                 buffer.readUInt16(); //??
-                result = new StyxRStatMessage(tag, deserializeStat(buffer));
+                result = messageFactory.constructRStatMessage(tag, deserializeStat(buffer));
             }
             case MessageType.Twstat -> {
                 var fid = buffer.readUInt32();

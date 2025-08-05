@@ -18,4 +18,7 @@ public interface Factory {
     StyxMessage constructTWriteMessage(long fid, long fileOffset, byte[] data, int dataOffset, int dataLength);
     StyxMessage constructTWalkMessage(long fid, long new_fid, List<String> path);
     StyxMessage constructTWStatMessage(long fid, StyxStat stat);
+    StyxMessage constructRStatMessage(int tag, StyxStat stat);
+    StyxMessage constructTFlushMessage(int tag);
+    StyxMessage constructTOpenMessage(long fid, int mode);
 }

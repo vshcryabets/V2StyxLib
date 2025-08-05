@@ -1,4 +1,4 @@
-package com.v2soft.styxlib.l5.messages;
+package com.v2soft.styxlib.l5.messages.v9p2000;
 
 import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.l5.messages.base.StyxTMessageFID;
@@ -6,7 +6,7 @@ import com.v2soft.styxlib.l5.messages.base.StyxTMessageFID;
 public class StyxTOpenMessage extends StyxTMessageFID {
     public final int mode;
 
-    public StyxTOpenMessage(long fid, int mode) {
+    protected StyxTOpenMessage(long fid, int mode) {
         super(MessageType.Topen, fid);
         this.mode = mode;
     }
