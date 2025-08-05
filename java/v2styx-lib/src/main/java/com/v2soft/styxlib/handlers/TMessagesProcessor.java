@@ -6,17 +6,14 @@ import com.v2soft.styxlib.exceptions.StyxNotAuthorizedException;
 import com.v2soft.styxlib.exceptions.StyxUnknownClientIdException;
 import com.v2soft.styxlib.l5.dev.MetricsAndStats;
 import com.v2soft.styxlib.l5.enums.MessageType;
-import com.v2soft.styxlib.l5.messages.StyxRReadMessage;
-import com.v2soft.styxlib.l5.messages.StyxRWalkMessage;
-import com.v2soft.styxlib.l5.messages.StyxRWriteMessage;
-import com.v2soft.styxlib.l5.messages.StyxTCreateMessage;
-import com.v2soft.styxlib.l5.messages.v9p2000.StyxTOpenMessage;
-import com.v2soft.styxlib.l5.messages.StyxTReadMessage;
+import com.v2soft.styxlib.l5.messages.v9p2000.StyxTCreateMessage;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
 import com.v2soft.styxlib.l5.messages.base.StyxTMessageFID;
 import com.v2soft.styxlib.l5.messages.v9p2000.BaseMessage;
 import com.v2soft.styxlib.l5.messages.v9p2000.StyxTAttachMessage;
 import com.v2soft.styxlib.l5.messages.v9p2000.StyxTAuthMessage;
+import com.v2soft.styxlib.l5.messages.v9p2000.StyxTOpenMessage;
+import com.v2soft.styxlib.l5.messages.v9p2000.StyxTReadMessage;
 import com.v2soft.styxlib.l5.messages.v9p2000.StyxTWStatMessage;
 import com.v2soft.styxlib.l5.messages.v9p2000.StyxTWalkMessage;
 import com.v2soft.styxlib.l5.messages.v9p2000.StyxTWriteMessage;
@@ -164,7 +161,7 @@ public class TMessagesProcessor extends QueueMessagesProcessor {
                 qidsList);
         if (walkFile != null) {
             mDi.getClientsRepo().getClient(clientId).registerOpenedFile(msg.mNewFID, walkFile);
-            return new StyxRWalkMessage(msg.getTag(), qidsList);
+            return mDi.getMessageFactory().constructRWalkMessage(msg.getTag(), qidsList);
         } else {
             return mDi.getMessageFactory().constructRerror(msg.getTag(),
                     String.format("file \"%s\" does not exist", msg.mPathElements));
@@ -206,7 +203,7 @@ public class TMessagesProcessor extends QueueMessagesProcessor {
 
     private StyxMessage processWrite(int clientId, StyxTWriteMessage msg) throws StyxException {
         long fid = msg.getFID();
-        return new StyxRWriteMessage(msg.getTag(),
+        return mDi.getMessageFactory().constructRWriteMessage(msg.getTag(),
                 mDi.getClientsRepo().getAssignedFile(clientId, fid).write(clientId, msg.data, msg.offset));
     }
 
@@ -217,7 +214,7 @@ public class TMessagesProcessor extends QueueMessagesProcessor {
         long fid = msg.getFID();
         byte[] buffer = new byte[(int) msg.count];
         MetricsAndStats.byteArrayAllocationRRead++;
-        return new StyxRReadMessage(msg.getTag(), buffer,
+        return mDi.getMessageFactory().constructRReadMessage(msg.getTag(), buffer,
                 mDi.getClientsRepo()
                         .getAssignedFile(clientId, fid)
                         .read(clientId, buffer, msg.offset, msg.count));

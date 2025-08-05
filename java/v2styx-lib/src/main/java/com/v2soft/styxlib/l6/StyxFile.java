@@ -9,7 +9,6 @@ import com.v2soft.styxlib.l5.enums.Constants;
 import com.v2soft.styxlib.l5.enums.FileMode;
 import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.l5.enums.ModeType;
-import com.v2soft.styxlib.l5.messages.StyxTCreateMessage;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
 import com.v2soft.styxlib.l5.messages.base.StyxTMessageFID;
 import com.v2soft.styxlib.l5.messages.v9p2000.StyxRErrorMessage;
@@ -96,7 +95,8 @@ public class StyxFile {
         var iounit = open(ModeType.OREAD, tempFID);
         var stats = new ArrayList<StyxStat>();
         try {
-            var is = new StyxFileBufferedInputStream(mTransmitter, tempFID, iounit, mClientId);
+            var is = new StyxFileBufferedInputStream(mTransmitter, tempFID, iounit, mClientId,
+                    mDI.getGetMessagesFactoryUseCase());
             var sis = new StyxDataInputStream(is);
             while (true) {
                 stats.add(mDI.getDataDeserializer().deserializeStat(sis));
@@ -125,7 +125,8 @@ public class StyxFile {
             throws StyxException {
         long tempFID = getCloneFID();
         int iounit = open(ModeType.OREAD, tempFID);
-        return new StyxFileBufferedInputStream(mTransmitter, tempFID, iounit, mClientId);
+        return new StyxFileBufferedInputStream(mTransmitter, tempFID, iounit, mClientId,
+                mDI.getGetMessagesFactoryUseCase());
     }
 
     /**
@@ -136,7 +137,8 @@ public class StyxFile {
     public StyxUnbufferedInputStream openForReadUnbuffered() throws StyxException {
         long tempFID = getCloneFID();
         int iounit = open(ModeType.OREAD, tempFID);
-        return new StyxUnbufferedInputStream(tempFID, mTransmitter, iounit, mClientId);
+        return new StyxUnbufferedInputStream(tempFID, mTransmitter, iounit, mClientId,
+                mDI.getGetMessagesFactoryUseCase());
     }
 
     public OutputStream openForWrite()
@@ -158,7 +160,10 @@ public class StyxFile {
     public void create(long permissions) throws StyxException {
         // reserve FID
         long tempFID = sendWalkMessage(mParentFID, "");
-        var tCreate = new StyxTCreateMessage(tempFID, mPath, permissions, ModeType.OWRITE);
+        var tCreate = mDI.getMessageFactory().constructTCreateMessage(tempFID,
+                mPath,
+                permissions,
+                ModeType.OWRITE);
         mTransmitter
             .sendMessage(tCreate, mClientId)
 //                .exceptionally()
@@ -226,7 +231,11 @@ public class StyxFile {
 
     public void mkdir(long permissions) throws InterruptedException, StyxException {
         permissions = permissions & FileMode.PERMISSION_BITMASK | FileMode.Directory;
-        StyxTCreateMessage tCreate = new StyxTCreateMessage(mParentFID, getName(), permissions, ModeType.OREAD);
+        final var tCreate = mDI.getMessageFactory().constructTCreateMessage(
+                mParentFID,
+                getName(),
+                permissions,
+                ModeType.OREAD);
         mTransmitter.sendMessage(tCreate, mClientId).getResult(mTimeout);
     }
 

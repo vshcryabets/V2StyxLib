@@ -1,12 +1,13 @@
 package com.v2soft.styxlib.l6.io;
 
-import com.v2soft.styxlib.l5.Connection;
-import com.v2soft.styxlib.l5.messages.StyxRReadMessage;
-import com.v2soft.styxlib.l5.messages.StyxTReadMessage;
-import com.v2soft.styxlib.l5.messages.base.StyxTMessageFID;
-import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.handlers.IMessageTransmitter;
+import com.v2soft.styxlib.l5.Connection;
 import com.v2soft.styxlib.l5.dev.MetricsAndStats;
+import com.v2soft.styxlib.l5.enums.MessageType;
+import com.v2soft.styxlib.l5.messages.v9p2000.StyxRReadMessage;
+import com.v2soft.styxlib.l5.messages.base.StyxMessage;
+import com.v2soft.styxlib.l5.messages.base.StyxTMessageFID;
+import com.v2soft.styxlib.utils.GetMessagesFactoryUseCase;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,17 +25,20 @@ public class StyxUnbufferedInputStream extends InputStream {
     private long mFileOffset = 0;
     private int mIOUnitSize;
     protected int mRecepient;
+    private GetMessagesFactoryUseCase getMessagesFactoryUseCase;
 
     public StyxUnbufferedInputStream(long file,
                                      IMessageTransmitter messenger,
                                      int iounit,
-                                     int clientId) {
+                                     int clientId,
+                                     GetMessagesFactoryUseCase getMessagesFactoryUseCase) {
         if ( clientId < 0 ) {
             throw new NullPointerException("clientId is negative");
         }
         if ( messenger == null ) {
             throw new NullPointerException("messenger is null");
         }
+        this.getMessagesFactoryUseCase = getMessagesFactoryUseCase;
         MetricsAndStats.byteArrayAllocationIo++;
         mRecepient = clientId;
         mIOUnitSize = iounit;
@@ -58,7 +62,8 @@ public class StyxUnbufferedInputStream extends InputStream {
         int read = 0;
         try {
             // send Tread
-            final StyxTReadMessage tRead = new StyxTReadMessage(mFID, mFileOffset, len);
+            final StyxMessage tRead = getMessagesFactoryUseCase.get()
+                    .constructTReadMessage(mFID, mFileOffset, len);
             final var rRead = mMessenger.<StyxRReadMessage>sendMessage(tRead, mRecepient)
                     .getResult(mTimeout);
             read = rRead.dataLength;
