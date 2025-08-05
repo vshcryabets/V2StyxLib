@@ -4,7 +4,6 @@ import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.l5.enums.FileMode;
 import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.l5.enums.QidType;
-import com.v2soft.styxlib.l5.messages.StyxRReadMessage;
 import com.v2soft.styxlib.l5.messages.base.Factory;
 import com.v2soft.styxlib.l5.messages.v9p2000.FactoryImpl;
 import com.v2soft.styxlib.l5.serialization.impl.BufferWriterImpl;
@@ -105,7 +104,7 @@ public class MessageSerializerImplTest {
 
     @Test
     public void testRReadZeroDataLength() throws StyxException {
-        serializer.serialize(new StyxRReadMessage(128, new byte[0], 0), outputBuffer);
+        serializer.serialize(messageFactory.constructRReadMessage(128, new byte[0], 0), outputBuffer);
         byte[] data = new byte[buffer.limit()];
         buffer.position(0);
         buffer.get(data);

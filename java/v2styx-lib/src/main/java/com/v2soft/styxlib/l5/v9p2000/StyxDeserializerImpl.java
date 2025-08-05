@@ -3,11 +3,6 @@ package com.v2soft.styxlib.l5.v9p2000;
 import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.l5.dev.MetricsAndStats;
 import com.v2soft.styxlib.l5.enums.MessageType;
-import com.v2soft.styxlib.l5.messages.StyxRReadMessage;
-import com.v2soft.styxlib.l5.messages.StyxRWalkMessage;
-import com.v2soft.styxlib.l5.messages.StyxRWriteMessage;
-import com.v2soft.styxlib.l5.messages.StyxTCreateMessage;
-import com.v2soft.styxlib.l5.messages.StyxTReadMessage;
 import com.v2soft.styxlib.l5.messages.base.Factory;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
 import com.v2soft.styxlib.l5.messages.base.StyxTMessageFID;
@@ -72,14 +67,15 @@ public class StyxDeserializerImpl implements IDataDeserializer {
                 for (int i = 0; i < count; i++) {
                     qids.add(deserializeQid(buffer));
                 }
-                result = new StyxRWalkMessage(tag, qids);
+                result = messageFactory.constructRWalkMessage(tag, qids);
             }
             case MessageType.Topen -> result = messageFactory.constructTOpenMessage(buffer.readUInt32(),
                     buffer.readUInt8());
             case MessageType.Ropen -> result = messageFactory.constructROpenMessage(tag,
                     deserializeQid(buffer),
                     buffer.readUInt32());
-            case MessageType.Tcreate -> result = new StyxTCreateMessage(buffer.readUInt32(),
+            case MessageType.Tcreate -> result = messageFactory.constructTCreateMessage(
+                    buffer.readUInt32(),
                     buffer.readUTFString(),
                     buffer.readUInt32(),
                     buffer.readUInt8());
@@ -87,7 +83,7 @@ public class StyxDeserializerImpl implements IDataDeserializer {
                     tag,
                     deserializeQid(buffer),
                     buffer.readUInt32());
-            case MessageType.Tread -> result = new StyxTReadMessage(
+            case MessageType.Tread -> result = messageFactory.constructTReadMessage(
                     buffer.readUInt32(),
                     buffer.readUInt64(),
                     (int) buffer.readUInt32());
@@ -96,7 +92,7 @@ public class StyxDeserializerImpl implements IDataDeserializer {
                 MetricsAndStats.byteArrayAllocationRRead++;
                 var data = new byte[dataLength];
                 buffer.readData(data, 0, dataLength);
-                result = new StyxRReadMessage(tag,
+                result = messageFactory.constructRReadMessage(tag,
                         data,
                         dataLength);
             }
@@ -113,7 +109,7 @@ public class StyxDeserializerImpl implements IDataDeserializer {
                         0,
                         0);
             }
-            case MessageType.Rwrite -> result = new StyxRWriteMessage(tag, buffer.readUInt32());
+            case MessageType.Rwrite -> result = messageFactory.constructRWriteMessage(tag, buffer.readUInt32());
             case MessageType.Tclunk -> result = new StyxTMessageFID(
                     MessageType.Tclunk,
                     buffer.readUInt32());

@@ -3,6 +3,7 @@ package com.v2soft.styxlib.l5.messages.v9p2000;
 import com.v2soft.styxlib.l5.enums.Constants;
 import com.v2soft.styxlib.l5.enums.FileMode;
 import com.v2soft.styxlib.l5.enums.MessageType;
+import com.v2soft.styxlib.l5.enums.ModeType;
 import com.v2soft.styxlib.l5.messages.base.Factory;
 import com.v2soft.styxlib.l5.structs.StyxQID;
 import com.v2soft.styxlib.l5.structs.StyxStat;
@@ -47,7 +48,7 @@ public class FactoryImplTests {
         var message = factory.constructRerror(1, "Test error");
         Assertions.assertNotNull(message);
         Assertions.assertEquals(1, message.getTag());
-        Assertions.assertTrue(message instanceof StyxRErrorMessage);
+        Assertions.assertInstanceOf(StyxRErrorMessage.class, message);
         Assertions.assertEquals("Test error", ((StyxRErrorMessage) message).mError);
     }
 
@@ -64,7 +65,7 @@ public class FactoryImplTests {
         var message = factory.constructRAttachMessage(1, StyxQID.EMPTY);
         Assertions.assertNotNull(message);
         Assertions.assertEquals(1, message.getTag());
-        Assertions.assertTrue(message instanceof StyxRAttachMessage);
+        Assertions.assertInstanceOf(StyxRAttachMessage.class, message);
         Assertions.assertEquals(StyxQID.EMPTY, ((StyxRAttachMessage) message).mQID);
     }
 
@@ -73,7 +74,7 @@ public class FactoryImplTests {
         var message = factory.constructRAuthMessage(1, StyxQID.EMPTY);
         Assertions.assertNotNull(message);
         Assertions.assertEquals(1, message.getTag());
-        Assertions.assertTrue(message instanceof StyxRAuthMessage);
+        Assertions.assertInstanceOf(StyxRAuthMessage.class, message);
         Assertions.assertEquals(StyxQID.EMPTY, ((StyxRAuthMessage) message).mQID);
     }
 
@@ -166,5 +167,69 @@ public class FactoryImplTests {
         Assertions.assertEquals(FileMode.AppendOnly, ((StyxTOpenMessage)message).mode);
         Assertions.assertInstanceOf(StyxTOpenMessage.class, message);
         Assertions.assertEquals(MessageType.Topen, message.getType());
+    }
+
+    @Test
+    public void testCreateRWrite() {
+        var message = factory.constructRWriteMessage(1, 12345);
+        Assertions.assertNotNull(message);
+        Assertions.assertEquals(1, ((StyxRWriteMessage)message).getTag());
+        Assertions.assertEquals(12345, ((StyxRWriteMessage)message).count);
+        Assertions.assertInstanceOf(StyxRWriteMessage.class, message);
+        Assertions.assertEquals(MessageType.Rwrite, message.getType());
+    }
+
+    @Test
+    public void testCreateTRead() {
+        var message = factory.constructTReadMessage(1, 12345, 67890);
+        Assertions.assertNotNull(message);
+        Assertions.assertEquals(1, ((StyxTReadMessage)message).getFID());
+        Assertions.assertEquals(12345, ((StyxTReadMessage)message).offset);
+        Assertions.assertEquals(67890, ((StyxTReadMessage)message).count);
+        Assertions.assertInstanceOf(StyxTReadMessage.class, message);
+        Assertions.assertEquals(MessageType.Tread, message.getType());
+    }
+
+    @Test
+    public void testCreateRWalk() {
+        var message = factory.constructRWalkMessage(1,
+                List.of(StyxQID.EMPTY, StyxQID.EMPTY)
+        );
+        Assertions.assertNotNull(message);
+        Assertions.assertEquals(1, ((StyxRWalkMessage)message).getTag());
+        Assertions.assertEquals(2, ((StyxRWalkMessage)message).qidList.size());
+        Assertions.assertInstanceOf(StyxRWalkMessage.class, message);
+        Assertions.assertEquals(MessageType.Rwalk, message.getType());
+    }
+
+    @Test
+    public void testCreateRRead() {
+        var data = new byte[]{0x01, 0x02, 0x03};
+        var message = factory.constructRReadMessage(1,
+                data,
+                3
+        );
+        Assertions.assertNotNull(message);
+        Assertions.assertEquals(1, ((StyxRReadMessage)message).getTag());
+        Assertions.assertEquals(3, ((StyxRReadMessage)message).dataLength);
+        Assertions.assertArrayEquals(data, ((StyxRReadMessage)message).data);
+        Assertions.assertInstanceOf(StyxRReadMessage.class, message);
+        Assertions.assertEquals(MessageType.Rread, message.getType());
+    }
+
+    @Test
+    public void testCreateTCreate() {
+        var message = factory.constructTCreateMessage(1,
+                "testFile",
+                0x123,
+                ModeType.ORDWR
+        );
+        Assertions.assertNotNull(message);
+        Assertions.assertEquals(1, ((StyxTCreateMessage)message).getFID());
+        Assertions.assertEquals("testFile", ((StyxTCreateMessage)message).name);
+        Assertions.assertEquals(0x123, ((StyxTCreateMessage)message).permissions);
+        Assertions.assertEquals(ModeType.ORDWR, ((StyxTCreateMessage)message).mode);
+        Assertions.assertInstanceOf(StyxTCreateMessage.class, message);
+        Assertions.assertEquals(MessageType.Tcreate, message.getType());
     }
 }

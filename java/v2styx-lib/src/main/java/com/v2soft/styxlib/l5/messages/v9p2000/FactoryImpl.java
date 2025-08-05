@@ -82,4 +82,29 @@ public class FactoryImpl implements Factory  {
     public StyxMessage constructTOpenMessage(long fid, int mode) {
         return new StyxTOpenMessage(fid, mode);
     }
+
+    @Override
+    public StyxMessage constructRWriteMessage(int tag, long count) {
+        return new StyxRWriteMessage(tag, count);
+    }
+
+    @Override
+    public StyxMessage constructTReadMessage(long fid, long offset, int count) {
+        return new StyxTReadMessage(fid, offset, count);
+    }
+
+    @Override
+    public StyxMessage constructRWalkMessage(int tag, List<StyxQID> empty) {
+        return new StyxRWalkMessage(tag, empty);
+    }
+
+    @Override
+    public StyxMessage constructRReadMessage(int tag, byte[] data, int size) {
+        return new StyxRReadMessage(tag, data, size);
+    }
+
+    @Override
+    public StyxMessage constructTCreateMessage(long fid, String name, long permissions, int mode) {
+        return new StyxTCreateMessage(fid, name, permissions, mode);
+    }
 }

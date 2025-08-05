@@ -1,7 +1,7 @@
 package com.v2soft.styxlib.l6.io;
 
-import com.v2soft.styxlib.server.ClientDetails;
 import com.v2soft.styxlib.handlers.IMessageTransmitter;
+import com.v2soft.styxlib.utils.GetMessagesFactoryUseCase;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -21,10 +21,12 @@ public class StyxFileBufferedInputStream extends InputStream {
      * @param iounit maximal block size.
      */
     public StyxFileBufferedInputStream(IMessageTransmitter messenger,
-            long fid,
-            int iounit,
-            int clientId) {
-        mUnbufferedInput = new StyxUnbufferedInputStream(fid, messenger, iounit, clientId);
+                                       long fid,
+                                       int iounit,
+                                       int clientId,
+                                       GetMessagesFactoryUseCase getMessagesFactoryUseCase) {
+        mUnbufferedInput = new StyxUnbufferedInputStream(fid, messenger, iounit, clientId,
+                getMessagesFactoryUseCase);
         mBufferedInput = new CBufferedInputStream(mUnbufferedInput, iounit);
     }
 
