@@ -6,12 +6,12 @@ import com.v2soft.styxlib.exceptions.StyxNotAuthorizedException;
 import com.v2soft.styxlib.exceptions.StyxUnknownClientIdException;
 import com.v2soft.styxlib.l5.dev.MetricsAndStats;
 import com.v2soft.styxlib.l5.enums.MessageType;
-import com.v2soft.styxlib.l5.messages.v9p2000.StyxTCreateMessage;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
-import com.v2soft.styxlib.l5.messages.base.StyxTMessageFID;
 import com.v2soft.styxlib.l5.messages.v9p2000.BaseMessage;
 import com.v2soft.styxlib.l5.messages.v9p2000.StyxTAttachMessage;
 import com.v2soft.styxlib.l5.messages.v9p2000.StyxTAuthMessage;
+import com.v2soft.styxlib.l5.messages.v9p2000.StyxTCreateMessage;
+import com.v2soft.styxlib.l5.messages.v9p2000.StyxTMessage;
 import com.v2soft.styxlib.l5.messages.v9p2000.StyxTOpenMessage;
 import com.v2soft.styxlib.l5.messages.v9p2000.StyxTReadMessage;
 import com.v2soft.styxlib.l5.messages.v9p2000.StyxTWStatMessage;
@@ -146,7 +146,7 @@ public class TMessagesProcessor extends QueueMessagesProcessor {
         return mDi.getMessageFactory().constructRAuthMessage(msg.getTag(), StyxQID.EMPTY);
     }
 
-    private StyxMessage processClunk(int clientId, StyxTMessageFID msg)
+    private StyxMessage processClunk(int clientId, StyxTMessage msg)
             throws StyxException {
         mDi.getClientsRepo().closeFile(clientId, msg.getFID());
         return new BaseMessage(MessageType.Rclunk, msg.getTag(), null);
@@ -180,7 +180,7 @@ public class TMessagesProcessor extends QueueMessagesProcessor {
         }
     }
 
-    private StyxMessage processRemove(int clientId, StyxTMessageFID msg)
+    private StyxMessage processRemove(int clientId, StyxTMessage msg)
             throws StyxException {
         if (mDi.getClientsRepo().getAssignedFile(clientId, msg.getFID()).delete(clientId)) {
             return new BaseMessage(MessageType.Rremove, msg.getTag(), null);

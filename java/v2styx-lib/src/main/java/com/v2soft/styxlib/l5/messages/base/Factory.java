@@ -26,4 +26,16 @@ public interface Factory {
     StyxMessage constructRWalkMessage(int tag, List<StyxQID> empty);
     StyxMessage constructRReadMessage(int tag, byte[] data, int size);
     StyxMessage constructTCreateMessage(long fid, String name, long permissions, int mode);
+
+    StyxMessage constructTClunk(long fid);
+
+    StyxMessage constructRClunk(int tag);
+
+    StyxMessage constructTRemove(long fid);
+
+    StyxMessage constructRRemove(int tag);
+
+    StyxMessage constructTStat(long fid);
+
+    StyxMessage constructRWStat(int tag);
 }

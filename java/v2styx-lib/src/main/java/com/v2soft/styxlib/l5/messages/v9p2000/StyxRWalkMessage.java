@@ -9,7 +9,7 @@ public class StyxRWalkMessage extends BaseMessage {
 	public final List<StyxQID> qidList;
 
 	protected StyxRWalkMessage(int tag, List<StyxQID> qids) {
-		super(MessageType.Rwalk, tag, null);
+		super(MessageType.Rwalk, tag, null, 0);
 		qidList = qids;
 	}
 

@@ -3,10 +3,8 @@ package com.v2soft.styxlib.l6.io;
 import com.v2soft.styxlib.handlers.IMessageTransmitter;
 import com.v2soft.styxlib.l5.Connection;
 import com.v2soft.styxlib.l5.dev.MetricsAndStats;
-import com.v2soft.styxlib.l5.enums.MessageType;
-import com.v2soft.styxlib.l5.messages.v9p2000.StyxRReadMessage;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
-import com.v2soft.styxlib.l5.messages.base.StyxTMessageFID;
+import com.v2soft.styxlib.l5.messages.v9p2000.StyxRReadMessage;
 import com.v2soft.styxlib.utils.GetMessagesFactoryUseCase;
 
 import java.io.IOException;
@@ -91,7 +89,7 @@ public class StyxUnbufferedInputStream extends InputStream {
     @Override
     public void close() throws IOException {
         // send Tclunk
-        final StyxTMessageFID tClunk = new StyxTMessageFID(MessageType.Tclunk, mFID);
+        final StyxMessage tClunk = getMessagesFactoryUseCase.get().constructTClunk(mFID);
         try {
             var future = mMessenger.sendMessage(tClunk, mRecepient).getResult(mTimeout);
         } catch (Exception e) {

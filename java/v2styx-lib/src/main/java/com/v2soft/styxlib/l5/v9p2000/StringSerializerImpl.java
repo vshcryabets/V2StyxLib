@@ -76,7 +76,7 @@ public class StringSerializerImpl implements StringSerializer {
                 break;
             case MessageType.Twalk:
                 result.append(",fid:");
-                result.append(((StyxTWalkMessage)message).mFID);
+                result.append(((BaseMessage)message).getFID());
                 result.append(",newFid:");
                 result.append(((StyxTWalkMessage)message).mNewFID);
                 result.append(",pathElements:");
@@ -84,7 +84,7 @@ public class StringSerializerImpl implements StringSerializer {
                 break;
             case MessageType.Twstat:
                 result.append(",fid:");
-                result.append(((StyxTWStatMessage)message).mFID);
+                result.append(((BaseMessage)message).getFID());
                 result.append(",Stat:");
                 result.append(serializeStat(((StyxTWStatMessage)message).stat));
                 break;

@@ -1,5 +1,6 @@
 package com.v2soft.styxlib.l5.messages.v9p2000;
 
+import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.l5.messages.base.Factory;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
 import com.v2soft.styxlib.l5.structs.StyxQID;
@@ -106,5 +107,65 @@ public class FactoryImpl implements Factory  {
     @Override
     public StyxMessage constructTCreateMessage(long fid, String name, long permissions, int mode) {
         return new StyxTCreateMessage(fid, name, permissions, mode);
+    }
+
+    @Override
+    public StyxMessage constructTClunk(long fid) {
+        return new BaseMessage(
+                MessageType.Tclunk,
+                0, // tag will be set later
+                null, // no QID for Tclunk
+                fid
+        );
+    }
+
+    @Override
+    public StyxMessage constructRClunk(int tag) {
+        return new BaseMessage(
+                MessageType.Rclunk,
+                tag,
+                null, // no QID for Rclunk
+                0 // fid is not needed for Rclunk
+        );
+    }
+
+    @Override
+    public StyxMessage constructTRemove(long fid) {
+        return new BaseMessage(
+                MessageType.Tremove,
+                0,
+                null,
+                fid
+        );
+    }
+
+    @Override
+    public StyxMessage constructRRemove(int tag) {
+        return new BaseMessage(
+                MessageType.Rremove,
+                tag,
+                null, // no QID for Rremove
+                0 // fid is not needed for Rremove
+        );
+    }
+
+    @Override
+    public StyxMessage constructTStat(long fid) {
+        return new BaseMessage(
+                MessageType.Tstat,
+                0,
+                null,
+                fid
+        );
+    }
+
+    @Override
+    public StyxMessage constructRWStat(int tag) {
+        return new BaseMessage(
+                MessageType.Rwstat,
+                tag,
+                null, // no QID for Rwstat
+                0 // fid is not needed for Rwstat
+        );
     }
 }

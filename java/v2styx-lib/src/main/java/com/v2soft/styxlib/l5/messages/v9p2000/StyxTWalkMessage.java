@@ -1,7 +1,6 @@
 package com.v2soft.styxlib.l5.messages.v9p2000;
 
 import com.v2soft.styxlib.l5.enums.MessageType;
-import com.v2soft.styxlib.l5.messages.base.StyxTMessageFID;
 
 import java.util.List;
 
@@ -11,12 +10,12 @@ import java.util.List;
  *
  */
 public class StyxTWalkMessage
-extends StyxTMessageFID {
+extends StyxTMessage {
     public final long mNewFID;
     public final List<String> mPathElements;
 
     protected StyxTWalkMessage(long fid, long new_fid, List<String> path){
-        super(MessageType.Twalk, fid);
+        super(MessageType.Twalk, null, fid);
         mNewFID = new_fid;
         mPathElements = path;
     }

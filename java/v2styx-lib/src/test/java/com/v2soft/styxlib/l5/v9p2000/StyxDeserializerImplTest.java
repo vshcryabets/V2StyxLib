@@ -6,7 +6,7 @@ import com.v2soft.styxlib.l5.enums.QidType;
 import com.v2soft.styxlib.l5.io.impl.BufferImpl;
 import com.v2soft.styxlib.l5.messages.v9p2000.StyxROpenMessage;
 import com.v2soft.styxlib.l5.messages.base.Factory;
-import com.v2soft.styxlib.l5.messages.base.StyxTMessageFID;
+import com.v2soft.styxlib.l5.messages.v9p2000.StyxTMessageFID;
 import com.v2soft.styxlib.l5.messages.v9p2000.FactoryImpl;
 import com.v2soft.styxlib.l5.serialization.impl.BufferReaderImpl;
 import org.junit.jupiter.api.Assertions;

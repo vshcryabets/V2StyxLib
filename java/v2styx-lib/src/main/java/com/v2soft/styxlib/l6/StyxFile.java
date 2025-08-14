@@ -10,7 +10,6 @@ import com.v2soft.styxlib.l5.enums.FileMode;
 import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.l5.enums.ModeType;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
-import com.v2soft.styxlib.l5.messages.base.StyxTMessageFID;
 import com.v2soft.styxlib.l5.messages.v9p2000.StyxRErrorMessage;
 import com.v2soft.styxlib.l5.messages.v9p2000.StyxROpenMessage;
 import com.v2soft.styxlib.l5.messages.v9p2000.StyxRStatMessage;
@@ -80,10 +79,9 @@ public class StyxFile {
             return;
         }
         // send Tclunk
-        final StyxTMessageFID tClunk = new StyxTMessageFID(MessageType.Tclunk, mFID);
+        final StyxMessage tClunk = mDI.getMessageFactory().constructTClunk(mFID);
         var feature = mTransmitter.sendMessage(tClunk, mClientId);
         feature.getResult(mTimeout);
-
         mFID = Constants.NOFID;
     }
 
@@ -171,7 +169,7 @@ public class StyxFile {
         // TODO reuse FID
 //        mFID = tempFID;
         // close temp FID
-        var tClunk = new StyxTMessageFID(MessageType.Tclunk, tempFID);
+        var tClunk = mDI.getMessageFactory().constructTClunk(tempFID);
         mTransmitter
             .sendMessage(tClunk, mClientId)
             .getResult(mTimeout);
@@ -205,7 +203,7 @@ public class StyxFile {
         }
         long fid = getFID();
         mFID = Constants.NOFID;
-        var tRemove = new StyxTMessageFID(MessageType.Tremove, fid);
+        var tRemove = mDI.getMessageFactory().constructTClunk(fid);
         mTransmitter
             .sendMessage(tRemove, mClientId)
             .getResult(mTimeout);
@@ -344,7 +342,7 @@ public class StyxFile {
     public StyxStat getStat()
             throws StyxException {
         final var rMessage = (StyxRStatMessage)mTransmitter.sendMessage(
-                new StyxTMessageFID(MessageType.Tstat, getFID()),
+                mDI.getMessageFactory().constructTClunk(getFID()),
                 mClientId).getResult(mTimeout);
         return rMessage.stat;
     }

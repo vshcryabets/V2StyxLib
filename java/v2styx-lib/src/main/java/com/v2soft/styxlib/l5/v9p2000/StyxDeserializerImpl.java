@@ -5,8 +5,6 @@ import com.v2soft.styxlib.l5.dev.MetricsAndStats;
 import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.l5.messages.base.Factory;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
-import com.v2soft.styxlib.l5.messages.base.StyxTMessageFID;
-import com.v2soft.styxlib.l5.messages.v9p2000.BaseMessage;
 import com.v2soft.styxlib.l5.serialization.IBufferReader;
 import com.v2soft.styxlib.l5.serialization.IDataDeserializer;
 import com.v2soft.styxlib.l5.structs.StyxQID;
@@ -59,7 +57,7 @@ public class StyxDeserializerImpl implements IDataDeserializer {
             }
             case MessageType.Rauth -> result = messageFactory.constructRAuthMessage(tag, deserializeQid(buffer));
             case MessageType.Rerror -> result = messageFactory.constructRerror(tag, buffer.readUTFString());
-            case MessageType.Rflush -> result = new BaseMessage(MessageType.Rflush, tag, null);
+            case MessageType.Rflush -> result = messageFactory.constructRClunk(tag);
             case MessageType.Rattach -> result = messageFactory.constructRAttachMessage(tag, deserializeQid(buffer));
             case MessageType.Rwalk -> {
                 var count = buffer.readUInt16();
@@ -110,15 +108,11 @@ public class StyxDeserializerImpl implements IDataDeserializer {
                         0);
             }
             case MessageType.Rwrite -> result = messageFactory.constructRWriteMessage(tag, buffer.readUInt32());
-            case MessageType.Tclunk -> result = new StyxTMessageFID(
-                    MessageType.Tclunk,
-                    buffer.readUInt32());
-            case MessageType.Rclunk -> result = new BaseMessage(MessageType.Rclunk, tag, null);
-            case MessageType.Tremove -> result = new StyxTMessageFID(MessageType.Tremove,
-                    buffer.readUInt32());
-            case MessageType.Rremove -> result = new BaseMessage(MessageType.Rremove, tag, null);
-            case MessageType.Tstat -> result = new StyxTMessageFID(MessageType.Tstat,
-                    buffer.readUInt32());
+            case MessageType.Tclunk -> result = messageFactory.constructTClunk(buffer.readUInt32());
+            case MessageType.Rclunk -> result = messageFactory.constructRClunk(tag);
+            case MessageType.Tremove -> result = messageFactory.constructTRemove(buffer.readUInt32());
+            case MessageType.Rremove -> result = messageFactory.constructRRemove(tag);
+            case MessageType.Tstat -> result = messageFactory.constructTStat(buffer.readUInt32());
             case MessageType.Rstat -> {
                 buffer.readUInt16(); //??
                 result = messageFactory.constructRStatMessage(tag, deserializeStat(buffer));
@@ -129,7 +123,7 @@ public class StyxDeserializerImpl implements IDataDeserializer {
                 var stat = deserializeStat(buffer);
                 result = messageFactory.constructTWStatMessage(fid, stat);
             }
-            case MessageType.Rwstat -> result = new BaseMessage(MessageType.Rwstat, tag, null);
+            case MessageType.Rwstat -> result = messageFactory.constructRWStat(tag);
             default ->
                 throw new StyxException("Type is null, can't decode message ps=" +
                         packet_size + " typeId=" + typeId);

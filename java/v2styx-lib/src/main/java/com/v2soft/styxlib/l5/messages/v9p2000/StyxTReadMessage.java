@@ -1,14 +1,13 @@
 package com.v2soft.styxlib.l5.messages.v9p2000;
 
 import com.v2soft.styxlib.l5.enums.MessageType;
-import com.v2soft.styxlib.l5.messages.base.StyxTMessageFID;
 
-public class StyxTReadMessage extends StyxTMessageFID {
+public class StyxTReadMessage extends StyxTMessage {
 	public final long offset;
 	public final int count;
 
 	protected StyxTReadMessage(long fid, long offset, int count)	{
-		super(MessageType.Tread, fid);
+		super(MessageType.Tread, null, fid);
 		this.offset = offset;
 		this.count = count;
 	}

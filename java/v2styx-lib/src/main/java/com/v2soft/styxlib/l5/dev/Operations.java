@@ -3,7 +3,6 @@ package com.v2soft.styxlib.l5.dev;
 import com.v2soft.styxlib.Logger;
 import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
-import com.v2soft.styxlib.l5.messages.base.StyxTMessageFID;
 import com.v2soft.styxlib.l5.messages.v9p2000.StyxRErrorMessage;
 import com.v2soft.styxlib.l5.messages.v9p2000.StyxTAttachMessage;
 import com.v2soft.styxlib.l5.messages.v9p2000.StyxTAuthMessage;
@@ -31,12 +30,6 @@ public class Operations {
         result.append(message.getType());
         result.append(" Tag: ");
         result.append(message.getTag());
-
-        if (message instanceof StyxTMessageFID) {
-            StyxTMessageFID fidMessage = (StyxTMessageFID) message;
-            result.append(" FID: ");
-            result.append(fidMessage.getFID());
-        }
 
         switch (message.getType()) {
             case MessageType.Rerror:

@@ -10,7 +10,7 @@ public class StyxROpenMessage extends BaseMessage {
                             StyxQID qid,
                             long iounit,
                             boolean create) {
-        super(( create ? MessageType.Rcreate : MessageType.Ropen ), tag, qid);
+        super(( create ? MessageType.Rcreate : MessageType.Ropen ), tag, qid, 0);
         ioUnit = iounit;
     }
 }

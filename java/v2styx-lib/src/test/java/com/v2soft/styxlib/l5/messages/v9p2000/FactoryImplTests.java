@@ -232,4 +232,52 @@ public class FactoryImplTests {
         Assertions.assertInstanceOf(StyxTCreateMessage.class, message);
         Assertions.assertEquals(MessageType.Tcreate, message.getType());
     }
+
+    @Test
+    public void testCreateTClunk() {
+        var message = factory.constructTClunk(0x123);
+        Assertions.assertNotNull(message);
+        Assertions.assertEquals(0x123, ((BaseMessage)message).getFID());
+        Assertions.assertEquals(MessageType.Tclunk, message.getType());
+    }
+
+    @Test
+    public void testCreateRClunk() {
+        var message = factory.constructRClunk(0x123);
+        Assertions.assertNotNull(message);
+        Assertions.assertEquals(0x123, ((BaseMessage)message).getTag());
+        Assertions.assertEquals(MessageType.Rclunk, message.getType());
+    }
+
+    @Test
+    public void testCreateTRemove() {
+        var message = factory.constructTRemove(0x123);
+        Assertions.assertNotNull(message);
+        Assertions.assertEquals(0x123, ((BaseMessage)message).getFID());
+        Assertions.assertEquals(MessageType.Tremove, message.getType());
+    }
+
+    @Test
+    public void testCreateRRemove() {
+        var message = factory.constructRRemove(0x123);
+        Assertions.assertNotNull(message);
+        Assertions.assertEquals(0x123, message.getTag());
+        Assertions.assertEquals(MessageType.Rremove, message.getType());
+    }
+
+    @Test
+    public void testCreateTStat() {
+        var message = factory.constructTStat(0x123);
+        Assertions.assertNotNull(message);
+        Assertions.assertEquals(0x123, ((BaseMessage)message).getFID());
+        Assertions.assertEquals(MessageType.Tstat, message.getType());
+    }
+
+    @Test
+    public void testCreateRWStat() {
+        var message = factory.constructRWStat(0x123);
+        Assertions.assertNotNull(message);
+        Assertions.assertEquals(0x123, message.getTag());
+        Assertions.assertEquals(MessageType.Rwstat, message.getType());
+    }
 }
