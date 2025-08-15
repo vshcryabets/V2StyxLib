@@ -1,14 +1,14 @@
 package com.v2soft.styxlib.l5.messages.v9p2000;
 
 import com.v2soft.styxlib.l5.enums.MessageType;
-import com.v2soft.styxlib.l5.messages.base.Factory;
+import com.v2soft.styxlib.l5.messages.base.MessagesFactory;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
 import com.v2soft.styxlib.l5.structs.StyxQID;
 import com.v2soft.styxlib.l5.structs.StyxStat;
 
 import java.util.List;
 
-public class FactoryImpl implements Factory  {
+public class FactoryImpl implements MessagesFactory {
     @Override
     public StyxMessage constructTVersion(long iounit, String version) {
         return new StyxTVersionMessage(iounit, version);
@@ -166,6 +166,16 @@ public class FactoryImpl implements Factory  {
                 tag,
                 null, // no QID for Rwstat
                 0 // fid is not needed for Rwstat
+        );
+    }
+
+    @Override
+    public StyxMessage constructRFlush(int tag) {
+        return new BaseMessage(
+                MessageType.Rflush,
+                tag,
+                null, // no QID for Rflush
+                0 // fid is not needed for Rflush
         );
     }
 }

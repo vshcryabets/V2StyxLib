@@ -44,7 +44,7 @@ public class StyxFile {
                     int clientId,
                     IMessageTransmitter transmitter,
                     int timeout,
-                    StyxSessionDI di) throws StyxException {
+                    StyxSessionDI di) {
         mDI = di;
         mTransmitter = transmitter;
         mClientId = clientId;
@@ -203,7 +203,7 @@ public class StyxFile {
         }
         long fid = getFID();
         mFID = Constants.NOFID;
-        var tRemove = mDI.getMessageFactory().constructTClunk(fid);
+        var tRemove = mDI.getMessageFactory().constructTRemove(fid);
         mTransmitter
             .sendMessage(tRemove, mClientId)
             .getResult(mTimeout);
@@ -342,7 +342,7 @@ public class StyxFile {
     public StyxStat getStat()
             throws StyxException {
         final var rMessage = (StyxRStatMessage)mTransmitter.sendMessage(
-                mDI.getMessageFactory().constructTClunk(getFID()),
+                mDI.getMessageFactory().constructTStat(getFID()),
                 mClientId).getResult(mTimeout);
         return rMessage.stat;
     }

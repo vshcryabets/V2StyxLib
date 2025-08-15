@@ -4,7 +4,7 @@ import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.l5.enums.FileMode;
 import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.l5.enums.QidType;
-import com.v2soft.styxlib.l5.messages.base.Factory;
+import com.v2soft.styxlib.l5.messages.base.MessagesFactory;
 import com.v2soft.styxlib.l5.messages.v9p2000.FactoryImpl;
 import com.v2soft.styxlib.l5.serialization.impl.BufferWriterImpl;
 import com.v2soft.styxlib.l5.structs.StyxQID;
@@ -18,7 +18,7 @@ import java.nio.ByteBuffer;
 import java.util.Date;
 
 public class MessageSerializerImplTest {
-    final Factory messageFactory = new FactoryImpl();
+    final MessagesFactory messageFactory = new FactoryImpl();
     final StyxSerializerImpl serializer = new StyxSerializerImpl();
     BufferWriterImpl outputBuffer = new BufferWriterImpl(8192);
     final ByteBuffer buffer = outputBuffer.getBuffer();

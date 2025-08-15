@@ -3,7 +3,7 @@ package com.v2soft.styxlib.l5.v9p2000;
 import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.l5.dev.MetricsAndStats;
 import com.v2soft.styxlib.l5.enums.MessageType;
-import com.v2soft.styxlib.l5.messages.base.Factory;
+import com.v2soft.styxlib.l5.messages.base.MessagesFactory;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
 import com.v2soft.styxlib.l5.serialization.IBufferReader;
 import com.v2soft.styxlib.l5.serialization.IDataDeserializer;
@@ -14,9 +14,9 @@ import java.util.Date;
 import java.util.LinkedList;
 
 public class StyxDeserializerImpl implements IDataDeserializer {
-    public final Factory messageFactory;
+    public final MessagesFactory messageFactory;
 
-    public StyxDeserializerImpl(Factory messageFactory) {
+    public StyxDeserializerImpl(MessagesFactory messageFactory) {
         this.messageFactory = messageFactory;
     }
 
@@ -30,7 +30,7 @@ public class StyxDeserializerImpl implements IDataDeserializer {
         var typeId = buffer.readUInt8();
         int tag = buffer.readUInt16();
         // load other data
-        StyxMessage result = null;
+        StyxMessage result;
         switch (typeId) {
             case MessageType.Tversion -> result = messageFactory.constructTVersion(buffer.readUInt32(), buffer.readUTFString());
             case MessageType.Rversion -> result = messageFactory.constructRVersion(buffer.readUInt32(), buffer.readUTFString());

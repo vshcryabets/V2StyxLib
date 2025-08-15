@@ -5,7 +5,7 @@ import com.v2soft.styxlib.l5.structs.StyxStat;
 
 import java.util.List;
 
-public interface Factory {
+public interface MessagesFactory {
     StyxMessage constructTVersion(long iounit, String version);
     StyxMessage constructTAuth(long fid, String userName, String mountPoint);
     StyxMessage constructTAttach(long fid, long afid, String userName, String mountPoint);
@@ -38,4 +38,6 @@ public interface Factory {
     StyxMessage constructTStat(long fid);
 
     StyxMessage constructRWStat(int tag);
+
+    StyxMessage constructRFlush(int tag);
 }

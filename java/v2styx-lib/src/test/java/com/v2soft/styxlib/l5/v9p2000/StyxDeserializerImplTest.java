@@ -4,16 +4,16 @@ import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.l5.enums.QidType;
 import com.v2soft.styxlib.l5.io.impl.BufferImpl;
+import com.v2soft.styxlib.l5.messages.v9p2000.BaseMessage;
 import com.v2soft.styxlib.l5.messages.v9p2000.StyxROpenMessage;
-import com.v2soft.styxlib.l5.messages.base.Factory;
-import com.v2soft.styxlib.l5.messages.v9p2000.StyxTMessageFID;
+import com.v2soft.styxlib.l5.messages.base.MessagesFactory;
 import com.v2soft.styxlib.l5.messages.v9p2000.FactoryImpl;
 import com.v2soft.styxlib.l5.serialization.impl.BufferReaderImpl;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 public class StyxDeserializerImplTest {
-    Factory messageFactory = new FactoryImpl();
+    MessagesFactory messageFactory = new FactoryImpl();
     StyxDeserializerImpl deserializer = new StyxDeserializerImpl(messageFactory);
 
     @Test
@@ -57,8 +57,8 @@ public class StyxDeserializerImplTest {
         var message = deserializer.deserializeMessage(bufferReader, 8192);
         Assertions.assertNotNull(message);
         Assertions.assertEquals(0xFF11, message.getTag());
-        Assertions.assertEquals(StyxTMessageFID.class, message.getClass());
-        Assertions.assertEquals(0x04030201, ((StyxTMessageFID) message).getFID());
+        Assertions.assertEquals(BaseMessage.class, message.getClass());
+        Assertions.assertEquals(0x04030201, ((BaseMessage) message).getFID());
         Assertions.assertEquals(0, buffer.remainsToRead());
     }
 

@@ -4,11 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.v2soft.styxlib.exceptions.StyxException;
-import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.l5.enums.QidType;
-import com.v2soft.styxlib.l5.messages.base.Factory;
-import com.v2soft.styxlib.l5.messages.v9p2000.StyxTMessageFID;
-import com.v2soft.styxlib.l5.messages.v9p2000.BaseMessage;
+import com.v2soft.styxlib.l5.messages.base.MessagesFactory;
 import com.v2soft.styxlib.l5.messages.v9p2000.FactoryImpl;
 import com.v2soft.styxlib.l5.serialization.IDataSerializer;
 import com.v2soft.styxlib.l5.serialization.impl.BufferWriterImpl;
@@ -22,7 +19,7 @@ import java.util.Date;
 import java.util.List;
 
 class StyxSerializerImplTest {
-    Factory messageFactory = new FactoryImpl();
+    MessagesFactory messageFactory = new FactoryImpl();
     StyxSerializerImpl serializer = new StyxSerializerImpl();
 
     @Test
@@ -31,8 +28,7 @@ class StyxSerializerImplTest {
                 serializer.getMessageSize(messageFactory.constructRerror(0, "AB")));
 
         assertEquals(IDataSerializer.BASE_BINARY_SIZE + 4,
-                serializer.getMessageSize(new StyxTMessageFID(MessageType.Unspecified,
-                        0x2345)));
+                serializer.getMessageSize(messageFactory.constructTStat(0x2345)));
 
         assertEquals(IDataSerializer.BASE_BINARY_SIZE + 4 + 2 + 2 + 6 + 12,
                 serializer.getMessageSize(messageFactory.constructTAttach(
@@ -42,8 +38,7 @@ class StyxSerializerImplTest {
                         "mountpoint")));
 
         assertEquals(IDataSerializer.BASE_BINARY_SIZE + serializer.getQidSize(),
-                serializer.getMessageSize(new BaseMessage(
-                        MessageType.Unspecified,
+                serializer.getMessageSize(messageFactory.constructRAttachMessage(
                         0x10,
                         new StyxQID(QidType.QTFILE, 1, 2))));
 
