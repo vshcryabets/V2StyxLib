@@ -5,6 +5,6 @@ import com.v2soft.styxlib.l5.structs.StyxQID;
 
 public class StyxRAttachMessage extends BaseMessage {
 	protected StyxRAttachMessage(int tag, StyxQID qid) {
-		super(MessageType.Rattach, tag, qid);
+		super(MessageType.Rattach, tag, qid, 0);
 	}
 }

@@ -4,7 +4,7 @@ import com.v2soft.styxlib.l5.enums.Constants;
 import com.v2soft.styxlib.l5.enums.FileMode;
 import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.l5.enums.ModeType;
-import com.v2soft.styxlib.l5.messages.base.Factory;
+import com.v2soft.styxlib.l5.messages.base.MessagesFactory;
 import com.v2soft.styxlib.l5.structs.StyxQID;
 import com.v2soft.styxlib.l5.structs.StyxStat;
 
@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 public class FactoryImplTests {
-    final Factory factory = new FactoryImpl();
+    final MessagesFactory factory = new MessageFactoryImpl();
 
     @Test
     public void testCreateTVersion() {
@@ -124,7 +124,7 @@ public class FactoryImplTests {
         Assertions.assertEquals(Constants.NOTAG, message.getTag());
         Assertions.assertInstanceOf(StyxTWalkMessage.class, message);
         Assertions.assertEquals(MessageType.Twalk, message.getType());
-        Assertions.assertEquals(1080, ((StyxTWalkMessage) message).mFID);
+        Assertions.assertEquals(1080, ((StyxTWalkMessage) message).getFID());
         Assertions.assertEquals(23432, ((StyxTWalkMessage) message).mNewFID);
         Assertions.assertEquals(3, ((StyxTWalkMessage) message).mPathElements.size());
     }
@@ -136,7 +136,7 @@ public class FactoryImplTests {
         Assertions.assertEquals(Constants.NOTAG, message.getTag());
         Assertions.assertInstanceOf(StyxTWStatMessage.class, message);
         Assertions.assertEquals(MessageType.Twstat, message.getType());
-        Assertions.assertEquals(1080, ((StyxTWStatMessage) message).mFID);
+        Assertions.assertEquals(1080, ((StyxTWStatMessage) message).getFID());
         Assertions.assertEquals(StyxStat.EMPTY, ((StyxTWStatMessage) message).stat);
     }
 
@@ -231,5 +231,62 @@ public class FactoryImplTests {
         Assertions.assertEquals(ModeType.ORDWR, ((StyxTCreateMessage)message).mode);
         Assertions.assertInstanceOf(StyxTCreateMessage.class, message);
         Assertions.assertEquals(MessageType.Tcreate, message.getType());
+    }
+
+    @Test
+    public void testCreateTClunk() {
+        var message = factory.constructTClunk(0x123);
+        Assertions.assertNotNull(message);
+        Assertions.assertEquals(0x123, ((BaseMessage)message).getFID());
+        Assertions.assertEquals(MessageType.Tclunk, message.getType());
+    }
+
+    @Test
+    public void testCreateRClunk() {
+        var message = factory.constructRClunk(0x123, 0x2345FF80);
+        Assertions.assertNotNull(message);
+        Assertions.assertEquals(0x123, ((BaseMessage)message).getTag());
+        Assertions.assertEquals(0x2345FF80, ((BaseMessage)message).getFID());
+        Assertions.assertEquals(MessageType.Rclunk, message.getType());
+    }
+
+    @Test
+    public void testCreateTRemove() {
+        var message = factory.constructTRemove(0x123);
+        Assertions.assertNotNull(message);
+        Assertions.assertEquals(0x123, ((BaseMessage)message).getFID());
+        Assertions.assertEquals(MessageType.Tremove, message.getType());
+    }
+
+    @Test
+    public void testCreateRRemove() {
+        var message = factory.constructRRemove(0x123);
+        Assertions.assertNotNull(message);
+        Assertions.assertEquals(0x123, message.getTag());
+        Assertions.assertEquals(MessageType.Rremove, message.getType());
+    }
+
+    @Test
+    public void testCreateTStat() {
+        var message = factory.constructTStat(0x123);
+        Assertions.assertNotNull(message);
+        Assertions.assertEquals(0x123, ((BaseMessage)message).getFID());
+        Assertions.assertEquals(MessageType.Tstat, message.getType());
+    }
+
+    @Test
+    public void testCreateRWStat() {
+        var message = factory.constructRWStat(0x123);
+        Assertions.assertNotNull(message);
+        Assertions.assertEquals(0x123, message.getTag());
+        Assertions.assertEquals(MessageType.Rwstat, message.getType());
+    }
+
+    @Test
+    public void testCreateRFlush() {
+        var message = factory.constructRFlush(0x123);
+        Assertions.assertNotNull(message);
+        Assertions.assertEquals(0x123, message.getTag());
+        Assertions.assertEquals(MessageType.Rflush, message.getType());
     }
 }

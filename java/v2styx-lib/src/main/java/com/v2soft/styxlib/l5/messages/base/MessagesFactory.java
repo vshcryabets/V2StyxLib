@@ -5,7 +5,7 @@ import com.v2soft.styxlib.l5.structs.StyxStat;
 
 import java.util.List;
 
-public interface Factory {
+public interface MessagesFactory {
     StyxMessage constructTVersion(long iounit, String version);
     StyxMessage constructTAuth(long fid, String userName, String mountPoint);
     StyxMessage constructTAttach(long fid, long afid, String userName, String mountPoint);
@@ -26,4 +26,18 @@ public interface Factory {
     StyxMessage constructRWalkMessage(int tag, List<StyxQID> empty);
     StyxMessage constructRReadMessage(int tag, byte[] data, int size);
     StyxMessage constructTCreateMessage(long fid, String name, long permissions, int mode);
+
+    StyxMessage constructTClunk(long fid);
+
+    StyxMessage constructRClunk(int tag, long fid);
+
+    StyxMessage constructTRemove(long fid);
+
+    StyxMessage constructRRemove(int tag);
+
+    StyxMessage constructTStat(long fid);
+
+    StyxMessage constructRWStat(int tag);
+
+    StyxMessage constructRFlush(int tag);
 }

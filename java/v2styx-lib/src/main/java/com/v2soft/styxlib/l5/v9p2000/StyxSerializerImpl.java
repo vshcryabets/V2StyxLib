@@ -4,7 +4,6 @@ import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.l5.enums.Checks;
 import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
-import com.v2soft.styxlib.l5.messages.base.StyxTMessageFID;
 import com.v2soft.styxlib.l5.messages.v9p2000.*;
 import com.v2soft.styxlib.l5.serialization.IBufferWriter;
 import com.v2soft.styxlib.l5.serialization.IDataSerializer;
@@ -17,13 +16,29 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 public class StyxSerializerImpl implements IDataSerializer {
+    private final Set<Integer> FID_MESSAGES = Set.of(
+            MessageType.Tattach,
+            MessageType.Tauth,
+            MessageType.Tcreate,
+            MessageType.Topen,
+            MessageType.Tread,
+            MessageType.Twalk,
+            MessageType.Twrite,
+            MessageType.Twstat,
+            MessageType.Tstat,
+            MessageType.Tclunk,
+            MessageType.Tremove
+    );
+
     @Override
     public int getMessageSize(StyxMessage message) {
         var size = IDataSerializer.BASE_BINARY_SIZE;
-        if (message instanceof StyxTMessageFID) {
-            size += 4;
+        if (FID_MESSAGES.contains(message.getType()) ||
+                message.getType() == MessageType.Rclunk) {
+            size += 4; // FID
         }
         if (message instanceof BaseMessage && ((BaseMessage) message).mQID != null) {
             size += getQidSize();
@@ -85,9 +100,8 @@ public class StyxSerializerImpl implements IDataSerializer {
     }
 
     private void serializeTMessage(StyxMessage message, IBufferWriter output) throws StyxException {
-        if (message instanceof StyxTMessageFID) {
-            StyxTMessageFID msg = (StyxTMessageFID) message;
-            output.writeUInt32(msg.getFID());
+        if (FID_MESSAGES.contains(message.getType())) {
+            output.writeUInt32(((BaseMessage)message).getFID());
         }
         switch (message.getType()) {
             case MessageType.Tversion:
@@ -190,6 +204,9 @@ public class StyxSerializerImpl implements IDataSerializer {
                 output.writeUInt16(rWalkMessage.qidList.size());
                 for (var qid : rWalkMessage.qidList)
                     serializeQid(qid, output);
+                break;
+            case MessageType.Rclunk:
+                output.writeUInt32(((BaseMessage)message).getFID());
                 break;
         }
     }

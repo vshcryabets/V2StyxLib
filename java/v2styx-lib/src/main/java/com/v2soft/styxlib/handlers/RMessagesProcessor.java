@@ -4,7 +4,7 @@ import com.v2soft.styxlib.Logger;
 import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
-import com.v2soft.styxlib.l5.messages.base.StyxTMessageFID;
+import com.v2soft.styxlib.l5.messages.v9p2000.BaseMessage;
 import com.v2soft.styxlib.server.ClientsRepo;
 
 /**
@@ -33,10 +33,9 @@ public class RMessagesProcessor extends QueueMessagesProcessor {
         try {
             final var polls = mClientsRepo.getPolls(clientId);
             polls.assignAnswer(tag, message);
-            if (message.getType() == MessageType.Rclunk ||
-                    message.getType() == MessageType.Rremove) {
-                if (message instanceof StyxTMessageFID) {
-                    polls.releaseFID(((StyxTMessageFID) message).mFID);
+            if (message.getType() == MessageType.Rclunk) {
+                if (message instanceof BaseMessage) {
+                    polls.releaseFID(((BaseMessage) message).getFID());
                 } else {
                     // Log or handle the unexpected message type
                     Logger.e(RMessagesProcessor.class.getSimpleName(),

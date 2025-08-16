@@ -6,12 +6,11 @@ import com.v2soft.styxlib.exceptions.StyxNotAuthorizedException;
 import com.v2soft.styxlib.exceptions.StyxUnknownClientIdException;
 import com.v2soft.styxlib.l5.dev.MetricsAndStats;
 import com.v2soft.styxlib.l5.enums.MessageType;
-import com.v2soft.styxlib.l5.messages.v9p2000.StyxTCreateMessage;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
-import com.v2soft.styxlib.l5.messages.base.StyxTMessageFID;
 import com.v2soft.styxlib.l5.messages.v9p2000.BaseMessage;
 import com.v2soft.styxlib.l5.messages.v9p2000.StyxTAttachMessage;
 import com.v2soft.styxlib.l5.messages.v9p2000.StyxTAuthMessage;
+import com.v2soft.styxlib.l5.messages.v9p2000.StyxTCreateMessage;
 import com.v2soft.styxlib.l5.messages.v9p2000.StyxTOpenMessage;
 import com.v2soft.styxlib.l5.messages.v9p2000.StyxTReadMessage;
 import com.v2soft.styxlib.l5.messages.v9p2000.StyxTWStatMessage;
@@ -76,16 +75,16 @@ public class TMessagesProcessor extends QueueMessagesProcessor {
                     answer = processAuth(clientId, (StyxTAuthMessage)message);
                     break;
                 case MessageType.Tstat:
-                    fid = ((StyxTMessageFID)message).getFID();
+                    fid = ((BaseMessage)message).getFID();
                     file = mDi.getClientsRepo().getAssignedFile(clientId, fid);
                     answer = mDi.getMessageFactory().constructRStatMessage(message.getTag(), file.getStat());
                     break;
                 case MessageType.Tclunk:
-                    answer = processClunk(clientId, (StyxTMessageFID)message);
+                    answer = processClunk(clientId, (BaseMessage) message);
                     break;
                 case MessageType.Tflush:
                     // TODO do something there
-                    answer = new BaseMessage(MessageType.Rflush, message.getTag(), null);
+                    answer = mDi.getMessageFactory().constructRFlush(message.getTag());
                     break;
                 case MessageType.Twalk:
                     answer = processWalk(clientId, (StyxTWalkMessage) message);
@@ -106,7 +105,7 @@ public class TMessagesProcessor extends QueueMessagesProcessor {
                     answer = processCreate(clientId, (StyxTCreateMessage)message);
                     break;
                 case MessageType.Tremove:
-                    answer = processRemove(clientId, (StyxTMessageFID)message);
+                    answer = processRemove(clientId, (BaseMessage)message);
                     break;
                 default:
                     System.out.println("Got message:");
@@ -146,15 +145,15 @@ public class TMessagesProcessor extends QueueMessagesProcessor {
         return mDi.getMessageFactory().constructRAuthMessage(msg.getTag(), StyxQID.EMPTY);
     }
 
-    private StyxMessage processClunk(int clientId, StyxTMessageFID msg)
+    private StyxMessage processClunk(int clientId, BaseMessage msg)
             throws StyxException {
         mDi.getClientsRepo().closeFile(clientId, msg.getFID());
-        return new BaseMessage(MessageType.Rclunk, msg.getTag(), null);
+        return mDi.getMessageFactory().constructRClunk(msg.getTag(), msg.getFID());
     }
 
     private StyxMessage processWalk(int clientId, StyxTWalkMessage msg) throws StyxException {
         long fid = msg.getFID();
-        final List<StyxQID> qidsList = new LinkedList<StyxQID>();
+        final List<StyxQID> qidsList = new LinkedList<>();
         final IVirtualStyxFile walkFile = mDi.getClientsRepo().getAssignedFile(clientId, fid).walk(
                 clientId,
                 new LinkedList<>(msg.mPathElements),
@@ -180,10 +179,10 @@ public class TMessagesProcessor extends QueueMessagesProcessor {
         }
     }
 
-    private StyxMessage processRemove(int clientId, StyxTMessageFID msg)
+    private StyxMessage processRemove(int clientId, BaseMessage msg)
             throws StyxException {
         if (mDi.getClientsRepo().getAssignedFile(clientId, msg.getFID()).delete(clientId)) {
-            return new BaseMessage(MessageType.Rremove, msg.getTag(), null);
+            return mDi.getMessageFactory().constructRRemove(msg.getTag());
         } else {
             return mDi.getMessageFactory().constructRerror(msg.getTag(), "Can't delete file");
         }
@@ -198,7 +197,7 @@ public class TMessagesProcessor extends QueueMessagesProcessor {
 
     private StyxMessage processWStat(StyxTWStatMessage msg) {
         // TODO handle Twstat
-        return new BaseMessage(MessageType.Rwstat, msg.getTag(), null);
+        return mDi.getMessageFactory().constructRWStat(msg.getTag());
     }
 
     private StyxMessage processWrite(int clientId, StyxTWriteMessage msg) throws StyxException {

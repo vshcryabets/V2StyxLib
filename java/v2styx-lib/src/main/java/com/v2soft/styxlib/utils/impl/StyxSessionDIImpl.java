@@ -2,7 +2,8 @@ package com.v2soft.styxlib.utils.impl;
 
 import com.v2soft.styxlib.exceptions.StyxUnknownClientIdException;
 import com.v2soft.styxlib.l5.dev.StringSerializer;
-import com.v2soft.styxlib.l5.messages.base.Factory;
+import com.v2soft.styxlib.l5.messages.base.MessagesFactory;
+import com.v2soft.styxlib.l5.messages.v9p2000.MessageFactoryImpl;
 import com.v2soft.styxlib.l5.serialization.IDataDeserializer;
 import com.v2soft.styxlib.l5.serialization.IDataSerializer;
 import com.v2soft.styxlib.l5.v9p2000.StyxDeserializerImpl;
@@ -21,7 +22,7 @@ public class StyxSessionDIImpl implements StyxSessionDI {
     private final IDataSerializer serializer = new StyxSerializerImpl();
     private final IsClientAuthorizedUseCaseImpl isClientAuthorizedUseCase;
     private final StringSerializer stringSerializer;
-    private final Factory messageFactory = new com.v2soft.styxlib.l5.messages.v9p2000.FactoryImpl();
+    private final MessagesFactory messageFactory = new MessageFactoryImpl();
     private final IDataDeserializer deserializer = new StyxDeserializerImpl(messageFactory);
 
     public StyxSessionDIImpl(boolean authRequired) {
@@ -66,7 +67,7 @@ public class StyxSessionDIImpl implements StyxSessionDI {
     }
 
     @Override
-    public Factory getMessageFactory() {
+    public MessagesFactory getMessageFactory() {
         return messageFactory;
     }
 }

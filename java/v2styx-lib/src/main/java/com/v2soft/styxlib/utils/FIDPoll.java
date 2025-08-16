@@ -18,7 +18,7 @@ public class FIDPoll extends AbstractPoll<Long> {
     public Long getFreeItem() {
         var id = super.getFreeItem();
         if (Config.DEBUG_FID_POLL)
-            Logger.DEBUG.println("Reserve " + id);
+            Logger.d("FIDPoll", "Reserve " + id);
         return id;
     }
 
@@ -27,7 +27,7 @@ public class FIDPoll extends AbstractPoll<Long> {
         if (id == Constants.NOFID)
             return false;
         if (Config.DEBUG_FID_POLL)
-            Logger.DEBUG.println("Release " + id);
+            Logger.d("FIDPoll", "Release " + id);
         return super.release(id);
     }
     @Override

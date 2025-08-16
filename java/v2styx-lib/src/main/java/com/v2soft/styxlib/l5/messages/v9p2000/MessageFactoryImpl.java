@@ -1,13 +1,14 @@
 package com.v2soft.styxlib.l5.messages.v9p2000;
 
-import com.v2soft.styxlib.l5.messages.base.Factory;
+import com.v2soft.styxlib.l5.enums.MessageType;
+import com.v2soft.styxlib.l5.messages.base.MessagesFactory;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
 import com.v2soft.styxlib.l5.structs.StyxQID;
 import com.v2soft.styxlib.l5.structs.StyxStat;
 
 import java.util.List;
 
-public class FactoryImpl implements Factory  {
+public class MessageFactoryImpl implements MessagesFactory {
     @Override
     public StyxMessage constructTVersion(long iounit, String version) {
         return new StyxTVersionMessage(iounit, version);
@@ -106,5 +107,75 @@ public class FactoryImpl implements Factory  {
     @Override
     public StyxMessage constructTCreateMessage(long fid, String name, long permissions, int mode) {
         return new StyxTCreateMessage(fid, name, permissions, mode);
+    }
+
+    @Override
+    public StyxMessage constructTClunk(long fid) {
+        return new BaseMessage(
+                MessageType.Tclunk,
+                0, // tag will be set later
+                null, // no QID for Tclunk
+                fid
+        );
+    }
+
+    @Override
+    public StyxMessage constructRClunk(int tag, long fid) {
+        return new BaseMessage(
+                MessageType.Rclunk,
+                tag,
+                null, // no QID for Rclunk
+                fid
+        );
+    }
+
+    @Override
+    public StyxMessage constructTRemove(long fid) {
+        return new BaseMessage(
+                MessageType.Tremove,
+                0,
+                null,
+                fid
+        );
+    }
+
+    @Override
+    public StyxMessage constructRRemove(int tag) {
+        return new BaseMessage(
+                MessageType.Rremove,
+                tag,
+                null, // no QID for Rremove
+                0 // fid is not needed for Rremove
+        );
+    }
+
+    @Override
+    public StyxMessage constructTStat(long fid) {
+        return new BaseMessage(
+                MessageType.Tstat,
+                0,
+                null,
+                fid
+        );
+    }
+
+    @Override
+    public StyxMessage constructRWStat(int tag) {
+        return new BaseMessage(
+                MessageType.Rwstat,
+                tag,
+                null, // no QID for Rwstat
+                0 // fid is not needed for Rwstat
+        );
+    }
+
+    @Override
+    public StyxMessage constructRFlush(int tag) {
+        return new BaseMessage(
+                MessageType.Rflush,
+                tag,
+                null, // no QID for Rflush
+                0 // fid is not needed for Rflush
+        );
     }
 }

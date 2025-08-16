@@ -8,7 +8,6 @@ import com.v2soft.styxlib.handlers.TMessageTransmitter;
 import com.v2soft.styxlib.l5.enums.Constants;
 import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
-import com.v2soft.styxlib.l5.messages.base.StyxTMessageFID;
 import com.v2soft.styxlib.l5.messages.v9p2000.StyxRAttachMessage;
 import com.v2soft.styxlib.l5.messages.v9p2000.StyxRAuthMessage;
 import com.v2soft.styxlib.l5.messages.v9p2000.StyxRVersionMessage;
@@ -181,7 +180,8 @@ public class Connection
             throws StyxException {
         // release attached FID
         if (mRootFid != Constants.NOFID) {
-            final StyxTMessageFID tClunk = new StyxTMessageFID(MessageType.Tclunk, mRootFid);
+            final StyxMessage tClunk = mConfiguration.di.getMessageFactory()
+                    .constructTClunk(mRootFid);
             mConfiguration.transmitter.sendMessage(tClunk, mClientId).getResult(mTimeout);
             mRootFid = Constants.NOFID;
         }

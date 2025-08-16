@@ -62,7 +62,8 @@ public class ClientsRepoImpl implements ClientsRepo {
     @Override
     public void closeFile(int clientId, long fid) throws StyxErrorMessageException, StyxUnknownClientIdException {
         var client = getClient(clientId);
-        client.getAssignedFile(fid).close(clientId);
+        final var assignedFile = client.getAssignedFile(fid);
+        assignedFile.close(clientId);
         client.closeFile(fid);
     }
 

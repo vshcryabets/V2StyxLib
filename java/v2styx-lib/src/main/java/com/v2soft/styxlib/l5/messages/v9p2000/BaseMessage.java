@@ -8,20 +8,26 @@ public class BaseMessage implements StyxMessage {
     protected int mTag;
     public final int type;
     public final StyxQID mQID;
+    protected long fid;
 
-    public BaseMessage(int type, int tag, StyxQID qid) {
+    protected BaseMessage(
+            int type,
+            int tag,
+            StyxQID qid,
+            long fid) {
         MetricsAndStats.newStyxMessage++;
         this.type = type;
         mTag = tag;
         mQID = qid;
+        this.fid = fid;
     }
 
     @Override
-    public int getTag(){
+    public int getTag() {
         return mTag;
     }
 
-    public void setTag(int tag){
+    public void setTag(int tag) {
         mTag = (tag & 0xFFFF);
     }
 
@@ -32,5 +38,9 @@ public class BaseMessage implements StyxMessage {
 
     public StyxQID getQID() {
         return mQID;
+    }
+
+    public long getFID() {
+        return fid;
     }
 }

@@ -6,7 +6,7 @@ public class StyxRWriteMessage extends BaseMessage {
 	public final long count;
 
 	protected StyxRWriteMessage(int tag, long count) {
-		super(MessageType.Rwrite, tag, null);
+		super(MessageType.Rwrite, tag, null, 0);
 		this.count = count;
 	}
 

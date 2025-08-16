@@ -9,7 +9,7 @@ public class StyxRReadMessage extends BaseMessage {
     public final int dataLength;
 
     protected StyxRReadMessage(int tag, byte[] data, int length) {
-        super(MessageType.Rread, tag, null);
+        super(MessageType.Rread, tag, null, 0);
         if (length < 0) {
             throw new IllegalArgumentException("length is negative " + length);
         }

@@ -1,8 +1,8 @@
 package com.v2soft.styxlib.l5.v9p2000;
 
 import com.v2soft.styxlib.exceptions.StyxException;
-import com.v2soft.styxlib.l5.messages.base.Factory;
-import com.v2soft.styxlib.l5.messages.v9p2000.FactoryImpl;
+import com.v2soft.styxlib.l5.messages.base.MessagesFactory;
+import com.v2soft.styxlib.l5.messages.v9p2000.MessageFactoryImpl;
 import com.v2soft.styxlib.l5.structs.StyxQID;
 import com.v2soft.styxlib.l5.structs.StyxStat;
 
@@ -15,7 +15,7 @@ import java.util.TimeZone;
 
 public class StringSerializerImplTests {
     StringSerializerImpl serializer = new StringSerializerImpl();
-    Factory messageFactory = new FactoryImpl();
+    MessagesFactory messageFactory = new MessageFactoryImpl();
 
     @Test
     public void testSerializeQid() throws StyxException {

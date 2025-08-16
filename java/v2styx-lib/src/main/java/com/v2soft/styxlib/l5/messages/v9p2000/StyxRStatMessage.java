@@ -7,7 +7,7 @@ public class StyxRStatMessage extends BaseMessage {
     public final StyxStat stat;
 
     protected StyxRStatMessage(int tag, StyxStat stat) {
-        super(MessageType.Rstat, tag, null);
+        super(MessageType.Rstat, tag, null, 0);
         this.stat = stat;
     }
 

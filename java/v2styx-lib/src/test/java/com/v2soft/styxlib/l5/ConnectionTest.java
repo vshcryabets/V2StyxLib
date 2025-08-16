@@ -8,7 +8,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.v2soft.styxlib.Logger;
 import com.v2soft.styxlib.exceptions.StyxErrorMessageException;
-import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.l5.dev.MetricsAndStats;
 import com.v2soft.styxlib.l5.enums.FileMode;
 import com.v2soft.styxlib.l6.StyxFile;
@@ -37,7 +36,6 @@ import java.net.InetAddress;
 import java.util.Arrays;
 import java.util.Random;
 import java.util.UUID;
-import java.util.concurrent.TimeoutException;
 import java.util.zip.CRC32;
 
 /**
@@ -316,7 +314,7 @@ public class ConnectionTest {
 
     // TVersion, Tattach, Twalk, create, write, Tclunk, open, read, remove
     @Test
-    public void testFileSeek() throws IOException, StyxException, InterruptedException, TimeoutException {
+    public void testFileSeek() throws IOException {
         final StyxFile newFile = mConnection.open(UUID.randomUUID().toString());
         newFile.create(FileMode.ReadOthersPermission |
                 FileMode.WriteOthersPermission);
