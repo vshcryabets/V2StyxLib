@@ -1,6 +1,5 @@
 package com.v2soft.styxlib.utils;
 
-import java.security.InvalidParameterException;
 import java.util.HashSet;
 
 /**
@@ -30,7 +29,7 @@ public abstract class AbstractPoll<T> {
     public boolean release(T id) {
         synchronized (mAvailable) {
             if ( mAvailable.contains(id)) {
-                throw new InvalidParameterException(
+                throw new IllegalStateException(
                         String.format("Something goes wrong, this item (%s) already has been released",
                                 String.valueOf(id)));
             }

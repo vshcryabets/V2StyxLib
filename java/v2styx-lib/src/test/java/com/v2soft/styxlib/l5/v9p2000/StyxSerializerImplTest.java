@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.v2soft.styxlib.exceptions.StyxException;
+import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.l5.enums.QidType;
 import com.v2soft.styxlib.l5.messages.base.MessagesFactory;
 import com.v2soft.styxlib.l5.messages.v9p2000.FactoryImpl;
@@ -29,6 +30,9 @@ class StyxSerializerImplTest {
 
         assertEquals(IDataSerializer.BASE_BINARY_SIZE + 4,
                 serializer.getMessageSize(messageFactory.constructTStat(0x2345)));
+
+        assertEquals(IDataSerializer.BASE_BINARY_SIZE + 4,
+                serializer.getMessageSize(messageFactory.constructTClunk(0x2345)));
 
         assertEquals(IDataSerializer.BASE_BINARY_SIZE + 4 + 2 + 2 + 6 + 12,
                 serializer.getMessageSize(messageFactory.constructTAttach(
@@ -160,6 +164,29 @@ class StyxSerializerImplTest {
         serializer.serializeQid(qid, outputBuffer);
         byte[] data = new byte[buffer.limit()];
         buffer.position(0);
+        buffer.get(data);
+        assertArrayEquals(expected, data);
+    }
+
+    @Test
+    void testTClunkSerialization() throws StyxException {
+        var message = messageFactory.constructTClunk(0x1234);
+        BufferWriterImpl output = new BufferWriterImpl(8192);
+        serializer.serialize(message, output);
+
+        // Validate buffer size and some expected values
+        var buffer = output.getBuffer();
+        assertEquals(serializer.getMessageSize(message), output.getPosition());
+
+        byte[] expected = {
+                11, 0x00, 0x00, 0x00, // size
+                (byte) MessageType.Tclunk, // type
+                0x00, 0x00, // Tag
+                0x34, 0x12, 0x00, 0x00 // fid
+        };
+
+        buffer.flip();
+        byte[] data = new byte[buffer.limit()];
         buffer.get(data);
         assertArrayEquals(expected, data);
     }

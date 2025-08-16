@@ -28,7 +28,8 @@ public class StyxSerializerImpl implements IDataSerializer {
             MessageType.Twalk,
             MessageType.Twrite,
             MessageType.Twstat,
-            MessageType.Tstat
+            MessageType.Tstat,
+            MessageType.Tclunk
     );
 
     @Override
