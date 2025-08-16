@@ -33,8 +33,7 @@ public class RMessagesProcessor extends QueueMessagesProcessor {
         try {
             final var polls = mClientsRepo.getPolls(clientId);
             polls.assignAnswer(tag, message);
-            if (message.getType() == MessageType.Rclunk ||
-                    message.getType() == MessageType.Rremove) {
+            if (message.getType() == MessageType.Rclunk) {
                 if (message instanceof BaseMessage) {
                     polls.releaseFID(((BaseMessage) message).getFID());
                 } else {

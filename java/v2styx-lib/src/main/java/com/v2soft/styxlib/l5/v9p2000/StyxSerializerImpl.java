@@ -29,13 +29,15 @@ public class StyxSerializerImpl implements IDataSerializer {
             MessageType.Twrite,
             MessageType.Twstat,
             MessageType.Tstat,
-            MessageType.Tclunk
+            MessageType.Tclunk,
+            MessageType.Tremove
     );
 
     @Override
     public int getMessageSize(StyxMessage message) {
         var size = IDataSerializer.BASE_BINARY_SIZE;
-        if (FID_MESSAGES.contains(message.getType())) {
+        if (FID_MESSAGES.contains(message.getType()) ||
+                message.getType() == MessageType.Rclunk) {
             size += 4; // FID
         }
         if (message instanceof BaseMessage && ((BaseMessage) message).mQID != null) {
@@ -202,6 +204,9 @@ public class StyxSerializerImpl implements IDataSerializer {
                 output.writeUInt16(rWalkMessage.qidList.size());
                 for (var qid : rWalkMessage.qidList)
                     serializeQid(qid, output);
+                break;
+            case MessageType.Rclunk:
+                output.writeUInt32(((BaseMessage)message).getFID());
                 break;
         }
     }

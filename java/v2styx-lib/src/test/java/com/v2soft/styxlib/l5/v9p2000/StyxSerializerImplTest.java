@@ -7,7 +7,7 @@ import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.l5.enums.QidType;
 import com.v2soft.styxlib.l5.messages.base.MessagesFactory;
-import com.v2soft.styxlib.l5.messages.v9p2000.FactoryImpl;
+import com.v2soft.styxlib.l5.messages.v9p2000.MessageFactoryImpl;
 import com.v2soft.styxlib.l5.serialization.IDataSerializer;
 import com.v2soft.styxlib.l5.serialization.impl.BufferWriterImpl;
 import com.v2soft.styxlib.l5.structs.StyxQID;
@@ -20,7 +20,7 @@ import java.util.Date;
 import java.util.List;
 
 class StyxSerializerImplTest {
-    MessagesFactory messageFactory = new FactoryImpl();
+    MessagesFactory messageFactory = new MessageFactoryImpl();
     StyxSerializerImpl serializer = new StyxSerializerImpl();
 
     @Test
@@ -33,6 +33,12 @@ class StyxSerializerImplTest {
 
         assertEquals(IDataSerializer.BASE_BINARY_SIZE + 4,
                 serializer.getMessageSize(messageFactory.constructTClunk(0x2345)));
+
+        assertEquals(IDataSerializer.BASE_BINARY_SIZE + 4,
+                serializer.getMessageSize(messageFactory.constructRClunk(0x2345, 0x0CAFE)));
+
+        assertEquals(IDataSerializer.BASE_BINARY_SIZE + 4,
+                serializer.getMessageSize(messageFactory.constructTRemove(0x2345)));
 
         assertEquals(IDataSerializer.BASE_BINARY_SIZE + 4 + 2 + 2 + 6 + 12,
                 serializer.getMessageSize(messageFactory.constructTAttach(
@@ -183,6 +189,74 @@ class StyxSerializerImplTest {
                 (byte) MessageType.Tclunk, // type
                 0x00, 0x00, // Tag
                 0x34, 0x12, 0x00, 0x00 // fid
+        };
+
+        buffer.flip();
+        byte[] data = new byte[buffer.limit()];
+        buffer.get(data);
+        assertArrayEquals(expected, data);
+    }
+
+    @Test
+    void testRClunkSerialization() throws StyxException {
+        var message = messageFactory.constructRClunk(0, 0x1234);
+        BufferWriterImpl output = new BufferWriterImpl(8192);
+        serializer.serialize(message, output);
+
+        // Validate buffer size and some expected values
+        var buffer = output.getBuffer();
+        assertEquals(serializer.getMessageSize(message), output.getPosition());
+
+        byte[] expected = {
+                11, 0x00, 0x00, 0x00, // size
+                (byte) MessageType.Rclunk, // type
+                0x00, 0x00, // Tag
+                0x34, 0x12, 0x00, 0x00 // fid
+        };
+
+        buffer.flip();
+        byte[] data = new byte[buffer.limit()];
+        buffer.get(data);
+        assertArrayEquals(expected, data);
+    }
+
+    @Test
+    void testTRemoveSerialization() throws StyxException {
+        var message = messageFactory.constructTRemove(0x1234);
+        BufferWriterImpl output = new BufferWriterImpl(8192);
+        serializer.serialize(message, output);
+
+        // Validate buffer size and some expected values
+        var buffer = output.getBuffer();
+        assertEquals(serializer.getMessageSize(message), output.getPosition());
+
+        byte[] expected = {
+                11, 0x00, 0x00, 0x00, // size
+                (byte) MessageType.Tremove, // type
+                0x00, 0x00, // Tag
+                0x34, 0x12, 0x00, 0x00 // fid
+        };
+
+        buffer.flip();
+        byte[] data = new byte[buffer.limit()];
+        buffer.get(data);
+        assertArrayEquals(expected, data);
+    }
+
+    @Test
+    void testRRemoveSerialization() throws StyxException {
+        var message = messageFactory.constructRRemove(0x1234);
+        BufferWriterImpl output = new BufferWriterImpl(8192);
+        serializer.serialize(message, output);
+
+        // Validate buffer size and some expected values
+        var buffer = output.getBuffer();
+        assertEquals(serializer.getMessageSize(message), output.getPosition());
+
+        byte[] expected = {
+                7, 0x00, 0x00, 0x00, // size
+                (byte) MessageType.Rremove, // type
+                0x34, 0x12
         };
 
         buffer.flip();

@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 public class FactoryImplTests {
-    final MessagesFactory factory = new FactoryImpl();
+    final MessagesFactory factory = new MessageFactoryImpl();
 
     @Test
     public void testCreateTVersion() {
@@ -243,9 +243,10 @@ public class FactoryImplTests {
 
     @Test
     public void testCreateRClunk() {
-        var message = factory.constructRClunk(0x123);
+        var message = factory.constructRClunk(0x123, 0x2345FF80);
         Assertions.assertNotNull(message);
         Assertions.assertEquals(0x123, ((BaseMessage)message).getTag());
+        Assertions.assertEquals(0x2345FF80, ((BaseMessage)message).getFID());
         Assertions.assertEquals(MessageType.Rclunk, message.getType());
     }
 

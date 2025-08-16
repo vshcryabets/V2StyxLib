@@ -7,13 +7,13 @@ import com.v2soft.styxlib.l5.io.impl.BufferImpl;
 import com.v2soft.styxlib.l5.messages.v9p2000.BaseMessage;
 import com.v2soft.styxlib.l5.messages.v9p2000.StyxROpenMessage;
 import com.v2soft.styxlib.l5.messages.base.MessagesFactory;
-import com.v2soft.styxlib.l5.messages.v9p2000.FactoryImpl;
+import com.v2soft.styxlib.l5.messages.v9p2000.MessageFactoryImpl;
 import com.v2soft.styxlib.l5.serialization.impl.BufferReaderImpl;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 public class StyxDeserializerImplTest {
-    MessagesFactory messageFactory = new FactoryImpl();
+    MessagesFactory messageFactory = new MessageFactoryImpl();
     StyxDeserializerImpl deserializer = new StyxDeserializerImpl(messageFactory);
 
     @Test
@@ -101,5 +101,23 @@ public class StyxDeserializerImplTest {
         Assertions.assertEquals(QidType.QTDIR, qid.type());
         Assertions.assertEquals(0x6A7470F1, qid.version());
         Assertions.assertEquals(0x12309E51049E5104L, qid.path());
+    }
+
+    @Test
+    public void testDeserializeTRemove() throws StyxException {
+        var dataBuffer = new byte[]{11, 0, 0, 0,
+                (byte) MessageType.Tremove,
+                (byte) 0x11, (byte) 0xFF, // tag
+                0x01, 0x02, 0x03, 0x04 // FID
+        };
+        var buffer = new BufferImpl(dataBuffer.length);
+        buffer.write(dataBuffer, 0, dataBuffer.length);
+        var bufferReader = new BufferReaderImpl(buffer);
+        var message = deserializer.deserializeMessage(bufferReader, 8192);
+        Assertions.assertNotNull(message);
+        Assertions.assertEquals(0xFF11, message.getTag());
+        Assertions.assertEquals(BaseMessage.class, message.getClass());
+        Assertions.assertEquals(0x04030201, ((BaseMessage) message).getFID());
+        Assertions.assertEquals(0, buffer.remainsToRead());
     }
 }

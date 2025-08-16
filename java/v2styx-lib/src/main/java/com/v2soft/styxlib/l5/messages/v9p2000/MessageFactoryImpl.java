@@ -8,7 +8,7 @@ import com.v2soft.styxlib.l5.structs.StyxStat;
 
 import java.util.List;
 
-public class FactoryImpl implements MessagesFactory {
+public class MessageFactoryImpl implements MessagesFactory {
     @Override
     public StyxMessage constructTVersion(long iounit, String version) {
         return new StyxTVersionMessage(iounit, version);
@@ -120,12 +120,12 @@ public class FactoryImpl implements MessagesFactory {
     }
 
     @Override
-    public StyxMessage constructRClunk(int tag) {
+    public StyxMessage constructRClunk(int tag, long fid) {
         return new BaseMessage(
                 MessageType.Rclunk,
                 tag,
                 null, // no QID for Rclunk
-                0 // fid is not needed for Rclunk
+                fid
         );
     }
 

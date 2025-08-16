@@ -164,16 +164,12 @@ public class StyxFile {
                 ModeType.OWRITE);
         mTransmitter
             .sendMessage(tCreate, mClientId)
-//                .exceptionally()
             .getResult(mTimeout);
-        // TODO reuse FID
-//        mFID = tempFID;
         // close temp FID
         var tClunk = mDI.getMessageFactory().constructTClunk(tempFID);
         mTransmitter
             .sendMessage(tClunk, mClientId)
             .getResult(mTimeout);
-//        mRecipient.getPolls().releaseFID(tCreate);
     }
 
     public boolean exists() throws StyxException {
@@ -185,28 +181,12 @@ public class StyxFile {
      */
     public void delete()
             throws StyxException {
-        delete(false);
-    }
-
-    public void delete(boolean recursive)
-            throws StyxException {
-        if (recursive && this.isDirectory()) {
-            for (var stat : listStat()) {
-                var file = new StyxFile(stat.name(),
-                        mFID,
-                        mClientId,
-                        mTransmitter,
-                        mTimeout,
-                        mDI);
-                file.delete(true);
-            }
-        }
         long fid = getFID();
-        mFID = Constants.NOFID;
         var tRemove = mDI.getMessageFactory().constructTRemove(fid);
         mTransmitter
-            .sendMessage(tRemove, mClientId)
-            .getResult(mTimeout);
+                .sendMessage(tRemove, mClientId)
+                .getResult(mTimeout);
+        // warning FID still active and should be closed manually
     }
 
     public void renameTo(String name)

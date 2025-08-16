@@ -57,7 +57,7 @@ public class StyxDeserializerImpl implements IDataDeserializer {
             }
             case MessageType.Rauth -> result = messageFactory.constructRAuthMessage(tag, deserializeQid(buffer));
             case MessageType.Rerror -> result = messageFactory.constructRerror(tag, buffer.readUTFString());
-            case MessageType.Rflush -> result = messageFactory.constructRClunk(tag);
+            case MessageType.Rflush -> result = messageFactory.constructRFlush(tag);
             case MessageType.Rattach -> result = messageFactory.constructRAttachMessage(tag, deserializeQid(buffer));
             case MessageType.Rwalk -> {
                 var count = buffer.readUInt16();
@@ -109,8 +109,11 @@ public class StyxDeserializerImpl implements IDataDeserializer {
             }
             case MessageType.Rwrite -> result = messageFactory.constructRWriteMessage(tag, buffer.readUInt32());
             case MessageType.Tclunk -> result = messageFactory.constructTClunk(buffer.readUInt32());
-            case MessageType.Rclunk -> result = messageFactory.constructRClunk(tag);
-            case MessageType.Tremove -> result = messageFactory.constructTRemove(buffer.readUInt32());
+            case MessageType.Rclunk -> result = messageFactory.constructRClunk(tag, buffer.readUInt32());
+            case MessageType.Tremove -> {
+                var fid = buffer.readUInt32();
+                result = messageFactory.constructTRemove(fid);
+            }
             case MessageType.Rremove -> result = messageFactory.constructRRemove(tag);
             case MessageType.Tstat -> result = messageFactory.constructTStat(buffer.readUInt32());
             case MessageType.Rstat -> {

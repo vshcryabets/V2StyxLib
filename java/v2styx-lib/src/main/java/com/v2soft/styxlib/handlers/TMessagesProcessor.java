@@ -148,7 +148,7 @@ public class TMessagesProcessor extends QueueMessagesProcessor {
     private StyxMessage processClunk(int clientId, BaseMessage msg)
             throws StyxException {
         mDi.getClientsRepo().closeFile(clientId, msg.getFID());
-        return mDi.getMessageFactory().constructRClunk(msg.getTag());
+        return mDi.getMessageFactory().constructRClunk(msg.getTag(), msg.getFID());
     }
 
     private StyxMessage processWalk(int clientId, StyxTWalkMessage msg) throws StyxException {

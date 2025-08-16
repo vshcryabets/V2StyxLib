@@ -29,7 +29,7 @@ public interface MessagesFactory {
 
     StyxMessage constructTClunk(long fid);
 
-    StyxMessage constructRClunk(int tag);
+    StyxMessage constructRClunk(int tag, long fid);
 
     StyxMessage constructTRemove(long fid);
 
