@@ -7,7 +7,7 @@ import com.v2soft.styxlib.l5.structs.StyxQID;
 public class BaseMessage implements StyxMessage {
     protected int mTag;
     public final int type;
-    public final StyxQID mQID;
+    protected final StyxQID mQID;
     protected long fid;
     protected long iounit;
 

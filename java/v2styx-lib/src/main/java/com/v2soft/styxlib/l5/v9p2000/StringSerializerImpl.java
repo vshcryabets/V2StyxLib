@@ -44,9 +44,9 @@ public class StringSerializerImpl implements StringSerializer {
         result.append(",Tag:");
         result.append(message.getTag());
 
-        if (((BaseMessage)message).mQID != null) {
+        if (((BaseMessage)message).getQID() != null) {
             result.append(",QID=");
-            result.append(serializeQid(((BaseMessage)message).mQID));
+            result.append(serializeQid(((BaseMessage)message).getQID()));
         }
 
         switch (message.getType()) {
