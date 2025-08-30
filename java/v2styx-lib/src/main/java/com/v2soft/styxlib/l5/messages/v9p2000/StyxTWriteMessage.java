@@ -1,6 +1,7 @@
 package com.v2soft.styxlib.l5.messages.v9p2000;
 
 import com.v2soft.styxlib.l5.enums.MessageType;
+import com.v2soft.styxlib.l5.structs.QID;
 
 public class StyxTWriteMessage extends StyxTMessage {
     public final long offset;
@@ -13,7 +14,7 @@ public class StyxTWriteMessage extends StyxTMessage {
                              byte [] data,
                              int dataOffset,
                              int dataLength) {
-        super(MessageType.Twrite, null, fid, 0);
+        super(MessageType.Twrite, QID.EMPTY, fid, 0, "");
         this.offset = offset;
         this.data = data;
         this.dataLength = dataLength;

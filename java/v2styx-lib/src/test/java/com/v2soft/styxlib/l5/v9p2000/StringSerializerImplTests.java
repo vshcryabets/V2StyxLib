@@ -3,7 +3,7 @@ package com.v2soft.styxlib.l5.v9p2000;
 import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.l5.messages.base.MessagesFactory;
 import com.v2soft.styxlib.l5.messages.v9p2000.MessageFactoryImpl;
-import com.v2soft.styxlib.l5.structs.StyxQID;
+import com.v2soft.styxlib.l5.structs.QID;
 import com.v2soft.styxlib.l5.structs.StyxStat;
 
 import org.junit.jupiter.api.Assertions;
@@ -20,7 +20,7 @@ public class StringSerializerImplTests {
     @Test
     public void testSerializeQid() throws StyxException {
         Assertions.assertEquals("QID {type: 0, version: 0, path: 0}",
-                serializer.serializeQid(StyxQID.EMPTY));
+                serializer.serializeQid(QID.EMPTY));
     }
 
     @Test
@@ -32,7 +32,7 @@ public class StringSerializerImplTests {
         StyxStat stat = new StyxStat(
                 0x10,
                 0x20,
-                StyxQID.EMPTY,
+                QID.EMPTY,
                 0x123,
                 date, date,
                 123,
@@ -72,7 +72,7 @@ public class StringSerializerImplTests {
 
     @Test
     public void testSerializeRAttach() {
-        var message = messageFactory.constructRAttachMessage(1080, StyxQID.EMPTY);
+        var message = messageFactory.constructRAttachMessage(1080, QID.EMPTY);
         message.setTag(123);
         var str = serializer.serializeMessage(message);
         Assertions.assertTrue(str.contains("Message Type:105"));
@@ -82,7 +82,7 @@ public class StringSerializerImplTests {
 
     @Test
     public void testSerializeRAuth() {
-        var message = messageFactory.constructRAuthMessage(1080, StyxQID.EMPTY);
+        var message = messageFactory.constructRAuthMessage(1080, QID.EMPTY);
         message.setTag(123);
         var str = serializer.serializeMessage(message);
         Assertions.assertTrue(str.contains("Message Type:103"));
@@ -92,7 +92,7 @@ public class StringSerializerImplTests {
 
     @Test
     public void testSerializeRCreate() {
-        var message = messageFactory.constructRCreateMessage(1080, StyxQID.EMPTY, 46243);
+        var message = messageFactory.constructRCreateMessage(1080, QID.EMPTY, 46243);
         message.setTag(123);
         var str = serializer.serializeMessage(message);
         Assertions.assertTrue(str.contains("Message Type:115"));
@@ -103,7 +103,7 @@ public class StringSerializerImplTests {
 
     @Test
     public void testSerializeROpen() {
-        var message = messageFactory.constructROpenMessage(1080, StyxQID.EMPTY, 46243);
+        var message = messageFactory.constructROpenMessage(1080, QID.EMPTY, 46243);
         message.setTag(123);
         var str = serializer.serializeMessage(message);
         Assertions.assertTrue(str.contains("Message Type:113"));
@@ -145,7 +145,7 @@ public class StringSerializerImplTests {
         StyxStat stat = new StyxStat(
                 0x10,
                 0x20,
-                StyxQID.EMPTY,
+                QID.EMPTY,
                 0x123,
                 date, date,
                 123,

@@ -1,18 +1,20 @@
 #pragma once
 #include "serialization/IBufferReader.h"
 
-class BufferReaderImpl : public styxlib::serialization::IBufferReader {
+class BufferReaderImpl : public styxlib::serialization::IBufferReader
+{
 private:
-    const StyxBuffer buffer;
-    Styx::Size position;
-    Styx::Size limit;
+    const styxlib::StyxBuffer buffer;
+    styxlib::Size position;
+    styxlib::Size limit;
+
 public:
-    BufferReaderImpl(const StyxBuffer &buf, Styx::Size size);
+    BufferReaderImpl(const styxlib::StyxBuffer &buf, styxlib::Size size);
     virtual ~BufferReaderImpl();
     uint8_t readUInt8() override;
     uint16_t readUInt16() override;
     uint32_t readUInt32() override;
     uint64_t readUInt64() override;
-    StyxString readUTFString() override;
-    Styx::Size read(uint8_t* data, Styx::Size count) override;
+    styxlib::StyxString readUTFString() override;
+    styxlib::Size read(uint8_t *data, styxlib::Size count) override;
 };

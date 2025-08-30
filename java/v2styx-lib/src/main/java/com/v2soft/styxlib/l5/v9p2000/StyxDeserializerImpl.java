@@ -7,7 +7,7 @@ import com.v2soft.styxlib.l5.messages.base.MessagesFactory;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
 import com.v2soft.styxlib.l5.serialization.IBufferReader;
 import com.v2soft.styxlib.l5.serialization.IDataDeserializer;
-import com.v2soft.styxlib.l5.structs.StyxQID;
+import com.v2soft.styxlib.l5.structs.QID;
 import com.v2soft.styxlib.l5.structs.StyxStat;
 
 import java.util.Date;
@@ -61,7 +61,7 @@ public class StyxDeserializerImpl implements IDataDeserializer {
             case MessageType.Rattach -> result = messageFactory.constructRAttachMessage(tag, deserializeQid(buffer));
             case MessageType.Rwalk -> {
                 var count = buffer.readUInt16();
-                var qids = new LinkedList<StyxQID>();
+                var qids = new LinkedList<QID>();
                 for (int i = 0; i < count; i++) {
                     qids.add(deserializeQid(buffer));
                 }
@@ -170,8 +170,8 @@ public class StyxDeserializerImpl implements IDataDeserializer {
     }
 
     @Override
-    public StyxQID deserializeQid(IBufferReader input) throws StyxException {
-        return new StyxQID(
+    public QID deserializeQid(IBufferReader input) throws StyxException {
+        return new QID(
                 input.readUInt8(),
                 input.readUInt32(),
                 input.readUInt64()

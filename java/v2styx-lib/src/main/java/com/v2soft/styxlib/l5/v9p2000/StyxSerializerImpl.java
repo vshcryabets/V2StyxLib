@@ -8,7 +8,7 @@ import com.v2soft.styxlib.l5.messages.v9p2000.*;
 import com.v2soft.styxlib.l5.serialization.IBufferWriter;
 import com.v2soft.styxlib.l5.serialization.IDataSerializer;
 import com.v2soft.styxlib.l5.serialization.UTF;
-import com.v2soft.styxlib.l5.structs.StyxQID;
+import com.v2soft.styxlib.l5.structs.QID;
 import com.v2soft.styxlib.l5.structs.StyxStat;
 import com.v2soft.styxlib.l6.StyxFile;
 
@@ -75,8 +75,8 @@ public class StyxSerializerImpl implements IDataSerializer {
             case MessageType.Tflush -> size += 2;
             case MessageType.Rcreate -> size += 4;
             case MessageType.Ropen -> size += 4;
-            case MessageType.Tversion -> size += 4 + UTF.getUTFSize(((StyxTVersionMessage)message).protocolVersion);
-            case MessageType.Rversion -> size += 4 + UTF.getUTFSize(((StyxRVersionMessage)message).protocolVersion);
+            case MessageType.Tversion -> size += 4 + UTF.getUTFSize(((BaseMessage)message).getProtocolVersion());
+            case MessageType.Rversion -> size += 4 + UTF.getUTFSize(((BaseMessage)message).getProtocolVersion());
             case MessageType.Rwalk -> {
                 var walkMessage = (StyxRWalkMessage)message;
                 size += 2 + walkMessage.qidList.size() * getQidSize();
@@ -105,9 +105,9 @@ public class StyxSerializerImpl implements IDataSerializer {
         }
         switch (message.getType()) {
             case MessageType.Tversion:
-                StyxTVersionMessage tVersionMessage = (StyxTVersionMessage) message;
+                BaseMessage tVersionMessage = (BaseMessage) message;
                 output.writeUInt32(tVersionMessage.getIounit());
-                output.writeUTFString(tVersionMessage.protocolVersion);
+                output.writeUTFString(tVersionMessage.getProtocolVersion());
                 break;
             case MessageType.Tcreate:
                 StyxTCreateMessage tCreate = (StyxTCreateMessage) message;
@@ -174,9 +174,9 @@ public class StyxSerializerImpl implements IDataSerializer {
                 output.writeUTFString(((StyxRErrorMessage)message).mError);
                 break;
             case MessageType.Rversion:
-                StyxRVersionMessage version = (StyxRVersionMessage) message;
-                output.writeUInt32(version.maxPacketSize);
-                output.writeUTFString(version.protocolVersion);
+                BaseMessage version = (BaseMessage) message;
+                output.writeUInt32(version.getIounit());
+                output.writeUTFString(version.getProtocolVersion());
                 break;
             case MessageType.Rwrite:
                 StyxRWriteMessage msg = (StyxRWriteMessage) message;
@@ -250,7 +250,7 @@ public class StyxSerializerImpl implements IDataSerializer {
     }
 
     @Override
-    public void serializeQid(StyxQID qid, IBufferWriter output) throws StyxException {
+    public void serializeQid(QID qid, IBufferWriter output) throws StyxException {
         output.writeUInt8((short) qid.type());
         output.writeUInt32(qid.version());
         output.writeUInt64(qid.path());

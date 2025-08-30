@@ -8,6 +8,8 @@ if(BUILD_MODULE_L5)
         src/StyxSerializerImpl.cpp
         src/StyxQID.cpp
         src/StyxStat.cpp
+        src/messages/v9p2000/BaseMessage.cpp
+        src/messages/v9p2000/MessageFactoryImpl.cpp
     )
     target_include_directories(module_l5 PUBLIC
         $<INSTALL_INTERFACE:include>

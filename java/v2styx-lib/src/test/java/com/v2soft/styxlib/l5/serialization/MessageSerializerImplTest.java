@@ -7,7 +7,7 @@ import com.v2soft.styxlib.l5.enums.QidType;
 import com.v2soft.styxlib.l5.messages.base.MessagesFactory;
 import com.v2soft.styxlib.l5.messages.v9p2000.MessageFactoryImpl;
 import com.v2soft.styxlib.l5.serialization.impl.BufferWriterImpl;
-import com.v2soft.styxlib.l5.structs.StyxQID;
+import com.v2soft.styxlib.l5.structs.QID;
 import com.v2soft.styxlib.l5.structs.StyxStat;
 import com.v2soft.styxlib.l5.v9p2000.StyxSerializerImpl;
 
@@ -46,7 +46,7 @@ public class MessageSerializerImplTest {
         var stat = new StyxStat(
                 (short) 0x1122,
                 0x000E89E7,
-                new StyxQID(QidType.QTFILE,
+                new QID(QidType.QTFILE,
                         0x6A7470F1,
                         0x12309E51049E5104L),
                 (int) FileMode.ReadOwnerPermission,
@@ -87,7 +87,7 @@ public class MessageSerializerImplTest {
 
     @Test
     public void testRCreate() throws StyxException {
-        serializer.serialize(messageFactory.constructRCreateMessage(128, StyxQID.EMPTY, 0x1234), outputBuffer);
+        serializer.serialize(messageFactory.constructRCreateMessage(128, QID.EMPTY, 0x1234), outputBuffer);
         byte[] data = new byte[buffer.limit()];
         buffer.position(0);
         buffer.get(data);

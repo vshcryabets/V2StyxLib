@@ -1,6 +1,7 @@
 package com.v2soft.styxlib.l5.messages.v9p2000;
 
 import com.v2soft.styxlib.l5.enums.MessageType;
+import com.v2soft.styxlib.l5.structs.QID;
 
 public class StyxTCreateMessage extends StyxTMessage {
     public final String name;
@@ -8,7 +9,7 @@ public class StyxTCreateMessage extends StyxTMessage {
     public final int mode;
 
     protected StyxTCreateMessage(long fid, String name, long permissions, int mode) {
-        super(MessageType.Tcreate, null, fid, 0);
+        super(MessageType.Tcreate, QID.EMPTY, fid, 0, null);
         this.name = name;
         this.permissions = permissions;
         this.mode = mode;

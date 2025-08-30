@@ -1,6 +1,7 @@
 package com.v2soft.styxlib.l5.messages.v9p2000;
 
 import com.v2soft.styxlib.l5.enums.MessageType;
+import com.v2soft.styxlib.l5.structs.QID;
 
 import java.util.List;
 
@@ -15,7 +16,7 @@ extends StyxTMessage {
     public final List<String> mPathElements;
 
     protected StyxTWalkMessage(long fid, long new_fid, List<String> path){
-        super(MessageType.Twalk, null, fid, 0);
+        super(MessageType.Twalk, QID.EMPTY, fid, 0, null);
         mNewFID = new_fid;
         mPathElements = path;
     }

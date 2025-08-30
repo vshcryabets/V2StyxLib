@@ -2,7 +2,7 @@ package com.v2soft.styxlib.l5.serialization;
 
 import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
-import com.v2soft.styxlib.l5.structs.StyxQID;
+import com.v2soft.styxlib.l5.structs.QID;
 import com.v2soft.styxlib.l5.structs.StyxStat;
 
 public interface IDataSerializer {
@@ -12,5 +12,5 @@ public interface IDataSerializer {
     void serializeStat(StyxStat stat, IBufferWriter output) throws StyxException;
     int getStatSerializedSize(StyxStat stat);
     int getQidSize();
-    void serializeQid(StyxQID qid, IBufferWriter output) throws StyxException;
+    void serializeQid(QID qid, IBufferWriter output) throws StyxException;
 }

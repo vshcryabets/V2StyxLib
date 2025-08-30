@@ -4,17 +4,15 @@ import com.v2soft.styxlib.l5.dev.StringSerializer;
 import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
 import com.v2soft.styxlib.l5.messages.v9p2000.BaseMessage;
-import com.v2soft.styxlib.l5.messages.v9p2000.StyxRVersionMessage;
-import com.v2soft.styxlib.l5.messages.v9p2000.StyxTVersionMessage;
 import com.v2soft.styxlib.l5.messages.v9p2000.StyxTWStatMessage;
 import com.v2soft.styxlib.l5.messages.v9p2000.StyxTWalkMessage;
 import com.v2soft.styxlib.l5.messages.v9p2000.StyxTWriteMessage;
-import com.v2soft.styxlib.l5.structs.StyxQID;
+import com.v2soft.styxlib.l5.structs.QID;
 import com.v2soft.styxlib.l5.structs.StyxStat;
 
 public class StringSerializerImpl implements StringSerializer {
     @Override
-    public String serializeQid(StyxQID qid) {
+    public String serializeQid(QID qid) {
         return String.format("QID {type: %d, version: %d, path: %d}",
                 qid.type(), qid.version(), qid.path());
     }
@@ -52,15 +50,15 @@ public class StringSerializerImpl implements StringSerializer {
         switch (message.getType()) {
             case MessageType.Rversion:
                 result.append(",MaxPacketSize:");
-                result.append(((StyxRVersionMessage) message).maxPacketSize);
+                result.append(((BaseMessage) message).getIounit());
                 result.append(",ProtocolVersion:");
-                result.append(((StyxRVersionMessage) message).protocolVersion);
+                result.append(((BaseMessage) message).getProtocolVersion());
                 break;
             case MessageType.Tversion:
                 result.append(",MaxPacketSize:");
                 result.append(((BaseMessage) message).getIounit());
                 result.append(",ProtocolVersion:");
-                result.append(((StyxTVersionMessage) message).protocolVersion);
+                result.append(((BaseMessage) message).getProtocolVersion());
                 break;
             case MessageType.Twrite:
                 result.append(",fileOffset:");
