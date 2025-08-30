@@ -1,14 +1,16 @@
 #include <catch2/catch_test_macros.hpp>
 #include "serialization/BufferWriterImpl.h"
 
-TEST_CASE("testWriteUInt8", "[BufferWriterImpl]") {
+TEST_CASE("testWriteUInt8", "[BufferWriterImpl]")
+{
     BufferWriterImpl writer(32);
     writer.writeUInt8(171);
     StyxBuffer buf = writer.getBuffer();
-    REQUIRE( 171 == buf[0]);
+    REQUIRE(171 == buf[0]);
 }
 
-TEST_CASE("testWriteUInt16", "[BufferWriterImpl]") {
+TEST_CASE("testWriteUInt16", "[BufferWriterImpl]")
+{
     BufferWriterImpl writer(32);
     writer.writeUInt16(0xBEEF);
     StyxBuffer buf = writer.getBuffer();
@@ -16,7 +18,8 @@ TEST_CASE("testWriteUInt16", "[BufferWriterImpl]") {
     REQUIRE(0xBE == buf[1]);
 }
 
-TEST_CASE("testWriteUInt32", "[BufferWriterImpl]") {
+TEST_CASE("testWriteUInt32", "[BufferWriterImpl]")
+{
     BufferWriterImpl writer(32);
     writer.writeUInt32(0xCAFEBABE);
     StyxBuffer buf = writer.getBuffer();
@@ -26,7 +29,8 @@ TEST_CASE("testWriteUInt32", "[BufferWriterImpl]") {
     REQUIRE(0xCA == buf[3]);
 }
 
-TEST_CASE("testWriteUInt64", "[BufferWriterImpl]") {
+TEST_CASE("testWriteUInt64", "[BufferWriterImpl]")
+{
     BufferWriterImpl writer(32);
     writer.writeUInt64(0x1122334455667788L);
     StyxBuffer buf = writer.getBuffer();
@@ -40,7 +44,8 @@ TEST_CASE("testWriteUInt64", "[BufferWriterImpl]") {
     REQUIRE(0x11 == buf[7]);
 }
 
-TEST_CASE("testWriteUTFString", "[BufferWriterImpl]") {
+TEST_CASE("testWriteUTFString", "[BufferWriterImpl]")
+{
     BufferWriterImpl writer(32);
     StyxString str = "Test";
     writer.writeUTFString(str);
@@ -53,16 +58,17 @@ TEST_CASE("testWriteUTFString", "[BufferWriterImpl]") {
     REQUIRE(buf[5] == 't');
 }
 
-TEST_CASE("testWriteAndPrepareBuffer", "[BufferWriterImpl]") {
+TEST_CASE("testWriteAndPrepareBuffer", "[BufferWriterImpl]")
+{
     BufferWriterImpl writer(32);
     writer.writeUInt8(0x01);
     writer.prepareBuffer(16);
     REQUIRE(0 == writer.getPosition());
     REQUIRE(16 == writer.getLimit());
-
 }
 
-TEST_CASE("testWriteBufferOverflow", "[BufferWriterImpl]") {
+TEST_CASE("testWriteBufferOverflow", "[BufferWriterImpl]")
+{
     BufferWriterImpl writer(2);
     REQUIRE_THROWS(writer.writeUInt32(0xCAFEBABE));
 }

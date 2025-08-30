@@ -9,7 +9,7 @@ TEST_CASE("testGetSize", "[StyxSerializationImpl]")
     StyxSerializerImpl serializer;
 
     REQUIRE(IDataSerializer::BASE_BINARY_SIZE + 2 + 2 ==
-            serializer.getMessageSize(styxlib::messages::StyxRErrorMessage(0, "AB")));
+            serializer.getMessageSize(styxlib::messages::base::StyxRErrorMessage(0, "AB")));
 }
 
 TEST_CASE("testGetStyxStatSize", "[StyxSerializationImpl]")

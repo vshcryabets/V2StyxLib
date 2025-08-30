@@ -3,7 +3,7 @@
 #include <cstdint>
 #include "data.h"
 
-namespace styxlib::messages
+namespace styxlib::messages::base
 {
 
     typedef uint8_t MessageType;
