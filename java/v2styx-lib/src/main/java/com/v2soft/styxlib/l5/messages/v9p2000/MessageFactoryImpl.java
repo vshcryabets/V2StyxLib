@@ -36,7 +36,7 @@ public class MessageFactoryImpl implements MessagesFactory {
 
     @Override
     public StyxMessage constructRAttachMessage(int tag, StyxQID qid) {
-        return new StyxRAttachMessage(tag, qid);
+        return new BaseMessage(MessageType.Rattach, tag, qid, 0);
     }
 
     @Override
