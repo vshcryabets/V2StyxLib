@@ -6,10 +6,10 @@ package com.v2soft.styxlib.l5.structs;
 import com.v2soft.styxlib.l5.enums.QidType;
 
 // Styx QID structure
-public record StyxQID(
+public record QID(
     int type,
     long version,
     long path
 ) {
-    public static final StyxQID EMPTY = new StyxQID(QidType.QTFILE, 0L, 0L);
+    public static final QID EMPTY = new QID(QidType.QTFILE, 0L, 0L);
 }

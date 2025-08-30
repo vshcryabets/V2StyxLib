@@ -16,7 +16,7 @@ import com.v2soft.styxlib.l5.messages.v9p2000.StyxTReadMessage;
 import com.v2soft.styxlib.l5.messages.v9p2000.StyxTWStatMessage;
 import com.v2soft.styxlib.l5.messages.v9p2000.StyxTWalkMessage;
 import com.v2soft.styxlib.l5.messages.v9p2000.StyxTWriteMessage;
-import com.v2soft.styxlib.l5.structs.StyxQID;
+import com.v2soft.styxlib.l5.structs.QID;
 import com.v2soft.styxlib.l6.vfs.IVirtualStyxFile;
 import com.v2soft.styxlib.library.types.ConnectionDetails;
 import com.v2soft.styxlib.utils.StyxSessionDI;
@@ -142,7 +142,7 @@ public class TMessagesProcessor extends QueueMessagesProcessor {
     private StyxMessage processAuth(int clientId, StyxTAuthMessage msg) throws StyxUnknownClientIdException {
         mDi.getClientsRepo().getClient(clientId).setUsername(msg.mUserName);
         // TODO handle auth packet
-        return mDi.getMessageFactory().constructRAuthMessage(msg.getTag(), StyxQID.EMPTY);
+        return mDi.getMessageFactory().constructRAuthMessage(msg.getTag(), QID.EMPTY);
     }
 
     private StyxMessage processClunk(int clientId, BaseMessage msg)
@@ -153,7 +153,7 @@ public class TMessagesProcessor extends QueueMessagesProcessor {
 
     private StyxMessage processWalk(int clientId, StyxTWalkMessage msg) throws StyxException {
         long fid = msg.getFID();
-        final List<StyxQID> qidsList = new LinkedList<>();
+        final List<QID> qidsList = new LinkedList<>();
         final IVirtualStyxFile walkFile = mDi.getClientsRepo().getAssignedFile(clientId, fid).walk(
                 clientId,
                 new LinkedList<>(msg.mPathElements),
@@ -191,7 +191,7 @@ public class TMessagesProcessor extends QueueMessagesProcessor {
     private StyxMessage processCreate(int clientId, StyxTCreateMessage msg)
             throws StyxException {
         final IVirtualStyxFile file = mDi.getClientsRepo().getAssignedFile(clientId, msg.getFID());
-        StyxQID qid = file.create(clientId, msg.name, msg.permissions, msg.mode);
+        QID qid = file.create(clientId, msg.name, msg.permissions, msg.mode);
         return mDi.getMessageFactory().constructRCreateMessage(msg.getTag(), qid, mConnectionDetails.ioUnit());
     }
 

@@ -8,7 +8,7 @@ import com.v2soft.styxlib.l5.enums.ModeType;
 import com.v2soft.styxlib.l5.enums.QidType;
 import com.v2soft.styxlib.l5.serialization.IBufferWriter;
 import com.v2soft.styxlib.l5.serialization.impl.BufferWriterImpl;
-import com.v2soft.styxlib.l5.structs.StyxQID;
+import com.v2soft.styxlib.l5.structs.QID;
 import com.v2soft.styxlib.l5.structs.StyxStat;
 import com.v2soft.styxlib.utils.StyxSessionDI;
 
@@ -28,7 +28,7 @@ extends DiskStyxFile {
 
     public DiskStyxDirectory(File directory, StyxSessionDI di) throws StyxException {
         super(directory, di);
-        mQID = new StyxQID(QidType.QTDIR, 0, mName.hashCode());
+        mQID = new QID(QidType.QTDIR, 0, mName.hashCode());
         mVirtualFiles = new ArrayList<>();
         mRealFiles = new ArrayList<>();
         mBuffersMap = new HashMap<>();
@@ -40,7 +40,7 @@ extends DiskStyxFile {
     }
 
     @Override
-    public IVirtualStyxFile walk(int clienId, Queue<String> pathElements, List<StyxQID> qids)
+    public IVirtualStyxFile walk(int clienId, Queue<String> pathElements, List<QID> qids)
             throws StyxException {
         if ( !pathElements.isEmpty() ) {
             String filename = pathElements.poll();
@@ -152,7 +152,7 @@ extends DiskStyxFile {
     }
 
     @Override
-    public StyxQID create(int clientId, String name, long permissions, int mode)
+    public QID create(int clientId, String name, long permissions, int mode)
             throws StyxErrorMessageException {
         File newFile = new File(mFile, name);
         if ( newFile.exists() ) {

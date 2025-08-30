@@ -8,7 +8,7 @@ import com.v2soft.styxlib.l5.enums.ModeType;
 import com.v2soft.styxlib.l5.enums.QidType;
 import com.v2soft.styxlib.l5.serialization.IBufferWriter;
 import com.v2soft.styxlib.l5.serialization.impl.BufferWriterImpl;
-import com.v2soft.styxlib.l5.structs.StyxQID;
+import com.v2soft.styxlib.l5.structs.QID;
 import com.v2soft.styxlib.l5.structs.StyxStat;
 import com.v2soft.styxlib.utils.StyxSessionDI;
 
@@ -27,7 +27,7 @@ extends MemoryStyxFile {
 
     public MemoryStyxDirectory(String name, StyxSessionDI di) {
         super(name, di);
-        mQID = new StyxQID(QidType.QTDIR, 0, mName.hashCode());
+        mQID = new QID(QidType.QTDIR, 0, mName.hashCode());
         mFiles = new LinkedList<IVirtualStyxFile>();
         mBuffersMap = new HashMap<>();
     }
@@ -38,7 +38,7 @@ extends MemoryStyxFile {
     }
 
     @Override
-    public IVirtualStyxFile walk(int clientId, Queue<String> pathElements, List<StyxQID> qids)
+    public IVirtualStyxFile walk(int clientId, Queue<String> pathElements, List<QID> qids)
             throws StyxException {
         if (!pathElements.isEmpty() ) {
             String filename = pathElements.poll();

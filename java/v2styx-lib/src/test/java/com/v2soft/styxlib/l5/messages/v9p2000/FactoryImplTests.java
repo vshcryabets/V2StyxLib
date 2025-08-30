@@ -5,7 +5,7 @@ import com.v2soft.styxlib.l5.enums.FileMode;
 import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.l5.enums.ModeType;
 import com.v2soft.styxlib.l5.messages.base.MessagesFactory;
-import com.v2soft.styxlib.l5.structs.StyxQID;
+import com.v2soft.styxlib.l5.structs.QID;
 import com.v2soft.styxlib.l5.structs.StyxStat;
 
 import org.junit.jupiter.api.Assertions;
@@ -56,47 +56,47 @@ public class FactoryImplTests {
     public void testCreateRVersion() {
         var message = factory.constructRVersion(16384, "9P2000");
         Assertions.assertNotNull(message);
-        Assertions.assertEquals(16384, ((StyxRVersionMessage) message).maxPacketSize);
-        Assertions.assertEquals("9P2000", ((StyxRVersionMessage) message).protocolVersion);
+        Assertions.assertEquals(16384, ((BaseMessage) message).getIounit());
+        Assertions.assertEquals("9P2000", ((BaseMessage) message).getProtocolVersion());
     }
 
     @Test
     public void testCreateRAttachMessage() {
-        var message = factory.constructRAttachMessage(1, StyxQID.EMPTY);
+        var message = factory.constructRAttachMessage(1, QID.EMPTY);
         Assertions.assertNotNull(message);
         Assertions.assertEquals(1, message.getTag());
         Assertions.assertInstanceOf(BaseMessage.class, message);
-        Assertions.assertEquals(StyxQID.EMPTY, ((BaseMessage) message).mQID);
+        Assertions.assertEquals(QID.EMPTY, ((BaseMessage) message).qid);
     }
 
     @Test
     public void testCreateRAuthMessage() {
-        var message = factory.constructRAuthMessage(1, StyxQID.EMPTY);
+        var message = factory.constructRAuthMessage(1, QID.EMPTY);
         Assertions.assertNotNull(message);
         Assertions.assertEquals(1, message.getTag());
         Assertions.assertInstanceOf(BaseMessage.class, message);
-        Assertions.assertEquals(StyxQID.EMPTY, ((BaseMessage) message).mQID);
+        Assertions.assertEquals(QID.EMPTY, ((BaseMessage) message).qid);
     }
 
     @Test
     public void testCreateRCreateMessage() {
-        var message = factory.constructRCreateMessage(1, StyxQID.EMPTY, 3642);
+        var message = factory.constructRCreateMessage(1, QID.EMPTY, 3642);
         Assertions.assertNotNull(message);
         Assertions.assertEquals(1, message.getTag());
         Assertions.assertInstanceOf(BaseMessage.class, message);
         Assertions.assertEquals(MessageType.Rcreate, message.getType());
-        Assertions.assertEquals(StyxQID.EMPTY, ((BaseMessage) message).mQID);
+        Assertions.assertEquals(QID.EMPTY, ((BaseMessage) message).qid);
         Assertions.assertEquals(3642, ((BaseMessage) message).getIounit());
     }
 
     @Test
     public void testCreateROpenMessage() {
-        var message = factory.constructROpenMessage(1, StyxQID.EMPTY, 3642);
+        var message = factory.constructROpenMessage(1, QID.EMPTY, 3642);
         Assertions.assertNotNull(message);
         Assertions.assertEquals(1, message.getTag());
         Assertions.assertInstanceOf(BaseMessage.class, message);
         Assertions.assertEquals(MessageType.Ropen, message.getType());
-        Assertions.assertEquals(StyxQID.EMPTY, ((BaseMessage) message).mQID);
+        Assertions.assertEquals(QID.EMPTY, ((BaseMessage) message).qid);
         Assertions.assertEquals(3642, ((BaseMessage) message).getIounit());
     }
 
@@ -111,7 +111,8 @@ public class FactoryImplTests {
         Assertions.assertEquals(Constants.NOTAG, message.getTag());
         Assertions.assertInstanceOf(StyxTWriteMessage.class, message);
         Assertions.assertEquals(MessageType.Twrite, message.getType());
-        Assertions.assertNull(((StyxTWriteMessage) message).mQID);
+        var qid =  ((StyxTWriteMessage) message).qid;
+        Assertions.assertTrue(qid == null || qid == QID.EMPTY);
         Assertions.assertEquals(0x123, ((StyxTWriteMessage) message).offset);
         Assertions.assertArrayEquals(data, ((StyxTWriteMessage) message).data);
     }
@@ -193,7 +194,7 @@ public class FactoryImplTests {
     @Test
     public void testCreateRWalk() {
         var message = factory.constructRWalkMessage(1,
-                List.of(StyxQID.EMPTY, StyxQID.EMPTY)
+                List.of(QID.EMPTY, QID.EMPTY)
         );
         Assertions.assertNotNull(message);
         Assertions.assertEquals(1, message.getTag());

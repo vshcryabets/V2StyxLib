@@ -5,7 +5,7 @@ import com.v2soft.styxlib.exceptions.StyxException;
 import com.v2soft.styxlib.exceptions.StyxNotAuthorizedException;
 import com.v2soft.styxlib.l5.enums.ModeType;
 import com.v2soft.styxlib.l5.enums.QidType;
-import com.v2soft.styxlib.l5.structs.StyxQID;
+import com.v2soft.styxlib.l5.structs.QID;
 import com.v2soft.styxlib.l5.structs.StyxStat;
 import com.v2soft.styxlib.utils.StyxSessionDI;
 
@@ -22,7 +22,7 @@ import java.util.Queue;
 public class MemoryStyxFile implements IVirtualStyxFile {
     protected final StyxSessionDI mDI;
     protected final String mName;
-    protected StyxQID mQID;
+    protected QID mQID;
     protected StyxStat mStat;
     protected static final int ALL_MODES = 0x000001FF;
 
@@ -33,11 +33,11 @@ public class MemoryStyxFile implements IVirtualStyxFile {
         }
         mDI = di;
         mName = name;
-        mQID = new StyxQID(QidType.QTFILE, 0, mName.hashCode());
+        mQID = new QID(QidType.QTFILE, 0, mName.hashCode());
     }
 
     @Override
-    public StyxQID getQID() {
+    public QID getQID() {
         return mQID;
     }
 
@@ -110,7 +110,7 @@ public class MemoryStyxFile implements IVirtualStyxFile {
     }
 
     @Override
-    public IVirtualStyxFile walk(int clientId, Queue<String> pathElements, List<StyxQID> qids)
+    public IVirtualStyxFile walk(int clientId, Queue<String> pathElements, List<QID> qids)
             throws StyxException {
         if (!mDI.getIsClientAuthorizedUseCase().isClientAuthorized(clientId)) {
             throw new StyxNotAuthorizedException();
@@ -142,7 +142,7 @@ public class MemoryStyxFile implements IVirtualStyxFile {
     }
 
     @Override
-    public StyxQID create(int clientId, String name, long permissions, int mode)
+    public QID create(int clientId, String name, long permissions, int mode)
             throws StyxErrorMessageException {
         throw StyxErrorMessageException.newInstance("Can't create file, this is read-only file system.");
     }

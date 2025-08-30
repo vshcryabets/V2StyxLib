@@ -2,11 +2,16 @@
 
 #include "serialization/IBufferWriter.h"
 
-class BufferWriterImpl : public IBufferWriter {
+using StyxSize = styxlib::Size;
+using StyxBuffer = styxlib::StyxBuffer;
+
+class BufferWriterImpl : public IBufferWriter
+{
 protected:
     StyxBuffer buffer;
-    Styx::Size position;
-    Styx::Size limit;
+    StyxSize position;
+    StyxSize limit;
+
 public:
     BufferWriterImpl(size_t bufferSize);
     virtual ~BufferWriterImpl();
@@ -15,9 +20,9 @@ public:
     void writeUInt32(uint32_t val) override;
     void writeUInt64(uint64_t value) override;
     void writeUTFString(StyxString string) override;
-    Styx::Size write(const uint8_t* data, Styx::Size count) override;
-    void prepareBuffer(Styx::Size bufferSize) override;
+    StyxSize write(const StyxBuffer data, StyxSize count) override;
+    void prepareBuffer(StyxSize bufferSize) override;
     StyxBuffer getBuffer() const override;
-    Styx::Size getPosition() const override { return position; }
-    Styx::Size getLimit() const override { return limit; }
+    StyxSize getPosition() const override { return position; }
+    StyxSize getLimit() const override { return limit; }
 };

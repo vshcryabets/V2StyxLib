@@ -1,9 +1,10 @@
 package com.v2soft.styxlib.l5.messages.v9p2000;
 
+import com.v2soft.styxlib.l5.enums.Constants;
 import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.l5.messages.base.MessagesFactory;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
-import com.v2soft.styxlib.l5.structs.StyxQID;
+import com.v2soft.styxlib.l5.structs.QID;
 import com.v2soft.styxlib.l5.structs.StyxStat;
 
 import java.util.List;
@@ -31,27 +32,27 @@ public class MessageFactoryImpl implements MessagesFactory {
 
     @Override
     public StyxMessage constructRVersion(long maxPacketSize, String protocolVersion) {
-        return new StyxRVersionMessage(maxPacketSize, protocolVersion);
+        return new BaseMessage(MessageType.Rversion, Constants.NOTAG, null, 0, maxPacketSize, protocolVersion);
     }
 
     @Override
-    public StyxMessage constructRAttachMessage(int tag, StyxQID qid) {
-        return new BaseMessage(MessageType.Rattach, tag, qid, 0, 0);
+    public StyxMessage constructRAttachMessage(int tag, QID qid) {
+        return new BaseMessage(MessageType.Rattach, tag, qid, 0, 0, null);
     }
 
     @Override
-    public StyxMessage constructRAuthMessage(int tag, StyxQID qid) {
-        return new BaseMessage(MessageType.Rauth, tag, qid, 0, 0);
+    public StyxMessage constructRAuthMessage(int tag, QID qid) {
+        return new BaseMessage(MessageType.Rauth, tag, qid, 0, 0, null);
     }
 
     @Override
-    public StyxMessage constructROpenMessage(int tag, StyxQID qid, long iounit) {
-        return new BaseMessage(MessageType.Ropen, tag, qid, 0, iounit);
+    public StyxMessage constructROpenMessage(int tag, QID qid, long iounit) {
+        return new BaseMessage(MessageType.Ropen, tag, qid, 0, iounit, null);
     }
 
     @Override
-    public StyxMessage constructRCreateMessage(int tag, StyxQID qid, long iounit) {
-        return new BaseMessage(MessageType.Rcreate, tag, qid, 0, iounit);
+    public StyxMessage constructRCreateMessage(int tag, QID qid, long iounit) {
+        return new BaseMessage(MessageType.Rcreate, tag, qid, 0, iounit, null);
     }
 
     @Override
@@ -95,7 +96,7 @@ public class MessageFactoryImpl implements MessagesFactory {
     }
 
     @Override
-    public StyxMessage constructRWalkMessage(int tag, List<StyxQID> empty) {
+    public StyxMessage constructRWalkMessage(int tag, List<QID> empty) {
         return new StyxRWalkMessage(tag, empty);
     }
 
@@ -116,7 +117,8 @@ public class MessageFactoryImpl implements MessagesFactory {
                 0, // tag will be set later
                 null, // no QID for Tclunk
                 fid,
-                0
+                0,
+                null
         );
     }
 
@@ -127,7 +129,8 @@ public class MessageFactoryImpl implements MessagesFactory {
                 tag,
                 null, // no QID for Rclunk
                 fid,
-                0
+                0,
+                null
         );
     }
 
@@ -138,7 +141,8 @@ public class MessageFactoryImpl implements MessagesFactory {
                 0,
                 null,
                 fid,
-                0
+                0,
+                null
         );
     }
 
@@ -149,7 +153,8 @@ public class MessageFactoryImpl implements MessagesFactory {
                 tag,
                 null, // no QID for Rremove
                 0, // fid is not needed for Rremove
-                0
+                0,
+                null
         );
     }
 
@@ -160,7 +165,8 @@ public class MessageFactoryImpl implements MessagesFactory {
                 0,
                 null,
                 fid,
-                0
+                0,
+                null
         );
     }
 
@@ -171,7 +177,8 @@ public class MessageFactoryImpl implements MessagesFactory {
                 tag,
                 null, // no QID for Rwstat
                 0, // fid is not needed for Rwstat
-                0
+                0,
+                null
         );
     }
 
@@ -182,7 +189,8 @@ public class MessageFactoryImpl implements MessagesFactory {
                 tag,
                 null, // no QID for Rflush
                 0, // fid is not needed for Rflush
-                0
+                0,
+                null
         );
     }
 }

@@ -1,7 +1,11 @@
 #include "serialization/StyxSerializerImpl.h"
 #include "enums/MessageType.h"
+#include "messages/v9p2000/BaseMessage.h"
 
-void StyxSerializerImpl::serialize(const styxlib::messages::StyxMessage &message,
+using namespace styxlib::messages::v9p2000;
+using namespace styxlib::messages::base;
+
+void StyxSerializerImpl::serialize(const styxlib::messages::base::StyxMessage &message,
                                    IBufferWriter &output)
 {
 }
@@ -23,26 +27,26 @@ void StyxSerializerImpl::serializeStat(const StyxStat &stat, IBufferWriter &outp
     output.writeUTFString(stat.modificationUser);
 }
 
-Styx::Size StyxSerializerImpl::getStatSerializedSize(const StyxStat &stat)
+styxlib::Size StyxSerializerImpl::getStatSerializedSize(const StyxStat &stat)
 {
     return 28 + getQidSize() + 2 + stat.name.length() + 2 + stat.userName.length() + 2 + stat.groupName.length() + 2 + stat.modificationUser.length();
 }
 
-Styx::Size StyxSerializerImpl::getQidSize()
+styxlib::Size StyxSerializerImpl::getQidSize()
 {
     return 13; // Size of StyxQID: 1 byte type, 4 bytes version, 8 bytes path
 }
 
-void StyxSerializerImpl::serializeQid(const StyxQID &qid, IBufferWriter &output)
+void StyxSerializerImpl::serializeQid(const styxlib::structs::QID &qid, IBufferWriter &output)
 {
     output.writeUInt8(qid.type);
     output.writeUInt32(qid.version);
     output.writeUInt64(qid.path);
 }
 
-Styx::Size StyxSerializerImpl::getMessageSize(const styxlib::messages::StyxMessage &message) const
+styxlib::Size StyxSerializerImpl::getMessageSize(const styxlib::messages::base::StyxMessage &message) const
 {
-    Styx::Size size = IDataSerializer::BASE_BINARY_SIZE;
+    styxlib::Size size = IDataSerializer::BASE_BINARY_SIZE;
     // if (message instanceof StyxTMessageFID)
     // {
     //     size += 4;
@@ -51,10 +55,10 @@ Styx::Size StyxSerializerImpl::getMessageSize(const styxlib::messages::StyxMessa
     // {
     //     size += getQidSize();
     // }
-    switch (message.type)
+    switch (message.getType())
     {
     case styxlib::enums::Rerror:
-        size += ((const styxlib::messages::StyxRErrorMessage &)message).errorMessage.length() + 2;
+        size += ((const StyxRErrorMessage &)message).getMessage().length() + 2;
         break;
         // case styxlib::enums::Tattach:
         //     var attachMessage = (StyxTAttachMessage)message;

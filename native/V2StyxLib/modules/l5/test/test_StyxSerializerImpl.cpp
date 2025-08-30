@@ -3,13 +3,16 @@
 #include "structs/StyxStat.h"
 #include "enums/QidType.h"
 #include "serialization/BufferWriterImpl.h"
+#include "messages/v9p2000/MessageFactoryImpl.h"
 
 TEST_CASE("testGetSize", "[StyxSerializationImpl]")
 {
     StyxSerializerImpl serializer;
+    styxlib::messages::v9p2000::MessageFactoryImpl messageFactory;
+    auto message = messageFactory.constructRerror(0, "AB");
 
     REQUIRE(IDataSerializer::BASE_BINARY_SIZE + 2 + 2 ==
-            serializer.getMessageSize(styxlib::messages::StyxRErrorMessage(0, "AB")));
+            serializer.getMessageSize(*message));
 }
 
 TEST_CASE("testGetStyxStatSize", "[StyxSerializationImpl]")
@@ -27,7 +30,7 @@ TEST_CASE("testGetQidSize", "[StyxSerializationImpl]")
 TEST_CASE("testQidSerialization", "[StyxSerializationImpl]")
 {
     StyxSerializerImpl serializer;
-    StyxQID qid(
+    styxlib::structs::QID qid(
         styxlib::enums::QTDIR,
         0x6A7470F1,
         0x12309E51049E5104L);
@@ -51,7 +54,7 @@ TEST_CASE("testSerializeStat", "[StyxSerializationImpl]")
     StyxStat stat{
         .type = 1,
         .dev = 2,
-        .QID = StyxQID(styxlib::enums::QTFILE, 0x80, 0x90),
+        .QID = styxlib::structs::QID(styxlib::enums::QTFILE, 0x80, 0x90),
         .mode = 0x01,
         .accessTime = 1717171717, // fixed date for reproducibility
         .modificationTime = 1717171717,

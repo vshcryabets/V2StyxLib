@@ -5,7 +5,7 @@ import java.util.Date;
 public record StyxStat(
         int type, //for kernel use
         long dev, //for kernel use
-        StyxQID QID,
+        QID QID,
         long mode, // permissions and flags
         Date accessTime, // last access time
         Date modificationTime, // last modification time
@@ -18,7 +18,7 @@ public record StyxStat(
     public static StyxStat EMPTY = new StyxStat(
             (short) 0,
             0,
-            StyxQID.EMPTY,
+            com.v2soft.styxlib.l5.structs.QID.EMPTY,
             0,
             new Date(),
             new Date(),

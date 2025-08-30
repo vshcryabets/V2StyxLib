@@ -8,8 +8,7 @@ import com.v2soft.styxlib.handlers.TMessageTransmitter;
 import com.v2soft.styxlib.l5.enums.Constants;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
 import com.v2soft.styxlib.l5.messages.v9p2000.BaseMessage;
-import com.v2soft.styxlib.l5.messages.v9p2000.StyxRVersionMessage;
-import com.v2soft.styxlib.l5.structs.StyxQID;
+import com.v2soft.styxlib.l5.structs.QID;
 import com.v2soft.styxlib.l6.StyxFile;
 import com.v2soft.styxlib.library.types.ConnectionDetails;
 import com.v2soft.styxlib.library.types.Credentials;
@@ -79,8 +78,8 @@ public class Connection
     private int mTimeout = DEFAULT_TIMEOUT;
     private boolean isAttached;
     private long mAuthFID = Constants.NOFID;
-    private StyxQID mAuthQID;
-    private StyxQID mQID;
+    private QID mAuthQID;
+    private QID mQID;
     private long mRootFid = Constants.NOFID;
 
     protected ConnectionDetails mDetails;
@@ -157,7 +156,7 @@ public class Connection
         return mRootFid;
     }
 
-    public StyxQID getQID() {
+    public QID getQID() {
         return mQID;
     }
 
@@ -165,7 +164,7 @@ public class Connection
         return mAuthFID;
     }
 
-    public StyxQID getAuthQID() {
+    public QID getAuthQID() {
         return mAuthQID;
     }
 
@@ -186,9 +185,9 @@ public class Connection
         StyxMessage rMessage = mConfiguration.transmitter.sendMessage(
                 mConfiguration.di.getMessageFactory().constructTVersion(mDetails.ioUnit(), getProtocol()),
                 mClientId).getResult(mTimeout);
-        StyxRVersionMessage rVersion = (StyxRVersionMessage) rMessage;
-        if (rVersion.maxPacketSize < mDetails.ioUnit()) {
-            mDetails = new ConnectionDetails(getProtocol(), (int) rVersion.maxPacketSize);
+        BaseMessage rVersion = (BaseMessage) rMessage;
+        if (rVersion.getIounit() < mDetails.ioUnit()) {
+            mDetails = new ConnectionDetails(getProtocol(), (int) rVersion.getIounit());
         }
         mConfiguration.di.getClientsRepo().getFidPoll(mClientId).clean();
         sendAuthMessage();

@@ -1,7 +1,7 @@
 package com.v2soft.styxlib.l6.vfs;
 
 import com.v2soft.styxlib.exceptions.StyxException;
-import com.v2soft.styxlib.l5.structs.StyxQID;
+import com.v2soft.styxlib.l5.structs.QID;
 import com.v2soft.styxlib.l5.structs.StyxStat;
 
 import java.io.IOException;
@@ -18,7 +18,7 @@ public interface IVirtualStyxFile {
     /**
      * @return unic ID of the file
      */
-    StyxQID getQID();
+    QID getQID();
 
     StyxStat getStat();
     /**
@@ -60,7 +60,7 @@ public interface IVirtualStyxFile {
      * @return number of bytes that was read into the buffer
      */
     int read(int clientId, byte[] buffer, long offset, int count) throws StyxException;
-    IVirtualStyxFile walk(int clientId, Queue<String> pathElements, List<StyxQID> qids)
+    IVirtualStyxFile walk(int clientId, Queue<String> pathElements, List<QID> qids)
             throws StyxException;
     /**
      * Writes data to file at the position offset.
@@ -82,7 +82,7 @@ public interface IVirtualStyxFile {
      * @param mode create mode
      * @return QID of new file
      */
-    StyxQID create(int clientId, String name, long permissions, int mode)
+    QID create(int clientId, String name, long permissions, int mode)
             throws StyxException;
     /**
      * Delete this file
