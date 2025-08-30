@@ -74,8 +74,8 @@ public class FactoryImplTests {
         var message = factory.constructRAuthMessage(1, StyxQID.EMPTY);
         Assertions.assertNotNull(message);
         Assertions.assertEquals(1, message.getTag());
-        Assertions.assertInstanceOf(StyxRAuthMessage.class, message);
-        Assertions.assertEquals(StyxQID.EMPTY, ((StyxRAuthMessage) message).mQID);
+        Assertions.assertInstanceOf(BaseMessage.class, message);
+        Assertions.assertEquals(StyxQID.EMPTY, ((BaseMessage) message).mQID);
     }
 
     @Test
