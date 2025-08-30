@@ -6,7 +6,7 @@ public class StyxRErrorMessage extends BaseMessage {
 	public final String mError;
 
 	protected StyxRErrorMessage(int tag, String error) {
-		super(MessageType.Rerror, tag, null, 0);
+		super(MessageType.Rerror, tag, null, 0, 0);
 		mError = error;
 	}
 }

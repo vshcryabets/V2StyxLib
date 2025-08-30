@@ -7,7 +7,7 @@ public class StyxTWStatMessage extends StyxTMessage {
     public final StyxStat stat;
 
     protected StyxTWStatMessage(long fid, StyxStat stat) {
-        super(MessageType.Twstat, null, fid);
+        super(MessageType.Twstat, null, fid, 0);
         this.stat = stat;
     }
 }

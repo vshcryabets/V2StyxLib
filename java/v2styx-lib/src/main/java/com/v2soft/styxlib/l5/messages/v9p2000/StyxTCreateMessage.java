@@ -8,7 +8,7 @@ public class StyxTCreateMessage extends StyxTMessage {
     public final int mode;
 
     protected StyxTCreateMessage(long fid, String name, long permissions, int mode) {
-        super(MessageType.Tcreate, null, fid);
+        super(MessageType.Tcreate, null, fid, 0);
         this.name = name;
         this.permissions = permissions;
         this.mode = mode;

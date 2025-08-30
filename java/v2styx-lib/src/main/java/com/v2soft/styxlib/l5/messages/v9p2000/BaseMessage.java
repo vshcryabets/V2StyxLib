@@ -9,17 +9,20 @@ public class BaseMessage implements StyxMessage {
     public final int type;
     public final StyxQID mQID;
     protected long fid;
+    protected long iounit;
 
     protected BaseMessage(
             int type,
             int tag,
             StyxQID qid,
-            long fid) {
+            long fid,
+            long iounit) {
         MetricsAndStats.newStyxMessage++;
         this.type = type;
         mTag = tag;
         mQID = qid;
         this.fid = fid;
+        this.iounit = iounit;
     }
 
     @Override
@@ -42,5 +45,8 @@ public class BaseMessage implements StyxMessage {
 
     public long getFID() {
         return fid;
+    }
+    public long getIounit() {
+        return iounit;
     }
 }

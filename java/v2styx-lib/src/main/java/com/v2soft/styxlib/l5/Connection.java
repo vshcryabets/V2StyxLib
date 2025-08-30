@@ -133,7 +133,7 @@ public class Connection
     }
 
     @Deprecated
-    public StyxFile getRoot() throws StyxException {
+    public StyxFile getRoot() {
         if (mRoot == null) {
             mRoot = new StyxFile( "",
                     getRootFID(),

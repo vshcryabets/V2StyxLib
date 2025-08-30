@@ -6,7 +6,7 @@ public class StyxTOpenMessage extends StyxTMessage {
     public final int mode;
 
     protected StyxTOpenMessage(long fid, int mode) {
-        super(MessageType.Topen, null, fid);
+        super(MessageType.Topen, null, fid, 0);
         this.mode = mode;
     }
 

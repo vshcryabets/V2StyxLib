@@ -36,22 +36,22 @@ public class MessageFactoryImpl implements MessagesFactory {
 
     @Override
     public StyxMessage constructRAttachMessage(int tag, StyxQID qid) {
-        return new BaseMessage(MessageType.Rattach, tag, qid, 0);
+        return new BaseMessage(MessageType.Rattach, tag, qid, 0, 0);
     }
 
     @Override
     public StyxMessage constructRAuthMessage(int tag, StyxQID qid) {
-        return new BaseMessage(MessageType.Rauth, tag, qid, 0);
+        return new BaseMessage(MessageType.Rauth, tag, qid, 0, 0);
     }
 
     @Override
     public StyxMessage constructROpenMessage(int tag, StyxQID qid, long iounit) {
-        return new StyxROpenMessage(tag, qid, iounit, false);
+        return new BaseMessage(MessageType.Ropen, tag, qid, 0, iounit);
     }
 
     @Override
     public StyxMessage constructRCreateMessage(int tag, StyxQID qid, long iounit) {
-        return new StyxROpenMessage(tag, qid, iounit, true);
+        return new BaseMessage(MessageType.Rcreate, tag, qid, 0, iounit);
     }
 
     @Override
@@ -115,7 +115,8 @@ public class MessageFactoryImpl implements MessagesFactory {
                 MessageType.Tclunk,
                 0, // tag will be set later
                 null, // no QID for Tclunk
-                fid
+                fid,
+                0
         );
     }
 
@@ -125,7 +126,8 @@ public class MessageFactoryImpl implements MessagesFactory {
                 MessageType.Rclunk,
                 tag,
                 null, // no QID for Rclunk
-                fid
+                fid,
+                0
         );
     }
 
@@ -135,7 +137,8 @@ public class MessageFactoryImpl implements MessagesFactory {
                 MessageType.Tremove,
                 0,
                 null,
-                fid
+                fid,
+                0
         );
     }
 
@@ -145,7 +148,8 @@ public class MessageFactoryImpl implements MessagesFactory {
                 MessageType.Rremove,
                 tag,
                 null, // no QID for Rremove
-                0 // fid is not needed for Rremove
+                0, // fid is not needed for Rremove
+                0
         );
     }
 
@@ -155,7 +159,8 @@ public class MessageFactoryImpl implements MessagesFactory {
                 MessageType.Tstat,
                 0,
                 null,
-                fid
+                fid,
+                0
         );
     }
 
@@ -165,7 +170,8 @@ public class MessageFactoryImpl implements MessagesFactory {
                 MessageType.Rwstat,
                 tag,
                 null, // no QID for Rwstat
-                0 // fid is not needed for Rwstat
+                0, // fid is not needed for Rwstat
+                0
         );
     }
 
@@ -175,7 +181,8 @@ public class MessageFactoryImpl implements MessagesFactory {
                 MessageType.Rflush,
                 tag,
                 null, // no QID for Rflush
-                0 // fid is not needed for Rflush
+                0, // fid is not needed for Rflush
+                0
         );
     }
 }

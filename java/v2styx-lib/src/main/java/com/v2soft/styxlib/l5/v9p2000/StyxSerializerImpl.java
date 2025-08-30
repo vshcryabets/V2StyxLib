@@ -106,7 +106,7 @@ public class StyxSerializerImpl implements IDataSerializer {
         switch (message.getType()) {
             case MessageType.Tversion:
                 StyxTVersionMessage tVersionMessage = (StyxTVersionMessage) message;
-                output.writeUInt32(tVersionMessage.maxPacketSize);
+                output.writeUInt32(tVersionMessage.getIounit());
                 output.writeUTFString(tVersionMessage.protocolVersion);
                 break;
             case MessageType.Tcreate:
@@ -196,8 +196,8 @@ public class StyxSerializerImpl implements IDataSerializer {
                 break;
             case MessageType.Rcreate:
             case MessageType.Ropen:
-                StyxROpenMessage rOpenMessage = (StyxROpenMessage) message;
-                output.writeUInt32(rOpenMessage.ioUnit);
+                BaseMessage rOpenMessage = (BaseMessage) message;
+                output.writeUInt32(rOpenMessage.getIounit());
                 break;
             case MessageType.Rwalk:
                 StyxRWalkMessage rWalkMessage = (StyxRWalkMessage) message;

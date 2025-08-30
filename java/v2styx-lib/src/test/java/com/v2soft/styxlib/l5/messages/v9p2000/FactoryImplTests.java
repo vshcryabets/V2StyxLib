@@ -20,7 +20,7 @@ public class FactoryImplTests {
     public void testCreateTVersion() {
         var message = factory.constructTVersion(16384,   "9P2000");
         Assertions.assertNotNull(message);
-        Assertions.assertEquals(16384, ((StyxTVersionMessage) message).maxPacketSize);
+        Assertions.assertEquals(16384, ((BaseMessage) message).getIounit());
         Assertions.assertEquals("9P2000", ((StyxTVersionMessage) message).protocolVersion);
     }
 
@@ -83,10 +83,10 @@ public class FactoryImplTests {
         var message = factory.constructRCreateMessage(1, StyxQID.EMPTY, 3642);
         Assertions.assertNotNull(message);
         Assertions.assertEquals(1, message.getTag());
-        Assertions.assertInstanceOf(StyxROpenMessage.class, message);
+        Assertions.assertInstanceOf(BaseMessage.class, message);
         Assertions.assertEquals(MessageType.Rcreate, message.getType());
-        Assertions.assertEquals(StyxQID.EMPTY, ((StyxROpenMessage) message).mQID);
-        Assertions.assertEquals(3642, ((StyxROpenMessage) message).ioUnit);
+        Assertions.assertEquals(StyxQID.EMPTY, ((BaseMessage) message).mQID);
+        Assertions.assertEquals(3642, ((BaseMessage) message).getIounit());
     }
 
     @Test
@@ -94,10 +94,10 @@ public class FactoryImplTests {
         var message = factory.constructROpenMessage(1, StyxQID.EMPTY, 3642);
         Assertions.assertNotNull(message);
         Assertions.assertEquals(1, message.getTag());
-        Assertions.assertInstanceOf(StyxROpenMessage.class, message);
+        Assertions.assertInstanceOf(BaseMessage.class, message);
         Assertions.assertEquals(MessageType.Ropen, message.getType());
-        Assertions.assertEquals(StyxQID.EMPTY, ((StyxROpenMessage) message).mQID);
-        Assertions.assertEquals(3642, ((StyxROpenMessage) message).ioUnit);
+        Assertions.assertEquals(StyxQID.EMPTY, ((BaseMessage) message).mQID);
+        Assertions.assertEquals(3642, ((BaseMessage) message).getIounit());
     }
 
     @Test
@@ -173,7 +173,7 @@ public class FactoryImplTests {
     public void testCreateRWrite() {
         var message = factory.constructRWriteMessage(1, 12345);
         Assertions.assertNotNull(message);
-        Assertions.assertEquals(1, ((StyxRWriteMessage)message).getTag());
+        Assertions.assertEquals(1, message.getTag());
         Assertions.assertEquals(12345, ((StyxRWriteMessage)message).count);
         Assertions.assertInstanceOf(StyxRWriteMessage.class, message);
         Assertions.assertEquals(MessageType.Rwrite, message.getType());
@@ -196,7 +196,7 @@ public class FactoryImplTests {
                 List.of(StyxQID.EMPTY, StyxQID.EMPTY)
         );
         Assertions.assertNotNull(message);
-        Assertions.assertEquals(1, ((StyxRWalkMessage)message).getTag());
+        Assertions.assertEquals(1, message.getTag());
         Assertions.assertEquals(2, ((StyxRWalkMessage)message).qidList.size());
         Assertions.assertInstanceOf(StyxRWalkMessage.class, message);
         Assertions.assertEquals(MessageType.Rwalk, message.getType());
@@ -210,7 +210,7 @@ public class FactoryImplTests {
                 3
         );
         Assertions.assertNotNull(message);
-        Assertions.assertEquals(1, ((StyxRReadMessage)message).getTag());
+        Assertions.assertEquals(1, message.getTag());
         Assertions.assertEquals(3, ((StyxRReadMessage)message).dataLength);
         Assertions.assertArrayEquals(data, ((StyxRReadMessage)message).data);
         Assertions.assertInstanceOf(StyxRReadMessage.class, message);
@@ -245,7 +245,7 @@ public class FactoryImplTests {
     public void testCreateRClunk() {
         var message = factory.constructRClunk(0x123, 0x2345FF80);
         Assertions.assertNotNull(message);
-        Assertions.assertEquals(0x123, ((BaseMessage)message).getTag());
+        Assertions.assertEquals(0x123, message.getTag());
         Assertions.assertEquals(0x2345FF80, ((BaseMessage)message).getFID());
         Assertions.assertEquals(MessageType.Rclunk, message.getType());
     }

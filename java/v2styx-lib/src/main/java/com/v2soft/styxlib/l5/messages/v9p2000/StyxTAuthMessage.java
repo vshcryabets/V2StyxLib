@@ -7,7 +7,7 @@ public class StyxTAuthMessage extends StyxTMessage {
 	public final String mMountPoint;
 
 	protected StyxTAuthMessage(long fid, String userName, String mountPoint) {
-		super(MessageType.Tauth, null, fid);
+		super(MessageType.Tauth, null, fid, 0);
 		mUserName = userName;
 		mMountPoint = mountPoint;
 	}
