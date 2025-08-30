@@ -3,7 +3,6 @@
 #include "serialization/StyxSerializerImpl.h"
 #include "serialization/BufferWriterImpl.h"
 #include "messages/v9p2000/BaseMessage.h"
-#include <iostream>
 
 using namespace styxlib::messages::v9p2000;
 using namespace styxlib::messages::base;
