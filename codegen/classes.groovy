@@ -115,6 +115,9 @@ styxQid.with {
     field("path", DataType.int64.INSTANCE)
     // public static final StyxQID EMPTY = new StyxQID(QidType.QTFILE, 0L, 0L);
 }
+styxQid.addstaticfield("EMPTY", new DataType.custom(styxQid, false), styxQid.instance(
+        [type: 0, version: 0, path: 0]
+))
 
 def nsLibraryTypes = namespace("styxlib.types")
 switch (target()) {
@@ -122,12 +125,12 @@ switch (target()) {
     case ce.defs.Target.Java:
         nsLibraryTypes = namespace("com.v2soft.styxlib.library.types")
 }
+
 def connectionDetails = nsLibraryTypes.dataClass("ConnectionDetails")
-connectionDetails.with {
-    addBlockComment("Styx connection details")
-    field("protocol", new DataType.string())
-    field("ioUnit", DataType.int32.INSTANCE)
-}
+connectionDetails.addBlockComment("Styx connection details")
+connectionDetails.field("protocol", DataType.string.INSTANCE)
+connectionDetails.field("ioUnit", DataType.int32.INSTANCE)
+
 //def stat = ns.dataClass("StyxStat")
 //stat.field("type", DataType.int32.INSTANCE)
 //stat.field("dev", DataType.int64.INSTANCE)

@@ -6,10 +6,8 @@ import com.v2soft.styxlib.handlers.IMessageProcessor;
 import com.v2soft.styxlib.handlers.RMessagesProcessor;
 import com.v2soft.styxlib.handlers.TMessageTransmitter;
 import com.v2soft.styxlib.l5.enums.Constants;
-import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
-import com.v2soft.styxlib.l5.messages.v9p2000.StyxRAttachMessage;
-import com.v2soft.styxlib.l5.messages.v9p2000.StyxRAuthMessage;
+import com.v2soft.styxlib.l5.messages.v9p2000.BaseMessage;
 import com.v2soft.styxlib.l5.messages.v9p2000.StyxRVersionMessage;
 import com.v2soft.styxlib.l5.structs.StyxQID;
 import com.v2soft.styxlib.l6.StyxFile;
@@ -135,7 +133,7 @@ public class Connection
     }
 
     @Deprecated
-    public StyxFile getRoot() throws StyxException {
+    public StyxFile getRoot() {
         if (mRoot == null) {
             mRoot = new StyxFile( "",
                     getRootFID(),
@@ -205,7 +203,7 @@ public class Connection
             StyxMessage tAuth = mConfiguration.di.getMessageFactory().constructTAuth(mAuthFID,
                     mConfiguration.credentials.getUserName(), getMountPoint());
             StyxMessage rMessage = mConfiguration.transmitter.sendMessage(tAuth, mClientId).getResult(mTimeout);
-            StyxRAuthMessage rAuth = (StyxRAuthMessage) rMessage;
+            BaseMessage rAuth = (BaseMessage) rMessage;
             mAuthQID = rAuth.getQID();
 
             // TODO uncomment later
@@ -219,7 +217,7 @@ public class Connection
         StyxMessage tAttach = mConfiguration.di.getMessageFactory().constructTAttach(mRootFid, getAuthFID(),
                 mConfiguration.credentials.getUserName(),
                 getMountPoint());
-        var rAttach = (StyxRAttachMessage)mConfiguration.transmitter
+        var rAttach = (BaseMessage)mConfiguration.transmitter
                 .sendMessage(tAttach, mClientId)
                 .getResult(mTimeout);
         mQID = rAttach.getQID();

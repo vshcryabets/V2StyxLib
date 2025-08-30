@@ -10,8 +10,8 @@ import com.v2soft.styxlib.l5.enums.FileMode;
 import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.l5.enums.ModeType;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
+import com.v2soft.styxlib.l5.messages.v9p2000.BaseMessage;
 import com.v2soft.styxlib.l5.messages.v9p2000.StyxRErrorMessage;
-import com.v2soft.styxlib.l5.messages.v9p2000.StyxROpenMessage;
 import com.v2soft.styxlib.l5.messages.v9p2000.StyxRStatMessage;
 import com.v2soft.styxlib.l5.structs.StyxStat;
 import com.v2soft.styxlib.l5.v9p2000.StyxSerializerImpl;
@@ -69,9 +69,9 @@ public class StyxFile {
     private int open(int mode, long fid)
             throws StyxException {
         final StyxMessage tOpen = mDI.getMessageFactory().constructTOpenMessage(fid, mode);
-        final var rOpen = (StyxROpenMessage) mTransmitter.sendMessage(tOpen, mClientId)
+        final var rOpen = (BaseMessage) mTransmitter.sendMessage(tOpen, mClientId)
                 .getResult(mTimeout);
-        return (int) rOpen.ioUnit;
+        return (int) rOpen.getIounit();
     }
 
     public void close() throws StyxException {

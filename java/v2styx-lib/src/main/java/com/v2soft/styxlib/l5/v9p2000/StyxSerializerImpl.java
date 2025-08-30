@@ -40,7 +40,7 @@ public class StyxSerializerImpl implements IDataSerializer {
                 message.getType() == MessageType.Rclunk) {
             size += 4; // FID
         }
-        if (message instanceof BaseMessage && ((BaseMessage) message).mQID != null) {
+        if (message instanceof BaseMessage && ((BaseMessage) message).getQID() != null) {
             size += getQidSize();
         }
         switch (message.getType()) {
@@ -106,7 +106,7 @@ public class StyxSerializerImpl implements IDataSerializer {
         switch (message.getType()) {
             case MessageType.Tversion:
                 StyxTVersionMessage tVersionMessage = (StyxTVersionMessage) message;
-                output.writeUInt32(tVersionMessage.maxPacketSize);
+                output.writeUInt32(tVersionMessage.getIounit());
                 output.writeUTFString(tVersionMessage.protocolVersion);
                 break;
             case MessageType.Tcreate:
@@ -166,8 +166,8 @@ public class StyxSerializerImpl implements IDataSerializer {
     }
 
     private void serializeRMessage(StyxMessage message, IBufferWriter output) throws StyxException {
-        if (message instanceof BaseMessage && ((BaseMessage) message).mQID != null) {
-            serializeQid(((BaseMessage) message).mQID, output);
+        if (message instanceof BaseMessage && ((BaseMessage) message).getQID() != null) {
+            serializeQid(((BaseMessage) message).getQID(), output);
         }
         switch (message.getType()) {
             case MessageType.Rerror:
@@ -196,8 +196,8 @@ public class StyxSerializerImpl implements IDataSerializer {
                 break;
             case MessageType.Rcreate:
             case MessageType.Ropen:
-                StyxROpenMessage rOpenMessage = (StyxROpenMessage) message;
-                output.writeUInt32(rOpenMessage.ioUnit);
+                BaseMessage rOpenMessage = (BaseMessage) message;
+                output.writeUInt32(rOpenMessage.getIounit());
                 break;
             case MessageType.Rwalk:
                 StyxRWalkMessage rWalkMessage = (StyxRWalkMessage) message;

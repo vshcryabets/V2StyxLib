@@ -13,7 +13,7 @@ public class StyxTWriteMessage extends StyxTMessage {
                              byte [] data,
                              int dataOffset,
                              int dataLength) {
-        super(MessageType.Twrite, null, fid);
+        super(MessageType.Twrite, null, fid, 0);
         this.offset = offset;
         this.data = data;
         this.dataLength = dataLength;

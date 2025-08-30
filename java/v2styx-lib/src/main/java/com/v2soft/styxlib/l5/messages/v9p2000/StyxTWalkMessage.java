@@ -15,7 +15,7 @@ extends StyxTMessage {
     public final List<String> mPathElements;
 
     protected StyxTWalkMessage(long fid, long new_fid, List<String> path){
-        super(MessageType.Twalk, null, fid);
+        super(MessageType.Twalk, null, fid, 0);
         mNewFID = new_fid;
         mPathElements = path;
     }

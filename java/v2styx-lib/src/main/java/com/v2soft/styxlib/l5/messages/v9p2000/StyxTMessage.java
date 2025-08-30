@@ -6,7 +6,8 @@ import com.v2soft.styxlib.l5.structs.StyxQID;
 public class StyxTMessage extends BaseMessage {
     protected StyxTMessage(int type,
                            StyxQID qid,
-                           long fid) {
-        super(type, Constants.NOTAG, qid, fid);
+                           long fid,
+                           long iounit) {
+        super(type, Constants.NOTAG, qid, fid, iounit);
     }
 }

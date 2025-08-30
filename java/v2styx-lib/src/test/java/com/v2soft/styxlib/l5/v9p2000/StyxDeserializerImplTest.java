@@ -5,7 +5,6 @@ import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.l5.enums.QidType;
 import com.v2soft.styxlib.l5.io.impl.BufferImpl;
 import com.v2soft.styxlib.l5.messages.v9p2000.BaseMessage;
-import com.v2soft.styxlib.l5.messages.v9p2000.StyxROpenMessage;
 import com.v2soft.styxlib.l5.messages.base.MessagesFactory;
 import com.v2soft.styxlib.l5.messages.v9p2000.MessageFactoryImpl;
 import com.v2soft.styxlib.l5.serialization.impl.BufferReaderImpl;
@@ -75,7 +74,7 @@ public class StyxDeserializerImplTest {
         var buffer = new BufferImpl(dataBuffer.length);
         buffer.write(dataBuffer, 0, dataBuffer.length);
         var bufferReader = new BufferReaderImpl(buffer);
-        var message = (StyxROpenMessage) deserializer.deserializeMessage(bufferReader, 8192);
+        var message = (BaseMessage) deserializer.deserializeMessage(bufferReader, 8192);
         Assertions.assertNotNull(message);
         Assertions.assertEquals(MessageType.Rcreate, message.type);
         Assertions.assertEquals(1, message.getTag());
@@ -83,7 +82,7 @@ public class StyxDeserializerImplTest {
         Assertions.assertEquals(0, qid.type());
         Assertions.assertEquals(0, qid.version());
         Assertions.assertEquals(427389138, qid.path());
-        Assertions.assertEquals(8192, message.ioUnit);
+        Assertions.assertEquals(8192, message.getIounit());
     }
 
     @Test

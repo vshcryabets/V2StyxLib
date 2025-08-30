@@ -4,7 +4,6 @@ import com.v2soft.styxlib.l5.dev.StringSerializer;
 import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
 import com.v2soft.styxlib.l5.messages.v9p2000.BaseMessage;
-import com.v2soft.styxlib.l5.messages.v9p2000.StyxROpenMessage;
 import com.v2soft.styxlib.l5.messages.v9p2000.StyxRVersionMessage;
 import com.v2soft.styxlib.l5.messages.v9p2000.StyxTVersionMessage;
 import com.v2soft.styxlib.l5.messages.v9p2000.StyxTWStatMessage;
@@ -45,9 +44,9 @@ public class StringSerializerImpl implements StringSerializer {
         result.append(",Tag:");
         result.append(message.getTag());
 
-        if (((BaseMessage)message).mQID != null) {
+        if (((BaseMessage)message).getQID() != null) {
             result.append(",QID=");
-            result.append(serializeQid(((BaseMessage)message).mQID));
+            result.append(serializeQid(((BaseMessage)message).getQID()));
         }
 
         switch (message.getType()) {
@@ -59,7 +58,7 @@ public class StringSerializerImpl implements StringSerializer {
                 break;
             case MessageType.Tversion:
                 result.append(",MaxPacketSize:");
-                result.append(((StyxTVersionMessage) message).maxPacketSize);
+                result.append(((BaseMessage) message).getIounit());
                 result.append(",ProtocolVersion:");
                 result.append(((StyxTVersionMessage) message).protocolVersion);
                 break;
@@ -72,7 +71,7 @@ public class StringSerializerImpl implements StringSerializer {
             case MessageType.Ropen:
             case MessageType.Rcreate:
                 result.append(",iounit:");
-                result.append(((StyxROpenMessage)message).ioUnit);
+                result.append(((BaseMessage)message).getIounit());
                 break;
             case MessageType.Twalk:
                 result.append(",fid:");
