@@ -40,7 +40,9 @@ public class StyxSerializerImpl implements IDataSerializer {
                 message.getType() == MessageType.Rclunk) {
             size += 4; // FID
         }
-        if (message instanceof BaseMessage && ((BaseMessage) message).getQID() != null) {
+        if (message instanceof BaseMessage &&
+                ((BaseMessage) message).getQID() != null &&
+                ((BaseMessage) message).getQID() != QID.EMPTY) {
             size += getQidSize();
         }
         switch (message.getType()) {

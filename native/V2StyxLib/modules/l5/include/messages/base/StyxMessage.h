@@ -1,31 +1,23 @@
 #pragma once
 
-#include <cstdint>
 #include "data.h"
+#include <memory>
 
 namespace styxlib::messages::base
 {
 
-    typedef uint8_t MessageType;
-    typedef uint16_t MessageTag;
-
     class StyxMessage
     {
-    public:
-        const MessageType type;
-        const MessageTag tag;
+    private:
+        Tag tag;
+        Type type;
 
     public:
-        StyxMessage(MessageType type, MessageTag tag);
+        StyxMessage(Type type, Tag tag);
+        virtual ~StyxMessage() = default;
+        Type getType() const { return type; }
+        Tag getTag() const { return tag; }
     };
 
-    class StyxRErrorMessage : public StyxMessage
-    {
-    public:
-        const StyxString errorMessage;
-
-    public:
-        StyxRErrorMessage(MessageTag tag, const StyxString &message);
-    };
-
+    typedef std::unique_ptr<StyxMessage> StyxMessageUPtr;
 }

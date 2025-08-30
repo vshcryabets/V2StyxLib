@@ -111,7 +111,8 @@ public class FactoryImplTests {
         Assertions.assertEquals(Constants.NOTAG, message.getTag());
         Assertions.assertInstanceOf(StyxTWriteMessage.class, message);
         Assertions.assertEquals(MessageType.Twrite, message.getType());
-        Assertions.assertNull(((StyxTWriteMessage) message).qid);
+        var qid =  ((StyxTWriteMessage) message).qid;
+        Assertions.assertTrue(qid == null || qid == QID.EMPTY);
         Assertions.assertEquals(0x123, ((StyxTWriteMessage) message).offset);
         Assertions.assertArrayEquals(data, ((StyxTWriteMessage) message).data);
     }

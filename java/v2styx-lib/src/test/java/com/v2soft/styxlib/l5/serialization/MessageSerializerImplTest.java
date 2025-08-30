@@ -87,19 +87,22 @@ public class MessageSerializerImplTest {
 
     @Test
     public void testRCreate() throws StyxException {
-        serializer.serialize(messageFactory.constructRCreateMessage(128, QID.EMPTY, 0x1234), outputBuffer);
+        serializer.serialize(messageFactory.constructRCreateMessage(128, new QID(
+            QidType.QTAPPEND, 0, 0x5678
+        ), 0x1234), outputBuffer);
         byte[] data = new byte[buffer.limit()];
         buffer.position(0);
         buffer.get(data);
-        Assertions.assertArrayEquals(new byte[]{24, 0, 0, 0,
-                (byte) MessageType.Rcreate,
+        Assertions.assertArrayEquals(new byte[]{
+                24, 0, 0, 0, // size
+                (byte) MessageType.Rcreate, //type
                 (byte) 0x80, (byte) 0x00, // tag
-                // qid
-                (byte) 0x0, 0, 0, 0,
-                0x00, 0x00, 0x00, 0x00,
-                0x00, 0x00,
-                0x00,
-                0x00, 0x00, 0x34, 0x12, 0, 0}, data, "Rcreate");
+                // quid
+                64,
+                0, 0, 0, 0x00, // version
+                0x78, 0x56, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // path
+                0x34, 0x12, 0, 0 // iounit
+        }, data, "Rcreate");
     }
 
     @Test

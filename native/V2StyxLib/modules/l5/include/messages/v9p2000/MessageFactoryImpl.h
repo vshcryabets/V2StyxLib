@@ -6,40 +6,40 @@ namespace styxlib::messages::v9p2000
 {
 
     using MessageFactory = styxlib::messages::base::MessageFactory;
-    using StyxMessage = styxlib::messages::base::StyxMessage;
+    using StyxMessageUniquePtr = styxlib::messages::base::StyxMessageUPtr;
     using QID = styxlib::structs::QID;
 
     class MessageFactoryImpl : public MessageFactory
     {
     public:
         MessageFactoryImpl() = default;
-        std::unique_ptr<StyxMessage> constructTVersion(long iounit, const StyxString &version) const override;
-        std::unique_ptr<StyxMessage> constructTAuth(long fid, const StyxString &userName, const StyxString &mountPoint) const override;
-        std::unique_ptr<StyxMessage> constructTAttach(long fid, long afid, const StyxString &userName, const StyxString &mountPoint) const override;
-        std::unique_ptr<StyxMessage> constructRerror(int tag, const StyxString &error) const override;
-        std::unique_ptr<StyxMessage> constructRVersion(long maxPacketSize, const StyxString &protocolVersion) const override;
-        std::unique_ptr<StyxMessage> constructRAttachMessage(int tag, const QID &qid) const override;
-        std::unique_ptr<StyxMessage> constructRAuthMessage(int tag, const QID &qid) const override;
-        std::unique_ptr<StyxMessage> constructROpenMessage(int tag, const QID &qid, long iounit) const override;
-        std::unique_ptr<StyxMessage> constructRCreateMessage(int tag, const QID &qid, long iounit) const override;
-        std::unique_ptr<StyxMessage> constructTWriteMessage(long fid, long fileOffset, StyxBuffer data, int dataOffset, int dataLength) const override;
-        std::unique_ptr<StyxMessage> constructTWalkMessage(long fid, long new_fid, const std::vector<StyxString> &path) const override;
-        std::unique_ptr<StyxMessage> constructTWStatMessage(long fid, const StyxStat &stat) const override;
-        std::unique_ptr<StyxMessage> constructRStatMessage(int tag, const StyxStat &stat) const override;
-        std::unique_ptr<StyxMessage> constructTFlushMessage(int tag) const override;
-        std::unique_ptr<StyxMessage> constructTOpenMessage(long fid, int mode) const override;
-        std::unique_ptr<StyxMessage> constructRWriteMessage(int tag, long count) const override;
-        std::unique_ptr<StyxMessage> constructTReadMessage(long fid, long offset, int count) const override;
-        std::unique_ptr<StyxMessage> constructRWalkMessage(int tag, const std::vector<QID> &empty) const override;
-        std::unique_ptr<StyxMessage> constructRReadMessage(int tag, StyxBuffer data, int size) const override;
-        std::unique_ptr<StyxMessage> constructTCreateMessage(long fid, StyxString name, long permissions, int mode) const override;
-        std::unique_ptr<StyxMessage> constructTClunk(long fid) const override;
-        std::unique_ptr<StyxMessage> constructRClunk(int tag, long fid) const override;
-        std::unique_ptr<StyxMessage> constructTRemove(long fid) const override;
-        std::unique_ptr<StyxMessage> constructRRemove(int tag) const override;
-        std::unique_ptr<StyxMessage> constructTStat(long fid) const override;
-        std::unique_ptr<StyxMessage> constructRWStat(int tag) const override;
-        std::unique_ptr<StyxMessage> constructRFlush(int tag) const override;
+        StyxMessageUniquePtr constructTVersion(long iounit, const StyxString &version) const override;
+        StyxMessageUniquePtr constructTAuth(long fid, const StyxString &userName, const StyxString &mountPoint) const override;
+        StyxMessageUniquePtr constructTAttach(long fid, long afid, const StyxString &userName, const StyxString &mountPoint) const override;
+        StyxMessageUniquePtr constructRerror(int tag, const StyxString &error) const override;
+        StyxMessageUniquePtr constructRVersion(long maxPacketSize, const StyxString &protocolVersion) const override;
+        StyxMessageUniquePtr constructRAttachMessage(int tag, const QID &qid) const override;
+        StyxMessageUniquePtr constructRAuthMessage(int tag, const QID &qid) const override;
+        StyxMessageUniquePtr constructROpenMessage(int tag, const QID &qid, long iounit) const override;
+        StyxMessageUniquePtr constructRCreateMessage(int tag, const QID &qid, long iounit) const override;
+        StyxMessageUniquePtr constructTWriteMessage(long fid, long fileOffset, StyxBuffer data, int dataOffset, int dataLength) const override;
+        StyxMessageUniquePtr constructTWalkMessage(long fid, long new_fid, const std::vector<StyxString> &path) const override;
+        StyxMessageUniquePtr constructTWStatMessage(long fid, const StyxStat &stat) const override;
+        StyxMessageUniquePtr constructRStatMessage(int tag, const StyxStat &stat) const override;
+        StyxMessageUniquePtr constructTFlushMessage(int tag) const override;
+        StyxMessageUniquePtr constructTOpenMessage(long fid, int mode) const override;
+        StyxMessageUniquePtr constructRWriteMessage(int tag, long count) const override;
+        StyxMessageUniquePtr constructTReadMessage(long fid, long offset, int count) const override;
+        StyxMessageUniquePtr constructRWalkMessage(int tag, const std::vector<QID> &empty) const override;
+        StyxMessageUniquePtr constructRReadMessage(int tag, StyxBuffer data, int size) const override;
+        StyxMessageUniquePtr constructTCreateMessage(long fid, StyxString name, long permissions, int mode) const override;
+        StyxMessageUniquePtr constructTClunk(long fid) const override;
+        StyxMessageUniquePtr constructRClunk(int tag, long fid) const override;
+        StyxMessageUniquePtr constructTRemove(long fid) const override;
+        StyxMessageUniquePtr constructRRemove(int tag) const override;
+        StyxMessageUniquePtr constructTStat(long fid) const override;
+        StyxMessageUniquePtr constructRWStat(int tag) const override;
+        StyxMessageUniquePtr constructRFlush(int tag) const override;
     };
 
 }

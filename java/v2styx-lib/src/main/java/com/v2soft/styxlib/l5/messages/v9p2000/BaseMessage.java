@@ -12,7 +12,6 @@ public class BaseMessage implements StyxMessage {
     protected long iounit;
     protected final String protocolVersion;
 
-
     protected BaseMessage(
             int type,
             int tag,

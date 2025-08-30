@@ -127,16 +127,22 @@ class StyxSerializerImplTest {
                 serializer.getMessageSize(messageFactory.constructTVersion(0x1111, "ABCD")));
 
         assertEquals(IDataSerializer.BASE_BINARY_SIZE + serializer.getQidSize() + 4,
-                serializer.getMessageSize(messageFactory.constructROpenMessage(0x1111, QID.EMPTY, 0)));
+                serializer.getMessageSize(messageFactory.constructROpenMessage(0x1111, new QID(
+                        QidType.QTFILE, 1, 2
+                ), 0)));
 
         assertEquals(IDataSerializer.BASE_BINARY_SIZE + serializer.getQidSize() + 4,
-                serializer.getMessageSize(messageFactory.constructRCreateMessage(0x1111, QID.EMPTY, 0)));
+                serializer.getMessageSize(messageFactory.constructRCreateMessage(0x1111, new QID(
+                        QidType.QTFILE, 1, 2
+                ), 0)));
 
         assertEquals(IDataSerializer.BASE_BINARY_SIZE + 4 + 2 + 4,
                 serializer.getMessageSize(messageFactory.constructRVersion(0x1111, "ABCD")));
 
         assertEquals(IDataSerializer.BASE_BINARY_SIZE + 2 + serializer.getQidSize(),
-                serializer.getMessageSize(messageFactory.constructRWalkMessage(0x1111, Collections.singletonList(QID.EMPTY))));
+                serializer.getMessageSize(messageFactory.constructRWalkMessage(0x1111, Collections.singletonList(new QID(
+                        QidType.QTFILE, 1, 2
+                )))));
 
     }
 
