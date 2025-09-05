@@ -50,7 +50,7 @@ public class StringSerializerImplTests {
 
     @Test
     public void testSerializeRVersion() {
-        var message = messageFactory.constructRVersion(1080, "9P2000.L");
+        var message = messageFactory.constructRVersion(1, 1080, "9P2000.L");
         message.setTag(123);
         var str = serializer.serializeMessage(message);
         Assertions.assertTrue(str.contains("Message Type:101"));

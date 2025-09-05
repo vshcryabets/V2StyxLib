@@ -16,7 +16,7 @@ namespace styxlib::messages::base
         virtual StyxMessageUPtr constructTAuth(long fid, const StyxString &userName, const StyxString &mountPoint) const = 0;
         virtual StyxMessageUPtr constructTAttach(long fid, long afid, const StyxString &userName, const StyxString &mountPoint) const = 0;
         virtual StyxMessageUPtr constructRerror(int tag, const StyxString &error) const = 0;
-        virtual StyxMessageUPtr constructRVersion(long maxPacketSize, const StyxString &protocolVersion) const = 0;
+        virtual StyxMessageUPtr constructRVersion(int tag, long maxPacketSize, const StyxString &protocolVersion) const = 0;
         virtual StyxMessageUPtr constructRAttachMessage(int tag, const QID &qid) const = 0;
         virtual StyxMessageUPtr constructRAuthMessage(int tag, const QID &qid) const = 0;
         virtual StyxMessageUPtr constructROpenMessage(int tag, const QID &qid, long iounit) const = 0;

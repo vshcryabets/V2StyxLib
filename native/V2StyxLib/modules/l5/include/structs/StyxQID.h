@@ -13,6 +13,11 @@ namespace styxlib::structs
         constexpr QID(uint8_t t, uint32_t v, uint64_t p)
             : type(t), version(v), path(p) {}
 
+        bool operator==(const QID &other) const
+        {
+            return type == other.type && version == other.version && path == other.path;
+        }
+
         const static QID EMPTY;
     };
 }

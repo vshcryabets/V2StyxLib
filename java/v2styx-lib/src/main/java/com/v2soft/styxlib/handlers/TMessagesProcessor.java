@@ -66,7 +66,10 @@ public class TMessagesProcessor extends QueueMessagesProcessor {
         try {
             switch (message.getType()) {
                 case MessageType.Tversion:
-                    answer = mDi.getMessageFactory().constructRVersion(mConnectionDetails.ioUnit(), mConnectionDetails.protocol());
+                    answer = mDi.getMessageFactory().constructRVersion(
+                            message.getTag(),
+                            mConnectionDetails.ioUnit(),
+                            mConnectionDetails.protocol());
                     break;
                 case MessageType.Tattach:
                     answer = processAttach(clientId, (StyxTAttachMessage)message);

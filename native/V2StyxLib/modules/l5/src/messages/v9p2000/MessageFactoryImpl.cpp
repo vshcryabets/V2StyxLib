@@ -1,5 +1,7 @@
 #include "messages/v9p2000/MessageFactoryImpl.h"
 #include "messages/v9p2000/BaseMessage.h"
+#include "messages/v9p2000/StyxTAuthMessage.h"
+#include "messages/v9p2000/StyxTAttachMessage.h"
 #include "enums/MessageType.h"
 #include "enums/Constants.h"
 
@@ -21,35 +23,32 @@ namespace styxlib::messages::v9p2000
 
     StyxMessageUPtr MessageFactoryImpl::constructTAuth(long fid, const StyxString &userName, const StyxString &mountPoint) const
     {
-        return std::make_unique<BaseMessage>(
-            styxlib::enums::Tauth,
-            styxlib::enums::NOTAG,
-            QID::EMPTY,
+        return std::make_unique<StyxTAuthMessage>(
             fid,
-            0,
-            "");
+            userName,
+            mountPoint);
     }
+
     StyxMessageUPtr MessageFactoryImpl::constructTAttach(long fid, long afid, const StyxString &userName, const StyxString &mountPoint) const
     {
-        return std::make_unique<BaseMessage>(
-            styxlib::enums::Tattach,
-            styxlib::enums::NOTAG,
-            QID::EMPTY,
+        return std::make_unique<StyxTAttachMessage>(
             fid,
-            0,
-            "");
+            afid,
+            userName,
+            mountPoint);
     }
+
     StyxMessageUPtr MessageFactoryImpl::constructRerror(int tag, const StyxString &error) const
     {
         return std::make_unique<StyxRErrorMessage>(
             tag,
             error);
     }
-    StyxMessageUPtr MessageFactoryImpl::constructRVersion(long maxPacketSize, const StyxString &protocolVersion) const
+    StyxMessageUPtr MessageFactoryImpl::constructRVersion(int tag, long maxPacketSize, const StyxString &protocolVersion) const
     {
         return std::make_unique<BaseMessage>(
             styxlib::enums::Rversion,
-            styxlib::enums::NOTAG,
+            tag,
             QID::EMPTY,
             0,
             maxPacketSize,

@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-public class FactoryImplTests {
+public class MessasagesFactoryImplTests {
     final MessagesFactory factory = new MessageFactoryImpl();
 
     @Test
@@ -28,7 +28,7 @@ public class FactoryImplTests {
     public void testCreateTAuth() {
         var message = factory.constructTAuth(0x20, "user", "test");
         Assertions.assertNotNull(message);
-        Assertions.assertEquals(0x20, ((StyxTAuthMessage) message).getFID());
+        Assertions.assertEquals(0x20, ((BaseMessage) message).getFID());
         Assertions.assertEquals("user", ((StyxTAuthMessage) message).mUserName);
         Assertions.assertEquals("test", ((StyxTAuthMessage) message).mMountPoint);
     }
@@ -37,7 +37,7 @@ public class FactoryImplTests {
     public void testCreateTAttach() {
         var message = factory.constructTAttach(1, 2, "user", "test");
         Assertions.assertNotNull(message);
-        Assertions.assertEquals(1, ((StyxTAttachMessage) message).getFID());
+        Assertions.assertEquals(1, ((BaseMessage) message).getFID());
         Assertions.assertEquals(2, ((StyxTAttachMessage) message).authFID);
         Assertions.assertEquals("user", ((StyxTAttachMessage) message).userName);
         Assertions.assertEquals("test", ((StyxTAttachMessage) message).mountPoint);
@@ -54,8 +54,9 @@ public class FactoryImplTests {
 
     @Test
     public void testCreateRVersion() {
-        var message = factory.constructRVersion(16384, "9P2000");
+        var message = factory.constructRVersion(1, 16384, "9P2000");
         Assertions.assertNotNull(message);
+        Assertions.assertEquals(1, message.getTag());
         Assertions.assertEquals(16384, ((BaseMessage) message).getIounit());
         Assertions.assertEquals("9P2000", ((BaseMessage) message).getProtocolVersion());
     }
