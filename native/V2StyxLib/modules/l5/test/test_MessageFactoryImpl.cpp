@@ -56,3 +56,22 @@ TEST_CASE("testCreateRerror", "[MessageFactoryImpl]")
     REQUIRE(((BaseMessage *)message.get())->getTag() == 1);
     REQUIRE(((StyxRErrorMessage *)message.get())->getMessage() == "Test error");
 }
+
+TEST_CASE("testCreateRVersion", "[MessageFactoryImpl]")
+{
+    Suite suite;
+    StyxMessageUPtr message = suite.messageFactory.constructRVersion(1, 16384, "9P2000");
+    REQUIRE(message.get() != nullptr);
+    REQUIRE(((BaseMessage *)message.get())->getTag() == 1);
+    REQUIRE(((BaseMessage *)message.get())->getIounit() == 16384);
+    REQUIRE(((BaseMessage *)message.get())->getProtocolVersion() == "9P2000");
+}
+
+TEST_CASE("testCreateRAttachMessage", "[MessageFactoryImpl]")
+{
+    Suite suite;
+    StyxMessageUPtr message = suite.messageFactory.constructRAttachMessage(1, QID::EMPTY);
+    REQUIRE(message.get() != nullptr);
+    REQUIRE(((BaseMessage *)message.get())->getTag() == 1);
+    REQUIRE(((BaseMessage *)message.get())->getQID() == QID::EMPTY);
+}

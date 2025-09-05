@@ -1,6 +1,5 @@
 package com.v2soft.styxlib.l5.messages.v9p2000;
 
-import com.v2soft.styxlib.l5.enums.Constants;
 import com.v2soft.styxlib.l5.enums.MessageType;
 import com.v2soft.styxlib.l5.messages.base.MessagesFactory;
 import com.v2soft.styxlib.l5.messages.base.StyxMessage;
@@ -31,8 +30,8 @@ public class MessageFactoryImpl implements MessagesFactory {
     }
 
     @Override
-    public StyxMessage constructRVersion(long maxPacketSize, String protocolVersion) {
-        return new BaseMessage(MessageType.Rversion, Constants.NOTAG, null, 0, maxPacketSize, protocolVersion);
+    public StyxMessage constructRVersion(int tag, long maxPacketSize, String protocolVersion) {
+        return new BaseMessage(MessageType.Rversion, tag, null, 0, maxPacketSize, protocolVersion);
     }
 
     @Override

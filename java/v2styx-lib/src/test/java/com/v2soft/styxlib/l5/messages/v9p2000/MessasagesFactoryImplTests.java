@@ -54,8 +54,9 @@ public class MessasagesFactoryImplTests {
 
     @Test
     public void testCreateRVersion() {
-        var message = factory.constructRVersion(16384, "9P2000");
+        var message = factory.constructRVersion(1, 16384, "9P2000");
         Assertions.assertNotNull(message);
+        Assertions.assertEquals(1, message.getTag());
         Assertions.assertEquals(16384, ((BaseMessage) message).getIounit());
         Assertions.assertEquals("9P2000", ((BaseMessage) message).getProtocolVersion());
     }

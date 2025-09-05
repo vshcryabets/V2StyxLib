@@ -44,11 +44,11 @@ namespace styxlib::messages::v9p2000
             tag,
             error);
     }
-    StyxMessageUPtr MessageFactoryImpl::constructRVersion(long maxPacketSize, const StyxString &protocolVersion) const
+    StyxMessageUPtr MessageFactoryImpl::constructRVersion(int tag, long maxPacketSize, const StyxString &protocolVersion) const
     {
         return std::make_unique<BaseMessage>(
             styxlib::enums::Rversion,
-            styxlib::enums::NOTAG,
+            tag,
             QID::EMPTY,
             0,
             maxPacketSize,
