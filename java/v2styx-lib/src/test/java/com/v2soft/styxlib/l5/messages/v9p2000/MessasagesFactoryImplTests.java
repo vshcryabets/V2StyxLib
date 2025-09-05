@@ -37,7 +37,7 @@ public class MessasagesFactoryImplTests {
     public void testCreateTAttach() {
         var message = factory.constructTAttach(1, 2, "user", "test");
         Assertions.assertNotNull(message);
-        Assertions.assertEquals(1, ((StyxTAttachMessage) message).getFID());
+        Assertions.assertEquals(1, ((BaseMessage) message).getFID());
         Assertions.assertEquals(2, ((StyxTAttachMessage) message).authFID);
         Assertions.assertEquals("user", ((StyxTAttachMessage) message).userName);
         Assertions.assertEquals("test", ((StyxTAttachMessage) message).mountPoint);

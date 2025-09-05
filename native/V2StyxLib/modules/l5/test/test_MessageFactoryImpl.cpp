@@ -4,6 +4,7 @@
 #include "serialization/BufferWriterImpl.h"
 #include "messages/v9p2000/BaseMessage.h"
 #include "messages/v9p2000/StyxTAuthMessage.h"
+#include "messages/v9p2000/StyxTAttachMessage.h"
 
 using namespace styxlib::messages::v9p2000;
 using namespace styxlib::messages::base;
@@ -34,6 +35,17 @@ TEST_CASE("testCreateTAuth", "[MessageFactoryImpl]")
     REQUIRE(((BaseMessage *)message.get())->getFID() == 0x20);
     REQUIRE(((StyxTAuthMessage *)message.get())->userName == "user");
     REQUIRE(((StyxTAuthMessage *)message.get())->mountPoint == "test");
+}
+
+TEST_CASE("testCreateTAttach", "[MessageFactoryImpl]")
+{
+    Suite suite;
+    StyxMessageUPtr message = suite.messageFactory.constructTAttach(1, 2, "user", "test");
+    REQUIRE(message.get() != nullptr);
+    REQUIRE(((BaseMessage *)message.get())->getFID() == 1);
+    REQUIRE(((StyxTAttachMessage *)message.get())->authFID == 2);
+    REQUIRE(((StyxTAttachMessage *)message.get())->userName == "user");
+    REQUIRE(((StyxTAttachMessage *)message.get())->mountPoint == "test");
 }
 
 TEST_CASE("testCreateRerror", "[MessageFactoryImpl]")

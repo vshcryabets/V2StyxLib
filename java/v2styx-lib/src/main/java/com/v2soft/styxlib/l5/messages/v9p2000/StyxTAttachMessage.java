@@ -8,9 +8,9 @@ public class StyxTAttachMessage extends StyxTMessage {
     public final String userName;
     public final String mountPoint;
 
-    protected StyxTAttachMessage(long fid, long afid, String username, String mountpoint) {
+    protected StyxTAttachMessage(long fid, long authFid, String username, String mountpoint) {
         super(MessageType.Tattach, QID.EMPTY, fid, 0, null);
-        authFID = afid;
+        authFID = authFid;
         userName = username;
         mountPoint = mountpoint;
     }
