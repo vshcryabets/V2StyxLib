@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-public class FactoryImplTests {
+public class MessasagesFactoryImplTests {
     final MessagesFactory factory = new MessageFactoryImpl();
 
     @Test
@@ -28,7 +28,7 @@ public class FactoryImplTests {
     public void testCreateTAuth() {
         var message = factory.constructTAuth(0x20, "user", "test");
         Assertions.assertNotNull(message);
-        Assertions.assertEquals(0x20, ((StyxTAuthMessage) message).getFID());
+        Assertions.assertEquals(0x20, ((BaseMessage) message).getFID());
         Assertions.assertEquals("user", ((StyxTAuthMessage) message).mUserName);
         Assertions.assertEquals("test", ((StyxTAuthMessage) message).mMountPoint);
     }

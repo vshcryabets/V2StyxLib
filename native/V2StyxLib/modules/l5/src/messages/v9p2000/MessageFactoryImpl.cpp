@@ -1,5 +1,6 @@
 #include "messages/v9p2000/MessageFactoryImpl.h"
 #include "messages/v9p2000/BaseMessage.h"
+#include "messages/v9p2000/StyxTAuthMessage.h"
 #include "enums/MessageType.h"
 #include "enums/Constants.h"
 
@@ -21,14 +22,12 @@ namespace styxlib::messages::v9p2000
 
     StyxMessageUPtr MessageFactoryImpl::constructTAuth(long fid, const StyxString &userName, const StyxString &mountPoint) const
     {
-        return std::make_unique<BaseMessage>(
-            styxlib::enums::Tauth,
-            styxlib::enums::NOTAG,
-            QID::EMPTY,
+        return std::make_unique<StyxTAuthMessage>(
             fid,
-            0,
-            "");
+            userName,
+            mountPoint);
     }
+
     StyxMessageUPtr MessageFactoryImpl::constructTAttach(long fid, long afid, const StyxString &userName, const StyxString &mountPoint) const
     {
         return std::make_unique<BaseMessage>(

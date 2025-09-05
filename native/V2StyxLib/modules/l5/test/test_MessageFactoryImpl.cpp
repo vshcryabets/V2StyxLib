@@ -3,6 +3,7 @@
 #include "serialization/StyxSerializerImpl.h"
 #include "serialization/BufferWriterImpl.h"
 #include "messages/v9p2000/BaseMessage.h"
+#include "messages/v9p2000/StyxTAuthMessage.h"
 
 using namespace styxlib::messages::v9p2000;
 using namespace styxlib::messages::base;
@@ -23,6 +24,16 @@ TEST_CASE("testCreateTVersion", "[MessageFactoryImpl]")
     REQUIRE(message.get() != nullptr);
     REQUIRE(((BaseMessage *)message.get())->getIounit() == 16384);
     REQUIRE(((BaseMessage *)message.get())->getProtocolVersion() == "9P2000");
+}
+
+TEST_CASE("testCreateTAuth", "[MessageFactoryImpl]")
+{
+    Suite suite;
+    StyxMessageUPtr message = suite.messageFactory.constructTAuth(0x20, "user", "test");
+    REQUIRE(message.get() != nullptr);
+    REQUIRE(((BaseMessage *)message.get())->getFID() == 0x20);
+    REQUIRE(((StyxTAuthMessage *)message.get())->userName == "user");
+    REQUIRE(((StyxTAuthMessage *)message.get())->mountPoint == "test");
 }
 
 TEST_CASE("testCreateRerror", "[MessageFactoryImpl]")

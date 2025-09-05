@@ -24,7 +24,7 @@ namespace styxlib::messages::v9p2000
             const StyxString &protocolVersion);
         virtual ~BaseMessage() = default;
         styxlib::structs::QID getQID() const { return qid; }
-        styxlib::Fid getFid() const { return fid; }
+        styxlib::Fid getFID() const { return fid; }
         uint32_t getIounit() const { return iounit; }
         const StyxString &getProtocolVersion() const { return protocolVersion; }
     };
