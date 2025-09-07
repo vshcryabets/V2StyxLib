@@ -4,7 +4,7 @@ if(BUILD_MODULE_L5)
     add_library(module_l5 STATIC
         src/BufferWriterImpl.cpp
         src/BufferReaderImpl.cpp
-        src/StyxMessage.cpp
+        src/messages/base/StyxMessage.cpp
         src/StyxSerializerImpl.cpp
         src/StyxQID.cpp
         src/StyxStat.cpp
