@@ -9,9 +9,8 @@ namespace styxlib::messages::base
     class StyxMessage
     {
     private:
-        Tag tag;
         Type type;
-
+        Tag tag;
     public:
         StyxMessage(Type type, Tag tag);
         virtual ~StyxMessage() = default;
