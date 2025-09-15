@@ -11,5 +11,4 @@ namespace styxlib
     typedef uint32_t Fid;
     typedef uint16_t Tag;
     typedef uint16_t Type;
-
 }

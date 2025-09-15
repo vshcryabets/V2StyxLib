@@ -1,0 +1,9 @@
+{
+  "name": "V2StyxLibL5",
+  "version": "1.0.0",
+  "build": {
+    "srcFilter": [
+      "+<messages/base/StyxMessage.cpp>"
+    ]
+  }
+}
