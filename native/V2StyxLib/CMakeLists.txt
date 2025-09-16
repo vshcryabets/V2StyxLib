@@ -17,6 +17,7 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(Catch2)
 
+add_subdirectory(modules/l4)
 if (BUILD_MODULE_L5)
     add_subdirectory(modules/l5)
 endif()

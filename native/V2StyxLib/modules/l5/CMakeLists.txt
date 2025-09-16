@@ -11,6 +11,7 @@ if(BUILD_MODULE_L5)
         src/messages/v9p2000/BaseMessage.cpp
         src/messages/v9p2000/MessageFactoryImpl.cpp
     )
+    target_link_libraries(module_l5 PUBLIC module_l4)
     target_include_directories(module_l5 PUBLIC
         $<INSTALL_INTERFACE:include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
