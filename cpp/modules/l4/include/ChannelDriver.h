@@ -1,5 +1,6 @@
 #pragma once
 #include "data.h"
+#include <memory>
 
 namespace styxlib
 {

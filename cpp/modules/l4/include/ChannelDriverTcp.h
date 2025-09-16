@@ -4,6 +4,7 @@
 #include <map>
 #include <thread>
 #include <atomic>
+#include <future>
 
 namespace styxlib
 {
@@ -41,10 +42,9 @@ namespace styxlib
     private:
         const Configuration configuration;
         std::thread serverThread;
-        int serverSocket{NO_FD};
         std::map<int, ChannelTxPtr> clients;
         std::atomic<bool> running{false};
-        // int clientSocket;
+        std::atomic<bool> stopRequested{false};
 
         void workThreadFunction();
 
@@ -52,8 +52,8 @@ namespace styxlib
         ChannelDriverTcpServer(const Configuration &config);
         ~ChannelDriverTcpServer() override;
         Size sendBuffer(int clientId, const StyxBuffer buffer, Size size);
-        bool start();
-        void stop();
+        void start();
+        std::future<void> stop();
         bool isStarted() const;
     };
 }

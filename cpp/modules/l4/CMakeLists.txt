@@ -15,3 +15,12 @@ target_include_directories(module_l4 PUBLIC
     $<INSTALL_INTERFACE:include>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     )
+
+add_executable(module_l4_tests
+    test/test_ChannelDriverTcp.cpp
+    )
+target_include_directories(module_l4_tests PRIVATE ./include/)
+target_link_libraries(module_l4_tests PUBLIC Catch2::Catch2WithMain module_l4)
+catch_discover_tests(module_l4_tests 
+    PROPERTIES 
+    TIMEOUT 10)

@@ -94,29 +94,24 @@ namespace styxlib
         return client->sendBuffer(buffer, size);
     }
 
-    bool ChannelDriverTcpServer::start()
+    void ChannelDriverTcpServer::start()
     {
-        if (isStarted())
+        if (!isStarted())
         {
-            return true;
+            stopRequested.store(false);
+            serverThread = std::thread([this]()
+                                       { this->workThreadFunction(); });
         }
-        serverThread = std::thread([this]()
-                                   { this->workThreadFunction(); });
-        return 0;
     }
 
-    void ChannelDriverTcpServer::stop()
+    std::future<void> ChannelDriverTcpServer::stop()
     {
-        if (isStarted())
-        {
-            // close(clientSocket);
-            // clientSocket = ChannelDriverTcpServer::NO_FD;
-        }
-        if (serverSocket != ChannelDriverTcpServer::NO_FD)
-        {
-            close(serverSocket);
-            serverSocket = ChannelDriverTcpServer::NO_FD;
-        }
+        stopRequested.store(true);
+        return std::async(std::launch::async,
+                          [this]()
+                          {
+                              this->serverThread.join();
+                          });
     }
     bool ChannelDriverTcpServer::isStarted() const
     {
@@ -127,7 +122,7 @@ namespace styxlib
     {
         running.store(true);
         // Create the server socket
-        serverSocket = ::socket(AF_INET, SOCK_STREAM, 0);
+        int serverSocket = ::socket(AF_INET, SOCK_STREAM, 0);
         if (serverSocket < 0)
         {
             return;
@@ -147,7 +142,7 @@ namespace styxlib
             return;
         }
 
-        while (running.load())
+        while (!stopRequested.load())
         {
 
             if (listen(serverSocket, 1) < 0)
@@ -174,5 +169,9 @@ namespace styxlib
                 clients[clientSocket] = client;
             }
         }
+        close(serverSocket);
+        serverSocket = ChannelDriverTcpServer::NO_FD;
+        running.store(false);
+        stopRequested.store(false);
     }
 } // namespace styxlib
