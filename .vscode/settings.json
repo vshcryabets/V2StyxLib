@@ -103,7 +103,8 @@
         "csignal": "cpp",
         "source_location": "cpp",
         "stdfloat": "cpp",
-        "*.inc": "cpp"
+        "*.inc": "cpp",
+        "strstream": "cpp"
     },
     "cmake.sourceDirectory": "${workspaceFolder}/cpp/"
 }

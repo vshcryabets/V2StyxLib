@@ -4,10 +4,11 @@ add_library(module_l4 STATIC)
 
 target_sources(module_l4
     PRIVATE
-        src/ChannelDriverTcp.cpp
+        src/ChannelUnixTcp.cpp
+        src/impl/ClientsRepoImpl.cpp
     PUBLIC
-        include/ChannelDriver.h
-        include/ChannelDriverTcp.h
+        include/Channel.h
+        include/ChannelUnixTcp.h
         include/data.h
     )
 
@@ -17,7 +18,7 @@ target_include_directories(module_l4 PUBLIC
     )
 
 add_executable(module_l4_tests
-    test/test_ChannelDriverTcp.cpp
+    test/test_ChannelUnixTcp.cpp
     )
 target_include_directories(module_l4_tests PRIVATE ./include/)
 target_link_libraries(module_l4_tests PUBLIC Catch2::Catch2WithMain module_l4)
