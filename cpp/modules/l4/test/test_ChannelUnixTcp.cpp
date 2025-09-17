@@ -13,6 +13,7 @@ TEST_CASE("testStartStop", "[ChannelUnixTcpServer]")
     styxlib::ChannelUnixTcpServer server(config);
 
     REQUIRE_FALSE(server.isStarted());
+
     auto future = server.start();
     auto status = future.wait_for(std::chrono::seconds(1));
     REQUIRE(status == std::future_status::ready);

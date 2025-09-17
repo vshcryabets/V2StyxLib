@@ -104,12 +104,18 @@ namespace styxlib
 
     std::future<void> ChannelUnixTcpServer::start()
     {
+        startPromise = std::make_unique<std::promise<void>>();
         if (!isStarted())
         {
             stopRequested.store(false);
             serverThread = std::thread([this]()
                                        { this->workThreadFunction(); });
         }
+        else
+        {
+            startPromise->set_value();
+        }
+        return startPromise->get_future();
     }
 
     std::future<void> ChannelUnixTcpServer::stop()
@@ -118,6 +124,7 @@ namespace styxlib
         return std::async(std::launch::async,
                           [this]()
                           {
+                              this->startPromise = nullptr;
                               this->serverThread.join();
                           });
     }
@@ -129,6 +136,7 @@ namespace styxlib
     void ChannelUnixTcpServer::workThreadFunction()
     {
         running.store(true);
+        startPromise->set_value();
         // Create the server socket
         int serverSocket = ::socket(AF_INET, SOCK_STREAM, 0);
         if (serverSocket < 0)

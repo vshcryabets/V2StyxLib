@@ -53,6 +53,7 @@ namespace styxlib
         std::map<int, ChannelTxPtr> socketToChannelTx;
         std::atomic<bool> running{false};
         std::atomic<bool> stopRequested{false};
+        std::unique_ptr<std::promise<void>> startPromise;
 
         void workThreadFunction();
         bool acceptClients(int serverSocket);
