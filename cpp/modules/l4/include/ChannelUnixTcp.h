@@ -6,6 +6,7 @@
 #include <atomic>
 #include <future>
 #include "ClientsRepo.h"
+#include "impl/ProgressObservableMutexImpl.h"
 
 namespace styxlib
 {
@@ -45,11 +46,18 @@ namespace styxlib
             uint8_t packetSizeHeader{4};
             uint16_t iounit{8192};
         };
+        struct ClientInfo
+        {
+            ClientId id;
+            std::string address;
+            uint16_t port;
+        };
 
     private:
         const Configuration configuration;
         std::thread serverThread;
-        std::map<int, ClientId> socketToClientId;
+        std::shared_ptr<std::map<int, ClientInfo>> socketToClientInfoMap;
+        ProgressObservableMutexImpl<std::shared_ptr<const std::map<int, ClientInfo>>> clientsObserver;
         std::map<int, ChannelTxPtr> socketToChannelTx;
         std::atomic<bool> running{false};
         std::atomic<bool> stopRequested{false};
@@ -64,6 +72,7 @@ namespace styxlib
         Size sendBuffer(int clientId, const StyxBuffer buffer, Size size);
         std::future<void> start();
         std::future<void> stop();
+        ProgressObserver<std::shared_ptr<const std::map<int, ClientInfo>>> &getClientsObserver() { return clientsObserver; }
         bool isStarted() const;
     };
 }

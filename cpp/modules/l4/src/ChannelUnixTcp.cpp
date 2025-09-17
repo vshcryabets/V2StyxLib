@@ -4,6 +4,7 @@
 #include <cstring>
 #include <stdexcept>
 #include "fcntl.h"
+#include <iostream>
 
 namespace styxlib
 {
@@ -32,35 +33,51 @@ namespace styxlib
     std::future<bool> ChannelUnixTcpClient::connect()
     {
         return std::async(
-            std::launch::async, [this]
-            {
-            if (isConnected())
-            {
-                return true;
+            std::launch::async, 
+            [this] {
+                if (isConnected())
+                {
+                    return true;
+                }
+
+                // Create and connect the TCP socket
+                int socket = ::socket(AF_INET, SOCK_STREAM, 0);
+                if (socket < 0)
+                {
+                    return false;
+                }
+
+                sockaddr_in serverAddress;
+                serverAddress.sin_family = AF_INET;
+                serverAddress.sin_port = htons(configuration.port);
+                inet_pton(AF_INET, configuration.address.c_str(), &serverAddress.sin_addr);
+                int result = ::connect(socket, reinterpret_cast<sockaddr *>(&serverAddress), sizeof(serverAddress));
+                bool isConnected = result == 0;
+                if (isConnected)
+                {
+                    this->socket = socket;
+                }
+                else
+                {
+                    close(socket);
+                }
+                return isConnected; 
             }
-
-            // Create and connect the TCP socket
-            socket = ::socket(AF_INET, SOCK_STREAM, 0);
-            if (socket < 0)
-            {
-                return false;
-            }
-
-            sockaddr_in serverAddress;
-            serverAddress.sin_family = AF_INET;
-            serverAddress.sin_port = htons(configuration.port);
-            inet_pton(AF_INET, configuration.address.c_str(), &serverAddress.sin_addr);
-
-        return (::connect(socket, reinterpret_cast<sockaddr *>(&serverAddress), sizeof(serverAddress)) == 0); });
+        );
     }
 
     std::future<void> ChannelUnixTcpClient::disconnect()
     {
-        if (isConnected())
-        {
-            close(socket);
-            socket = ChannelUnixTcpClient::NO_FD;
-        }
+        return std::async(
+            std::launch::async,
+            [this]()
+            {
+                if (isConnected())
+                {
+                    close(socket);
+                    socket = ChannelUnixTcpClient::NO_FD;
+                }
+            });
     }
 
     bool ChannelUnixTcpClient::isConnected() const
@@ -75,6 +92,7 @@ namespace styxlib
         {
             throw std::invalid_argument("ClientsRepo must be provided in configuration");
         }
+        socketToClientInfoMap = std::make_shared<std::map<int, ClientInfo>>();
     }
 
     ChannelUnixTcpServer::~ChannelUnixTcpServer()
@@ -125,6 +143,9 @@ namespace styxlib
                           [this]()
                           {
                               this->startPromise = nullptr;
+                              socketToChannelTx.clear();
+                              socketToClientInfoMap->clear();
+                              clientsObserver.setData(socketToClientInfoMap, true);
                               this->serverThread.join();
                           });
     }
@@ -186,22 +207,14 @@ namespace styxlib
         int clientSocket = accept(serverSocket, nullptr, nullptr);
         if (clientSocket < 0)
         {
-            // if (errno == EWOULDBLOCK || errno == EAGAIN)
-            // {
-            //     return;
-            //     // // No pending connections, sleep briefly to avoid busy loop
-            //     // std::this_thread::sleep_for(std::chrono::milliseconds(10));
-            //     // continue;
-            // }
-            // else
-            // {
-            //     // Error occurred
-            //     // break;
-            // }
             return false;
         }
-        auto clientId = configuration.clientsRepo->getNextClientId();
-        socketToClientId[clientSocket] = clientId;
+        ClientInfo clientInfo{
+            .id = configuration.clientsRepo->getNextClientId(), 
+            .address = "", 
+            .port = 0
+        };
+        socketToClientInfoMap->insert({clientSocket, clientInfo});
         // Create a ChannelTx for the client
         ChannelTxPtr client = std::make_shared<ChannelUnixTcpClient>(
             ChannelUnixTcpClient::Configuration{
@@ -210,6 +223,7 @@ namespace styxlib
             });
         // Store the client with its socket as the ID
         socketToChannelTx[clientSocket] = client;
+        clientsObserver.setData(socketToClientInfoMap, false);
         return true;
     }
 

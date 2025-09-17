@@ -24,6 +24,15 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(Catch2)
 include(Catch)
 
+# For GCC and Clang compilers
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    add_compile_options(-Werror=return-type)
+
+# For the Microsoft MSVC compiler
+elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+    add_compile_options(/we4716)
+endif()
+
 add_subdirectory(modules/l4)
 add_subdirectory(modules/l5)
 

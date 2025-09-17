@@ -13,5 +13,6 @@ namespace styxlib
     public:
         styxlib::ClientId getNextClientId() override;
         void releaseClientId(styxlib::ClientId id) override;
+        styxlib::ClientId getLastIssuedId() const;
     };
 } // namespace styxlib
