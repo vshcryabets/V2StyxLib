@@ -4,7 +4,7 @@ add_library(module_l4 STATIC)
 
 target_sources(module_l4
     PRIVATE
-        src/ChannelUnixTcp.cpp
+        src/impl/ChannelUnixTcp.cpp
         src/impl/ClientsRepoImpl.cpp
     PUBLIC
         include/Channel.h

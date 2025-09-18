@@ -211,15 +211,25 @@ namespace styxlib
         }
         ClientInfo clientInfo{
             .id = configuration.clientsRepo->getNextClientId(), 
-            .address = "", 
-            .port = 0
         };
+        sockaddr_in addr;
+        socklen_t addrLen = sizeof(addr);
+        if (getpeername(clientSocket, reinterpret_cast<sockaddr*>(&addr), &addrLen) == 0) {
+            char ipStr[INET_ADDRSTRLEN] = {0};
+            inet_ntop(AF_INET, &addr.sin_addr, ipStr, sizeof(ipStr));
+            clientInfo.address = ipStr;
+            clientInfo.port = ntohs(addr.sin_port);
+        }
+
         socketToClientInfoMap->insert({clientSocket, clientInfo});
         // Create a ChannelTx for the client
         ChannelTxPtr client = std::make_shared<ChannelUnixTcpClient>(
             ChannelUnixTcpClient::Configuration{
-                .address = "", // Not used for server-side
-                .port = 0      // Not used for server-side
+                .address = clientInfo.address,
+                .port = clientInfo.port,
+                .socketFd = clientSocket,
+                .packetSizeHeader = configuration.packetSizeHeader,
+                .iounit = configuration.iounit
             });
         // Store the client with its socket as the ID
         socketToChannelTx[clientSocket] = client;

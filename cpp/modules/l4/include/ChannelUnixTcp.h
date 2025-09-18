@@ -48,9 +48,9 @@ namespace styxlib
         };
         struct ClientInfo
         {
-            ClientId id;
-            std::string address;
-            uint16_t port;
+            ClientId id {0};
+            std::string address {""};
+            uint16_t port {0};
         };
 
     private:

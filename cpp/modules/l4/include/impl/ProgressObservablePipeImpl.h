@@ -20,7 +20,7 @@ public:
     {
         if (pipe(fd) == -1)
         {
-            throw "Can't create pipe";
+            throw ProgressObserverException("Can't create pipe");
         }
     }
     ProgressObservablePipeImpl(
@@ -65,7 +65,7 @@ private:
         read(readFd, &size, 4);
         size = ntohl(size);
         if (size > 16 * 1024)
-            throw "Size overflow";
+            throw ProgressObserverException("Size overflow");
         char *buffer = new char[size];
         ssize_t readed = read(readFd, buffer, size);
         data = deserializer(buffer, readed);

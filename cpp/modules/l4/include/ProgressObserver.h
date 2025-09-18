@@ -1,11 +1,15 @@
 #pragma once
 #include <functional>
+#include <exception>
 
-
-// #include <mutex>
-// #include <condition_variable>
-// #include <unistd.h>
-// #include <arpa/inet.h>
+class ProgressObserverException: public std::exception
+{
+public:
+    ProgressObserverException(const char *message): msg(message) {}
+    const char *what() const noexcept override { return msg; }
+private:
+    const char *msg;
+};
 
 template <typename T>
 class ProgressObservable

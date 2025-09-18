@@ -52,6 +52,9 @@ TEST_CASE("testStartConnectDisconnect", "[ChannelUnixTcpServer]")
             ", Client ID: " << clientInfo.id << 
             ", Address: " << clientInfo.address << 
             ", Port: " << clientInfo.port << std::endl;
+        REQUIRE(clientInfo.id > 0);
+        REQUIRE(clientInfo.port > 0);
+        REQUIRE(clientInfo.address.size() > 0);
     }
 
     REQUIRE(client.isConnected());
