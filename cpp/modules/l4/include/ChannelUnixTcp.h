@@ -58,7 +58,7 @@ namespace styxlib
         std::thread serverThread;
         std::shared_ptr<std::map<int, ClientInfo>> socketToClientInfoMap;
         ProgressObservableMutexImpl<std::shared_ptr<const std::map<int, ClientInfo>>> clientsObserver;
-        std::map<int, ChannelTxPtr> socketToChannelTx;
+        std::map<ClientId, ChannelTxPtr> clientIdToChannelTx;
         std::atomic<bool> running{false};
         std::atomic<bool> stopRequested{false};
         std::unique_ptr<std::promise<void>> startPromise;
@@ -69,7 +69,7 @@ namespace styxlib
     public:
         ChannelUnixTcpServer(const Configuration &config);
         ~ChannelUnixTcpServer() override;
-        Size sendBuffer(int clientId, const StyxBuffer buffer, Size size);
+        Size sendBuffer(ClientId clientId, const StyxBuffer buffer, Size size);
         std::future<void> start();
         std::future<void> stop();
         ProgressObserver<std::shared_ptr<const std::map<int, ClientInfo>>> &getClientsObserver() { return clientsObserver; }

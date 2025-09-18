@@ -1,6 +1,6 @@
 #pragma once
 #include "messages/base/StyxMessage.h"
-#include "ChannelDriver.h"
+#include "Channel.h"
 
 namespace styxlib
 {

@@ -1,6 +1,7 @@
 #pragma once
 #include "ProgressObserver.h"
 #include <memory>
+#include <arpa/inet.h>
 
 template <typename T>
 class ProgressObservablePipeImpl : public ProgressObservable<T>

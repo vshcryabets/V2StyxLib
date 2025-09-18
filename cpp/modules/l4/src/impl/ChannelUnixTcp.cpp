@@ -101,7 +101,7 @@ namespace styxlib
     }
 
     Size ChannelUnixTcpServer::sendBuffer(
-        int clientId,
+        ClientId clientId,
         const StyxBuffer buffer,
         Size size)
     {
@@ -110,14 +110,12 @@ namespace styxlib
             return 0;
         }
 
-        auto it = socketToChannelTx.find(clientId);
-        if (it == socketToChannelTx.end())
+        auto it = clientIdToChannelTx.find(clientId);
+        if (it == clientIdToChannelTx.end())
         {
             return 0;
         }
-
-        ChannelTxPtr &client = it->second;
-        return client->sendBuffer(buffer, size);
+        return it->second->sendBuffer(buffer, size);
     }
 
     std::future<void> ChannelUnixTcpServer::start()
@@ -143,7 +141,7 @@ namespace styxlib
                           [this]()
                           {
                               this->startPromise = nullptr;
-                              socketToChannelTx.clear();
+                              clientIdToChannelTx.clear();
                               socketToClientInfoMap->clear();
                               clientsObserver.setData(socketToClientInfoMap, true);
                               this->serverThread.join();
@@ -232,7 +230,7 @@ namespace styxlib
                 .iounit = configuration.iounit
             });
         // Store the client with its socket as the ID
-        socketToChannelTx[clientSocket] = client;
+        clientIdToChannelTx[clientInfo.id] = client;
         clientsObserver.setData(socketToClientInfoMap, false);
         return true;
     }
