@@ -1,6 +1,6 @@
 #pragma once
 #include "ProgressObserver.h"
-
+#include <memory>
 
 template <typename T>
 class ProgressObservablePipeImpl : public ProgressObservable<T>
@@ -66,10 +66,10 @@ private:
         size = ntohl(size);
         if (size > 16 * 1024)
             throw ProgressObserverException("Size overflow");
-        char *buffer = new char[size];
-        ssize_t readed = read(readFd, buffer, size);
-        data = deserializer(buffer, readed);
-        delete [] buffer;
+        std::unique_ptr<char[]> bufferPtr(new char[size]);
+        ssize_t readBytesCount = read(readFd, bufferPtr.get(), size);
+        data = deserializer(bufferPtr.get(), readBytesCount);
+        bufferPtr.reset();
     }
 
 public:
