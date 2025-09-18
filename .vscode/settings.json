@@ -2,7 +2,7 @@
     "editor.tabSize": 4,
     "editor.insertSpaces": true,
     "editor.detectIndentation": false,
-    "editor.formatOnSave": true,
+    "editor.formatOnSave": false,
     "files.associations": {
         "cstdint": "cpp",
         "ostream": "cpp",
@@ -102,7 +102,9 @@
         "csetjmp": "cpp",
         "csignal": "cpp",
         "source_location": "cpp",
-        "stdfloat": "cpp"
+        "stdfloat": "cpp",
+        "*.inc": "cpp",
+        "strstream": "cpp"
     },
-    "cmake.sourceDirectory": "${workspaceFolder}/linux/"
+    "cmake.sourceDirectory": "${workspaceFolder}/cpp/"
 }

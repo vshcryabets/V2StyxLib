@@ -8,7 +8,7 @@
                 "-B",
                 "${workspaceFolder}/build",
                 "-S",
-                "${workspaceFolder}/native/V2StyxLib",
+                "${workspaceFolder}/cpp",
                 "-DCMAKE_BUILD_TYPE=Debug"
             ],
             "group": {
