@@ -1,12 +1,21 @@
 #pragma once
-#include "data.h"
 #include <memory>
+
+#include "data.h"
+#include "SerializerL4.h"
 
 namespace styxlib
 {
     class ChannelRx
     {
+    protected:
+        DeserializerL4Ptr deserializer;
     public:
+        ChannelRx(DeserializerL4Ptr deserializer) : deserializer(deserializer) {
+            if (!deserializer) {
+                throw std::invalid_argument("Deserializer cannot be null");
+            }
+        }
         virtual ~ChannelRx() = default;
     };
 
@@ -17,6 +26,9 @@ namespace styxlib
         virtual Size sendBuffer(const StyxBuffer buffer, Size size) = 0;
     };
 
-    typedef std::shared_ptr<ChannelRx> ChannelRxPtr;
-    typedef std::shared_ptr<ChannelTx> ChannelTxPtr;
+    class ChannelTxOneToMany {
+    public:
+        virtual ~ChannelTxOneToMany() = default;
+        virtual Size sendBuffer(ClientId clientId, const StyxBuffer buffer, Size size) = 0;
+    };
 }

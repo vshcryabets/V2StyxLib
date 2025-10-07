@@ -21,6 +21,7 @@ namespace styxlib
             int socketFd = ChannelUnixTcpClient::NO_FD;
             uint8_t packetSizeHeader{4};
             uint16_t iounit{8192};
+            DeserializerL4Ptr deserializer{nullptr};
         };
 
     private:
@@ -36,7 +37,7 @@ namespace styxlib
         bool isConnected() const;
     };
 
-    class ChannelUnixTcpServer : public ChannelRx
+    class ChannelUnixTcpServer : public ChannelRx, public ChannelTxOneToMany
     {
     public:
         struct Configuration
@@ -45,12 +46,13 @@ namespace styxlib
             std::shared_ptr<ClientsRepo> clientsRepo{nullptr};
             uint8_t packetSizeHeader{4};
             uint16_t iounit{8192};
+            DeserializerL4Ptr deserializer{nullptr};
         };
         struct ClientInfo
         {
-            ClientId id {0};
-            std::string address {""};
-            uint16_t port {0};
+            ClientId id{0};
+            std::string address{""};
+            uint16_t port{0};
         };
 
     private:
@@ -69,10 +71,13 @@ namespace styxlib
     public:
         ChannelUnixTcpServer(const Configuration &config);
         ~ChannelUnixTcpServer() override;
-        Size sendBuffer(ClientId clientId, const StyxBuffer buffer, Size size);
+        Size sendBuffer(ClientId clientId, const StyxBuffer buffer, Size size) override;
         std::future<void> start();
         std::future<void> stop();
-        ProgressObserver<std::shared_ptr<const std::map<int, ClientInfo>>> &getClientsObserver() { return clientsObserver; }
+        ProgressObserver<std::shared_ptr<const std::map<int, ClientInfo>>> &getClientsObserver()
+        {
+            return clientsObserver;
+        }
         bool isStarted() const;
     };
 }

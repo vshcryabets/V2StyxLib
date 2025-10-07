@@ -1,14 +1,27 @@
 #pragma once
 #include <string>
 #include <cstdint>
+#include <memory>
 
 namespace styxlib
 {
-    typedef std::string StyxString;
-    typedef uint32_t StyxDate;
-    typedef uint8_t *StyxBuffer;
-    typedef uint16_t Size;
-    typedef uint32_t Fid;
-    typedef uint16_t Tag;
-    typedef uint16_t Type;
+    using StyxString = std::string;
+    using StyxDate = uint32_t;
+    using StyxBuffer = uint8_t *;
+    using Size = uint16_t;
+    using Fid = uint32_t;
+    using Tag = uint16_t;
+    using Type = uint16_t;
+    using ClientId = int;
+
+    class SerializerL4;
+    class DeserializerL4;
+    class ChannelRx;
+    class ChannelTx;
+
+    using SerializerL4Ptr = std::shared_ptr<SerializerL4>;
+    using DeserializerL4Ptr = std::shared_ptr<DeserializerL4>;
+    using ChannelRxPtr = std::shared_ptr<ChannelRx>;
+    using ChannelTxPtr = std::shared_ptr<ChannelTx>;
+    using ChannelTxOneToManyPtr = std::shared_ptr<ChannelTxOneToMany>;
 }

@@ -1,16 +1,14 @@
 #pragma once
 #include "messages/base/StyxMessage.h"
 #include "Channel.h"
+#include "SerializerL4.h"
 
 namespace styxlib
 {
-    class Serializer
+    class Serializer: public SerializerL4
     {
-    protected:
-        ChannelTxPtr channelTx;
-
     public:
-        Serializer(ChannelTxPtr channelTx) : channelTx(channelTx) {}
+        Serializer(ChannelTxPtr channelTx) : SerializerL4(channelTx) {}
         virtual ~Serializer() = default;
         virtual Tag sendMessage(const messages::base::StyxMessage &message) = 0;
     };

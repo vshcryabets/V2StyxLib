@@ -9,7 +9,7 @@
 namespace styxlib
 {
     ChannelUnixTcpClient::ChannelUnixTcpClient(const Configuration &config)
-        : configuration(config), socket(ChannelUnixTcpClient::NO_FD)
+        : ChannelRx(config.deserializer), configuration(config), socket(ChannelUnixTcpClient::NO_FD)
     {
     }
 
@@ -86,7 +86,7 @@ namespace styxlib
     }
 
     ChannelUnixTcpServer::ChannelUnixTcpServer(const Configuration &config)
-        : configuration(config)
+        : ChannelRx(config.deserializer), configuration(config)
     {
         if (configuration.clientsRepo == nullptr)
         {
