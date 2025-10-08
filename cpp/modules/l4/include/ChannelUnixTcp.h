@@ -1,10 +1,12 @@
 #pragma once
 
-#include "Channel.h"
 #include <map>
 #include <thread>
 #include <atomic>
 #include <future>
+#include <optional>
+
+#include "Channel.h"
 #include "ClientsRepo.h"
 #include "impl/ProgressObservableMutexImpl.h"
 
@@ -13,12 +15,11 @@ namespace styxlib
     class ChannelUnixTcpClient : public ChannelTx, public ChannelRx
     {
     public:
-        const static int NO_FD = -1;
         struct Configuration
         {
             std::string address;
             uint16_t port;
-            int socketFd = ChannelUnixTcpClient::NO_FD;
+            std::optional<int> socketFd = std::nullopt;
             uint8_t packetSizeHeader{4};
             uint16_t iounit{8192};
             DeserializerL4Ptr deserializer{nullptr};
@@ -51,15 +52,15 @@ namespace styxlib
 
     private:
         const Configuration configuration;
-        int socket;
+        std::optional<int> socket = std::nullopt;
 
     public:
         ChannelUnixTcpClient(const Configuration &config);
         ChannelUnixTcpClient(ChannelUnixTcpClient &&) = delete;
         ChannelUnixTcpClient &operator=(ChannelUnixTcpClient &&) = delete;
         ~ChannelUnixTcpClient() override;
-        Size sendBuffer(const StyxBuffer buffer, Size size) override;
-        std::future<bool> connect();
+        SizeResult sendBuffer(const StyxBuffer buffer, Size size) override;
+        std::future<ErrorCode> connect();
         std::future<void> disconnect();
         bool isConnected() const;
     };
@@ -90,7 +91,7 @@ namespace styxlib
         std::map<ClientId, ChannelTxPtr> clientIdToChannelTx;
         std::atomic<bool> running{false};
         std::atomic<bool> stopRequested{false};
-        std::unique_ptr<std::promise<void>> startPromise;
+        std::unique_ptr<std::promise<ErrorCode>> startPromise;
 
         void workThreadFunction();
         bool acceptClients(int serverSocket);
@@ -98,8 +99,8 @@ namespace styxlib
     public:
         ChannelUnixTcpServer(const Configuration &config);
         ~ChannelUnixTcpServer() override;
-        Size sendBuffer(ClientId clientId, const StyxBuffer buffer, Size size) override;
-        std::future<void> start();
+        SizeResult sendBuffer(ClientId clientId, const StyxBuffer buffer, Size size) override;
+        std::future<ErrorCode> start();
         std::future<void> stop();
         ProgressObserver<std::shared_ptr<const std::map<int, ClientInfo>>> &getClientsObserver()
         {

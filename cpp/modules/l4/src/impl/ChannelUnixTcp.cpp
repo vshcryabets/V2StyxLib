@@ -9,7 +9,7 @@
 namespace styxlib
 {
     ChannelUnixTcpClient::ChannelUnixTcpClient(const Configuration &config)
-        : ChannelRx("unixClient", config.deserializer), configuration(config), socket(ChannelUnixTcpClient::NO_FD)
+        : ChannelRx("unixClient", config.deserializer), configuration(config)
     {
     }
 
@@ -18,33 +18,37 @@ namespace styxlib
         disconnect();
     }
 
-    Size ChannelUnixTcpClient::sendBuffer(const StyxBuffer buffer, Size size)
+    SizeResult ChannelUnixTcpClient::sendBuffer(const StyxBuffer buffer, Size size)
     {
-        if (!isConnected())
+        if (socket.has_value())
         {
-            return 0;
+            // Send the buffer over the TCP socket
+            Size bytesSent = ::send(socket.value(), &size, configuration.packetSizeHeader, 0);
+            bytesSent += ::send(socket.value(), buffer, size, 0);
+            return bytesSent;
         }
-
-        // Send the buffer over the TCP socket
-        ssize_t bytesSent = send(socket, buffer, size, 0);
-        return (bytesSent > 0) ? static_cast<Size>(bytesSent) : 0;
+        else
+        {
+            return std::unexpected(ErrorCode::NotConnected);
+        }
     }
 
-    std::future<bool> ChannelUnixTcpClient::connect()
+    std::future<ErrorCode> ChannelUnixTcpClient::connect()
     {
         return std::async(
-            std::launch::async, 
-            [this] {
+            std::launch::async,
+            [this]
+            {
                 if (isConnected())
                 {
-                    return true;
+                    return ErrorCode::AlreadyStarted;
                 }
 
                 // Create and connect the TCP socket
                 int socket = ::socket(AF_INET, SOCK_STREAM, 0);
                 if (socket < 0)
                 {
-                    return false;
+                    return ErrorCode::CantCreateSocket;
                 }
 
                 sockaddr_in serverAddress;
@@ -52,18 +56,17 @@ namespace styxlib
                 serverAddress.sin_port = htons(configuration.port);
                 inet_pton(AF_INET, configuration.address.c_str(), &serverAddress.sin_addr);
                 int result = ::connect(socket, reinterpret_cast<sockaddr *>(&serverAddress), sizeof(serverAddress));
-                bool isConnected = result == 0;
-                if (isConnected)
+                if (result == 0)
                 {
                     this->socket = socket;
+                    return ErrorCode::Success;
                 }
                 else
                 {
                     close(socket);
+                    return ErrorCode::NotConnected;
                 }
-                return isConnected; 
-            }
-        );
+            });
     }
 
     std::future<void> ChannelUnixTcpClient::disconnect()
@@ -72,17 +75,17 @@ namespace styxlib
             std::launch::async,
             [this]()
             {
-                if (isConnected())
+                if (socket.has_value())
                 {
-                    close(socket);
-                    socket = ChannelUnixTcpClient::NO_FD;
+                    ::close(socket.value());
+                    socket = std::nullopt;
                 }
             });
     }
 
     bool ChannelUnixTcpClient::isConnected() const
     {
-        return (socket != ChannelUnixTcpClient::NO_FD);
+        return socket.has_value();
     }
 
     ChannelUnixTcpServer::ChannelUnixTcpServer(const Configuration &config)
@@ -97,10 +100,10 @@ namespace styxlib
 
     ChannelUnixTcpServer::~ChannelUnixTcpServer()
     {
-        stop();
+        stop().get();
     }
 
-    Size ChannelUnixTcpServer::sendBuffer(
+    SizeResult ChannelUnixTcpServer::sendBuffer(
         ClientId clientId,
         const StyxBuffer buffer,
         Size size)
@@ -118,9 +121,9 @@ namespace styxlib
         return it->second->sendBuffer(buffer, size);
     }
 
-    std::future<void> ChannelUnixTcpServer::start()
+    std::future<ErrorCode> ChannelUnixTcpServer::start()
     {
-        startPromise = std::make_unique<std::promise<void>>();
+        startPromise = std::make_unique<std::promise<ErrorCode>>();
         if (!isStarted())
         {
             stopRequested.store(false);
@@ -129,24 +132,29 @@ namespace styxlib
         }
         else
         {
-            startPromise->set_value();
+            startPromise->set_value(ErrorCode::AlreadyStarted);
         }
         return startPromise->get_future();
     }
 
     std::future<void> ChannelUnixTcpServer::stop()
     {
-        stopRequested.store(true);
-        return std::async(std::launch::async,
-                          [this]()
-                          {
-                              this->startPromise = nullptr;
-                              clientIdToChannelTx.clear();
-                              socketToClientInfoMap->clear();
-                              clientsObserver.setData(socketToClientInfoMap, true);
-                              this->serverThread.join();
-                          });
+        return std::async(
+            std::launch::async,
+            [this]()
+            {
+                stopRequested.store(true);
+                this->startPromise = nullptr;
+                clientIdToChannelTx.clear();
+                socketToClientInfoMap->clear();
+                clientsObserver.setData(socketToClientInfoMap, true);
+                if (this->serverThread.joinable())
+                {
+                    this->serverThread.join();
+                }
+            });
     }
+
     bool ChannelUnixTcpServer::isStarted() const
     {
         return running.load();
@@ -155,11 +163,19 @@ namespace styxlib
     void ChannelUnixTcpServer::workThreadFunction()
     {
         running.store(true);
-        startPromise->set_value();
         // Create the server socket
         int serverSocket = ::socket(AF_INET, SOCK_STREAM, 0);
         if (serverSocket < 0)
         {
+            startPromise->set_value(ErrorCode::CantCreateSocket);
+            return;
+        }
+
+        int opt = 1;
+        if (setsockopt(serverSocket, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0)
+        {
+            close(serverSocket);
+            startPromise->set_value(ErrorCode::CantCreateSocket);
             return;
         }
 
@@ -168,24 +184,26 @@ namespace styxlib
         serverAddress.sin_addr.s_addr = INADDR_ANY;
         serverAddress.sin_port = htons(configuration.port);
 
-        if (bind(serverSocket,
+        if (::bind(serverSocket,
                  reinterpret_cast<sockaddr *>(&serverAddress),
                  sizeof(serverAddress)) < 0)
         {
             close(serverSocket);
-            serverSocket = ChannelUnixTcpClient::NO_FD;
+            startPromise->set_value(ErrorCode::CantBindSocket);
             return;
         }
 
         if (listen(serverSocket, 1) < 0)
         {
             close(serverSocket);
-            serverSocket = ChannelUnixTcpClient::NO_FD;
+            startPromise->set_value(ErrorCode::CantListenSocket);
             return;
         }
         // Set server socket to non-blocking mode
         int flags = fcntl(serverSocket, F_GETFL, 0);
         fcntl(serverSocket, F_SETFL, flags | O_NONBLOCK);
+
+        startPromise->set_value(ErrorCode::Success);
 
         while (!stopRequested.load())
         {
@@ -194,8 +212,7 @@ namespace styxlib
 
             std::this_thread::sleep_for(std::chrono::milliseconds(10));
         }
-        close(serverSocket);
-        serverSocket = ChannelUnixTcpClient::NO_FD;
+        ::close(serverSocket);
         running.store(false);
         stopRequested.store(false);
     }
@@ -208,11 +225,12 @@ namespace styxlib
             return false;
         }
         ClientInfo clientInfo{
-            .id = configuration.clientsRepo->getNextClientId(), 
+            .id = configuration.clientsRepo->getNextClientId(),
         };
         sockaddr_in addr;
         socklen_t addrLen = sizeof(addr);
-        if (getpeername(clientSocket, reinterpret_cast<sockaddr*>(&addr), &addrLen) == 0) {
+        if (getpeername(clientSocket, reinterpret_cast<sockaddr *>(&addr), &addrLen) == 0)
+        {
             char ipStr[INET_ADDRSTRLEN] = {0};
             inet_ntop(AF_INET, &addr.sin_addr, ipStr, sizeof(ipStr));
             clientInfo.address = ipStr;
@@ -228,8 +246,7 @@ namespace styxlib
                 clientSocket,
                 configuration.packetSizeHeader,
                 configuration.iounit,
-                configuration.deserializer
-            ));
+                configuration.deserializer));
         // Store the client with its socket as the ID
         clientIdToChannelTx[clientInfo.id] = client;
         clientsObserver.setData(socketToClientInfoMap, false);

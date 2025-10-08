@@ -23,12 +23,12 @@ namespace styxlib
     {
     public:
         virtual ~ChannelTx() = default;
-        virtual Size sendBuffer(const StyxBuffer buffer, Size size) = 0;
+        virtual SizeResult sendBuffer(const StyxBuffer buffer, Size size) = 0;
     };
 
     class ChannelTxOneToMany {
     public:
         virtual ~ChannelTxOneToMany() = default;
-        virtual Size sendBuffer(ClientId clientId, const StyxBuffer buffer, Size size) = 0;
+        virtual SizeResult sendBuffer(ClientId clientId, const StyxBuffer buffer, Size size) = 0;
     };
 }

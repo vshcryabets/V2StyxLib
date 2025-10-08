@@ -53,75 +53,82 @@ public:
         config.port = 23500;
         config.packetSizeHeader = 1;
         config.deserializer = serverDeserializer;
-        std::cout << "Creating server" << std::endl;
         server = std::make_shared<styxlib::ChannelUnixTcpServer>(config);
 
         client = std::make_shared<styxlib::ChannelUnixTcpClient>(clientConfig);
+        serverDeserializer->setChannelTx(server);
+    }
 
-        std::cout << "client = " << 
-            " (0x" << std::hex << reinterpret_cast<uintptr_t>(client.get()) << ")" 
-            << std::dec << std::endl;
-        // serverDeserializer->setChannelTx(server);
+    void waitStartServer() {
+        REQUIRE_FALSE(server->isStarted());
+        auto futureWithCode = server->start();
+        REQUIRE(futureWithCode.wait_for(std::chrono::seconds(1)) == std::future_status::ready);
+        REQUIRE(futureWithCode.get() == styxlib::ErrorCode::Success);
+        REQUIRE(server->isStarted());
+    }
+
+    void waitStopServer() {
+        REQUIRE(server->isStarted());
+        auto future = server->stop();
+        REQUIRE(future.wait_for(std::chrono::seconds(1)) == std::future_status::ready);
+        future.get();
+        REQUIRE_FALSE(server->isStarted());
+    }
+
+    void connectClient() {
+        auto future = client->connect();
+        REQUIRE(future.wait_for(std::chrono::seconds(1)) == std::future_status::ready);
+        REQUIRE(future.get() == styxlib::ErrorCode::Success);
+        REQUIRE(client->isConnected());
     }
 };
 
 TEST_CASE_METHOD(TestSuite, "Server starts and stops", "[ChannelUnixTcpServer]")
 {
-    REQUIRE_FALSE(server->isStarted());
-    auto future = server->start();
-    auto status = future.wait_for(std::chrono::seconds(1));
-    REQUIRE(status == std::future_status::ready);
-
-    REQUIRE(server->isStarted());
-
-    future = server->stop();
-    status = future.wait_for(std::chrono::seconds(1));
-    REQUIRE(status == std::future_status::ready);
-    REQUIRE_FALSE(server->isStarted());
+    waitStartServer();
+    waitStopServer();
 }
 
 TEST_CASE_METHOD(TestSuite, "Server accepts connections", "[ChannelUnixTcpServer]")
 {
-    REQUIRE(server->start().wait_for(std::chrono::seconds(1)) == std::future_status::ready);
-    REQUIRE(client->connect().wait_for(std::chrono::seconds(1)) == std::future_status::ready);
-
+    waitStartServer();
+    connectClient();
     auto map = server->getClientsObserver().wait();
     REQUIRE(map->size() == 1);
-    // std::cout << "Connected clients:" << std::endl;
-    // for (const auto &[socket, clientInfo] : *map)
-    // {
-    //     std::cout << "\tSocket: " << socket 
-    //         << ", Client ID: " << clientInfo.id 
-    //         << ", Address: " << clientInfo.address 
-    //         << ", Port: " << clientInfo.port << std::endl;
-    //     REQUIRE(clientInfo.id > 0);
-    //     REQUIRE(clientInfo.port > 0);
-    //     REQUIRE(clientInfo.address.size() > 0);
-    // }
+    std::cout << "Connected clients:" << std::endl;
+    for (const auto &[socket, clientInfo] : *map)
+    {
+        std::cout << "\tSocket: " << socket 
+            << ", Client ID: " << clientInfo.id 
+            << ", Address: " << clientInfo.address 
+            << ", Port: " << clientInfo.port << std::endl;
+        REQUIRE(clientInfo.id > 0);
+        REQUIRE(clientInfo.port > 0);
+        REQUIRE(clientInfo.address.size() > 0);
+    }
 
-//     REQUIRE(client->isConnected());
+    REQUIRE(client->isConnected());
 
-//     std::cout << "Last issued client ID: " << clientsRepo->getLastIssuedId() << std::endl;
+    std::cout << "Last issued client ID: " << clientsRepo->getLastIssuedId() << std::endl;
 
-//     REQUIRE(client->disconnect().wait_for(std::chrono::seconds(1)) == std::future_status::ready);
-//     REQUIRE_FALSE(client->isConnected());
-    server->stop();
-//     // Wait for observer to complete
-//     // REQUIRE(observerFuture.wait_for(std::chrono::seconds(1)) == std::future_status::ready);
+    REQUIRE(client->disconnect().wait_for(std::chrono::seconds(1)) == std::future_status::ready);
+
+    waitStopServer();
 }
 
 TEST_CASE_METHOD(TestSuite, "Server can receive messages from client", "[ChannelUnixTcpServer]")
 {
-    REQUIRE(server->start().wait_for(std::chrono::seconds(1)) == std::future_status::ready);
-    REQUIRE(client->connect().wait_for(std::chrono::seconds(1)) == std::future_status::ready);
+    waitStartServer();
+    connectClient();
 
     const char *msg = "Hello, World!";
     auto bytesSent = client->sendBuffer((const styxlib::StyxBuffer)msg, strlen(msg));
-    REQUIRE(bytesSent == strlen(msg));
+    REQUIRE(bytesSent.has_value());
+    REQUIRE(bytesSent.value() == strlen(msg));
 
     REQUIRE(false);
 
     REQUIRE(client->disconnect().wait_for(std::chrono::seconds(1)) == std::future_status::ready);
     REQUIRE_FALSE(client->isConnected());
-    server->stop();
+    server->stop().get();
 }
