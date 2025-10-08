@@ -9,7 +9,7 @@
 namespace styxlib
 {
     ChannelUnixTcpClient::ChannelUnixTcpClient(const Configuration &config)
-        : ChannelRx(config.deserializer), configuration(config), socket(ChannelUnixTcpClient::NO_FD)
+        : ChannelRx("unixClient", config.deserializer), configuration(config), socket(ChannelUnixTcpClient::NO_FD)
     {
     }
 
@@ -86,7 +86,7 @@ namespace styxlib
     }
 
     ChannelUnixTcpServer::ChannelUnixTcpServer(const Configuration &config)
-        : ChannelRx(config.deserializer), configuration(config)
+        : ChannelRx("unixServer", config.deserializer), configuration(config)
     {
         if (configuration.clientsRepo == nullptr)
         {
@@ -222,13 +222,14 @@ namespace styxlib
         socketToClientInfoMap->insert({clientSocket, clientInfo});
         // Create a ChannelTx for the client
         ChannelTxPtr client = std::make_shared<ChannelUnixTcpClient>(
-            ChannelUnixTcpClient::Configuration{
-                .address = clientInfo.address,
-                .port = clientInfo.port,
-                .socketFd = clientSocket,
-                .packetSizeHeader = configuration.packetSizeHeader,
-                .iounit = configuration.iounit
-            });
+            ChannelUnixTcpClient::Configuration(
+                clientInfo.address,
+                clientInfo.port,
+                clientSocket,
+                configuration.packetSizeHeader,
+                configuration.iounit,
+                configuration.deserializer
+            ));
         // Store the client with its socket as the ID
         clientIdToChannelTx[clientInfo.id] = client;
         clientsObserver.setData(socketToClientInfoMap, false);

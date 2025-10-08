@@ -18,6 +18,7 @@ namespace styxlib
     class DeserializerL4;
     class ChannelRx;
     class ChannelTx;
+    class ChannelTxOneToMany;
 
     using SerializerL4Ptr = std::shared_ptr<SerializerL4>;
     using DeserializerL4Ptr = std::shared_ptr<DeserializerL4>;

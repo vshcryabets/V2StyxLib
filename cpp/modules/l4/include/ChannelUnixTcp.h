@@ -22,6 +22,31 @@ namespace styxlib
             uint8_t packetSizeHeader{4};
             uint16_t iounit{8192};
             DeserializerL4Ptr deserializer{nullptr};
+            Configuration(
+                const std::string &address, 
+                uint16_t port, 
+                uint8_t packetSizeHeader,
+                uint16_t iounit,
+                DeserializerL4Ptr deserializer)
+                : address(address), 
+                port(port), 
+                packetSizeHeader(packetSizeHeader),
+                iounit(iounit),
+                deserializer(deserializer) {}
+
+            Configuration(
+                const std::string &address,
+                uint16_t port, 
+                int socketFd, 
+                uint8_t packetSizeHeader,
+                uint16_t iounit,
+                DeserializerL4Ptr deserializer)
+                : address(address), 
+                port(port), 
+                socketFd(socketFd), 
+                packetSizeHeader(packetSizeHeader),
+                iounit(iounit),
+                deserializer(deserializer) {}
         };
 
     private:
@@ -30,6 +55,8 @@ namespace styxlib
 
     public:
         ChannelUnixTcpClient(const Configuration &config);
+        ChannelUnixTcpClient(ChannelUnixTcpClient &&) = delete;
+        ChannelUnixTcpClient &operator=(ChannelUnixTcpClient &&) = delete;
         ~ChannelUnixTcpClient() override;
         Size sendBuffer(const StyxBuffer buffer, Size size) override;
         std::future<bool> connect();
