@@ -3,13 +3,16 @@
 #include <unistd.h>
 #include <cstring>
 #include <stdexcept>
-#include "fcntl.h"
+#include <fcntl.h>
 #include <iostream>
+#include <sys/epoll.h>
 
 namespace styxlib
 {
     ChannelUnixTcpClient::ChannelUnixTcpClient(const Configuration &config)
-        : ChannelRx("unixClient", config.deserializer), configuration(config)
+        : ChannelRx("unixClient", config.deserializer),
+        ChannelUnixTcpTx(config.packetSizeHeader, std::nullopt),
+        configuration(config)
     {
     }
 
@@ -18,12 +21,12 @@ namespace styxlib
         disconnect();
     }
 
-    SizeResult ChannelUnixTcpClient::sendBuffer(const StyxBuffer buffer, Size size)
+    SizeResult ChannelUnixTcpTx::sendBuffer(const StyxBuffer buffer, Size size)
     {
         if (socket.has_value())
         {
             // Send the buffer over the TCP socket
-            Size bytesSent = ::send(socket.value(), &size, configuration.packetSizeHeader, 0);
+            Size bytesSent = ::send(socket.value(), &size, packetSizeHeader, 0);
             bytesSent += ::send(socket.value(), buffer, size, 0);
             return bytesSent;
         }
@@ -113,8 +116,8 @@ namespace styxlib
             return 0;
         }
 
-        auto it = clientIdToChannelTx.find(clientId);
-        if (it == clientIdToChannelTx.end())
+        auto it = clientIdToChannelClient.find(clientId);
+        if (it == clientIdToChannelClient.end())
         {
             return 0;
         }
@@ -145,7 +148,7 @@ namespace styxlib
             {
                 stopRequested.store(true);
                 this->startPromise = nullptr;
-                clientIdToChannelTx.clear();
+                clientIdToChannelClient.clear();
                 socketToClientInfoMap->clear();
                 clientsObserver.setData(socketToClientInfoMap, true);
                 if (this->serverThread.joinable())
@@ -203,15 +206,30 @@ namespace styxlib
         int flags = fcntl(serverSocket, F_GETFL, 0);
         fcntl(serverSocket, F_SETFL, flags | O_NONBLOCK);
 
+        int epollFd = epoll_create1(0);
+        if (epollFd == -1) {
+            close(serverSocket);
+            std::cout << "Failed to create epoll instance: " << strerror(errno) << std::endl;
+            startPromise->set_value(ErrorCode::CantCreateSocketPoll);
+            return;
+        }
+
         startPromise->set_value(ErrorCode::Success);
 
         while (!stopRequested.load())
         {
             auto haveNewClients = acceptClients(serverSocket);
             // read sockets for data here
-
-            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+            // If we accepted a new client, we can immediately try to read from all clients
+            // for (auto &[clientId, channelClient] : clientIdToChannelClient)
+            // {
+            //     channelClient->readData();
+            // }
+            if (!haveNewClients) {
+                std::this_thread::sleep_for(std::chrono::milliseconds(10));
+            }
         }
+        ::close(epollFd);
         ::close(serverSocket);
         running.store(false);
         stopRequested.store(false);
@@ -239,16 +257,9 @@ namespace styxlib
 
         socketToClientInfoMap->insert({clientSocket, clientInfo});
         // Create a ChannelTx for the client
-        ChannelTxPtr client = std::make_shared<ChannelUnixTcpClient>(
-            ChannelUnixTcpClient::Configuration(
-                clientInfo.address,
-                clientInfo.port,
-                clientSocket,
-                configuration.packetSizeHeader,
-                configuration.iounit,
-                configuration.deserializer));
+        auto client = std::make_shared<ChannelUnixTcpTx>(configuration.packetSizeHeader, clientSocket);
         // Store the client with its socket as the ID
-        clientIdToChannelTx[clientInfo.id] = client;
+        clientIdToChannelClient[clientInfo.id] = client;
         clientsObserver.setData(socketToClientInfoMap, false);
         return true;
     }

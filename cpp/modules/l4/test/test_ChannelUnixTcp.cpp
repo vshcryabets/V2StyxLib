@@ -50,16 +50,16 @@ public:
             packetSizeHeader,
             8192,
             clientDeserializer
+        ), config(
+            port,
+            clientsRepo,
+            packetSizeHeader,
+            8192,
+            serverDeserializer,
+            10
         )
     {
-        clientsRepo = std::make_shared<styxlib::ClientsRepoImpl>();
-
-        config.clientsRepo = clientsRepo;
-        config.port = port;
-        config.packetSizeHeader = packetSizeHeader;
-        config.deserializer = serverDeserializer;
         server = std::make_shared<styxlib::ChannelUnixTcpServer>(config);
-
         client = std::make_shared<styxlib::ChannelUnixTcpClient>(clientConfig);
         serverDeserializer->setChannelTx(server);
     }

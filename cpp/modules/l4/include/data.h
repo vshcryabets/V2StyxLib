@@ -12,7 +12,8 @@ namespace styxlib
         NotConnected,
         CantCreateSocket,
         CantBindSocket,
-        CantListenSocket
+        CantListenSocket,
+        CantCreateSocketPoll
     };
 
     using StyxString = std::string;
