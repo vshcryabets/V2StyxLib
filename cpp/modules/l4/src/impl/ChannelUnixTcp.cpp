@@ -5,7 +5,7 @@
 #include <stdexcept>
 #include <fcntl.h>
 #include <iostream>
-#include <sys/epoll.h>
+#include <algorithm>
 
 namespace styxlib
 {
@@ -206,30 +206,43 @@ namespace styxlib
         int flags = fcntl(serverSocket, F_GETFL, 0);
         fcntl(serverSocket, F_SETFL, flags | O_NONBLOCK);
 
-        int epollFd = epoll_create1(0);
-        if (epollFd == -1) {
-            close(serverSocket);
-            std::cout << "Failed to create epoll instance: " << strerror(errno) << std::endl;
-            startPromise->set_value(ErrorCode::CantCreateSocketPoll);
-            return;
-        }
+        // int epollFd = epoll_create1(0);
+        // if (epollFd == -1) {
+        //     close(serverSocket);
+        //     std::cout << "Failed to create epoll instance: " << strerror(errno) << std::endl;
+        //     startPromise->set_value(ErrorCode::CantCreateSocketPoll);
+        //     return;
+        // }
+        pollFds.push_back({serverSocket, POLLIN, 0});
 
         startPromise->set_value(ErrorCode::Success);
 
         while (!stopRequested.load())
         {
-            auto haveNewClients = acceptClients(serverSocket);
-            // read sockets for data here
-            // If we accepted a new client, we can immediately try to read from all clients
-            // for (auto &[clientId, channelClient] : clientIdToChannelClient)
-            // {
-            //     channelClient->readData();
-            // }
-            if (!haveNewClients) {
-                std::this_thread::sleep_for(std::chrono::milliseconds(10));
+            int num_events = poll(pollFds.data(), pollFds.size(), 100); // 100 ms timeout
+            if (num_events < 0)
+            {
+                std::cerr << "Poll error: " << strerror(errno) << std::endl;
+                break;
+            } else if (num_events == 0) {
+                // Timeout, no events
+                continue;
+            } else {
+                handlePollEvents(serverSocket, num_events);
             }
+            
+            // auto haveNewClients = acceptClients(serverSocket);
+            // // read sockets for data here
+            // // If we accepted a new client, we can immediately try to read from all clients
+            // // for (auto &[clientId, channelClient] : clientIdToChannelClient)
+            // // {
+            // //     channelClient->readData();
+            // // }
+            // if (!haveNewClients) {
+            //     std::this_thread::sleep_for(std::chrono::milliseconds(10));
+            // }
         }
-        ::close(epollFd);
+        // ::close(epollFd);
         ::close(serverSocket);
         running.store(false);
         stopRequested.store(false);
@@ -261,7 +274,46 @@ namespace styxlib
         // Store the client with its socket as the ID
         clientIdToChannelClient[clientInfo.id] = client;
         clientsObserver.setData(socketToClientInfoMap, false);
+        pollFds.push_back({clientSocket, POLLIN | POLLPRI | POLLERR | POLLHUP, 0});
         return true;
     }
 
+    void ChannelUnixTcpServer::handlePollEvents(int serverSocket, size_t numEvents) {
+        for (auto &pollItem: pollFds) {
+            if (pollItem.revents & POLLIN) {
+                if (pollItem.fd == serverSocket) {
+                    // New incoming connections
+                    while (acceptClients(serverSocket)) ;                    
+                } else {
+                    int clientFd = pollItem.fd;
+                    // Data available on a client socket
+                    // Here you would typically read data from the client
+                    // For simplicity, we just print a message and continue
+                    char buffer[1024];
+                    ssize_t bytesRead = recv(clientFd, buffer, sizeof(buffer), 0);
+                    if (bytesRead > 0) {
+                        std::cout << "Received " << bytesRead << " bytes from client socket " << clientFd << std::endl;
+                    } else if (bytesRead == 0) {
+                        // Client disconnected
+                        std::cout << "Client socket " << clientFd << " disconnected" << std::endl;
+                        close(clientFd);
+                        pollFds.erase(std::remove_if(pollFds.begin(), pollFds.end(),
+                                                        [clientFd](const pollfd &p) { return p.fd == clientFd; }),
+                                        pollFds.end());
+                    } else {
+                        std::cerr << "Error reading from client socket " << clientFd << ": " << strerror(errno) << std::endl;
+                    }
+                }
+                // --num_events;
+            } 
+            if (pollItem.revents & (POLLERR | POLLHUP)) {
+                // Handle error or hang-up
+                std::cerr << "Error or hang-up on socket " << pollItem.fd << std::endl;
+                // close(pollItem.fd);
+                // pollFds.erase(std::remove_if(pollFds.begin(), pollFds.end(),
+                //                               [fd=pollItem.fd](const pollfd &p) { return p.fd == fd; }),
+                //                pollFds.end());
+            }
+        }
+    }
 } // namespace styxlib

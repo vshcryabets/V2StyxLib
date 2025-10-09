@@ -30,6 +30,28 @@ public:
     uint16_t getReceivedBytes() const { return receivedBytes; }
 };
 
+class TestChannelUnixTcpServer: public styxlib::ChannelUnixTcpServer {
+public:
+    int acceptCalled = 0;
+protected:
+    bool acceptClients(int serverSocket) override {
+        acceptCalled++;
+        return false;
+    }
+
+public:
+    TestChannelUnixTcpServer()
+        : ChannelUnixTcpServer(Configuration(
+            23500,
+            std::make_shared<styxlib::ClientsRepoImpl>(),
+            1,
+            8192,
+            std::make_shared<TestDeserializerL4>(),
+            10))
+    {
+    }
+};
+
 class TestSuite
 {
 public:
@@ -137,4 +159,23 @@ TEST_CASE_METHOD(TestSuite, "Server can receive messages from client", "[Channel
     REQUIRE(client->disconnect().wait_for(std::chrono::seconds(1)) == std::future_status::ready);
     REQUIRE_FALSE(client->isConnected());
     server->stop().get();
+}
+
+TEST_CASE_METHOD(TestChannelUnixTcpServer, "handlePollEvents accept connections", "[ChannelUnixTcpServer]")
+{
+    pollFds.clear();
+    pollFds.push_back({ .fd = 1, .events = POLLIN, .revents = POLLIN }); // Simulate server socket ready to accept
+    handlePollEvents(1, 1);
+    REQUIRE(acceptCalled == 1);
+}
+
+TEST_CASE_METHOD(TestChannelUnixTcpServer, "handlePollEvents read data from socket", "[ChannelUnixTcpServer]")
+{
+    pollFds.clear();
+    pollFds.push_back({ .fd = 1, .events = POLLIN, .revents = POLLIN }); // Simulate server socket ready to accept
+    pollFds.push_back({ .fd = 2, .events = POLLIN, .revents = POLLIN }); // client 1
+    pollFds.push_back({ .fd = 3, .events = POLLIN, .revents = POLLIN }); // client 2
+
+
+    REQUIRE(false);
 }

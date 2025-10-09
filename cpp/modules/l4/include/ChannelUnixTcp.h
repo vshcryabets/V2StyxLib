@@ -5,6 +5,7 @@
 #include <atomic>
 #include <future>
 #include <optional>
+#include <poll.h>
 
 #include "Channel.h"
 #include "ClientsRepo.h"
@@ -91,7 +92,7 @@ namespace styxlib
             uint16_t port{0};
         };
 
-    private:
+    protected:
         const Configuration configuration;
         std::thread serverThread;
         std::shared_ptr<std::map<int, ClientInfo>> socketToClientInfoMap;
@@ -100,9 +101,11 @@ namespace styxlib
         std::atomic<bool> running{false};
         std::atomic<bool> stopRequested{false};
         std::unique_ptr<std::promise<ErrorCode>> startPromise;
+        std::vector<pollfd> pollFds;
 
         void workThreadFunction();
-        bool acceptClients(int serverSocket);
+        virtual bool acceptClients(int serverSocket);
+        void handlePollEvents(int serverSocket, size_t numEvents);
 
     public:
         ChannelUnixTcpServer(const Configuration &config);
