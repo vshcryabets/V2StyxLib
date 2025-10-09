@@ -9,6 +9,7 @@ class TestDeserializerL4 : public styxlib::DeserializerL4
 {
 private:
     std::weak_ptr<styxlib::ChannelTxOneToMany> _channelTx;
+    uint16_t receivedBytes = 0;
 public:
     TestDeserializerL4() {}
     virtual ~TestDeserializerL4() = default;
@@ -18,6 +19,7 @@ public:
         const styxlib::StyxBuffer buffer,
         styxlib::Size size) override
     {
+        receivedBytes += size;
         std::string msg((const char*)buffer, size);
         std::cout << "Received from client " << clientId << ": " << msg << std::endl;
         if (auto p = _channelTx.lock()) {
@@ -25,24 +27,27 @@ public:
             p->sendBuffer(clientId, (const styxlib::StyxBuffer)response, strlen(response));
         }
     }
+    uint16_t getReceivedBytes() const { return receivedBytes; }
 };
 
 class TestSuite
 {
 public:
+    const static uint8_t packetSizeHeader = 1;
+    const static uint16_t port = 23500;
     std::shared_ptr<styxlib::ClientsRepoImpl> clientsRepo = std::make_shared<styxlib::ClientsRepoImpl>();
+    std::shared_ptr<TestDeserializerL4> clientDeserializer = std::make_shared<TestDeserializerL4>();
+    std::shared_ptr<TestDeserializerL4> serverDeserializer = std::make_shared<TestDeserializerL4>();
     styxlib::ChannelUnixTcpServer::Configuration config;
     std::shared_ptr<styxlib::ChannelUnixTcpServer> server;
     styxlib::ChannelUnixTcpClient::Configuration clientConfig;
     std::shared_ptr<styxlib::ChannelUnixTcpClient> client;
-    std::shared_ptr<TestDeserializerL4> clientDeserializer = std::make_shared<TestDeserializerL4>();
-    std::shared_ptr<TestDeserializerL4> serverDeserializer = std::make_shared<TestDeserializerL4>();
 
 public:
     TestSuite(): clientConfig(
             "127.0.0.1",
-            23500,
-            1,
+            port,
+            packetSizeHeader,
             8192,
             clientDeserializer
         )
@@ -50,8 +55,8 @@ public:
         clientsRepo = std::make_shared<styxlib::ClientsRepoImpl>();
 
         config.clientsRepo = clientsRepo;
-        config.port = 23500;
-        config.packetSizeHeader = 1;
+        config.port = port;
+        config.packetSizeHeader = packetSizeHeader;
         config.deserializer = serverDeserializer;
         server = std::make_shared<styxlib::ChannelUnixTcpServer>(config);
 
@@ -122,11 +127,12 @@ TEST_CASE_METHOD(TestSuite, "Server can receive messages from client", "[Channel
     connectClient();
 
     const char *msg = "Hello, World!";
+    uint16_t messageSize = strlen(msg) + packetSizeHeader;
     auto bytesSent = client->sendBuffer((const styxlib::StyxBuffer)msg, strlen(msg));
     REQUIRE(bytesSent.has_value());
-    REQUIRE(bytesSent.value() == strlen(msg));
+    REQUIRE(bytesSent.value() == messageSize);
 
-    REQUIRE(false);
+    REQUIRE(serverDeserializer->getReceivedBytes() == messageSize);
 
     REQUIRE(client->disconnect().wait_for(std::chrono::seconds(1)) == std::future_status::ready);
     REQUIRE_FALSE(client->isConnected());
