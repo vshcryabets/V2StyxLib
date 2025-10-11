@@ -13,7 +13,15 @@
 
 namespace styxlib
 {
+    struct ReadBuffer {
+        std::vector<uint8_t> buffer;
+        Size currentSize{0};
+        bool isDirty{false};
+    };
+
     class ChannelUnixTcpTx : public ChannelTx {
+    protected:
+
     protected:
         std::optional<int> socket = std::nullopt;
         uint8_t packetSizeHeader{4};
@@ -95,9 +103,14 @@ namespace styxlib
     protected:
         const Configuration configuration;
         std::thread serverThread;
+        // Sockets
         std::shared_ptr<std::map<int, ClientInfo>> socketToClientInfoMap;
-        ProgressObservableMutexImpl<std::shared_ptr<const std::map<int, ClientInfo>>> clientsObserver;
+        std::map<int, ReadBuffer> socketReadBuffers;
+        std::vector<int> socketsToClose;
+        // Clients
         std::map<ClientId, std::shared_ptr<ChannelUnixTcpTx>> clientIdToChannelClient;
+
+        ProgressObservableMutexImpl<std::shared_ptr<const std::map<int, ClientInfo>>> clientsObserver;
         std::atomic<bool> running{false};
         std::atomic<bool> stopRequested{false};
         std::unique_ptr<std::promise<ErrorCode>> startPromise;
@@ -105,7 +118,9 @@ namespace styxlib
 
         void workThreadFunction();
         virtual bool acceptClients(int serverSocket);
+        virtual void readDataFromSocket(int clientFd);
         void handlePollEvents(int serverSocket, size_t numEvents);
+        void cleanupClosedSockets();
 
     public:
         ChannelUnixTcpServer(const Configuration &config);

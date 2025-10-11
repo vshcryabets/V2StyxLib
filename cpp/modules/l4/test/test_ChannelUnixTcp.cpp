@@ -4,12 +4,14 @@
 #include <chrono>
 #include "impl/ClientsRepoImpl.h"
 #include <iostream>
+#include <future>
+#include <memory>
 
 class TestDeserializerL4 : public styxlib::DeserializerL4
 {
 private:
     std::weak_ptr<styxlib::ChannelTxOneToMany> _channelTx;
-    uint16_t receivedBytes = 0;
+    std::unique_ptr<std::promise<uint16_t>> receivedBytesPromise;
 public:
     TestDeserializerL4() {}
     virtual ~TestDeserializerL4() = default;
@@ -19,7 +21,10 @@ public:
         const styxlib::StyxBuffer buffer,
         styxlib::Size size) override
     {
-        receivedBytes += size;
+        if (receivedBytesPromise) {
+            receivedBytesPromise->set_value(size);
+            receivedBytesPromise = nullptr;
+        }
         std::string msg((const char*)buffer, size);
         std::cout << "Received from client " << clientId << ": " << msg << std::endl;
         if (auto p = _channelTx.lock()) {
@@ -27,16 +32,29 @@ public:
             p->sendBuffer(clientId, (const styxlib::StyxBuffer)response, strlen(response));
         }
     }
-    uint16_t getReceivedBytes() const { return receivedBytes; }
+    std::future<uint16_t> getReceivedBytes() { 
+        receivedBytesPromise = std::make_unique<std::promise<uint16_t>>();
+        return receivedBytesPromise->get_future();
+    }
 };
 
 class TestChannelUnixTcpServer: public styxlib::ChannelUnixTcpServer {
 public:
+    bool dontCallRealMethods = true;
     int acceptCalled = 0;
+    int readDataFromSocketCalled = 0;
 protected:
     bool acceptClients(int serverSocket) override {
         acceptCalled++;
+        if (!dontCallRealMethods)
+            return ChannelUnixTcpServer::acceptClients(serverSocket);
         return false;
+    }
+
+    void readDataFromSocket(int clientFd) override {
+        readDataFromSocketCalled++;
+        if (!dontCallRealMethods)
+            return ChannelUnixTcpServer::readDataFromSocket(clientFd);
     }
 
 public:
@@ -119,7 +137,7 @@ TEST_CASE_METHOD(TestSuite, "Server starts and stops", "[ChannelUnixTcpServer]")
 TEST_CASE_METHOD(TestSuite, "Server accepts connections", "[ChannelUnixTcpServer]")
 {
     waitStartServer();
-    connectClient();
+    client->connect(); // connect without waiting for future
     auto map = server->getClientsObserver().wait();
     REQUIRE(map->size() == 1);
     std::cout << "Connected clients:" << std::endl;
@@ -154,7 +172,10 @@ TEST_CASE_METHOD(TestSuite, "Server can receive messages from client", "[Channel
     REQUIRE(bytesSent.has_value());
     REQUIRE(bytesSent.value() == messageSize);
 
-    REQUIRE(serverDeserializer->getReceivedBytes() == messageSize);
+    auto futureReceivedBytes = serverDeserializer->getReceivedBytes();
+    REQUIRE(futureReceivedBytes.wait_for(std::chrono::seconds(4)) == std::future_status::ready);
+    uint16_t receivedBytes = futureReceivedBytes.get();
+    REQUIRE(receivedBytes == messageSize);
 
     REQUIRE(client->disconnect().wait_for(std::chrono::seconds(1)) == std::future_status::ready);
     REQUIRE_FALSE(client->isConnected());
@@ -172,10 +193,28 @@ TEST_CASE_METHOD(TestChannelUnixTcpServer, "handlePollEvents accept connections"
 TEST_CASE_METHOD(TestChannelUnixTcpServer, "handlePollEvents read data from socket", "[ChannelUnixTcpServer]")
 {
     pollFds.clear();
-    pollFds.push_back({ .fd = 1, .events = POLLIN, .revents = POLLIN }); // Simulate server socket ready to accept
-    pollFds.push_back({ .fd = 2, .events = POLLIN, .revents = POLLIN }); // client 1
+    pollFds.push_back({ .fd = 1, .events = POLLIN, .revents = 0 }); // Simulate server socket ready to accept
+    pollFds.push_back({ .fd = 2, .events = POLLIN, .revents = 0 }); // client 1
     pollFds.push_back({ .fd = 3, .events = POLLIN, .revents = POLLIN }); // client 2
+    handlePollEvents(1, 1);
 
+    REQUIRE(readDataFromSocketCalled == 1); 
+}
 
-    REQUIRE(false);
+TEST_CASE_METHOD(TestChannelUnixTcpServer, "handlePollEvents should cleanup closed sockets", "[ChannelUnixTcpServer]")
+{
+    dontCallRealMethods = false; // let the real methods be called
+    pollFds.clear();
+    pollFds.push_back({ .fd = 1, .events = POLLIN, .revents = 0 }); // Simulate server socket ready to accept
+    pollFds.push_back({ .fd = 256, .events = POLLIN, .revents = POLLIN }); // client 1
+    pollFds.push_back({ .fd = 3, .events = POLLIN, .revents = POLLHUP }); // client 2
+
+    handlePollEvents(1, 2);
+    REQUIRE(socketsToClose.size() == 2);
+
+    cleanupClosedSockets();
+    REQUIRE(socketsToClose.size() == 0);
+    REQUIRE(pollFds.size() == 1);
+
+    REQUIRE(readDataFromSocketCalled == 1); 
 }
