@@ -138,13 +138,12 @@ TEST_CASE_METHOD(TestSuite, "Server accepts connections", "[ChannelUnixTcpServer
 {
     waitStartServer();
     client->connect(); // connect without waiting for future
-    auto map = server->getClientsObserver().wait();
-    REQUIRE(map->size() == 1);
+    auto clientsVector = server->getClientsObserver().wait();
+    REQUIRE(clientsVector.size() == 1);
     std::cout << "Connected clients:" << std::endl;
-    for (const auto &[socket, clientInfo] : *map)
+    for (const auto &clientInfo : clientsVector)
     {
-        std::cout << "\tSocket: " << socket 
-            << ", Client ID: " << clientInfo.id 
+        std::cout << "\tClient ID: " << clientInfo.id 
             << ", Address: " << clientInfo.address 
             << ", Port: " << clientInfo.port << std::endl;
         REQUIRE(clientInfo.id > 0);

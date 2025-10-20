@@ -13,6 +13,8 @@
 
 namespace styxlib
 {
+    using Socket = int;
+
     struct ReadBuffer {
         std::vector<uint8_t> buffer;
         Size currentSize{0};
@@ -23,10 +25,10 @@ namespace styxlib
     protected:
 
     protected:
-        std::optional<int> socket = std::nullopt;
+        std::optional<Socket> socket = std::nullopt;
         uint8_t packetSizeHeader{4};
     public:
-        ChannelUnixTcpTx(uint8_t packetSizeHeader, std::optional<int> socket) : packetSizeHeader(packetSizeHeader), socket(socket) {}
+        ChannelUnixTcpTx(uint8_t packetSizeHeader, std::optional<Socket> socket) : packetSizeHeader(packetSizeHeader), socket(socket) {}
         virtual ~ChannelUnixTcpTx() = default;
         SizeResult sendBuffer(const StyxBuffer buffer, Size size) override;
     };
@@ -101,26 +103,29 @@ namespace styxlib
         };
 
     protected:
+        class ClientFullInfo : public ClientInfo, public ReadBuffer
+        {
+        };
         const Configuration configuration;
         std::thread serverThread;
         // Sockets
-        std::shared_ptr<std::map<int, ClientInfo>> socketToClientInfoMap;
-        std::map<int, ReadBuffer> socketReadBuffers;
-        std::vector<int> socketsToClose;
+        std::map<Socket, ClientFullInfo> socketToClientInfoMapFull;
+        std::vector<Socket> socketsToClose;
         // Clients
         std::map<ClientId, std::shared_ptr<ChannelUnixTcpTx>> clientIdToChannelClient;
 
-        ProgressObservableMutexImpl<std::shared_ptr<const std::map<int, ClientInfo>>> clientsObserver;
+        ProgressObservableMutexImpl<std::vector<ClientInfo>> clientsObserver;
         std::atomic<bool> running{false};
         std::atomic<bool> stopRequested{false};
         std::unique_ptr<std::promise<ErrorCode>> startPromise;
         std::vector<pollfd> pollFds;
 
         void workThreadFunction();
-        virtual bool acceptClients(int serverSocket);
-        virtual void readDataFromSocket(int clientFd);
-        void handlePollEvents(int serverSocket, size_t numEvents);
-        void cleanupClosedSockets();
+        virtual bool acceptClients(Socket serverSocket);
+        virtual void readDataFromSocket(Socket clientFd);
+        void handlePollEvents(Socket serverSocket, size_t numEvents); // Handle poll events
+        void cleanupClosedSockets(); // Clean up sockets marked for closure
+        void processBuffers(); // Check dirty buffers and send data to deserializer
 
     public:
         ChannelUnixTcpServer(const Configuration &config);
@@ -128,7 +133,7 @@ namespace styxlib
         SizeResult sendBuffer(ClientId clientId, const StyxBuffer buffer, Size size) override;
         std::future<ErrorCode> start();
         std::future<void> stop();
-        ProgressObserver<std::shared_ptr<const std::map<int, ClientInfo>>> &getClientsObserver()
+        ProgressObserver<std::vector<ClientInfo>> &getClientsObserver()
         {
             return clientsObserver;
         }

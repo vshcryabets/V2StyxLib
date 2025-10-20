@@ -6,6 +6,7 @@
 #include <fcntl.h>
 #include <iostream>
 #include <algorithm>
+#include <ranges>
 
 namespace styxlib
 {
@@ -98,7 +99,6 @@ namespace styxlib
         {
             throw std::invalid_argument("ClientsRepo must be provided in configuration");
         }
-        socketToClientInfoMap = std::make_shared<std::map<int, ClientInfo>>();
     }
 
     ChannelUnixTcpServer::~ChannelUnixTcpServer()
@@ -149,8 +149,8 @@ namespace styxlib
                 stopRequested.store(true);
                 this->startPromise = nullptr;
                 clientIdToChannelClient.clear();
-                socketToClientInfoMap->clear();
-                clientsObserver.setData(socketToClientInfoMap, true);
+                socketToClientInfoMapFull.clear();
+                clientsObserver.setData(std::vector<ClientInfo>{}, true);
                 if (this->serverThread.joinable())
                 {
                     this->serverThread.join();
@@ -224,6 +224,9 @@ namespace styxlib
                 continue;
             } else {
                 handlePollEvents(serverSocket, num_events);
+                if (stopRequested.load())
+                    break;
+                processBuffers();
                 cleanupClosedSockets();
             }
         }
@@ -232,16 +235,19 @@ namespace styxlib
         stopRequested.store(false);
     }
 
-    bool ChannelUnixTcpServer::acceptClients(int serverSocket)
+    bool ChannelUnixTcpServer::acceptClients(Socket serverSocket)
     {
         int clientSocket = accept(serverSocket, nullptr, nullptr);
         if (clientSocket < 0)
         {
             return false;
         }
-        ClientInfo clientInfo{
-            .id = configuration.clientsRepo->getNextClientId(),
-        };
+        ClientFullInfo clientInfo;
+        clientInfo.id = configuration.clientsRepo->getNextClientId();
+        clientInfo.buffer = std::vector<uint8_t>(configuration.iounit);
+        clientInfo.currentSize = 0;
+        clientInfo.isDirty = false;
+
         sockaddr_in addr;
         socklen_t addrLen = sizeof(addr);
         if (getpeername(clientSocket, reinterpret_cast<sockaddr *>(&addr), &addrLen) == 0)
@@ -252,21 +258,25 @@ namespace styxlib
             clientInfo.port = ntohs(addr.sin_port);
         }
 
-        socketToClientInfoMap->insert({clientSocket, clientInfo});
+        socketToClientInfoMapFull.insert({clientSocket, clientInfo});
         // Create a ChannelTx for the client
         auto client = std::make_shared<ChannelUnixTcpTx>(configuration.packetSizeHeader, clientSocket);
         // Store the client with its socket as the ID
         clientIdToChannelClient[clientInfo.id] = client;
-        socketReadBuffers[clientSocket] = ReadBuffer{
-            .buffer = std::vector<uint8_t>(configuration.iounit),
-            .isDirty = false
-        };
-        clientsObserver.setData(socketToClientInfoMap, false);
+        clientsObserver.setData(
+            socketToClientInfoMapFull | std::views::transform([](const auto &pair) { 
+                return ClientInfo {
+                    .id = pair.second.id,
+                    .address = pair.second.address,
+                    .port = pair.second.port
+                };
+            })
+            | std::ranges::to<std::vector>(), false);
         pollFds.push_back({clientSocket, POLLIN | POLLPRI | POLLERR | POLLHUP, 0});
         return true;
     }
 
-    void ChannelUnixTcpServer::handlePollEvents(int serverSocket, size_t numEvents) {
+    void ChannelUnixTcpServer::handlePollEvents(Socket serverSocket, size_t numEvents) {
         std::cout << "handlePollEvents with " << numEvents << " events" << std::endl;
         for (const auto &pollItem: pollFds) {
             if (pollItem.revents & POLLIN) {
@@ -286,9 +296,9 @@ namespace styxlib
         }
     }
 
-    void ChannelUnixTcpServer::readDataFromSocket(int clientFd) {
-        auto it = socketReadBuffers.find(clientFd);
-        if (it == socketReadBuffers.end()) {
+    void ChannelUnixTcpServer::readDataFromSocket(Socket clientFd) {
+        auto it = socketToClientInfoMapFull.find(clientFd);
+        if (it == socketToClientInfoMapFull.end()) {
             socketsToClose.push_back(clientFd);
             return;
         }
@@ -317,16 +327,53 @@ namespace styxlib
             pollFds.erase(std::remove_if(pollFds.begin(), pollFds.end(),
                                           [fd](const pollfd &p) { return p.fd == fd; }),
                            pollFds.end());
-            auto clientId = std::find_if(socketToClientInfoMap->begin(), socketToClientInfoMap->end(),
+            auto clientId = std::find_if(socketToClientInfoMapFull.begin(), socketToClientInfoMapFull.end(),
                                           [fd](const auto &pair) { return pair.first == fd; });
-            socketToClientInfoMap->erase(fd);
-            socketReadBuffers.erase(fd);
+            // TODO what if not found?
+            socketToClientInfoMapFull.erase(fd);
             clientIdToChannelClient.erase(clientId->second.id);
         }
 
         if (socketsToClose.empty() == false) {
-            clientsObserver.setData(socketToClientInfoMap, false);
+            clientsObserver.setData(socketToClientInfoMapFull 
+                | std::views::transform([](const auto &pair) { 
+                    return ClientInfo {
+                        .id = pair.second.id,
+                        .address = pair.second.address,
+                        .port = pair.second.port
+                    };
+                })
+                | std::ranges::to<std::vector>(), false);
         }
         socketsToClose.clear();
+    }
+
+    void ChannelUnixTcpServer::processBuffers() {
+        for (auto &pair : socketToClientInfoMapFull) {
+            ClientFullInfo &readBuffer = pair.second;
+            if (readBuffer.isDirty && readBuffer.currentSize > configuration.packetSizeHeader) {
+                uint32_t packetSize = 0;
+                std::memcpy(&packetSize, readBuffer.buffer.data(), configuration.packetSizeHeader);
+                // Convert from network byte order to host byte order
+                packetSize = ntohl(packetSize);
+
+                if (readBuffer.currentSize < packetSize) {
+                    // Not enough data yet
+                    continue;
+                }
+                // we have whole buffer
+                std::cout << "Processing buffer of size " << packetSize << " from socket " << pair.first << std::endl;
+                
+                // Process the buffer with the deserializer
+                auto it = socketToClientInfoMapFull.find(pair.first);
+                if (it != socketToClientInfoMapFull.end()) {
+                    ClientId clientId = it->second.id;
+                    deserializer->handleBuffer(clientId, readBuffer.buffer.data(), readBuffer.currentSize);
+                }
+                // Reset the buffer
+                readBuffer.currentSize = 0;
+                readBuffer.isDirty = false;
+            }
+        }
     }
 } // namespace styxlib
