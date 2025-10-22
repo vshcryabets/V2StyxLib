@@ -40,7 +40,7 @@ namespace styxlib
         {
             std::string address;
             uint16_t port;
-            uint8_t packetSizeHeader{4};
+            uint8_t packetSizeHeader{2};
             uint16_t iounit{8192};
             DeserializerL4Ptr deserializer{nullptr};
             Configuration(

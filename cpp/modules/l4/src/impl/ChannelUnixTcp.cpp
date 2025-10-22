@@ -351,35 +351,37 @@ namespace styxlib
     void ChannelUnixTcpServer::processBuffers() {
         for (auto &pair : socketToClientInfoMapFull) {
             ClientFullInfo &readBuffer = pair.second;
-            if (readBuffer.isDirty && readBuffer.currentSize > configuration.packetSizeHeader) {
+            while (readBuffer.isDirty && readBuffer.currentSize > configuration.packetSizeHeader) {
                 uint32_t packetSize = 0;
                 std::memcpy(&packetSize, readBuffer.buffer.data(), configuration.packetSizeHeader);
                 // Convert from network byte order to host byte order
                 packetSize = ntohl(packetSize);
+                uint32_t packetSizeWithHeader = packetSize + configuration.packetSizeHeader;
 
-                if (readBuffer.currentSize < packetSize) {
-                    // Not enough data yet
-                    continue;
+                if (readBuffer.currentSize >= packetSizeWithHeader) {
+                    // we have whole buffer
+                    std::cout << "Processing buffer of size " << packetSizeWithHeader << " from socket " << pair.first << std::endl;
+                    
+                    // Process the buffer with the deserializer
+                    auto it = socketToClientInfoMapFull.find(pair.first);
+                    if (it != socketToClientInfoMapFull.end()) {
+                        ClientId clientId = it->second.id;
+                        deserializer->handleBuffer(clientId, readBuffer.buffer.data() + configuration.packetSizeHeader, packetSize);
+                    }
+                    // move buffer
+                    Size remainingSize = readBuffer.currentSize - packetSizeWithHeader;
+                    if (remainingSize > 0) {
+                        std::memmove(readBuffer.buffer.data(),
+                                    readBuffer.buffer.data() + packetSizeWithHeader,
+                                    remainingSize);
+                    }
+                    readBuffer.currentSize = remainingSize;
+                } else {
+                    // not enough data yet                    
+                    break;
                 }
-                // we have whole buffer
-                std::cout << "Processing buffer of size " << packetSize << " from socket " << pair.first << std::endl;
-                
-                // Process the buffer with the deserializer
-                auto it = socketToClientInfoMapFull.find(pair.first);
-                if (it != socketToClientInfoMapFull.end()) {
-                    ClientId clientId = it->second.id;
-                    deserializer->handleBuffer(clientId, readBuffer.buffer.data(), readBuffer.currentSize);
-                }
-                // move buffer
-                Size remainingSize = readBuffer.currentSize - packetSize;
-                if (remainingSize > 0) {
-                    std::memmove(readBuffer.buffer.data(),
-                                 readBuffer.buffer.data() + packetSize,
-                                 remainingSize);
-                }
-                readBuffer.currentSize = remainingSize;
-                readBuffer.isDirty = false;
             }
+            readBuffer.isDirty = false;
         }
     }
 } // namespace styxlib

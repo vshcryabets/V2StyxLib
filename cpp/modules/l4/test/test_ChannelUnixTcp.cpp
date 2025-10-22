@@ -62,7 +62,7 @@ public:
         : ChannelUnixTcpServer(Configuration(
             23500,
             std::make_shared<styxlib::ClientsRepoImpl>(),
-            1,
+            4,
             8192,
             std::make_shared<TestDeserializerL4>(),
             10))
@@ -228,25 +228,37 @@ TEST_CASE_METHOD(TestChannelUnixTcpServer, "test_processBuffers", "[ChannelUnixT
     clientInfo.id = 1;
     clientInfo.address = "127.0.0.1";
     clientInfo.port = 12345;
-    clientInfo.buffer = std::vector<uint8_t>(16, 0);
-    clientInfo.currentSize = 10; // more than packetSizeHeader
+    clientInfo.buffer = std::vector<uint8_t>(32, 0);
+    clientInfo.currentSize = 18; // more than packetSizeHeader
     clientInfo.buffer[0] = 0;
     clientInfo.buffer[1] = 0;
     clientInfo.buffer[2] = 0;
-    clientInfo.buffer[3] = 8;
-    clientInfo.buffer[4] = 0xDE;
-    clientInfo.buffer[5] = 0xAD;
-    clientInfo.buffer[6] = 0xBE;
-    clientInfo.buffer[7] = 0xEF;
+    clientInfo.buffer[3] = 4;
+    clientInfo.buffer[4] = 'C';
+    clientInfo.buffer[5] = 'A';
+    clientInfo.buffer[6] = 'D';
+    clientInfo.buffer[7] = 'B';
     // next packet
     clientInfo.buffer[8] = 0x00;
-    clientInfo.buffer[9] = 0x01;
+    clientInfo.buffer[9] = 0x00;
+    clientInfo.buffer[10] = 0x00;
+    clientInfo.buffer[11] = 0x02;
+    clientInfo.buffer[12] = 'M';
+    clientInfo.buffer[13] = '2';
+    // 3rd packet
+    clientInfo.buffer[14] = 0x00;
+    clientInfo.buffer[15] = 0x00;
+    clientInfo.buffer[16] = 0x00;
+    clientInfo.buffer[17] = 0x02;
     clientInfo.isDirty = true;
     socketToClientInfoMapFull[clientSocket] = clientInfo;
     // Call processBuffers
     processBuffers();
     // Verify that the buffer is no longer dirty
     REQUIRE(socketToClientInfoMapFull[clientSocket].isDirty == false);
-    REQUIRE(socketToClientInfoMapFull[clientSocket].currentSize == 2);
-    
+    REQUIRE(socketToClientInfoMapFull[clientSocket].currentSize == 4); // only incomplete 3rd packet remains
+    auto future = serverDeserializer->getReceivedBytes();
+    REQUIRE(future.wait_for(std::chrono::seconds(1)) == std::future_status::ready);
+    REQUIRE(future.get() == 6); // 1s packet 4 bytes, 2nd packet 2 bytes
+
 }
