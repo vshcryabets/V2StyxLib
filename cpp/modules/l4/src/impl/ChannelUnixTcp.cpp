@@ -370,8 +370,14 @@ namespace styxlib
                     ClientId clientId = it->second.id;
                     deserializer->handleBuffer(clientId, readBuffer.buffer.data(), readBuffer.currentSize);
                 }
-                // Reset the buffer
-                readBuffer.currentSize = 0;
+                // move buffer
+                Size remainingSize = readBuffer.currentSize - packetSize;
+                if (remainingSize > 0) {
+                    std::memmove(readBuffer.buffer.data(),
+                                 readBuffer.buffer.data() + packetSize,
+                                 remainingSize);
+                }
+                readBuffer.currentSize = remainingSize;
                 readBuffer.isDirty = false;
             }
         }

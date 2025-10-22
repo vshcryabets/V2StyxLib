@@ -217,3 +217,36 @@ TEST_CASE_METHOD(TestChannelUnixTcpServer, "handlePollEvents should cleanup clos
 
     REQUIRE(readDataFromSocketCalled == 1); 
 }
+
+TEST_CASE_METHOD(TestChannelUnixTcpServer, "test_processBuffers", "[ChannelUnixTcpServer]")
+{
+    dontCallRealMethods = false; // let the real methods be called
+
+    // Simulate a client with a dirty buffer
+    int clientSocket = 42;
+    ClientFullInfo clientInfo;
+    clientInfo.id = 1;
+    clientInfo.address = "127.0.0.1";
+    clientInfo.port = 12345;
+    clientInfo.buffer = std::vector<uint8_t>(16, 0);
+    clientInfo.currentSize = 10; // more than packetSizeHeader
+    clientInfo.buffer[0] = 0;
+    clientInfo.buffer[1] = 0;
+    clientInfo.buffer[2] = 0;
+    clientInfo.buffer[3] = 8;
+    clientInfo.buffer[4] = 0xDE;
+    clientInfo.buffer[5] = 0xAD;
+    clientInfo.buffer[6] = 0xBE;
+    clientInfo.buffer[7] = 0xEF;
+    // next packet
+    clientInfo.buffer[8] = 0x00;
+    clientInfo.buffer[9] = 0x01;
+    clientInfo.isDirty = true;
+    socketToClientInfoMapFull[clientSocket] = clientInfo;
+    // Call processBuffers
+    processBuffers();
+    // Verify that the buffer is no longer dirty
+    REQUIRE(socketToClientInfoMapFull[clientSocket].isDirty == false);
+    REQUIRE(socketToClientInfoMapFull[clientSocket].currentSize == 2);
+    
+}
