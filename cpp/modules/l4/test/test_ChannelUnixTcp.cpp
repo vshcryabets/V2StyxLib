@@ -12,6 +12,7 @@ class TestDeserializerL4 : public styxlib::DeserializerL4
 private:
     std::weak_ptr<styxlib::ChannelTxOneToMany> _channelTx;
     std::unique_ptr<std::promise<uint16_t>> receivedBytesPromise;
+    uint32_t totalReceivedBytes{0};
 public:
     TestDeserializerL4() {}
     virtual ~TestDeserializerL4() = default;
@@ -21,6 +22,7 @@ public:
         const styxlib::StyxBuffer buffer,
         styxlib::Size size) override
     {
+        totalReceivedBytes += size;
         if (receivedBytesPromise) {
             receivedBytesPromise->set_value(size);
             receivedBytesPromise = nullptr;
@@ -36,6 +38,7 @@ public:
         receivedBytesPromise = std::make_unique<std::promise<uint16_t>>();
         return receivedBytesPromise->get_future();
     }
+    uint32_t getTotalReceivedBytes() const { return totalReceivedBytes; }
 };
 
 class TestChannelUnixTcpServer: public styxlib::ChannelUnixTcpServer {
@@ -257,8 +260,6 @@ TEST_CASE_METHOD(TestChannelUnixTcpServer, "test_processBuffers", "[ChannelUnixT
     // Verify that the buffer is no longer dirty
     REQUIRE(socketToClientInfoMapFull[clientSocket].isDirty == false);
     REQUIRE(socketToClientInfoMapFull[clientSocket].currentSize == 4); // only incomplete 3rd packet remains
-    auto future = serverDeserializer->getReceivedBytes();
-    REQUIRE(future.wait_for(std::chrono::seconds(1)) == std::future_status::ready);
-    REQUIRE(future.get() == 6); // 1s packet 4 bytes, 2nd packet 2 bytes
-
+    auto testDeserializer = std::dynamic_pointer_cast<TestDeserializerL4>(deserializer);
+    REQUIRE(testDeserializer->getTotalReceivedBytes() == 6); // 1s packet 4 bytes, 2nd packet 2 bytes
 }
