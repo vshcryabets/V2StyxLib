@@ -15,6 +15,16 @@ namespace styxlib
 {
     using Socket = int;
 
+    enum class PacketHeaderSize : uint8_t {
+        Size1Byte = 1,
+        Size2Bytes = 2,
+        Size4Bytes = 4
+    };
+
+    inline uint8_t to_uint8_t(const PacketHeaderSize &headerSize) {
+        return static_cast<uint8_t>(headerSize);
+    }
+
     struct ReadBuffer {
         std::vector<uint8_t> buffer;
         Size currentSize{0};
@@ -26,9 +36,14 @@ namespace styxlib
 
     protected:
         std::optional<Socket> socket = std::nullopt;
-        uint8_t packetSizeHeader{4};
+        PacketHeaderSize packetSizeHeader{PacketHeaderSize::Size2Bytes};
     public:
-        ChannelUnixTcpTx(uint8_t packetSizeHeader, std::optional<Socket> socket) : packetSizeHeader(packetSizeHeader), socket(socket) {}
+        ChannelUnixTcpTx(PacketHeaderSize packetSizeHeader, std::optional<Socket> socket) : 
+            packetSizeHeader(packetSizeHeader), socket(socket) {}
+        ChannelUnixTcpTx(const ChannelUnixTcpTx &) = delete;
+        ChannelUnixTcpTx(ChannelUnixTcpTx &&) = delete;
+        ChannelUnixTcpTx &operator=(ChannelUnixTcpTx &&) = delete;
+        ChannelUnixTcpTx &operator=(const ChannelUnixTcpTx &) = delete;
         virtual ~ChannelUnixTcpTx() = default;
         SizeResult sendBuffer(const StyxBuffer buffer, Size size) override;
     };
@@ -40,13 +55,13 @@ namespace styxlib
         {
             std::string address;
             uint16_t port;
-            uint8_t packetSizeHeader{2};
+            PacketHeaderSize packetSizeHeader{PacketHeaderSize::Size2Bytes};
             uint16_t iounit{8192};
             DeserializerL4Ptr deserializer{nullptr};
             Configuration(
-                const std::string &address, 
-                uint16_t port, 
-                uint8_t packetSizeHeader,
+                const std::string &address,
+                uint16_t port,
+                PacketHeaderSize packetSizeHeader,
                 uint16_t iounit,
                 DeserializerL4Ptr deserializer)
                 : address(address), 
@@ -76,14 +91,14 @@ namespace styxlib
         public:
             const uint16_t port;
             const std::shared_ptr<ClientsRepo> clientsRepo{nullptr};
-            const uint8_t packetSizeHeader{4};
+            const PacketHeaderSize packetSizeHeader{PacketHeaderSize::Size2Bytes};
             const uint16_t iounit{8192};
             const DeserializerL4Ptr deserializer{nullptr};
 
             Configuration(
                 uint16_t port,
                 std::shared_ptr<ClientsRepo> clientsRepo,
-                uint8_t packetSizeHeader,
+                PacketHeaderSize packetSizeHeader,
                 uint16_t iounit,
                 DeserializerL4Ptr deserializer,
                 uint8_t maxClients)

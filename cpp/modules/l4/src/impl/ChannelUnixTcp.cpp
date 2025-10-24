@@ -19,7 +19,7 @@ namespace styxlib
 
     ChannelUnixTcpClient::~ChannelUnixTcpClient()
     {
-        disconnect();
+        disconnect().get();
     }
 
     SizeResult ChannelUnixTcpTx::sendBuffer(const StyxBuffer buffer, Size size)
@@ -27,9 +27,31 @@ namespace styxlib
         if (socket.has_value())
         {
             // Send the buffer over the TCP socket
-            Size bytesSent = ::send(socket.value(), &size, packetSizeHeader, 0);
-            bytesSent += ::send(socket.value(), buffer, size, 0);
-            return bytesSent;
+            uint8_t packetSizeBuffer[4] = {0};
+            switch (packetSizeHeader)
+            {
+            case PacketHeaderSize::Size1Byte:
+                if (size > 255) {
+                    return std::unexpected(ErrorCode::PacketTooLarge);
+                }
+                packetSizeBuffer[0] = static_cast<uint8_t>(size);
+                break;
+            case PacketHeaderSize::Size2Bytes:
+                if (size > 65535) {
+                    return std::unexpected(ErrorCode::PacketTooLarge);
+                }
+                packetSizeBuffer[0] = size & 0xFF;
+                packetSizeBuffer[1] = (size >> 8) & 0xFF;
+                break;
+
+            case PacketHeaderSize::Size4Bytes:
+                uint32_t networkSize32 = static_cast<uint32_t>(htonl(size));
+                std::memcpy(packetSizeBuffer, &networkSize32, 4);
+                break;
+            }
+
+            ::send(socket.value(), packetSizeBuffer, static_cast<uint8_t>(packetSizeHeader), 0);
+            return ::send(socket.value(), buffer, size, 0);
         }
         else
         {
@@ -277,15 +299,13 @@ namespace styxlib
     }
 
     void ChannelUnixTcpServer::handlePollEvents(Socket serverSocket, size_t numEvents) {
-        std::cout << "handlePollEvents with " << numEvents << " events" << std::endl;
         for (const auto &pollItem: pollFds) {
             if (pollItem.revents & POLLIN) {
                 if (pollItem.fd == serverSocket) {
                     // New incoming connections
                     while (acceptClients(serverSocket)) ;                    
                 } else {
-                    std::cout << "Data available to read on socket " << pollItem.fd << std::endl;
-                    readDataFromSocket(pollItem.fd);                    
+                    readDataFromSocket(pollItem.fd);
                 }
                 // --num_events;
             } 
@@ -302,15 +322,12 @@ namespace styxlib
             socketsToClose.push_back(clientFd);
             return;
         }
-        ReadBuffer &readBuffer = it->second;
+        ClientFullInfo &readBuffer = it->second;
         Size leftForRead = readBuffer.buffer.size() - readBuffer.currentSize;
-        std::cout << "Reading up to " << leftForRead << " bytes from client socket " << clientFd << std::endl;
         ssize_t bytesRead = recv(clientFd, readBuffer.buffer.data() + readBuffer.currentSize, leftForRead, 0);
         if (bytesRead > 0) {
-            std::cout << "Read " << bytesRead << " bytes from client socket " << clientFd << std::endl;
             readBuffer.currentSize += bytesRead;
             readBuffer.isDirty = true;
-        } else if (bytesRead == 0) {
             std::cerr << "Client socket " << clientFd << " disconnected?" << std::endl;
             socketsToClose.push_back(clientFd);
         } else {
@@ -320,9 +337,7 @@ namespace styxlib
     }
 
     void ChannelUnixTcpServer::cleanupClosedSockets() {
-        std::cout << "cleanupClosedSockets() 1"<< std::endl;
         for (int fd : socketsToClose) {
-            std::cout << "Cleaning up closed socket " << fd << std::endl;
             close(fd);
             pollFds.erase(std::remove_if(pollFds.begin(), pollFds.end(),
                                           [fd](const pollfd &p) { return p.fd == fd; }),
@@ -349,24 +364,34 @@ namespace styxlib
     }
 
     void ChannelUnixTcpServer::processBuffers() {
+        auto headerSize = to_uint8_t(configuration.packetSizeHeader);
         for (auto &pair : socketToClientInfoMapFull) {
             ClientFullInfo &readBuffer = pair.second;
-            while (readBuffer.isDirty && readBuffer.currentSize > configuration.packetSizeHeader) {
+            while (readBuffer.isDirty && readBuffer.currentSize > headerSize) {
                 uint32_t packetSize = 0;
-                std::memcpy(&packetSize, readBuffer.buffer.data(), configuration.packetSizeHeader);
+                switch (configuration.packetSizeHeader)
+                {
+                case PacketHeaderSize::Size1Byte:
+                    packetSize = readBuffer.buffer[0];
+                    break;
+                case PacketHeaderSize::Size2Bytes:
+                    packetSize = readBuffer.buffer[1] | (readBuffer.buffer[0] << 8);
+                    break;
+                case PacketHeaderSize::Size4Bytes:
+                    packetSize = readBuffer.buffer[3] | 
+                        (readBuffer.buffer[2] << 8) | 
+                        (readBuffer.buffer[1] << 16) | 
+                        (readBuffer.buffer[0] << 24);
+                    break;
+                }
                 // Convert from network byte order to host byte order
-                packetSize = ntohl(packetSize);
-                uint32_t packetSizeWithHeader = packetSize + configuration.packetSizeHeader;
-
-                if (readBuffer.currentSize >= packetSizeWithHeader) {
-                    // we have whole buffer
-                    std::cout << "Processing buffer of size " << packetSizeWithHeader << " from socket " << pair.first << std::endl;
-                    
+                uint32_t packetSizeWithHeader = packetSize + to_uint8_t(configuration.packetSizeHeader);
+                if (readBuffer.currentSize >= packetSizeWithHeader) {                    
                     // Process the buffer with the deserializer
                     auto it = socketToClientInfoMapFull.find(pair.first);
                     if (it != socketToClientInfoMapFull.end()) {
                         ClientId clientId = it->second.id;
-                        deserializer->handleBuffer(clientId, readBuffer.buffer.data() + configuration.packetSizeHeader, packetSize);
+                        deserializer->handleBuffer(clientId, readBuffer.buffer.data() + to_uint8_t(configuration.packetSizeHeader), packetSize);
                     }
                     // move buffer
                     Size remainingSize = readBuffer.currentSize - packetSizeWithHeader;

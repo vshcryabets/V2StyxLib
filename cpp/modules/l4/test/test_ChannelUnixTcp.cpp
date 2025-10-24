@@ -65,7 +65,7 @@ public:
         : ChannelUnixTcpServer(Configuration(
             23500,
             std::make_shared<styxlib::ClientsRepoImpl>(),
-            4,
+            styxlib::PacketHeaderSize::Size4Bytes,
             8192,
             std::make_shared<TestDeserializerL4>(),
             10))
@@ -76,7 +76,7 @@ public:
 class TestSuite
 {
 public:
-    const static uint8_t packetSizeHeader = 1;
+    const static styxlib::PacketHeaderSize packetSizeHeader = styxlib::PacketHeaderSize::Size1Byte;
     const static uint16_t port = 23500;
     std::shared_ptr<styxlib::ClientsRepoImpl> clientsRepo = std::make_shared<styxlib::ClientsRepoImpl>();
     std::shared_ptr<TestDeserializerL4> clientDeserializer = std::make_shared<TestDeserializerL4>();
@@ -163,21 +163,21 @@ TEST_CASE_METHOD(TestSuite, "Server accepts connections", "[ChannelUnixTcpServer
     waitStopServer();
 }
 
-TEST_CASE_METHOD(TestSuite, "Server can receive messages from client", "[ChannelUnixTcpServer]")
+TEST_CASE_METHOD(TestSuite, "test_ServerReceiveMessages", "[ChannelUnixTcpServer]")
 {
     waitStartServer();
     connectClient();
 
     const char *msg = "Hello, World!";
-    uint16_t messageSize = strlen(msg) + packetSizeHeader;
+    uint16_t messageSize = strlen(msg);
+    auto futureReceivedBytes = serverDeserializer->getReceivedBytes();
+
     auto bytesSent = client->sendBuffer((const styxlib::StyxBuffer)msg, strlen(msg));
     REQUIRE(bytesSent.has_value());
     REQUIRE(bytesSent.value() == messageSize);
 
-    auto futureReceivedBytes = serverDeserializer->getReceivedBytes();
-    REQUIRE(futureReceivedBytes.wait_for(std::chrono::seconds(4)) == std::future_status::ready);
-    uint16_t receivedBytes = futureReceivedBytes.get();
-    REQUIRE(receivedBytes == messageSize);
+    REQUIRE(futureReceivedBytes.wait_for(std::chrono::seconds(2)) == std::future_status::ready);
+    REQUIRE(futureReceivedBytes.get() == messageSize);
 
     REQUIRE(client->disconnect().wait_for(std::chrono::seconds(1)) == std::future_status::ready);
     REQUIRE_FALSE(client->isConnected());

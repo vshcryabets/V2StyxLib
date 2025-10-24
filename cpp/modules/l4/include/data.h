@@ -13,7 +13,8 @@ namespace styxlib
         CantCreateSocket,
         CantBindSocket,
         CantListenSocket,
-        CantCreateSocketPoll
+        CantCreateSocketPoll,
+        PacketTooLarge,
     };
 
     using StyxString = std::string;
