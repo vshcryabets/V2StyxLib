@@ -22,19 +22,19 @@ jobs:
       contents: read
 
     steps:
-    - name: Set up GCC 14
-      uses: arikw/setup-gcc@v1
-      with:
-        version: 14
+
+    - name: Install GCC 14
+      run: |
+        sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+        sudo apt-get update
+        sudo apt-get install -y gcc-14 g++-14 cmake
 
     - uses: actions/checkout@v4
 
-    - name: Create build directory and run CMake
-      run: |
-        sudo apt-get -y update
-        sudo apt-get install -y cmake
-
     - name: Configure CMake
+      env:
+        CC: gcc-14
+        CXX: g++-14    
       working-directory: ${{github.workspace}}/
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
       # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
