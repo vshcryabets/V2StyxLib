@@ -92,6 +92,7 @@ namespace styxlib
             const PacketHeaderSize packetSizeHeader{PacketHeaderSize::Size2Bytes};
             const uint16_t iounit{8192};
             const DeserializerL4Ptr deserializer{nullptr};
+            const uint16_t maxClients{16};
 
             Configuration(
                 uint16_t port,
@@ -104,7 +105,8 @@ namespace styxlib
                   clientsRepo(clientsRepo),
                   packetSizeHeader(packetSizeHeader),
                   iounit(iounit),
-                  deserializer(deserializer)
+                  deserializer(deserializer),
+                  maxClients(maxClients)
             {
             }
         };

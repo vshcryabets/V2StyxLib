@@ -135,13 +135,13 @@ namespace styxlib
     {
         if (!isStarted())
         {
-            return 0;
+            return std::unexpected(ErrorCode::NotConnected);
         }
 
         auto it = clientIdToChannelClient.find(clientId);
         if (it == clientIdToChannelClient.end())
         {
-            return 0;
+            return std::unexpected(ErrorCode::UnknownClient);
         }
         return it->second->sendBuffer(buffer, size);
     }
@@ -219,7 +219,7 @@ namespace styxlib
             return;
         }
 
-        if (listen(serverSocket, 1) < 0)
+        if (::listen(serverSocket, configuration.maxClients) < 0)
         {
             close(serverSocket);
             startPromise->set_value(ErrorCode::CantListenSocket);

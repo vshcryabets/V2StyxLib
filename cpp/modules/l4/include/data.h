@@ -6,7 +6,7 @@
 
 namespace styxlib
 {
-    enum class ErrorCode {
+    enum class ErrorCode: uint8_t {
         Success = 0,
         AlreadyStarted,
         NotConnected,
@@ -15,6 +15,7 @@ namespace styxlib
         CantListenSocket,
         CantCreateSocketPoll,
         PacketTooLarge,
+        UnknownClient,
     };
 
     using StyxString = std::string;
