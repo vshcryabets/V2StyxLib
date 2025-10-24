@@ -33,8 +33,6 @@ namespace styxlib
 
     class ChannelUnixTcpTx : public ChannelTx {
     protected:
-
-    protected:
         std::optional<Socket> socket = std::nullopt;
         PacketHeaderSize packetSizeHeader{PacketHeaderSize::Size2Bytes};
     public:

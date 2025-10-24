@@ -155,11 +155,8 @@ TEST_CASE_METHOD(TestSuite, "Server accepts connections", "[ChannelUnixTcpServer
     }
 
     REQUIRE(client->isConnected());
-
     std::cout << "Last issued client ID: " << clientsRepo->getLastIssuedId() << std::endl;
-
     REQUIRE(client->disconnect().wait_for(std::chrono::seconds(1)) == std::future_status::ready);
-
     waitStopServer();
 }
 
@@ -261,5 +258,5 @@ TEST_CASE_METHOD(TestChannelUnixTcpServer, "test_processBuffers", "[ChannelUnixT
     REQUIRE(socketToClientInfoMapFull[clientSocket].isDirty == false);
     REQUIRE(socketToClientInfoMapFull[clientSocket].currentSize == 4); // only incomplete 3rd packet remains
     auto testDeserializer = std::dynamic_pointer_cast<TestDeserializerL4>(deserializer);
-    REQUIRE(testDeserializer->getTotalReceivedBytes() == 6); // 1s packet 4 bytes, 2nd packet 2 bytes
+    REQUIRE(testDeserializer->getTotalReceivedBytes() == 6); // 1st packet 4 bytes, 2nd packet 2 bytes
 }

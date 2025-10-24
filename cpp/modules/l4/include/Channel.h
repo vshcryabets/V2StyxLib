@@ -11,7 +11,7 @@ namespace styxlib
     protected:
         DeserializerL4Ptr deserializer;
     public:
-        ChannelRx(const std::string &tag, DeserializerL4Ptr deserializer) : deserializer(deserializer) {
+        ChannelRx(DeserializerL4Ptr deserializer) : deserializer(deserializer) {
             if (deserializer == nullptr) {
                 throw std::invalid_argument("Deserializer cannot be null");
             }

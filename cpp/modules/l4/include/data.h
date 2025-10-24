@@ -20,7 +20,7 @@ namespace styxlib
     using StyxString = std::string;
     using StyxDate = uint32_t;
     using StyxBuffer = uint8_t *;
-    using Size = int16_t;
+    using Size = uint16_t;
     using SizeResult = std::expected<Size, ErrorCode>;
     using Fid = uint32_t;
     using Tag = uint16_t;

@@ -11,7 +11,7 @@
 namespace styxlib
 {
     ChannelUnixTcpClient::ChannelUnixTcpClient(const Configuration &config)
-        : ChannelRx("unixClient", config.deserializer),
+        : ChannelRx(config.deserializer),
         ChannelUnixTcpTx(config.packetSizeHeader, std::nullopt),
         configuration(config)
     {
@@ -115,7 +115,7 @@ namespace styxlib
     }
 
     ChannelUnixTcpServer::ChannelUnixTcpServer(const Configuration &config)
-        : ChannelRx("unixServer", config.deserializer), configuration(config)
+        : ChannelRx(config.deserializer), configuration(config)
     {
         if (configuration.clientsRepo == nullptr)
         {
@@ -170,13 +170,14 @@ namespace styxlib
             {
                 stopRequested.store(true);
                 this->startPromise = nullptr;
-                clientIdToChannelClient.clear();
-                socketToClientInfoMapFull.clear();
-                clientsObserver.setData(std::vector<ClientInfo>{}, true);
                 if (this->serverThread.joinable())
                 {
                     this->serverThread.join();
                 }
+                // clean structures
+                clientIdToChannelClient.clear();
+                socketToClientInfoMapFull.clear();
+                clientsObserver.setData(std::vector<ClientInfo>{}, true);
             });
     }
 
@@ -282,7 +283,9 @@ namespace styxlib
 
         socketToClientInfoMapFull.insert({clientSocket, clientInfo});
         // Create a ChannelTx for the client
-        auto client = std::make_shared<ChannelUnixTcpTx>(configuration.packetSizeHeader, clientSocket);
+        auto client = std::make_shared<ChannelUnixTcpTx>(
+            configuration.packetSizeHeader, 
+            clientSocket);
         // Store the client with its socket as the ID
         clientIdToChannelClient[clientInfo.id] = client;
         clientsObserver.setData(
@@ -303,11 +306,12 @@ namespace styxlib
             if (pollItem.revents & POLLIN) {
                 if (pollItem.fd == serverSocket) {
                     // New incoming connections
-                    while (acceptClients(serverSocket)) ;                    
+                    while (acceptClients(serverSocket)) {
+                        // Accept all pending connections
+                    }
                 } else {
                     readDataFromSocket(pollItem.fd);
                 }
-                // --num_events;
             } 
             if (pollItem.revents & (POLLERR | POLLHUP)) {
                 socketsToClose.push_back(pollItem.fd);
@@ -328,8 +332,6 @@ namespace styxlib
         if (bytesRead > 0) {
             readBuffer.currentSize += bytesRead;
             readBuffer.isDirty = true;
-            std::cerr << "Client socket " << clientFd << " disconnected?" << std::endl;
-            socketsToClose.push_back(clientFd);
         } else {
             std::cerr << "Error reading from client socket " << clientFd << ": " << strerror(errno) << std::endl;
             socketsToClose.push_back(clientFd);
@@ -337,19 +339,23 @@ namespace styxlib
     }
 
     void ChannelUnixTcpServer::cleanupClosedSockets() {
-        for (int fd : socketsToClose) {
+        for (Socket fd : socketsToClose) {
             close(fd);
             pollFds.erase(std::remove_if(pollFds.begin(), pollFds.end(),
                                           [fd](const pollfd &p) { return p.fd == fd; }),
                            pollFds.end());
-            auto clientId = std::find_if(socketToClientInfoMapFull.begin(), socketToClientInfoMapFull.end(),
-                                          [fd](const auto &pair) { return pair.first == fd; });
-            // TODO what if not found?
+            auto it = std::find_if(
+                socketToClientInfoMapFull.begin(), 
+                socketToClientInfoMapFull.end(),
+                [fd](const auto &pair) { return pair.first == fd; });
+            
+            if (it != socketToClientInfoMapFull.end()) {
+                clientIdToChannelClient.erase(it->second.id);
+            }
             socketToClientInfoMapFull.erase(fd);
-            clientIdToChannelClient.erase(clientId->second.id);
         }
 
-        if (socketsToClose.empty() == false) {
+        if (!socketsToClose.empty()) {
             clientsObserver.setData(socketToClientInfoMapFull 
                 | std::views::transform([](const auto &pair) { 
                     return ClientInfo {
@@ -402,7 +408,7 @@ namespace styxlib
                     }
                     readBuffer.currentSize = remainingSize;
                 } else {
-                    // not enough data yet                    
+                    // Not enough data to process complete packet; waiting for more data
                     break;
                 }
             }
