@@ -1,9 +1,8 @@
 #pragma once
+#include "data.h"
 
 namespace styxlib
 {
-    typedef int ClientId;
-
     class ClientsRepo
     {
     public:

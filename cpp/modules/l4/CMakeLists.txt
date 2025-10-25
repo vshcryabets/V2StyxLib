@@ -22,6 +22,11 @@ add_executable(module_l4_tests
     )
 target_include_directories(module_l4_tests PRIVATE ./include/)
 target_link_libraries(module_l4_tests PUBLIC Catch2::Catch2WithMain module_l4)
+
+# This helps CMake provide better error messages if the compiler doesn't fully
+# support the C++23 standard.
+target_compile_features(module_l4_tests PRIVATE cxx_std_23)
+
 catch_discover_tests(module_l4_tests 
     PROPERTIES 
     TIMEOUT 10)

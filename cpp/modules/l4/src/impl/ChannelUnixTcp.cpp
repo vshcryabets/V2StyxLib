@@ -3,48 +3,78 @@
 #include <unistd.h>
 #include <cstring>
 #include <stdexcept>
-#include "fcntl.h"
+#include <fcntl.h>
 #include <iostream>
+#include <algorithm>
+#include <ranges>
 
 namespace styxlib
 {
     ChannelUnixTcpClient::ChannelUnixTcpClient(const Configuration &config)
-        : configuration(config), socket(ChannelUnixTcpClient::NO_FD)
+        : ChannelRx(config.deserializer),
+        ChannelUnixTcpTx(config.packetSizeHeader, std::nullopt),
+        configuration(config)
     {
     }
 
     ChannelUnixTcpClient::~ChannelUnixTcpClient()
     {
-        disconnect();
+        disconnect().get();
     }
 
-    Size ChannelUnixTcpClient::sendBuffer(const StyxBuffer buffer, Size size)
+    SizeResult ChannelUnixTcpTx::sendBuffer(const StyxBuffer buffer, Size size)
     {
-        if (!isConnected())
+        if (socket.has_value())
         {
-            return 0;
-        }
+            // Send the buffer over the TCP socket
+            uint8_t packetSizeBuffer[4] = {0};
+            switch (packetSizeHeader)
+            {
+            case PacketHeaderSize::Size1Byte:
+                if (size > 255) {
+                    return std::unexpected(ErrorCode::PacketTooLarge);
+                }
+                packetSizeBuffer[0] = static_cast<uint8_t>(size);
+                break;
+            case PacketHeaderSize::Size2Bytes:
+                if (size > 65535) {
+                    return std::unexpected(ErrorCode::PacketTooLarge);
+                }
+                packetSizeBuffer[0] = size & 0xFF;
+                packetSizeBuffer[1] = (size >> 8) & 0xFF;
+                break;
 
-        // Send the buffer over the TCP socket
-        ssize_t bytesSent = send(socket, buffer, size, 0);
-        return (bytesSent > 0) ? static_cast<Size>(bytesSent) : 0;
+            case PacketHeaderSize::Size4Bytes:
+                uint32_t networkSize32 = static_cast<uint32_t>(htonl(size));
+                std::memcpy(packetSizeBuffer, &networkSize32, 4);
+                break;
+            }
+
+            ::send(socket.value(), packetSizeBuffer, static_cast<uint8_t>(packetSizeHeader), 0);
+            return ::send(socket.value(), buffer, size, 0);
+        }
+        else
+        {
+            return std::unexpected(ErrorCode::NotConnected);
+        }
     }
 
-    std::future<bool> ChannelUnixTcpClient::connect()
+    std::future<ErrorCode> ChannelUnixTcpClient::connect()
     {
         return std::async(
-            std::launch::async, 
-            [this] {
+            std::launch::async,
+            [this]
+            {
                 if (isConnected())
                 {
-                    return true;
+                    return ErrorCode::AlreadyStarted;
                 }
 
                 // Create and connect the TCP socket
                 int socket = ::socket(AF_INET, SOCK_STREAM, 0);
                 if (socket < 0)
                 {
-                    return false;
+                    return ErrorCode::CantCreateSocket;
                 }
 
                 sockaddr_in serverAddress;
@@ -52,18 +82,17 @@ namespace styxlib
                 serverAddress.sin_port = htons(configuration.port);
                 inet_pton(AF_INET, configuration.address.c_str(), &serverAddress.sin_addr);
                 int result = ::connect(socket, reinterpret_cast<sockaddr *>(&serverAddress), sizeof(serverAddress));
-                bool isConnected = result == 0;
-                if (isConnected)
+                if (result == 0)
                 {
                     this->socket = socket;
+                    return ErrorCode::Success;
                 }
                 else
                 {
                     close(socket);
+                    return ErrorCode::NotConnected;
                 }
-                return isConnected; 
-            }
-        );
+            });
     }
 
     std::future<void> ChannelUnixTcpClient::disconnect()
@@ -72,55 +101,54 @@ namespace styxlib
             std::launch::async,
             [this]()
             {
-                if (isConnected())
+                if (socket.has_value())
                 {
-                    close(socket);
-                    socket = ChannelUnixTcpClient::NO_FD;
+                    ::close(socket.value());
+                    socket = std::nullopt;
                 }
             });
     }
 
     bool ChannelUnixTcpClient::isConnected() const
     {
-        return (socket != ChannelUnixTcpClient::NO_FD);
+        return socket.has_value();
     }
 
     ChannelUnixTcpServer::ChannelUnixTcpServer(const Configuration &config)
-        : configuration(config)
+        : ChannelRx(config.deserializer), configuration(config)
     {
         if (configuration.clientsRepo == nullptr)
         {
             throw std::invalid_argument("ClientsRepo must be provided in configuration");
         }
-        socketToClientInfoMap = std::make_shared<std::map<int, ClientInfo>>();
     }
 
     ChannelUnixTcpServer::~ChannelUnixTcpServer()
     {
-        stop();
+        stop().get();
     }
 
-    Size ChannelUnixTcpServer::sendBuffer(
+    SizeResult ChannelUnixTcpServer::sendBuffer(
         ClientId clientId,
         const StyxBuffer buffer,
         Size size)
     {
         if (!isStarted())
         {
-            return 0;
+            return std::unexpected(ErrorCode::NotConnected);
         }
 
-        auto it = clientIdToChannelTx.find(clientId);
-        if (it == clientIdToChannelTx.end())
+        auto it = clientIdToChannelClient.find(clientId);
+        if (it == clientIdToChannelClient.end())
         {
-            return 0;
+            return std::unexpected(ErrorCode::UnknownClient);
         }
         return it->second->sendBuffer(buffer, size);
     }
 
-    std::future<void> ChannelUnixTcpServer::start()
+    std::future<ErrorCode> ChannelUnixTcpServer::start()
     {
-        startPromise = std::make_unique<std::promise<void>>();
+        startPromise = std::make_unique<std::promise<ErrorCode>>();
         if (!isStarted())
         {
             stopRequested.store(false);
@@ -129,24 +157,30 @@ namespace styxlib
         }
         else
         {
-            startPromise->set_value();
+            startPromise->set_value(ErrorCode::AlreadyStarted);
         }
         return startPromise->get_future();
     }
 
     std::future<void> ChannelUnixTcpServer::stop()
     {
-        stopRequested.store(true);
-        return std::async(std::launch::async,
-                          [this]()
-                          {
-                              this->startPromise = nullptr;
-                              clientIdToChannelTx.clear();
-                              socketToClientInfoMap->clear();
-                              clientsObserver.setData(socketToClientInfoMap, true);
-                              this->serverThread.join();
-                          });
+        return std::async(
+            std::launch::async,
+            [this]()
+            {
+                stopRequested.store(true);
+                this->startPromise = nullptr;
+                if (this->serverThread.joinable())
+                {
+                    this->serverThread.join();
+                }
+                // clean structures
+                clientIdToChannelClient.clear();
+                socketToClientInfoMapFull.clear();
+                clientsObserver.setData(std::vector<ClientInfo>{}, true);
+            });
     }
+
     bool ChannelUnixTcpServer::isStarted() const
     {
         return running.load();
@@ -155,11 +189,19 @@ namespace styxlib
     void ChannelUnixTcpServer::workThreadFunction()
     {
         running.store(true);
-        startPromise->set_value();
         // Create the server socket
         int serverSocket = ::socket(AF_INET, SOCK_STREAM, 0);
         if (serverSocket < 0)
         {
+            startPromise->set_value(ErrorCode::CantCreateSocket);
+            return;
+        }
+
+        int opt = 1;
+        if (setsockopt(serverSocket, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0)
+        {
+            close(serverSocket);
+            startPromise->set_value(ErrorCode::CantCreateSocket);
             return;
         }
 
@@ -168,71 +210,209 @@ namespace styxlib
         serverAddress.sin_addr.s_addr = INADDR_ANY;
         serverAddress.sin_port = htons(configuration.port);
 
-        if (bind(serverSocket,
+        if (::bind(serverSocket,
                  reinterpret_cast<sockaddr *>(&serverAddress),
                  sizeof(serverAddress)) < 0)
         {
             close(serverSocket);
-            serverSocket = ChannelUnixTcpClient::NO_FD;
+            startPromise->set_value(ErrorCode::CantBindSocket);
             return;
         }
 
-        if (listen(serverSocket, 1) < 0)
+        if (::listen(serverSocket, configuration.maxClients) < 0)
         {
             close(serverSocket);
-            serverSocket = ChannelUnixTcpClient::NO_FD;
+            startPromise->set_value(ErrorCode::CantListenSocket);
             return;
         }
         // Set server socket to non-blocking mode
         int flags = fcntl(serverSocket, F_GETFL, 0);
         fcntl(serverSocket, F_SETFL, flags | O_NONBLOCK);
 
+        pollFds.push_back({serverSocket, POLLIN, 0});
+
+        startPromise->set_value(ErrorCode::Success);
+
         while (!stopRequested.load())
         {
-            auto haveNewClients = acceptClients(serverSocket);
-            // read sockets for data here
-
-            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+            int num_events = poll(pollFds.data(), pollFds.size(), 100); // 100 ms timeout
+            if (stopRequested.load())
+                break;
+            if (num_events < 0)
+            {
+                std::cerr << "Poll error: " << strerror(errno) << std::endl;
+                break;
+            } else if (num_events == 0) {
+                // Timeout, no events
+                continue;
+            } else {
+                handlePollEvents(serverSocket, num_events);
+                if (stopRequested.load())
+                    break;
+                processBuffers();
+                cleanupClosedSockets();
+            }
         }
-        close(serverSocket);
-        serverSocket = ChannelUnixTcpClient::NO_FD;
+        ::close(serverSocket);
         running.store(false);
         stopRequested.store(false);
     }
 
-    bool ChannelUnixTcpServer::acceptClients(int serverSocket)
+    bool ChannelUnixTcpServer::acceptClients(Socket serverSocket)
     {
         int clientSocket = accept(serverSocket, nullptr, nullptr);
         if (clientSocket < 0)
         {
             return false;
         }
-        ClientInfo clientInfo{
-            .id = configuration.clientsRepo->getNextClientId(), 
-        };
+        ClientFullInfo clientInfo;
+        clientInfo.id = configuration.clientsRepo->getNextClientId();
+        clientInfo.buffer = std::vector<uint8_t>(configuration.iounit);
+        clientInfo.currentSize = 0;
+        clientInfo.isDirty = false;
+
         sockaddr_in addr;
         socklen_t addrLen = sizeof(addr);
-        if (getpeername(clientSocket, reinterpret_cast<sockaddr*>(&addr), &addrLen) == 0) {
+        if (getpeername(clientSocket, reinterpret_cast<sockaddr *>(&addr), &addrLen) == 0)
+        {
             char ipStr[INET_ADDRSTRLEN] = {0};
             inet_ntop(AF_INET, &addr.sin_addr, ipStr, sizeof(ipStr));
             clientInfo.address = ipStr;
             clientInfo.port = ntohs(addr.sin_port);
         }
 
-        socketToClientInfoMap->insert({clientSocket, clientInfo});
+        socketToClientInfoMapFull.insert({clientSocket, clientInfo});
         // Create a ChannelTx for the client
-        ChannelTxPtr client = std::make_shared<ChannelUnixTcpClient>(
-            ChannelUnixTcpClient::Configuration{
-                .address = clientInfo.address,
-                .port = clientInfo.port,
-                .socketFd = clientSocket,
-                .packetSizeHeader = configuration.packetSizeHeader,
-                .iounit = configuration.iounit
-            });
+        auto client = std::make_shared<ChannelUnixTcpTx>(
+            configuration.packetSizeHeader, 
+            clientSocket);
         // Store the client with its socket as the ID
-        clientIdToChannelTx[clientInfo.id] = client;
-        clientsObserver.setData(socketToClientInfoMap, false);
+        clientIdToChannelClient[clientInfo.id] = client;
+        clientsObserver.setData(
+            socketToClientInfoMapFull | std::views::transform([](const auto &pair) { 
+                return ClientInfo {
+                    .id = pair.second.id,
+                    .address = pair.second.address,
+                    .port = pair.second.port
+                };
+            })
+            | std::ranges::to<std::vector>(), false);
+        pollFds.push_back({clientSocket, POLLIN | POLLPRI | POLLERR | POLLHUP, 0});
         return true;
     }
 
+    void ChannelUnixTcpServer::handlePollEvents(Socket serverSocket, size_t numEvents) {
+        for (const auto &pollItem: pollFds) {
+            if (pollItem.revents & POLLIN) {
+                if (pollItem.fd == serverSocket) {
+                    // New incoming connections
+                    while (acceptClients(serverSocket)) {
+                        // Accept all pending connections
+                    }
+                } else {
+                    readDataFromSocket(pollItem.fd);
+                }
+            } 
+            if (pollItem.revents & (POLLERR | POLLHUP)) {
+                socketsToClose.push_back(pollItem.fd);
+                std::cerr << "Error or hang-up on socket " << pollItem.fd << std::endl;
+            }
+        }
+    }
+
+    void ChannelUnixTcpServer::readDataFromSocket(Socket clientFd) {
+        auto it = socketToClientInfoMapFull.find(clientFd);
+        if (it == socketToClientInfoMapFull.end()) {
+            socketsToClose.push_back(clientFd);
+            return;
+        }
+        ClientFullInfo &readBuffer = it->second;
+        Size leftForRead = readBuffer.buffer.size() - readBuffer.currentSize;
+        ssize_t bytesRead = recv(clientFd, readBuffer.buffer.data() + readBuffer.currentSize, leftForRead, 0);
+        if (bytesRead > 0) {
+            readBuffer.currentSize += bytesRead;
+            readBuffer.isDirty = true;
+        } else {
+            std::cerr << "Error reading from client socket " << clientFd << ": " << strerror(errno) << std::endl;
+            socketsToClose.push_back(clientFd);
+        }
+    }
+
+    void ChannelUnixTcpServer::cleanupClosedSockets() {
+        for (Socket fd : socketsToClose) {
+            close(fd);
+            pollFds.erase(std::remove_if(pollFds.begin(), pollFds.end(),
+                                          [fd](const pollfd &p) { return p.fd == fd; }),
+                           pollFds.end());
+            auto it = std::find_if(
+                socketToClientInfoMapFull.begin(), 
+                socketToClientInfoMapFull.end(),
+                [fd](const auto &pair) { return pair.first == fd; });
+            
+            if (it != socketToClientInfoMapFull.end()) {
+                clientIdToChannelClient.erase(it->second.id);
+            }
+            socketToClientInfoMapFull.erase(fd);
+        }
+
+        if (!socketsToClose.empty()) {
+            clientsObserver.setData(socketToClientInfoMapFull 
+                | std::views::transform([](const auto &pair) { 
+                    return ClientInfo {
+                        .id = pair.second.id,
+                        .address = pair.second.address,
+                        .port = pair.second.port
+                    };
+                })
+                | std::ranges::to<std::vector>(), false);
+        }
+        socketsToClose.clear();
+    }
+
+    void ChannelUnixTcpServer::processBuffers() {
+        auto headerSize = to_uint8_t(configuration.packetSizeHeader);
+        for (auto &pair : socketToClientInfoMapFull) {
+            ClientFullInfo &readBuffer = pair.second;
+            while (readBuffer.isDirty && readBuffer.currentSize > headerSize) {
+                uint32_t packetSize = 0;
+                switch (configuration.packetSizeHeader)
+                {
+                case PacketHeaderSize::Size1Byte:
+                    packetSize = readBuffer.buffer[0];
+                    break;
+                case PacketHeaderSize::Size2Bytes:
+                    packetSize = readBuffer.buffer[1] | (readBuffer.buffer[0] << 8);
+                    break;
+                case PacketHeaderSize::Size4Bytes:
+                    packetSize = readBuffer.buffer[3] | 
+                        (readBuffer.buffer[2] << 8) | 
+                        (readBuffer.buffer[1] << 16) | 
+                        (readBuffer.buffer[0] << 24);
+                    break;
+                }
+                // Convert from network byte order to host byte order
+                uint32_t packetSizeWithHeader = packetSize + to_uint8_t(configuration.packetSizeHeader);
+                if (readBuffer.currentSize >= packetSizeWithHeader) {                    
+                    // Process the buffer with the deserializer
+                    auto it = socketToClientInfoMapFull.find(pair.first);
+                    if (it != socketToClientInfoMapFull.end()) {
+                        ClientId clientId = it->second.id;
+                        deserializer->handleBuffer(clientId, readBuffer.buffer.data() + to_uint8_t(configuration.packetSizeHeader), packetSize);
+                    }
+                    // move buffer
+                    Size remainingSize = readBuffer.currentSize - packetSizeWithHeader;
+                    if (remainingSize > 0) {
+                        std::memmove(readBuffer.buffer.data(),
+                                    readBuffer.buffer.data() + packetSizeWithHeader,
+                                    remainingSize);
+                    }
+                    readBuffer.currentSize = remainingSize;
+                } else {
+                    // Not enough data to process complete packet; waiting for more data
+                    break;
+                }
+            }
+            readBuffer.isDirty = false;
+        }
+    }
 } // namespace styxlib
