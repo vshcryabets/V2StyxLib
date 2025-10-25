@@ -1,5 +1,6 @@
 #pragma once
 #include "ProgressObserver.h"
+
 #include <memory>
 #include <arpa/inet.h>
 
@@ -93,6 +94,12 @@ public:
             readData();
         }
         return data;
+    }
+    std::future<T> waitAsync() override
+    {
+        return std::async(std::launch::async, [this]() {
+            return this->wait();
+        });
     }
     bool isComplete() override{ return done; }
     void subscribe(std::function<void(const T &)> callback, std::function<void(const T &)> complete) override

@@ -32,6 +32,12 @@ public:
         variable.wait(lock);
         return data;
     }
+    std::future<T> waitAsync() override
+    {
+        return std::async(std::launch::async, [this]() {
+            return this->wait();
+        });
+    }
     bool isComplete() override
     {
         std::unique_lock<std::mutex> lock(mutex);

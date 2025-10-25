@@ -137,13 +137,14 @@ TEST_CASE_METHOD(TestSuite, "Server starts and stops", "[ChannelUnixTcpServer]")
     waitStopServer();
 }
 
-TEST_CASE_METHOD(TestSuite, "Server accepts connections", "[ChannelUnixTcpServer]")
+TEST_CASE_METHOD(TestSuite, "test_ServerAcceptsConnections", "[ChannelUnixTcpServer]")
 {
     waitStartServer();
+    auto future = server->getClientsObserver().waitAsync();
     client->connect(); // connect without waiting for future
-    auto clientsVector = server->getClientsObserver().wait();
+    REQUIRE(future.wait_for(std::chrono::seconds(2)) == std::future_status::ready);
+    auto clientsVector = future.get();
     REQUIRE(clientsVector.size() == 1);
-    std::cout << "Connected clients:" << std::endl;
     for (const auto &clientInfo : clientsVector)
     {
         std::cout << "\tClient ID: " << clientInfo.id 

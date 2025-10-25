@@ -1,6 +1,7 @@
 #pragma once
 #include <functional>
 #include <exception>
+#include <future>
 
 class ProgressObserverException: public std::exception
 {
@@ -30,6 +31,7 @@ public:
      * Wait for new data from observable
      */
     virtual T wait() = 0;
+    virtual std::future<T> waitAsync() = 0;
     virtual bool isComplete() = 0;
     /**
      * Subscribe to updates from the observable.
