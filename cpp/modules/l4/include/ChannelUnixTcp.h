@@ -15,12 +15,6 @@ namespace styxlib
 {
     using Socket = int;
 
-    enum class PacketHeaderSize : uint8_t {
-        Size1Byte = 1,
-        Size2Bytes = 2,
-        Size4Bytes = 4
-    };
-
     inline uint8_t to_uint8_t(const PacketHeaderSize &headerSize) {
         return static_cast<uint8_t>(headerSize);
     }

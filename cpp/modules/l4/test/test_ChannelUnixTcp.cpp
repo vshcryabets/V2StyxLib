@@ -6,40 +6,7 @@
 #include <iostream>
 #include <future>
 #include <memory>
-
-class TestDeserializerL4 : public styxlib::DeserializerL4
-{
-private:
-    std::weak_ptr<styxlib::ChannelTxOneToMany> _channelTx;
-    std::unique_ptr<std::promise<uint16_t>> receivedBytesPromise;
-    uint32_t totalReceivedBytes{0};
-public:
-    TestDeserializerL4() {}
-    virtual ~TestDeserializerL4() = default;
-    void setChannelTx(styxlib::ChannelTxOneToManyPtr channelTx) { _channelTx = channelTx; }
-    void handleBuffer(
-        styxlib::ClientId clientId,
-        const styxlib::StyxBuffer buffer,
-        styxlib::Size size) override
-    {
-        totalReceivedBytes += size;
-        if (receivedBytesPromise) {
-            receivedBytesPromise->set_value(size);
-            receivedBytesPromise = nullptr;
-        }
-        std::string msg((const char*)buffer, size);
-        std::cout << "Received from client " << clientId << ": " << msg << std::endl;
-        if (auto p = _channelTx.lock()) {
-            const char* response = "Message received";
-            p->sendBuffer(clientId, (const styxlib::StyxBuffer)response, strlen(response));
-        }
-    }
-    std::future<uint16_t> getReceivedBytes() { 
-        receivedBytesPromise = std::make_unique<std::promise<uint16_t>>();
-        return receivedBytesPromise->get_future();
-    }
-    uint32_t getTotalReceivedBytes() const { return totalReceivedBytes; }
-};
+#include "TestClasses.h"
 
 class TestChannelUnixTcpServer: public styxlib::ChannelUnixTcpServer {
 public:
@@ -67,7 +34,7 @@ public:
             std::make_shared<styxlib::ClientsRepoImpl>(),
             styxlib::PacketHeaderSize::Size4Bytes,
             8192,
-            std::make_shared<TestDeserializerL4>(),
+            std::make_shared<TestDeserializerL4OneToMany>(),
             10))
     {
     }
@@ -79,8 +46,8 @@ public:
     const static styxlib::PacketHeaderSize packetSizeHeader = styxlib::PacketHeaderSize::Size1Byte;
     const static uint16_t port = 23500;
     std::shared_ptr<styxlib::ClientsRepoImpl> clientsRepo = std::make_shared<styxlib::ClientsRepoImpl>();
-    std::shared_ptr<TestDeserializerL4> clientDeserializer = std::make_shared<TestDeserializerL4>();
-    std::shared_ptr<TestDeserializerL4> serverDeserializer = std::make_shared<TestDeserializerL4>();
+    std::shared_ptr<TestDeserializerL4OneToMany> clientDeserializer = std::make_shared<TestDeserializerL4OneToMany>();
+    std::shared_ptr<TestDeserializerL4OneToMany> serverDeserializer = std::make_shared<TestDeserializerL4OneToMany>();
     styxlib::ChannelUnixTcpServer::Configuration config;
     std::shared_ptr<styxlib::ChannelUnixTcpServer> server;
     styxlib::ChannelUnixTcpClient::Configuration clientConfig;
@@ -258,6 +225,6 @@ TEST_CASE_METHOD(TestChannelUnixTcpServer, "test_processBuffers", "[ChannelUnixT
     // Verify that the buffer is no longer dirty
     REQUIRE(socketToClientInfoMapFull[clientSocket].isDirty == false);
     REQUIRE(socketToClientInfoMapFull[clientSocket].currentSize == 4); // only incomplete 3rd packet remains
-    auto testDeserializer = std::dynamic_pointer_cast<TestDeserializerL4>(deserializer);
+    auto testDeserializer = std::dynamic_pointer_cast<TestDeserializerL4OneToMany>(deserializer);
     REQUIRE(testDeserializer->getTotalReceivedBytes() == 6); // 1st packet 4 bytes, 2nd packet 2 bytes
 }

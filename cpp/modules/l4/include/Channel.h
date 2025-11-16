@@ -6,6 +6,12 @@
 
 namespace styxlib
 {
+    enum class PacketHeaderSize : uint8_t {
+        Size1Byte = 1,
+        Size2Bytes = 2,
+        Size4Bytes = 4
+    };
+
     class ChannelRx
     {
     protected:
