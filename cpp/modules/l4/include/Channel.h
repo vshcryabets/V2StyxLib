@@ -12,6 +12,10 @@ namespace styxlib
         Size4Bytes = 4
     };
 
+    inline uint8_t to_uint8_t(const PacketHeaderSize &headerSize) {
+        return static_cast<uint8_t>(headerSize);
+    }
+
     class ChannelRx
     {
     protected:

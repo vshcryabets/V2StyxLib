@@ -1,5 +1,9 @@
 #pragma once
 
+#include <vector>
+#include <cstdint>
+
+#include "data.h"
 #include "Channel.h"
 
 namespace styxlib
@@ -7,24 +11,51 @@ namespace styxlib
     using FileDescriptor = int;
     constexpr FileDescriptor InvalidFileDescriptor = -1;
 
-    class ChannelUnixFile: public ChannelTx, public ChannelRx
+    struct ReadBuffer
+    {
+        std::vector<uint8_t> buffer;
+        Size currentSize{0};
+        bool isDirty{false};
+    };
+
+    class ChannelUnixFile : public ChannelTx, public ChannelRx
     {
     public:
-        class FileDescriptorPair {
+        struct Configuration
+        {
+            PacketHeaderSize packetSizeHeader{PacketHeaderSize::Size2Bytes};
+            uint16_t iounit{8192};
+            DeserializerL4Ptr deserializer{nullptr};
+            Configuration(
+                PacketHeaderSize packetSizeHeader,
+                uint16_t iounit,
+                DeserializerL4Ptr deserializer)
+                : packetSizeHeader(packetSizeHeader),
+                  iounit(iounit),
+                  deserializer(deserializer) {}
+        };
+        class FileDescriptorPair
+        {
         public:
             FileDescriptor readFd;
             FileDescriptor writeFd;
             FileDescriptorPair(FileDescriptor readFd, FileDescriptor writeFd)
                 : readFd(readFd), writeFd(writeFd) {}
         };
+
     protected:
         FileDescriptorPair fds;
-        PacketHeaderSize packetSizeHeader;
-    public:
-        ChannelUnixFile(const PacketHeaderSize header, DeserializerL4Ptr deserializer);
-        ~ChannelUnixFile() override;
-        SizeResult sendBuffer(ClientId clientId, const StyxBuffer buffer, Size size) override;
-        const ChannelUnixFile::FileDescriptorPair &getFileDescriptors() const;
-    };
+        Configuration config;
+        ReadBuffer readBufferData;
 
+        virtual void closeDescriptors() = 0;
+    public:
+        ChannelUnixFile(const Configuration &config);
+        ~ChannelUnixFile() override;
+        SizeResult sendBuffer(
+            ClientId clientId,
+            const StyxBuffer buffer,
+            Size size) override;
+        void readBufferBlocking();
+    };
 } // namespace styxlib

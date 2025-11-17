@@ -7,8 +7,10 @@
 
 namespace styxlib
 {
-    ChannelUnixPipeImpl::ChannelUnixPipeImpl(const PacketHeaderSize header, DeserializerL4Ptr deserializer)
-        : ChannelUnixFile(header, deserializer)
+    ChannelUnixPipeImpl::ChannelUnixPipeImpl(const ChannelUnixFile::Configuration &config)
+        : ChannelUnixFile(config),
+            rxFds(InvalidFileDescriptor, InvalidFileDescriptor),
+            txFds(InvalidFileDescriptor, InvalidFileDescriptor)
     {
     }
 
@@ -21,6 +23,7 @@ namespace styxlib
             {
                 this->fds.readFd = fds.readFd;
                 this->fds.writeFd = fds.writeFd;
+                isDescriptorOwned = false;
                 return ErrorCode::Success;
             });
     }
@@ -58,6 +61,9 @@ namespace styxlib
                     {
                         this->serverThread.join();
                     }
+                } else {
+                    // Just close descriptors if owned
+                    closeDescriptors();
                 }
             });
     }
@@ -77,11 +83,27 @@ namespace styxlib
             startPromise->set_value(std::unexpected(ErrorCode::CantCreateSocket));
             return;
         }
-        fds.readFd = pipeFds[0];
-        fds.writeFd = pipeFds[1];
-        startPromise->set_value(fds);
+        rxFds.readFd = pipeFds[0];
+        rxFds.writeFd = pipeFds[1];
+        if (pipe(pipeFds) == -1)
+        {
+            startPromise->set_value(std::unexpected(ErrorCode::CantCreateSocket));
+            return;
+        }
+        txFds.readFd = pipeFds[0];
+        txFds.writeFd = pipeFds[1];
+        fds.readFd = rxFds.readFd;
+        fds.writeFd = txFds.writeFd;
+
+        std::cout << "ChannelUnixPipeImpl: Created tx pipe with fds " << txFds.readFd << " (read), " << txFds.writeFd << " (write)" << std::endl;
+        std::cout << "ChannelUnixPipeImpl: Created rx pipe with fds " << rxFds.readFd << " (read), " << rxFds.writeFd << " (write)" << std::endl;
+        isDescriptorOwned = true;
+        startPromise->set_value(ChannelUnixFile::FileDescriptorPair{
+            txFds.readFd,
+            rxFds.writeFd});
         std::vector<pollfd> pollFds;
-        pollFds.push_back({fds.readFd, POLLIN, 0});
+        // lets' listen on rx read fd
+        pollFds.push_back({rxFds.readFd, POLLIN, 0});
 
         while (!stopRequested.load())
         {
@@ -96,19 +118,48 @@ namespace styxlib
                 // Timeout, no events
                 continue;
             } else {
-                // handlePollEvents(serverSocket, num_events);
-                if (stopRequested.load())
-                    break;
-                // processBuffers();
-                // cleanupClosedSockets();
+                readBufferBlocking();
             }
         }
-        ::close(fds.readFd);
-        ::close(fds.writeFd);
-        fds.readFd = InvalidFileDescriptor;
-        fds.writeFd = InvalidFileDescriptor;
+        std::cout << "ChannelUnixPipeImpl: Stopping pipe channel, closing descriptors." << std::endl;
+        closeDescriptors();
         running.store(false);
         stopRequested.store(false);
+    }
+
+    bool ChannelUnixPipeImpl::isConnected() const {
+        return fds.readFd != InvalidFileDescriptor && fds.writeFd != InvalidFileDescriptor;
+    }
+
+    ChannelUnixFile::FileDescriptorPair ChannelUnixPipeImpl::getClientFileDescriptors() const {
+        return ChannelUnixFile::FileDescriptorPair{
+            txFds.readFd,
+            rxFds.writeFd
+        };
+    }
+
+    void ChannelUnixPipeImpl::closeDescriptors() {
+        if (isDescriptorOwned) {
+            if (rxFds.readFd != InvalidFileDescriptor) {
+                ::close(rxFds.readFd);
+            }
+            if (rxFds.writeFd != InvalidFileDescriptor) {
+                ::close(rxFds.writeFd);
+            }
+            if (txFds.readFd != InvalidFileDescriptor) {
+                ::close(txFds.readFd);
+            }
+            if (txFds.writeFd != InvalidFileDescriptor) {
+                ::close(txFds.writeFd);
+            }
+            isDescriptorOwned = false;
+        }
+        fds.readFd = InvalidFileDescriptor;
+        fds.writeFd = InvalidFileDescriptor;
+        rxFds.readFd = InvalidFileDescriptor;
+        rxFds.writeFd = InvalidFileDescriptor;
+        txFds.readFd = InvalidFileDescriptor;
+        txFds.writeFd = InvalidFileDescriptor;
     }
 
 } // namespace styxlib

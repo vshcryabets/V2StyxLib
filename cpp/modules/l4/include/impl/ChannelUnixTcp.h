@@ -10,20 +10,11 @@
 #include "Channel.h"
 #include "ClientsRepo.h"
 #include "impl/ProgressObservableMutexImpl.h"
+#include "impl/ChannelUnixFile.h"
 
 namespace styxlib
 {
-    using Socket = int;
-
-    inline uint8_t to_uint8_t(const PacketHeaderSize &headerSize) {
-        return static_cast<uint8_t>(headerSize);
-    }
-
-    struct ReadBuffer {
-        std::vector<uint8_t> buffer;
-        Size currentSize{0};
-        bool isDirty{false};
-    };
+    using Socket = FileDescriptor;
 
     class ChannelUnixTcpTx : public ChannelTx {
     protected:

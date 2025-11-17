@@ -1,4 +1,4 @@
-#include "ChannelUnixTcp.h"
+#include "impl/ChannelUnixTcp.h"
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <cstring>
@@ -390,7 +390,6 @@ namespace styxlib
                         (readBuffer.buffer[0] << 24);
                     break;
                 }
-                // Convert from network byte order to host byte order
                 uint32_t packetSizeWithHeader = packetSize + to_uint8_t(configuration.packetSizeHeader);
                 if (readBuffer.currentSize >= packetSizeWithHeader) {                    
                     // Process the buffer with the deserializer
