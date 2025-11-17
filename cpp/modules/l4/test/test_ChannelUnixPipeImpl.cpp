@@ -11,10 +11,10 @@
 class TestSuiteUnixPipe
 {
 public:
-    const static styxlib::PacketHeaderSize packetSizeHeader = styxlib::PacketHeaderSize::Size1Byte;
+    constexpr static styxlib::PacketHeaderSize packetSizeHeader = styxlib::PacketHeaderSize::Size1Byte;
     std::shared_ptr<styxlib::ClientsRepoImpl> clientsRepo = std::make_shared<styxlib::ClientsRepoImpl>();
-    std::shared_ptr<TestDeserializerL4OneToOne> clientDeserializer = std::make_shared<TestDeserializerL4OneToOne>();
-    std::shared_ptr<TestDeserializerL4OneToOne> serverDeserializer = std::make_shared<TestDeserializerL4OneToOne>();
+    std::shared_ptr<TestDeserializerL4> clientDeserializer = std::make_shared<TestDeserializerL4>();
+    std::shared_ptr<TestDeserializerL4> serverDeserializer = std::make_shared<TestDeserializerL4>();
     std::shared_ptr<styxlib::ChannelUnixPipeImpl> server;
     std::shared_ptr<styxlib::ChannelUnixPipeImpl> client;
 

@@ -6,9 +6,11 @@ target_sources(module_l4
     PRIVATE
         src/impl/ChannelUnixTcp.cpp
         src/impl/ClientsRepoImpl.cpp
+        src/impl/ChannelUnixPipeImpl.cpp
     PUBLIC
         include/Channel.h
         include/ChannelUnixTcp.h
+        include/impl/ChannelUnixPipeImpl.h
         include/data.h
     )
 

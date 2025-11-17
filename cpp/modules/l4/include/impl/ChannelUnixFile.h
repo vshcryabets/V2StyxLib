@@ -25,7 +25,7 @@ namespace styxlib
         {
         }
         ~ChannelUnixFile() override;
-        SizeResult sendBuffer(const StyxBuffer buffer, Size size) override;
+        SizeResult sendBuffer(ClientId clientId, const StyxBuffer buffer, Size size) override;
         const ChannelUnixFile::FileDescriptorPair &getFileDescriptors() const;
     };
 

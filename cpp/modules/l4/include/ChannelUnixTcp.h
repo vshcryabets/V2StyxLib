@@ -37,7 +37,7 @@ namespace styxlib
         ChannelUnixTcpTx &operator=(ChannelUnixTcpTx &&) = delete;
         ChannelUnixTcpTx &operator=(const ChannelUnixTcpTx &) = delete;
         virtual ~ChannelUnixTcpTx() = default;
-        SizeResult sendBuffer(const StyxBuffer buffer, Size size) override;
+        SizeResult sendBuffer(ClientId clientId, const StyxBuffer buffer, Size size) override;
     };
 
     class ChannelUnixTcpClient : public ChannelUnixTcpTx, public ChannelRx
@@ -75,7 +75,7 @@ namespace styxlib
         bool isConnected() const;
     };
 
-    class ChannelUnixTcpServer : public ChannelRx, public ChannelTxOneToMany
+    class ChannelUnixTcpServer : public ChannelRx, public ChannelTx
     {
     public:
         class Configuration

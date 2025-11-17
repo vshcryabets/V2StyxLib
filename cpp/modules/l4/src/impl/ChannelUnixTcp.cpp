@@ -22,7 +22,7 @@ namespace styxlib
         disconnect().get();
     }
 
-    SizeResult ChannelUnixTcpTx::sendBuffer(const StyxBuffer buffer, Size size)
+    SizeResult ChannelUnixTcpTx::sendBuffer(ClientId clientId, const StyxBuffer buffer, Size size)
     {
         if (socket.has_value())
         {
@@ -143,7 +143,7 @@ namespace styxlib
         {
             return std::unexpected(ErrorCode::UnknownClient);
         }
-        return it->second->sendBuffer(buffer, size);
+        return it->second->sendBuffer(InvalidClientId, buffer, size);
     }
 
     std::future<ErrorCode> ChannelUnixTcpServer::start()

@@ -34,7 +34,7 @@ public:
             std::make_shared<styxlib::ClientsRepoImpl>(),
             styxlib::PacketHeaderSize::Size4Bytes,
             8192,
-            std::make_shared<TestDeserializerL4OneToMany>(),
+            std::make_shared<TestDeserializerL4>(),
             10))
     {
     }
@@ -46,8 +46,8 @@ public:
     const static styxlib::PacketHeaderSize packetSizeHeader = styxlib::PacketHeaderSize::Size1Byte;
     const static uint16_t port = 23500;
     std::shared_ptr<styxlib::ClientsRepoImpl> clientsRepo = std::make_shared<styxlib::ClientsRepoImpl>();
-    std::shared_ptr<TestDeserializerL4OneToMany> clientDeserializer = std::make_shared<TestDeserializerL4OneToMany>();
-    std::shared_ptr<TestDeserializerL4OneToMany> serverDeserializer = std::make_shared<TestDeserializerL4OneToMany>();
+    std::shared_ptr<TestDeserializerL4> clientDeserializer = std::make_shared<TestDeserializerL4>();
+    std::shared_ptr<TestDeserializerL4> serverDeserializer = std::make_shared<TestDeserializerL4>();
     styxlib::ChannelUnixTcpServer::Configuration config;
     std::shared_ptr<styxlib::ChannelUnixTcpServer> server;
     styxlib::ChannelUnixTcpClient::Configuration clientConfig;
@@ -137,7 +137,10 @@ TEST_CASE_METHOD(TestSuite, "test_ServerReceiveMessages", "[ChannelUnixTcpServer
     uint16_t messageSize = strlen(msg);
     auto futureReceivedBytes = serverDeserializer->getReceivedBytes();
 
-    auto bytesSent = client->sendBuffer((const styxlib::StyxBuffer)msg, strlen(msg));
+    auto bytesSent = client->sendBuffer(
+        styxlib::InvalidClientId, 
+        (const styxlib::StyxBuffer)msg, 
+        strlen(msg));
     REQUIRE(bytesSent.has_value());
     REQUIRE(bytesSent.value() == messageSize);
 
@@ -225,6 +228,6 @@ TEST_CASE_METHOD(TestChannelUnixTcpServer, "test_processBuffers", "[ChannelUnixT
     // Verify that the buffer is no longer dirty
     REQUIRE(socketToClientInfoMapFull[clientSocket].isDirty == false);
     REQUIRE(socketToClientInfoMapFull[clientSocket].currentSize == 4); // only incomplete 3rd packet remains
-    auto testDeserializer = std::dynamic_pointer_cast<TestDeserializerL4OneToMany>(deserializer);
+    auto testDeserializer = std::dynamic_pointer_cast<TestDeserializerL4>(deserializer);
     REQUIRE(testDeserializer->getTotalReceivedBytes() == 6); // 1st packet 4 bytes, 2nd packet 2 bytes
 }
