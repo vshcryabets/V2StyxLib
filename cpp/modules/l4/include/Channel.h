@@ -16,6 +16,10 @@ namespace styxlib
         return static_cast<uint8_t>(headerSize);
     }
 
+    uint8_t setPacketSize(const PacketHeaderSize &headerSize,
+                          uint8_t* buffer,
+                          Size size);
+
     class ChannelRx
     {
     protected:

@@ -95,14 +95,12 @@ namespace styxlib
         fds.readFd = rxFds.readFd;
         fds.writeFd = txFds.writeFd;
 
-        std::cout << "ChannelUnixPipeImpl: Created tx pipe with fds " << txFds.readFd << " (read), " << txFds.writeFd << " (write)" << std::endl;
-        std::cout << "ChannelUnixPipeImpl: Created rx pipe with fds " << rxFds.readFd << " (read), " << rxFds.writeFd << " (write)" << std::endl;
         isDescriptorOwned = true;
         startPromise->set_value(ChannelUnixFile::FileDescriptorPair{
             txFds.readFd,
             rxFds.writeFd});
         std::vector<pollfd> pollFds;
-        // lets' listen on rx read fd
+        // let's listen on rx read fd
         pollFds.push_back({rxFds.readFd, POLLIN, 0});
 
         while (!stopRequested.load())
@@ -121,7 +119,6 @@ namespace styxlib
                 readBufferBlocking();
             }
         }
-        std::cout << "ChannelUnixPipeImpl: Stopping pipe channel, closing descriptors." << std::endl;
         closeDescriptors();
         running.store(false);
         stopRequested.store(false);

@@ -4,13 +4,14 @@ add_library(module_l4 STATIC)
 
 target_sources(module_l4
     PRIVATE
+        src/Channel.cpp
         src/impl/ChannelUnixTcp.cpp
         src/impl/ClientsRepoImpl.cpp
         src/impl/ChannelUnixPipeImpl.cpp
         src/impl/ChannelUnixFile.cpp
     PUBLIC
         include/Channel.h
-        include/ChannelUnixTcp.h
+        include/impl/ChannelUnixTcp.h
         include/impl/ChannelUnixPipeImpl.h
         include/impl/ChannelUnixFile.h
         include/data.h

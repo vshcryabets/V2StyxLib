@@ -18,19 +18,13 @@ namespace styxlib
 
     ChannelUnixFile::~ChannelUnixFile()
     {
-        if (fds.readFd != InvalidFileDescriptor)
-        {
-            ::close(fds.readFd);
-        }
-        if (fds.writeFd != InvalidFileDescriptor)
-        {
-            ::close(fds.writeFd);
-        }
-        fds.readFd = InvalidFileDescriptor;
-        fds.writeFd = InvalidFileDescriptor;
+        closeDescriptors();
     }
 
-    SizeResult ChannelUnixFile::sendBuffer(ClientId clientId, const StyxBuffer buffer, Size size)
+    SizeResult ChannelUnixFile::sendBuffer(
+        ClientId clientId, 
+        const StyxBuffer buffer, 
+        Size size)
     {
         if (fds.writeFd == InvalidFileDescriptor)
         {
@@ -38,35 +32,8 @@ namespace styxlib
         }
         // Send the buffer over the file descriptor
         uint8_t packetSizeBuffer[4] = {0};
-        switch (config.packetSizeHeader)
-        {
-        case PacketHeaderSize::Size1Byte:
-            if (size > 255)
-            {
-                return std::unexpected(ErrorCode::PacketTooLarge);
-            }
-            packetSizeBuffer[0] = static_cast<uint8_t>(size);
-            break;
-        case PacketHeaderSize::Size2Bytes:
-            if (size > 65535)
-            {
-                return std::unexpected(ErrorCode::PacketTooLarge);
-            }
-            packetSizeBuffer[0] = size & 0xFF;
-            packetSizeBuffer[1] = (size >> 8) & 0xFF;
-            break;
-
-        case PacketHeaderSize::Size4Bytes:
-            uint32_t networkSize32 = static_cast<uint32_t>(htonl(size));
-            std::memcpy(packetSizeBuffer, &networkSize32, 4);
-            break;
-        }
-        std::cerr << "ChannelUnixFile: Sending packet of size " << 
-            size << 
-            " with header size " << 
-            to_uint8_t(config.packetSizeHeader) << std::endl;
-
-        ssize_t result = ::write(fds.writeFd, packetSizeBuffer, to_uint8_t(config.packetSizeHeader));
+        uint8_t headerSize = setPacketSize(config.packetSizeHeader, packetSizeBuffer, sizeof(packetSizeBuffer));
+        ssize_t result = ::write(fds.writeFd, packetSizeBuffer, headerSize);
         if (result < 0)
         {
             std::cerr << "Error writing packet size to fd " << fds.writeFd << ": " << strerror(errno) << std::endl;
