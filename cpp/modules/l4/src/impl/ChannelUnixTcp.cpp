@@ -1,4 +1,4 @@
-#include "ChannelUnixTcp.h"
+#include "impl/ChannelUnixTcp.h"
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <cstring>
@@ -22,35 +22,24 @@ namespace styxlib
         disconnect().get();
     }
 
-    SizeResult ChannelUnixTcpTx::sendBuffer(const StyxBuffer buffer, Size size)
+    SizeResult ChannelUnixTcpTx::sendBuffer(
+        ClientId clientId, 
+        const StyxBuffer buffer, 
+        Size size)
     {
         if (socket.has_value())
         {
             // Send the buffer over the TCP socket
             uint8_t packetSizeBuffer[4] = {0};
-            switch (packetSizeHeader)
-            {
-            case PacketHeaderSize::Size1Byte:
-                if (size > 255) {
-                    return std::unexpected(ErrorCode::PacketTooLarge);
-                }
-                packetSizeBuffer[0] = static_cast<uint8_t>(size);
-                break;
-            case PacketHeaderSize::Size2Bytes:
-                if (size > 65535) {
-                    return std::unexpected(ErrorCode::PacketTooLarge);
-                }
-                packetSizeBuffer[0] = size & 0xFF;
-                packetSizeBuffer[1] = (size >> 8) & 0xFF;
-                break;
-
-            case PacketHeaderSize::Size4Bytes:
-                uint32_t networkSize32 = static_cast<uint32_t>(htonl(size));
-                std::memcpy(packetSizeBuffer, &networkSize32, 4);
-                break;
+            std::expected<uint8_t, ErrorCode> headerSize = setPacketSize(
+                packetSizeHeader, 
+                packetSizeBuffer, 
+                sizeof(packetSizeBuffer),
+                size);
+            if (!headerSize.has_value()) {
+                return std::unexpected(headerSize.error());
             }
-
-            ::send(socket.value(), packetSizeBuffer, static_cast<uint8_t>(packetSizeHeader), 0);
+            ::send(socket.value(), packetSizeBuffer, headerSize.value(), 0);
             return ::send(socket.value(), buffer, size, 0);
         }
         else
@@ -143,7 +132,7 @@ namespace styxlib
         {
             return std::unexpected(ErrorCode::UnknownClient);
         }
-        return it->second->sendBuffer(buffer, size);
+        return it->second->sendBuffer(InvalidClientId, buffer, size);
     }
 
     std::future<ErrorCode> ChannelUnixTcpServer::start()
@@ -169,11 +158,11 @@ namespace styxlib
             [this]()
             {
                 stopRequested.store(true);
-                this->startPromise = nullptr;
                 if (this->serverThread.joinable())
                 {
                     this->serverThread.join();
                 }
+                this->startPromise = nullptr;
                 // clean structures
                 clientIdToChannelClient.clear();
                 socketToClientInfoMapFull.clear();
@@ -390,7 +379,6 @@ namespace styxlib
                         (readBuffer.buffer[0] << 24);
                     break;
                 }
-                // Convert from network byte order to host byte order
                 uint32_t packetSizeWithHeader = packetSize + to_uint8_t(configuration.packetSizeHeader);
                 if (readBuffer.currentSize >= packetSizeWithHeader) {                    
                     // Process the buffer with the deserializer

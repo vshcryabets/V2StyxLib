@@ -16,6 +16,7 @@ namespace styxlib
         CantCreateSocketPoll,
         PacketTooLarge,
         UnknownClient,
+        BufferTooSmall,
     };
 
     using StyxString = std::string;
@@ -26,7 +27,9 @@ namespace styxlib
     using Fid = uint32_t;
     using Tag = uint16_t;
     using Type = uint16_t;
-    using ClientId = int;
+    using ClientId = uint16_t;
+
+    constexpr ClientId InvalidClientId = 0;
 
     class SerializerL4;
     class DeserializerL4;

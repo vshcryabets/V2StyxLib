@@ -8,7 +8,7 @@ namespace styxlib
     class ClientsRepoImpl : public styxlib::ClientsRepo
     {
     private:
-        std::atomic_int nextId{0};
+        std::atomic<ClientId> nextId{InvalidClientId + 1};
 
     public:
         styxlib::ClientId getNextClientId() override;
