@@ -7,10 +7,12 @@ target_sources(module_l4
         src/impl/ChannelUnixTcp.cpp
         src/impl/ClientsRepoImpl.cpp
         src/impl/ChannelUnixPipeImpl.cpp
+        src/impl/ChannelUnixFile.cpp
     PUBLIC
         include/Channel.h
         include/ChannelUnixTcp.h
         include/impl/ChannelUnixPipeImpl.h
+        include/impl/ChannelUnixFile.h
         include/data.h
     )
 

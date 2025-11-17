@@ -22,7 +22,7 @@ namespace styxlib
     private:
         void workThreadFunction();
     public:
-        ChannelUnixPipeImpl(const PacketHeaderSize header);
+        ChannelUnixPipeImpl(const PacketHeaderSize header, DeserializerL4Ptr deserializer);
         std::future<StartResult> start();
         std::future<ErrorCode> connect(const FileDescriptorPair& fds);
         bool isStarted() const;

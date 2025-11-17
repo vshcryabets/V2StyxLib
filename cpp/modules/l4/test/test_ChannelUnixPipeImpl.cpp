@@ -21,8 +21,8 @@ public:
 public:
     TestSuiteUnixPipe()
     {
-        server = std::make_shared<styxlib::ChannelUnixPipeImpl>(packetSizeHeader);
-        client = std::make_shared<styxlib::ChannelUnixPipeImpl>(packetSizeHeader);
+        server = std::make_shared<styxlib::ChannelUnixPipeImpl>(packetSizeHeader, serverDeserializer);
+        client = std::make_shared<styxlib::ChannelUnixPipeImpl>(packetSizeHeader, clientDeserializer);
 
         clientDeserializer->setChannelTx(client);
         serverDeserializer->setChannelTx(server);
@@ -59,7 +59,7 @@ public:
     }
 };
 
-TEST_CASE_METHOD(TestSuiteUnixPipe, "Server starts and stops", "[ChannelUnixPipe]")
+TEST_CASE_METHOD(TestSuiteUnixPipe, "ChannelUnixPipeStartStop", "[ChannelUnixPipe]")
 {
     waitStartServer();
     waitStopServer();
