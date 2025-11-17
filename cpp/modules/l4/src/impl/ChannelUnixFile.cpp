@@ -2,6 +2,7 @@
 
 #include <unistd.h>
 #include <iostream>
+#include <cstring>
 
 namespace styxlib
 {

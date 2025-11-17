@@ -158,11 +158,11 @@ namespace styxlib
             [this]()
             {
                 stopRequested.store(true);
-                this->startPromise = nullptr;
                 if (this->serverThread.joinable())
                 {
                     this->serverThread.join();
                 }
+                this->startPromise = nullptr;
                 // clean structures
                 clientIdToChannelClient.clear();
                 socketToClientInfoMapFull.clear();

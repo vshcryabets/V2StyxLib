@@ -57,11 +57,11 @@ namespace styxlib
                 if (isStarted())
                 {
                     stopRequested.store(true);
-                    this->startPromise = nullptr;
                     if (this->serverThread.joinable())
                     {
                         this->serverThread.join();
                     }
+                    this->startPromise = nullptr;
                 } else {
                     // Just close descriptors if owned
                     closeDescriptors();
