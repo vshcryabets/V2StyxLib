@@ -16,6 +16,7 @@ namespace styxlib
         CantCreateSocketPoll,
         PacketTooLarge,
         UnknownClient,
+        BufferTooSmall,
     };
 
     using StyxString = std::string;

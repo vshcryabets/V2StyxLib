@@ -32,8 +32,15 @@ namespace styxlib
         }
         // Send the buffer over the file descriptor
         uint8_t packetSizeBuffer[4] = {0};
-        uint8_t headerSize = setPacketSize(config.packetSizeHeader, packetSizeBuffer, sizeof(packetSizeBuffer));
-        ssize_t result = ::write(fds.writeFd, packetSizeBuffer, headerSize);
+        std::expected<uint8_t, ErrorCode> headerSize = setPacketSize(
+            config.packetSizeHeader, 
+            packetSizeBuffer, 
+            sizeof(packetSizeBuffer),
+            size);
+        if (!headerSize.has_value()) {
+            return std::unexpected(headerSize.error());
+        }
+        ssize_t result = ::write(fds.writeFd, packetSizeBuffer, headerSize.value());
         if (result < 0)
         {
             std::cerr << "Error writing packet size to fd " << fds.writeFd << ": " << strerror(errno) << std::endl;
@@ -97,5 +104,16 @@ namespace styxlib
                 readBufferData.buffer.data(),
                 readBufferData.currentSize);
         }
+    }
+
+    void ChannelUnixFile::closeDescriptors() {
+        if (fds.readFd != InvalidFileDescriptor) {
+            ::close(fds.readFd);
+        }
+        if (fds.writeFd != InvalidFileDescriptor) {
+            ::close(fds.writeFd);
+        }
+        fds.readFd = InvalidFileDescriptor;
+        fds.writeFd = InvalidFileDescriptor;
     }
 } // namespace styxlib

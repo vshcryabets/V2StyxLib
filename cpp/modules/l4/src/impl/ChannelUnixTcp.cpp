@@ -31,8 +31,15 @@ namespace styxlib
         {
             // Send the buffer over the TCP socket
             uint8_t packetSizeBuffer[4] = {0};
-            uint8_t headerSize = setPacketSize(packetSizeHeader, packetSizeBuffer, sizeof(packetSizeBuffer));
-            ::send(socket.value(), packetSizeBuffer, headerSize, 0);
+            std::expected<uint8_t, ErrorCode> headerSize = setPacketSize(
+                packetSizeHeader, 
+                packetSizeBuffer, 
+                sizeof(packetSizeBuffer),
+                size);
+            if (!headerSize.has_value()) {
+                return std::unexpected(headerSize.error());
+            }
+            ::send(socket.value(), packetSizeBuffer, headerSize.value(), 0);
             return ::send(socket.value(), buffer, size, 0);
         }
         else

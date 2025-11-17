@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <iostream>
+#include <cstring>
 #include <unistd.h>
 #include <poll.h>
 
@@ -80,6 +81,7 @@ namespace styxlib
         int pipeFds[2];
         if (pipe(pipeFds) == -1)
         {
+            running.store(false);
             startPromise->set_value(std::unexpected(ErrorCode::CantCreateSocket));
             return;
         }
@@ -87,6 +89,8 @@ namespace styxlib
         rxFds.writeFd = pipeFds[1];
         if (pipe(pipeFds) == -1)
         {
+            closeDescriptors();
+            running.store(false);
             startPromise->set_value(std::unexpected(ErrorCode::CantCreateSocket));
             return;
         }

@@ -48,7 +48,7 @@ namespace styxlib
         Configuration config;
         ReadBuffer readBufferData;
 
-        virtual void closeDescriptors() = 0;
+        virtual void closeDescriptors();
     public:
         ChannelUnixFile(const Configuration &config);
         ~ChannelUnixFile() override;
