@@ -8,6 +8,7 @@
 #include <poll.h>
 
 #include "Channel.h"
+#include "ChannelTx.h"
 #include "ClientsRepo.h"
 #include "impl/ProgressObservableMutexImpl.h"
 #include "impl/ChannelUnixFile.h"

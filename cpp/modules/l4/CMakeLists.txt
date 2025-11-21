@@ -20,6 +20,13 @@ add_executable(module_l4_tests
     test/test_ChannelUnixTcp.cpp
     test/test_ChannelUnixPipeImpl.cpp
     )
+
+if(CMAKE_CXX_STANDARD GREATER_EQUAL 23)
+    target_sources(module_l4 PRIVATE src/cxx_23/ChannelTx.cpp)
+elseif(CMAKE_CXX_STANDARD GREATER_EQUAL 17)
+    target_sources(module_l4 PRIVATE src/cxx_17/ChannelTx.cpp)
+endif()
+
 target_include_directories(module_l4_tests PRIVATE ./include/)
 target_link_libraries(module_l4_tests PUBLIC Catch2::Catch2WithMain module_l4)
 
