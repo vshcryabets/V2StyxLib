@@ -33,6 +33,8 @@ namespace styxlib
             buffer[1] = (packetSize >> 16) & 0xFF;
             buffer[0] = (packetSize >> 24) & 0xFF;
             break;
+        default:
+            return std::unexpected(ErrorCode::InvalidHeaderSize);
         }
         return static_cast<uint8_t>(headerSize);
     }

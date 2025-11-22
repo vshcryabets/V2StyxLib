@@ -24,14 +24,14 @@ namespace styxlib
             packetSizeBuffer, 
             sizeof(packetSizeBuffer),
             size);
-        if (headerSize <= 0) {
-            return 0;
+        if (!headerSize.has_value()) {
+            return headerSize;
         }
-        ssize_t result = fwrite(packetSizeBuffer, 1, headerSize, stdout);
+        ssize_t result = fwrite(packetSizeBuffer, 1, headerSize.value(), stdout);
 
         // write buffer
         result = fwrite(buffer, 1, size, stdout);
         fflush(stdout);
-        return result;
+        return SizeResult(static_cast<Size>(result));
     }
 }

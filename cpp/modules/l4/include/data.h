@@ -16,6 +16,7 @@ namespace styxlib
         PacketTooLarge,
         UnknownClient,
         BufferTooSmall,
+        InvalidHeaderSize
     };
 
     enum class PacketHeaderSize : uint8_t
@@ -56,8 +57,6 @@ namespace styxlib
 
 #if __cplusplus >= 202302L
     #include "cxx_23/data.h"
-#elif __cplusplus >= 202002L
-    #include "cxx_20/data.h"
 #elif __cplusplus >= 201703L
     #include "cxx_17/data.h"
 #else

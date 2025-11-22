@@ -7,33 +7,35 @@ namespace styxlib
                           Size bufferSize,
                           Size packetSize) {
         if (bufferSize < 4) {
-            return -1;
+            return SizeResult(ErrorCode::BufferTooSmall);
         }
         switch (headerSize)
         {
         case PacketHeaderSize::Size1Byte:
             if (packetSize > 0xFF) {
-                return -1;
+                return SizeResult(ErrorCode::PacketTooLarge);
             }
             buffer[0] = static_cast<uint8_t>(packetSize);
             break;
         case PacketHeaderSize::Size2Bytes:
             if (packetSize > 0xFFFF) {
-                return -1;
+                return SizeResult(ErrorCode::PacketTooLarge);
             }
             buffer[1] = packetSize & 0xFF;
             buffer[0] = (packetSize >> 8) & 0xFF;
             break;
         case PacketHeaderSize::Size4Bytes:
             if (packetSize > 0xFFFFFFFF) {
-                return -1;
+                return SizeResult(ErrorCode::PacketTooLarge);
             }
             buffer[3] = packetSize & 0xFF;
             buffer[2] = (packetSize >> 8) & 0xFF;
             buffer[1] = (packetSize >> 16) & 0xFF;
             buffer[0] = (packetSize >> 24) & 0xFF;
             break;
+        default:
+            return SizeResult(ErrorCode::InvalidHeaderSize);
         }
-        return static_cast<uint8_t>(headerSize);
+        return SizeResult(static_cast<Size>(headerSize));
     }
 } // namespace styxlib
