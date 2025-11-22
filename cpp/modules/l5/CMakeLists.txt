@@ -1,6 +1,7 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.22)
 
 add_library(module_l5 STATIC
+    src/Client.cpp
     src/BufferWriterImpl.cpp
     src/BufferReaderImpl.cpp
     src/messages/base/StyxMessage.cpp

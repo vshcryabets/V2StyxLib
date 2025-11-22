@@ -8,10 +8,13 @@ namespace styxlib
 {
     ChannelUnixFile::ChannelUnixFile(const ChannelUnixFile::Configuration &config)
         : ChannelTx(),
-          ChannelRx(config.deserializer),
+          ChannelRx(),
           fds(InvalidFileDescriptor, InvalidFileDescriptor),
           config(config)
     {
+        if (setDeserializer(config.deserializer) != ErrorCode::Success) {
+            throw std::invalid_argument("Deserializer cannot be null");
+        }
         readBufferData.buffer.resize(config.iounit);
         readBufferData.currentSize = 0;
         readBufferData.isDirty = false;

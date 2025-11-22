@@ -21,6 +21,11 @@ add_executable(module_l4_tests
     test/test_ChannelUnixPipeImpl.cpp
     )
 
+if (USE_STD_MEMORY)
+    target_compile_definitions(module_l4 PRIVATE USE_STD_MEMORY)
+    target_compile_definitions(module_l4_tests PRIVATE USE_STD_MEMORY)
+endif()
+
 if(CMAKE_CXX_STANDARD GREATER_EQUAL 23)
     target_sources(module_l4 PRIVATE src/cxx_23/ChannelTx.cpp)
 elseif(CMAKE_CXX_STANDARD GREATER_EQUAL 17)
