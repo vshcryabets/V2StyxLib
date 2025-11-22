@@ -17,6 +17,7 @@ namespace styxlib
         const StyxBuffer buffer,
         Size size)
     {
+        (void)clientId;
         // write size header
         uint8_t packetSizeBuffer[4] = {0};
         SizeResult headerSize = setPacketSize(

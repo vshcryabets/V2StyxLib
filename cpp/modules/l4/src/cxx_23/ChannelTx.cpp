@@ -1,4 +1,4 @@
-#include "Channel.h"
+#include "ChannelTx.h"
 
 namespace styxlib
 {
