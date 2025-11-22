@@ -8,7 +8,7 @@ namespace styxlib
      * @param buffer The buffer where the packet size will be set.
      * @param bufferSize The size of the buffer.
      * @param packetSize The size of the packet to set.
-     * @return The number of bytes used for the header, or an -1 if an error occurs.
+     * @return The number of bytes used for the header, or an ErrorCode if an error occurs.
      */
     SizeResult setPacketSize(
         const PacketHeaderSize &headerSize,
