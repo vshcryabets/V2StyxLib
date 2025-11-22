@@ -2,7 +2,7 @@
 
 namespace styxlib
 {
-    std::expected<uint8_t, ErrorCode> setPacketSize(const PacketHeaderSize &headerSize,
+    SizeResult setPacketSize(const PacketHeaderSize &headerSize,
                           uint8_t* buffer,
                           Size bufferSize,
                           Size packetSize) {
