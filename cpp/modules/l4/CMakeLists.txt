@@ -25,6 +25,8 @@ if(CMAKE_CXX_STANDARD GREATER_EQUAL 23)
     target_sources(module_l4 PRIVATE src/cxx_23/ChannelTx.cpp)
 elseif(CMAKE_CXX_STANDARD GREATER_EQUAL 17)
     target_sources(module_l4 PRIVATE src/cxx_17/ChannelTx.cpp)
+else()
+    message(FATAL_ERROR "module_l4 requires C++17 or higher. Please set CMAKE_CXX_STANDARD to 17 or above.")
 endif()
 
 target_include_directories(module_l4_tests PRIVATE ./include/)
