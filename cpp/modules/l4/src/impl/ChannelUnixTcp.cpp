@@ -11,10 +11,13 @@
 namespace styxlib
 {
     ChannelUnixTcpClient::ChannelUnixTcpClient(const Configuration &config)
-        : ChannelRx(config.deserializer),
+        : ChannelRx(),
         ChannelUnixTcpTx(config.packetSizeHeader, std::nullopt),
         configuration(config)
     {
+        if (setDeserializer(config.deserializer) != ErrorCode::Success) {
+            throw std::invalid_argument("Deserializer cannot be null");
+        }
     }
 
     ChannelUnixTcpClient::~ChannelUnixTcpClient()
@@ -104,8 +107,11 @@ namespace styxlib
     }
 
     ChannelUnixTcpServer::ChannelUnixTcpServer(const Configuration &config)
-        : ChannelRx(config.deserializer), configuration(config)
+        : ChannelRx(), configuration(config)
     {
+        if (setDeserializer(config.deserializer) != ErrorCode::Success) {
+            throw std::invalid_argument("Deserializer cannot be null");
+        }
         if (configuration.clientsRepo == nullptr)
         {
             throw std::invalid_argument("ClientsRepo must be provided in configuration");

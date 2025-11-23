@@ -1,10 +1,11 @@
 #pragma once
 
+#include "Channel.h"
 #include "ChannelTx.h"
 
 namespace styxlib
 {
-    class ChannelUsbUart : public ChannelTx
+    class ChannelUsbUart : public ChannelTx, public ChannelRx
     {
     private:
         PacketHeaderSize packetSizeHeader;

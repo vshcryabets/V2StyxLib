@@ -12,6 +12,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_C_STANDARD 99)
 set(CMAKE_C_STANDARD_REQUIRED True)
 
+option(USE_STD_MEMORY "Use std lib <memory>" ON)
 
 # find_package(Catch2 3 REQUIRED)
 

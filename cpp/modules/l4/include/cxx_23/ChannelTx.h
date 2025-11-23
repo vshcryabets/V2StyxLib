@@ -10,7 +10,7 @@ namespace styxlib
      * @param packetSize The size of the packet to set.
      * @return The number of bytes used for the header, or an ErrorCode if an error occurs.
      */
-    std::expected<uint8_t, ErrorCode> setPacketSize(
+    SizeResult setPacketSize(
         const PacketHeaderSize &headerSize,
         uint8_t *buffer,
         Size bufferSize,
