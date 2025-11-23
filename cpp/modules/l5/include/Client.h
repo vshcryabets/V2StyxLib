@@ -18,7 +18,7 @@ protected:
     ChannelRxPtr channelRx;
 public:
     ClientBlocking();
-    ~ClientBlocking();
+    ~ClientBlocking() override = default;
     /**
      * Sets the transmission and reception channels for the client.
      * @param channelTx The transmission channel.

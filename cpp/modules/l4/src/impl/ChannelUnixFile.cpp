@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <iostream>
 #include <cstring>
+#include <stdexcept>
 
 namespace styxlib
 {
