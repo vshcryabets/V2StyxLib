@@ -23,6 +23,12 @@ add_executable(module_l5_tests
     test/test_StyxSerializerImpl.cpp
     test/test_MessageFactoryImpl.cpp
     )
+
+if (USE_STD_MEMORY)
+    target_compile_definitions(module_l5 PRIVATE USE_STD_MEMORY)
+    target_compile_definitions(module_l5_tests PRIVATE USE_STD_MEMORY)
+endif()
+
 target_include_directories(module_l5_tests PRIVATE ./include/)
 target_link_libraries(module_l5_tests PRIVATE Catch2::Catch2WithMain module_l5)
 catch_discover_tests(module_l5_tests 

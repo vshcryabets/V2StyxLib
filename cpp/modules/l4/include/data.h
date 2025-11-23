@@ -51,13 +51,11 @@ namespace styxlib
     using DeserializerL4Ptr = std::shared_ptr<DeserializerL4>;
     using ChannelRxPtr = std::shared_ptr<ChannelRx>;
     using ChannelTxPtr = std::shared_ptr<ChannelTx>;
-    using SerializerPtr = std::shared_ptr<SerializerL4>;
 #else
     using SerializerL4Ptr = SerializerL4*;
     using DeserializerL4Ptr = DeserializerL4*;
     using ChannelRxPtr = ChannelRx*;
     using ChannelTxPtr = ChannelTx*;
-    using SerializerPtr = SerializerL4*;
 #endif
 
     inline uint8_t to_uint8_t(const PacketHeaderSize &headerSize)

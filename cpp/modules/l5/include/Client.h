@@ -1,6 +1,8 @@
 #pragma once
 
 #include "messages/base/StyxMessage.h"
+#include "Channel.h"
+#include "ChannelTx.h"
 
 namespace styxlib
 {
@@ -18,7 +20,7 @@ protected:
     ChannelRxPtr channelRx;
 public:
     ClientBlocking();
-    ~ClientBlocking() override = default;
+    ~ClientBlocking() override;
     /**
      * Sets the transmission and reception channels for the client.
      * @param channelTx The transmission channel.

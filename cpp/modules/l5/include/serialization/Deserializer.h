@@ -1,6 +1,5 @@
 #pragma once
 #include "messages/base/StyxMessage.h"
-#include "Channel.h"
 #include "SerializerL4.h"
 
 namespace styxlib
