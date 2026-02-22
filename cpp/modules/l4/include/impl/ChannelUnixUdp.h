@@ -1,6 +1,7 @@
 #pragma once
 
 #include <optional>
+#include <future>
 
 #include "impl/ChannelUnixSocket.h"
 
@@ -24,5 +25,24 @@ namespace styxlib
         ChannelUnixUdpTx &operator=(ChannelUnixUdpTx &&) = delete;
         ChannelUnixUdpTx &operator=(const ChannelUnixUdpTx &) = delete;
         virtual ~ChannelUnixUdpTx() = default;
+    };
+
+    /**
+     * UDP client channel (Tx + Rx).
+     *
+     * connect() creates a SOCK_DGRAM socket and calls ::connect() to fix the
+     * remote address, enabling plain ::send() / ::recv() calls without
+     * specifying the peer on every call.
+     */
+    class ChannelUnixUdpClient : public ChannelUnixSocketClient
+    {
+    public:
+        using Configuration = ChannelUnixSocketClient::Configuration;
+
+        explicit ChannelUnixUdpClient(const Configuration &config);
+        ChannelUnixUdpClient(ChannelUnixUdpClient &&) = delete;
+        ChannelUnixUdpClient &operator=(ChannelUnixUdpClient &&) = delete;
+        ~ChannelUnixUdpClient() override = default;
+        std::future<ErrorCode> connect() override;
     };
 } // namespace styxlib

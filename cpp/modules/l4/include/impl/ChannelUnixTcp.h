@@ -31,39 +31,17 @@ namespace styxlib
         virtual ~ChannelUnixTcpTx() = default;
     };
 
-    class ChannelUnixTcpClient : public ChannelUnixTcpTx, public ChannelRx
+    class ChannelUnixTcpClient : public ChannelUnixSocketClient
     {
     public:
-        struct Configuration
-        {
-            std::string address;
-            uint16_t port;
-            PacketHeaderSize packetSizeHeader{PacketHeaderSize::Size2Bytes};
-            uint16_t iounit{8192};
-            DeserializerL4Ptr deserializer{nullptr};
-            Configuration(
-                const std::string &address,
-                uint16_t port,
-                PacketHeaderSize packetSizeHeader,
-                uint16_t iounit,
-                DeserializerL4Ptr deserializer)
-                : address(address), 
-                port(port), 
-                packetSizeHeader(packetSizeHeader),
-                iounit(iounit),
-                deserializer(deserializer) {}
-        };
+        // Re-export the base Configuration so existing call sites remain unchanged.
+        using Configuration = ChannelUnixSocketClient::Configuration;
 
-    private:
-        const Configuration configuration;
-    public:
-        ChannelUnixTcpClient(const Configuration &config);
+        explicit ChannelUnixTcpClient(const Configuration &config);
         ChannelUnixTcpClient(ChannelUnixTcpClient &&) = delete;
         ChannelUnixTcpClient &operator=(ChannelUnixTcpClient &&) = delete;
-        ~ChannelUnixTcpClient() override;
-        std::future<ErrorCode> connect();
-        std::future<void> disconnect();
-        bool isConnected() const;
+        ~ChannelUnixTcpClient() override = default;
+        std::future<ErrorCode> connect() override;
     };
 
     class ChannelUnixTcpServer : public ChannelRx, public ChannelTx

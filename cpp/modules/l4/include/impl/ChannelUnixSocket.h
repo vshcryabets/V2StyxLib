@@ -1,6 +1,8 @@
 #pragma once
 
 #include <optional>
+#include <future>
+#include <string>
 
 #include "Channel.h"
 #include "impl/ChannelUnixFile.h"
@@ -42,5 +44,48 @@ namespace styxlib
             ClientId clientId, 
             const StyxBuffer buffer, 
             Size size) override;
+    };
+
+    /**
+     * Common base for socket-based client channels (TCP, UDP).
+     * Handles the shared Configuration, disconnect(), isConnected(),
+     * and the destructor.  Subclasses only need to implement connect(),
+     * which creates the protocol-specific socket and calls ::connect().
+     */
+    class ChannelUnixSocketClient : public ChannelUnixSocketTx, public ChannelRx
+    {
+    public:
+        struct Configuration
+        {
+            std::string address;
+            uint16_t port;
+            PacketHeaderSize packetSizeHeader{PacketHeaderSize::Size2Bytes};
+            uint16_t iounit{8192};
+            DeserializerL4Ptr deserializer{nullptr};
+            Configuration(
+                const std::string &address,
+                uint16_t port,
+                PacketHeaderSize packetSizeHeader,
+                uint16_t iounit,
+                DeserializerL4Ptr deserializer)
+                : address(address),
+                  port(port),
+                  packetSizeHeader(packetSizeHeader),
+                  iounit(iounit),
+                  deserializer(deserializer) {}
+        };
+
+    protected:
+        const Configuration configuration;
+
+    public:
+        explicit ChannelUnixSocketClient(const Configuration &config);
+        ChannelUnixSocketClient(ChannelUnixSocketClient &&) = delete;
+        ChannelUnixSocketClient &operator=(ChannelUnixSocketClient &&) = delete;
+        ~ChannelUnixSocketClient() override;
+
+        virtual std::future<ErrorCode> connect() = 0;
+        std::future<void> disconnect();
+        bool isConnected() const;
     };
 } // namespace styxlib

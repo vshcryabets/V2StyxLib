@@ -1,8 +1,10 @@
 #include "impl/ChannelUnixSocket.h"
 
 #include <sys/socket.h>
+#include <unistd.h>
 #include <cstring>
 #include <vector>
+#include <future>
 
 namespace styxlib
 {
@@ -44,5 +46,39 @@ namespace styxlib
         std::memcpy(combined.data() + headerSize.value(), buffer, size);
         Size bytesSent = static_cast<Size>(::send(socket.value(), combined.data(), combined.size(), 0));
         return bytesSent - headerSize.value();
+    }
+
+    ChannelUnixSocketClient::ChannelUnixSocketClient(const Configuration &config)
+        : ChannelUnixSocketTx(config.packetSizeHeader, std::nullopt),
+          ChannelRx(),
+          configuration(config)
+    {
+        if (setDeserializer(config.deserializer) != ErrorCode::Success) {
+            throw std::invalid_argument("Deserializer cannot be null");
+        }
+    }
+
+    ChannelUnixSocketClient::~ChannelUnixSocketClient()
+    {
+        disconnect().get();
+    }
+
+    std::future<void> ChannelUnixSocketClient::disconnect()
+    {
+        return std::async(
+            std::launch::async,
+            [this]()
+            {
+                if (socket.has_value())
+                {
+                    ::close(socket.value());
+                    socket = std::nullopt;
+                }
+            });
+    }
+
+    bool ChannelUnixSocketClient::isConnected() const
+    {
+        return socket.has_value();
     }
 } // namespace styxlib

@@ -7,6 +7,7 @@ target_sources(module_l4
         src/Channel.cpp
         src/impl/ChannelUnixSocket.cpp
         src/impl/ChannelUnixTcp.cpp
+        src/impl/ChannelUnixUdp.cpp
         src/impl/ClientsRepoImpl.cpp
         src/impl/ChannelUnixPipeImpl.cpp
         src/impl/ChannelUnixFile.cpp

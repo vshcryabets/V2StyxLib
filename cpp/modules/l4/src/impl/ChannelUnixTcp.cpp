@@ -11,18 +11,8 @@
 namespace styxlib
 {
     ChannelUnixTcpClient::ChannelUnixTcpClient(const Configuration &config)
-        : ChannelRx(),
-        ChannelUnixTcpTx(config.packetSizeHeader, std::nullopt),
-        configuration(config)
+        : ChannelUnixSocketClient(config)
     {
-        if (setDeserializer(config.deserializer) != ErrorCode::Success) {
-            throw std::invalid_argument("Deserializer cannot be null");
-        }
-    }
-
-    ChannelUnixTcpClient::~ChannelUnixTcpClient()
-    {
-        disconnect().get();
     }
 
     std::future<ErrorCode> ChannelUnixTcpClient::connect()
@@ -59,25 +49,6 @@ namespace styxlib
                     return ErrorCode::NotConnected;
                 }
             });
-    }
-
-    std::future<void> ChannelUnixTcpClient::disconnect()
-    {
-        return std::async(
-            std::launch::async,
-            [this]()
-            {
-                if (socket.has_value())
-                {
-                    ::close(socket.value());
-                    socket = std::nullopt;
-                }
-            });
-    }
-
-    bool ChannelUnixTcpClient::isConnected() const
-    {
-        return socket.has_value();
     }
 
     ChannelUnixTcpServer::ChannelUnixTcpServer(const Configuration &config)
