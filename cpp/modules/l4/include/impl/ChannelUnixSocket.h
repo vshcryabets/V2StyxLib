@@ -34,6 +34,9 @@ namespace styxlib
          * Sends the buffer with a length header prepended.
          * Header and payload are combined into one ::send() call so that
          * both TCP and UDP (datagram) transports work correctly.
+         * Returns the number of payload bytes sent without the header 
+         * (i.e. in success case it should return excactly same value as the size parameter), 
+         * or an error code on failure. 
          */
         SizeResult sendBuffer(
             ClientId clientId, 

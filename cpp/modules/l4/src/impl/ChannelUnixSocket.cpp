@@ -42,7 +42,7 @@ namespace styxlib
         std::vector<uint8_t> combined(headerSize.value() + size);
         std::memcpy(combined.data(), packetSizeBuffer, headerSize.value());
         std::memcpy(combined.data() + headerSize.value(), buffer, size);
-
-        return static_cast<Size>(::send(socket.value(), combined.data(), combined.size(), 0));
+        Size bytesSent = static_cast<Size>(::send(socket.value(), combined.data(), combined.size(), 0));
+        return bytesSent - headerSize.value();
     }
 } // namespace styxlib
