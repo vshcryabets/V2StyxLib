@@ -25,32 +25,6 @@ namespace styxlib
         disconnect().get();
     }
 
-    SizeResult ChannelUnixTcpTx::sendBuffer(
-        ClientId clientId, 
-        const StyxBuffer buffer, 
-        Size size)
-    {
-        if (socket.has_value())
-        {
-            // Send the buffer over the TCP socket
-            uint8_t packetSizeBuffer[4] = {0};
-            std::expected<uint8_t, ErrorCode> headerSize = setPacketSize(
-                packetSizeHeader, 
-                packetSizeBuffer, 
-                sizeof(packetSizeBuffer),
-                size);
-            if (!headerSize.has_value()) {
-                return std::unexpected(headerSize.error());
-            }
-            ::send(socket.value(), packetSizeBuffer, headerSize.value(), 0);
-            return ::send(socket.value(), buffer, size, 0);
-        }
-        else
-        {
-            return std::unexpected(ErrorCode::NotConnected);
-        }
-    }
-
     std::future<ErrorCode> ChannelUnixTcpClient::connect()
     {
         return std::async(

@@ -11,25 +11,24 @@
 #include "ChannelTx.h"
 #include "ClientsRepo.h"
 #include "impl/ProgressObservableMutexImpl.h"
-#include "impl/ChannelUnixFile.h"
+#include "impl/ChannelUnixSocket.h"
 
 namespace styxlib
 {
-    using Socket = FileDescriptor;
-
-    class ChannelUnixTcpTx : public ChannelTx {
-    protected:
-        std::optional<Socket> socket = std::nullopt;
-        PacketHeaderSize packetSizeHeader{PacketHeaderSize::Size2Bytes};
+    /**
+     * TCP-specific transmitter. Delegates all send logic to ChannelUnixSocketTx.
+     */
+    class ChannelUnixTcpTx : public ChannelUnixSocketTx {
     public:
-        ChannelUnixTcpTx(PacketHeaderSize packetSizeHeader, std::optional<Socket> socket) : 
-            packetSizeHeader(packetSizeHeader), socket(socket) {}
+        ChannelUnixTcpTx(
+            PacketHeaderSize packetSizeHeader, 
+            std::optional<Socket> socket)
+            : ChannelUnixSocketTx(packetSizeHeader, socket) {}
         ChannelUnixTcpTx(const ChannelUnixTcpTx &) = delete;
         ChannelUnixTcpTx(ChannelUnixTcpTx &&) = delete;
         ChannelUnixTcpTx &operator=(ChannelUnixTcpTx &&) = delete;
         ChannelUnixTcpTx &operator=(const ChannelUnixTcpTx &) = delete;
         virtual ~ChannelUnixTcpTx() = default;
-        SizeResult sendBuffer(ClientId clientId, const StyxBuffer buffer, Size size) override;
     };
 
     class ChannelUnixTcpClient : public ChannelUnixTcpTx, public ChannelRx
