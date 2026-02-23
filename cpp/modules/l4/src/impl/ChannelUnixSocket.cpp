@@ -47,7 +47,7 @@ namespace styxlib
         std::vector<uint8_t> combined(headerSize.value() + size);
         std::memcpy(combined.data(), packetSizeBuffer, headerSize.value());
         std::memcpy(combined.data() + headerSize.value(), buffer, size);
-        Size bytesSent = static_cast<Size>(::send(socket.value(), combined.data(), combined.size(), 0));
+        ssize_t bytesSent = static_cast<ssize_t>(::send(socket.value(), combined.data(), combined.size(), 0));
         return bytesSent - headerSize.value();
     }
 
@@ -266,7 +266,7 @@ namespace styxlib
     {
         for (Socket fd : socketsToClose)
         {
-            close(fd);
+            ::close(fd);
             pollFds.erase(std::remove_if(pollFds.begin(), pollFds.end(),
                                          [fd](const pollfd &p) { return p.fd == fd; }),
                           pollFds.end());

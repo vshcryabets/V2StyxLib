@@ -104,7 +104,18 @@ namespace styxlib
 
         // Non-blocking so the poll loop can time out gracefully
         int flags = fcntl(sock, F_GETFL, 0);
-        fcntl(sock, F_SETFL, flags | O_NONBLOCK);
+        if (flags == -1)
+        {
+            ::close(sock);
+            startPromise->set_value(ErrorCode::CantCreateSocket);
+            return InvalidFileDescriptor;
+        }
+        if (fcntl(sock, F_SETFL, flags | O_NONBLOCK) == -1)
+        {
+            ::close(sock);
+            startPromise->set_value(ErrorCode::CantCreateSocket);
+            return InvalidFileDescriptor;
+        }
 
         return sock;
     }
@@ -231,11 +242,11 @@ namespace styxlib
         Size size)
     {
         if (!isStarted())
-            return std::unexpected(ErrorCode::NotConnected);
+            return Unexpected(ErrorCode::NotConnected);
 
         auto addrIt = clientIdToSockAddr.find(clientId);
         if (addrIt == clientIdToSockAddr.end())
-            return std::unexpected(ErrorCode::UnknownClient);
+            return Unexpected(ErrorCode::UnknownClient);
 
         const uint8_t headerBytes = to_uint8_t(configuration.packetSizeHeader);
         std::vector<uint8_t> datagram(headerBytes + size);
@@ -243,7 +254,7 @@ namespace styxlib
             configuration.packetSizeHeader,
             datagram.data(), datagram.size(), size);
         if (!headerResult)
-            return std::unexpected(headerResult.error());
+            return Unexpected(headerResult.error());
 
         std::memcpy(datagram.data() + headerBytes, buffer, size);
 
@@ -254,7 +265,7 @@ namespace styxlib
             sizeof(sockaddr_in));
 
         if (sent < 0)
-            return std::unexpected(ErrorCode::SendFailed);
+            return Unexpected(ErrorCode::SendFailed);
 
         // Return the number of payload bytes sent (excluding the header)
         return static_cast<Size>(sent) - headerBytes;
