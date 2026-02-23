@@ -1,7 +1,7 @@
 #pragma once
 
 #include "messages/base/StyxMessage.h"
-#include "Channel.h"
+#include "ChannelRx.h"
 #include "ChannelTx.h"
 
 namespace styxlib

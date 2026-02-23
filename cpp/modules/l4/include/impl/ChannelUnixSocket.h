@@ -8,7 +8,7 @@
 #include <string>
 #include <poll.h>
 
-#include "Channel.h"
+#include "ChannelRx.h"
 #include "ChannelTx.h"
 #include "ClientsRepo.h"
 #include "impl/ChannelUnixFile.h"

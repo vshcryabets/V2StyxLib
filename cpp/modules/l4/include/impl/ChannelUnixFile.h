@@ -4,7 +4,7 @@
 #include <cstdint>
 
 #include "data.h"
-#include "Channel.h"
+#include "ChannelRx.h"
 #include "ChannelTx.h"
 
 namespace styxlib

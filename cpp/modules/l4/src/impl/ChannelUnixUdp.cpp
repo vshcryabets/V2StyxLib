@@ -8,7 +8,7 @@
 #include <iostream>
 #include <vector>
 
-#include "Channel.h"
+#include "ChannelRx.h"
 
 namespace styxlib
 {

@@ -2,7 +2,7 @@
 
 #include <optional>
 
-#include "Channel.h"
+#include "ChannelRx.h"
 #include "ChannelTx.h"
 #include "ClientsRepo.h"
 #include "impl/ProgressObservableMutexImpl.h"

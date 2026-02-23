@@ -30,29 +30,6 @@ namespace styxlib
         Size4Bytes = 4
     };
 
-
-
-    // inline uint8_t to_uint8_t(const PacketHeaderSize &headerSize)
-    // {
-    //     return static_cast<uint8_t>(headerSize);
-    // }
-
-    // /**
-    //  * Sets the packet size in the provided buffer according to the specified header size.
-    //  * @param headerSize The size of the packet header (1, 2, or 4 bytes).
-    //  * @param buffer The buffer where the packet size will be set.
-    //  * @param bufferSize The size of the buffer.
-    //  * @param packetSize The size of the packet to set.
-    //  * @return The number of bytes used for the header, or an ErrorCode if an error occurs.
-    //  */
-    // std::expected<uint8_t, ErrorCode> setPacketSize(
-    //     const PacketHeaderSize &headerSize,
-    //     uint8_t *buffer,
-    //     Size bufferSize,
-    //     Size packetSize);
-
-
-
     using StyxString = std::string;
     using StyxDate = uint32_t;
     using StyxBuffer = uint8_t *;
@@ -96,19 +73,3 @@ namespace styxlib
     // Handle older standards (C++14, C++11, etc.)
     #error "This library requires at least C++17."
 #endif
-
-namespace styxlib
-{
-    /**
-     * Reads the first X bytes of buffer and interprets them as a packet size.
-     * @param headerSize The size of the packet header (1, 2, or 4 bytes).
-     * @param buffer The buffer to read from.
-     * @param bufferSize The number of valid bytes available in the buffer.
-     * @return The decoded packet payload size, or an ErrorCode if the buffer
-     *         is too small to hold the header.
-     */
-    SizeResult getPacketSize(
-        const PacketHeaderSize &headerSize,
-        const uint8_t *buffer,
-        Size bufferSize);
-}

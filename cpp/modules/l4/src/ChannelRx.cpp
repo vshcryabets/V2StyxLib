@@ -1,4 +1,4 @@
-#include "Channel.h"
+#include "ChannelRx.h"
 
 namespace styxlib
 {
@@ -16,7 +16,7 @@ namespace styxlib
         return ErrorCode::Success;
     }
 
-    std::expected<Size, ErrorCode> getPacketSize(
+    SizeResult getPacketSize(
         const PacketHeaderSize &headerSize,
         const uint8_t *buffer,
         Size bufferSize)
@@ -24,7 +24,7 @@ namespace styxlib
         const uint8_t needed = static_cast<uint8_t>(headerSize);
         if (bufferSize < needed)
         {
-            return std::unexpected(ErrorCode::BufferTooSmall);
+            return Unexpected(ErrorCode::BufferTooSmall);
         }
         switch (headerSize)
         {
@@ -41,6 +41,6 @@ namespace styxlib
                 (static_cast<uint32_t>(buffer[2]) <<  8) |
                  static_cast<uint32_t>(buffer[3]));
         }
-        return std::unexpected(ErrorCode::InvalidHeaderSize);
+        return Unexpected(ErrorCode::InvalidHeaderSize);
     }
 } // namespace styxlib

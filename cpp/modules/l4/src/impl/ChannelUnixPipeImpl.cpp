@@ -43,7 +43,7 @@ namespace styxlib
         }
         else
         {
-            startPromise->set_value(std::unexpected(ErrorCode::AlreadyStarted));
+            startPromise->set_value(Unexpected(ErrorCode::AlreadyStarted));
         }
         return startPromise->get_future();
     }
@@ -82,7 +82,7 @@ namespace styxlib
         if (pipe(pipeFds) == -1)
         {
             running.store(false);
-            startPromise->set_value(std::unexpected(ErrorCode::CantCreateSocket));
+            startPromise->set_value(Unexpected(ErrorCode::CantCreateSocket));
             return;
         }
         rxFds.readFd = pipeFds[0];
@@ -91,7 +91,7 @@ namespace styxlib
         {
             closeDescriptors();
             running.store(false);
-            startPromise->set_value(std::unexpected(ErrorCode::CantCreateSocket));
+            startPromise->set_value(Unexpected(ErrorCode::CantCreateSocket));
             return;
         }
         txFds.readFd = pipeFds[0];

@@ -26,18 +26,18 @@ namespace styxlib
     {
         if (!socket.has_value())
         {
-            return std::unexpected(ErrorCode::NotConnected);
+            return Unexpected(ErrorCode::NotConnected);
         }
 
         uint8_t packetSizeBuffer[4] = {0};
-        std::expected<uint8_t, ErrorCode> headerSize = setPacketSize(
+        SizeResult headerSize = setPacketSize(
             packetSizeHeader,
             packetSizeBuffer,
             sizeof(packetSizeBuffer),
             size);
         if (!headerSize.has_value())
         {
-            return std::unexpected(headerSize.error());
+            return Unexpected(headerSize.error());
         }
 
         // Combine header and payload into a single buffer so the send is
@@ -111,12 +111,12 @@ namespace styxlib
     {
         if (!isStarted())
         {
-            return std::unexpected(ErrorCode::NotConnected);
+            return Unexpected(ErrorCode::NotConnected);
         }
         auto it = clientIdToChannelClient.find(clientId);
         if (it == clientIdToChannelClient.end())
         {
-            return std::unexpected(ErrorCode::UnknownClient);
+            return Unexpected(ErrorCode::UnknownClient);
         }
         return it->second->sendBuffer(InvalidClientId, buffer, size);
     }
