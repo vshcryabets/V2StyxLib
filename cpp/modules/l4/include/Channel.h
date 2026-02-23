@@ -1,5 +1,7 @@
 #pragma once
 
+#include <expected>
+
 #include "data.h"
 #include "SerializerL4.h"
 
