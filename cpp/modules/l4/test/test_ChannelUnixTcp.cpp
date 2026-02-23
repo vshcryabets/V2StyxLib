@@ -98,13 +98,13 @@ public:
     }
 };
 
-TEST_CASE_METHOD(TestSuite, "Server starts and stops", "[ChannelUnixTcpServer]")
+TEST_CASE_METHOD(TestSuite, "ChannelUnixTcpServer:starts and stops", "[ChannelUnixTcpServer]")
 {
     waitStartServer();
     waitStopServer();
 }
 
-TEST_CASE_METHOD(TestSuite, "test_ServerAcceptsConnections", "[ChannelUnixTcpServer]")
+TEST_CASE_METHOD(TestSuite, "ChannelUnixTcpServer:accepts connections", "[ChannelUnixTcpServer]")
 {
     waitStartServer();
     auto future = server->getClientsObserver().waitAsync();
@@ -128,7 +128,7 @@ TEST_CASE_METHOD(TestSuite, "test_ServerAcceptsConnections", "[ChannelUnixTcpSer
     waitStopServer();
 }
 
-TEST_CASE_METHOD(TestSuite, "test_ServerReceiveMessages", "[ChannelUnixTcpServer]")
+TEST_CASE_METHOD(TestSuite, "ChannelUnixTcpServer:receive messages", "[ChannelUnixTcpServer]")
 {
     waitStartServer();
     connectClient();
@@ -152,7 +152,7 @@ TEST_CASE_METHOD(TestSuite, "test_ServerReceiveMessages", "[ChannelUnixTcpServer
     server->stop().get();
 }
 
-TEST_CASE_METHOD(TestChannelUnixTcpServer, "handlePollEvents accept connections", "[ChannelUnixTcpServer]")
+TEST_CASE_METHOD(TestChannelUnixTcpServer, "ChannelUnixTcpServer:handlePollEvents accept connections", "[ChannelUnixTcpServer]")
 {
     pollFds.clear();
     pollFds.push_back({ .fd = 1, .events = POLLIN, .revents = POLLIN }); // Simulate server socket ready to accept
@@ -160,7 +160,7 @@ TEST_CASE_METHOD(TestChannelUnixTcpServer, "handlePollEvents accept connections"
     REQUIRE(acceptCalled == 1);
 }
 
-TEST_CASE_METHOD(TestChannelUnixTcpServer, "handlePollEvents read data from socket", "[ChannelUnixTcpServer]")
+TEST_CASE_METHOD(TestChannelUnixTcpServer, "ChannelUnixTcpServer:handlePollEvents read data from socket", "[ChannelUnixTcpServer]")
 {
     pollFds.clear();
     pollFds.push_back({ .fd = 1, .events = POLLIN, .revents = 0 }); // Simulate server socket ready to accept
@@ -171,7 +171,7 @@ TEST_CASE_METHOD(TestChannelUnixTcpServer, "handlePollEvents read data from sock
     REQUIRE(readDataFromSocketCalled == 1); 
 }
 
-TEST_CASE_METHOD(TestChannelUnixTcpServer, "handlePollEvents should cleanup closed sockets", "[ChannelUnixTcpServer]")
+TEST_CASE_METHOD(TestChannelUnixTcpServer, "ChannelUnixTcpServer:handlePollEvents should cleanup closed sockets", "[ChannelUnixTcpServer]")
 {
     dontCallRealMethods = false; // let the real methods be called
     pollFds.clear();
@@ -189,7 +189,7 @@ TEST_CASE_METHOD(TestChannelUnixTcpServer, "handlePollEvents should cleanup clos
     REQUIRE(readDataFromSocketCalled == 1); 
 }
 
-TEST_CASE_METHOD(TestChannelUnixTcpServer, "test_processBuffers", "[ChannelUnixTcpServer]")
+TEST_CASE_METHOD(TestChannelUnixTcpServer, "ChannelUnixTcpServer:processBuffers", "[ChannelUnixTcpServer]")
 {
     dontCallRealMethods = false; // let the real methods be called
 

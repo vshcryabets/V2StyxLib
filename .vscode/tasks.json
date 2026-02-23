@@ -1,15 +1,16 @@
 {
     "tasks": [
         {
-            "label": "CMakePrepare",
+            "label": "CMakePrepare CPP23",
             "type": "shell",
             "command": "cmake",
             "args": [
                 "-B",
-                "${workspaceFolder}/build",
+                "${workspaceFolder}/build23",
                 "-S",
                 "${workspaceFolder}/cpp",
-                "-DCMAKE_BUILD_TYPE=Debug"
+                "-DCMAKE_BUILD_TYPE=Debug",
+                "-DCPP_VERSION=23"
             ],
             "group": {
                 "kind": "build",
@@ -19,12 +20,54 @@
             "detail": "Generated task by Debugger."
         },
         {
-            "label": "CMakeBuild",
+            "label": "CMakeBuild CPP23",
             "type": "shell",
             "command": "cmake",
             "args": [
                 "--build",
-                "${workspaceFolder}/build"
+                "${workspaceFolder}/build23"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": ["$gcc"],
+            "detail": "Generated task by Debugger.",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": true
+            }
+        },
+        {
+            "label": "CMakePrepare CPP17",
+            "type": "shell",
+            "command": "cmake",
+            "args": [
+                "-B",
+                "${workspaceFolder}/build17",
+                "-S",
+                "${workspaceFolder}/cpp",
+                "-DCMAKE_BUILD_TYPE=Debug",
+                "-DCPP_VERSION=17"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": ["$gcc"],
+            "detail": "Generated task by Debugger."
+        },
+        {
+            "label": "CMakeBuild CPP17",
+            "type": "shell",
+            "command": "cmake",
+            "args": [
+                "--build",
+                "${workspaceFolder}/build17"
             ],
             "group": {
                 "kind": "build",

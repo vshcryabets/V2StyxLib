@@ -1,143 +1,66 @@
 #pragma once
 
-#include <map>
-#include <thread>
-#include <atomic>
-#include <future>
 #include <optional>
-#include <poll.h>
 
-#include "Channel.h"
+#include "ChannelRx.h"
 #include "ChannelTx.h"
 #include "ClientsRepo.h"
 #include "impl/ProgressObservableMutexImpl.h"
-#include "impl/ChannelUnixFile.h"
+#include "impl/ChannelUnixSocket.h"
 
 namespace styxlib
 {
-    using Socket = FileDescriptor;
-
-    class ChannelUnixTcpTx : public ChannelTx {
-    protected:
-        std::optional<Socket> socket = std::nullopt;
-        PacketHeaderSize packetSizeHeader{PacketHeaderSize::Size2Bytes};
+    /**
+     * TCP-specific transmitter. Delegates all send logic to ChannelUnixSocketTx.
+     */
+    class ChannelUnixTcpTx : public ChannelUnixSocketTx {
     public:
-        ChannelUnixTcpTx(PacketHeaderSize packetSizeHeader, std::optional<Socket> socket) : 
-            packetSizeHeader(packetSizeHeader), socket(socket) {}
+        ChannelUnixTcpTx(
+            PacketHeaderSize packetSizeHeader, 
+            std::optional<Socket> socket)
+            : ChannelUnixSocketTx(packetSizeHeader, socket) {}
         ChannelUnixTcpTx(const ChannelUnixTcpTx &) = delete;
         ChannelUnixTcpTx(ChannelUnixTcpTx &&) = delete;
         ChannelUnixTcpTx &operator=(ChannelUnixTcpTx &&) = delete;
         ChannelUnixTcpTx &operator=(const ChannelUnixTcpTx &) = delete;
         virtual ~ChannelUnixTcpTx() = default;
-        SizeResult sendBuffer(ClientId clientId, const StyxBuffer buffer, Size size) override;
     };
 
-    class ChannelUnixTcpClient : public ChannelUnixTcpTx, public ChannelRx
+    class ChannelUnixTcpClient : public ChannelUnixSocketClient
     {
     public:
-        struct Configuration
-        {
-            std::string address;
-            uint16_t port;
-            PacketHeaderSize packetSizeHeader{PacketHeaderSize::Size2Bytes};
-            uint16_t iounit{8192};
-            DeserializerL4Ptr deserializer{nullptr};
-            Configuration(
-                const std::string &address,
-                uint16_t port,
-                PacketHeaderSize packetSizeHeader,
-                uint16_t iounit,
-                DeserializerL4Ptr deserializer)
-                : address(address), 
-                port(port), 
-                packetSizeHeader(packetSizeHeader),
-                iounit(iounit),
-                deserializer(deserializer) {}
-        };
+        // Re-export the base Configuration so existing call sites remain unchanged.
+        using Configuration = ChannelUnixSocketClient::Configuration;
 
-    private:
-        const Configuration configuration;
-    public:
-        ChannelUnixTcpClient(const Configuration &config);
+        explicit ChannelUnixTcpClient(const Configuration &config);
         ChannelUnixTcpClient(ChannelUnixTcpClient &&) = delete;
         ChannelUnixTcpClient &operator=(ChannelUnixTcpClient &&) = delete;
-        ~ChannelUnixTcpClient() override;
-        std::future<ErrorCode> connect();
-        std::future<void> disconnect();
-        bool isConnected() const;
+        ~ChannelUnixTcpClient() override = default;
+        std::future<ErrorCode> connect() override;
     };
 
-    class ChannelUnixTcpServer : public ChannelRx, public ChannelTx
+    /**
+     * TCP server channel.
+     * Inherits the common server lifecycle, poll loop, buffer processing and
+     * client bookkeeping from ChannelUnixSocketServer.  Only the TCP-specific
+     * socket setup (SOCK_STREAM / listen) and per-client accept/recv logic
+     * is implemented here.
+     */
+    class ChannelUnixTcpServer : public ChannelUnixSocketServer
     {
     public:
-        class Configuration
-        {
-        public:
-            const uint16_t port;
-            const std::shared_ptr<ClientsRepo> clientsRepo{nullptr};
-            const PacketHeaderSize packetSizeHeader{PacketHeaderSize::Size2Bytes};
-            const uint16_t iounit{8192};
-            const DeserializerL4Ptr deserializer{nullptr};
-            const uint16_t maxClients{16};
+        // Re-export the shared Configuration and ClientInfo types.
+        using Configuration = ChannelUnixSocketServer::Configuration;
+        using ClientInfo    = ChannelUnixSocketServer::ClientInfo;
 
-            Configuration(
-                uint16_t port,
-                std::shared_ptr<ClientsRepo> clientsRepo,
-                PacketHeaderSize packetSizeHeader,
-                uint16_t iounit,
-                DeserializerL4Ptr deserializer,
-                uint8_t maxClients)
-                : port(port),
-                  clientsRepo(clientsRepo),
-                  packetSizeHeader(packetSizeHeader),
-                  iounit(iounit),
-                  deserializer(deserializer),
-                  maxClients(maxClients)
-            {
-            }
-        };
-        struct ClientInfo
-        {
-            ClientId id{0};
-            std::string address{""};
-            uint16_t port{0};
-        };
+        explicit ChannelUnixTcpServer(const Configuration &config);
+        ChannelUnixTcpServer(ChannelUnixTcpServer &&) = delete;
+        ChannelUnixTcpServer &operator=(ChannelUnixTcpServer &&) = delete;
+        ~ChannelUnixTcpServer() override = default;
 
     protected:
-        class ClientFullInfo : public ClientInfo, public ReadBuffer
-        {
-        };
-        const Configuration configuration;
-        std::thread serverThread;
-        // Sockets
-        std::map<Socket, ClientFullInfo> socketToClientInfoMapFull;
-        std::vector<Socket> socketsToClose;
-        // Clients
-        std::map<ClientId, std::shared_ptr<ChannelUnixTcpTx>> clientIdToChannelClient;
-
-        ProgressObservableMutexImpl<std::vector<ClientInfo>> clientsObserver;
-        std::atomic<bool> running{false};
-        std::atomic<bool> stopRequested{false};
-        std::unique_ptr<std::promise<ErrorCode>> startPromise;
-        std::vector<pollfd> pollFds;
-
-        void workThreadFunction();
-        virtual bool acceptClients(Socket serverSocket);
-        virtual void readDataFromSocket(Socket clientFd);
-        void handlePollEvents(Socket serverSocket, size_t numEvents); // Handle poll events
-        void cleanupClosedSockets(); // Clean up sockets marked for closure
-        void processBuffers(); // Check dirty buffers and send data to deserializer
-
-    public:
-        ChannelUnixTcpServer(const Configuration &config);
-        ~ChannelUnixTcpServer() override;
-        SizeResult sendBuffer(ClientId clientId, const StyxBuffer buffer, Size size) override;
-        std::future<ErrorCode> start();
-        std::future<void> stop();
-        ProgressObserver<std::vector<ClientInfo>> &getClientsObserver()
-        {
-            return clientsObserver;
-        }
-        bool isStarted() const;
+        Socket createServerSocket() override;
+        bool   acceptClients(Socket serverSocket) override;
+        void   readDataFromSocket(Socket clientFd) override;
     };
 }

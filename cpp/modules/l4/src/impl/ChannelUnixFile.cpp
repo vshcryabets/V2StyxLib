@@ -33,28 +33,28 @@ namespace styxlib
     {
         if (fds.writeFd == InvalidFileDescriptor)
         {
-            return std::unexpected(ErrorCode::NotConnected);
+            return Unexpected(ErrorCode::NotConnected);
         }
         // Send the buffer over the file descriptor
         uint8_t packetSizeBuffer[4] = {0};
-        std::expected<uint8_t, ErrorCode> headerSize = setPacketSize(
+        SizeResult headerSize = setPacketSize(
             config.packetSizeHeader, 
             packetSizeBuffer, 
             sizeof(packetSizeBuffer),
             size);
         if (!headerSize.has_value()) {
-            return std::unexpected(headerSize.error());
+            return Unexpected(headerSize.error());
         }
         ssize_t result = ::write(fds.writeFd, packetSizeBuffer, headerSize.value());
         if (result < 0)
         {
             std::cerr << "Error writing packet size to fd " << fds.writeFd << ": " << strerror(errno) << std::endl;
-            return std::unexpected(ErrorCode::NotConnected);
+            return Unexpected(ErrorCode::NotConnected);
         }
         result = ::write(fds.writeFd, buffer, size);
         if (result < 0)
         {
-            return std::unexpected(ErrorCode::NotConnected);
+            return Unexpected(ErrorCode::NotConnected);
         }
         return static_cast<Size>(result);
     }

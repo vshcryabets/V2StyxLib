@@ -15,5 +15,12 @@ namespace styxlib
         bool has_value() const { return _error == ErrorCode::Success; }
     };
 
+    class Unexpected: public ExpectedSizeResult
+    {
+    public:
+        Unexpected(ErrorCode error) : ExpectedSizeResult(error) {}
+    };
+
     using SizeResult = ExpectedSizeResult;
+    
 }

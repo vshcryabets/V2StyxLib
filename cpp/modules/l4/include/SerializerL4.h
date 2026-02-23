@@ -1,6 +1,5 @@
 #pragma once
 #include "data.h"
-#include "Channel.h"
 
 namespace styxlib
 {
