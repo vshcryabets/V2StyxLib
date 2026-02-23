@@ -31,22 +31,39 @@ jobs:
 
     - uses: actions/checkout@v4
 
-    - name: Configure CMake
+    - name: Configure CMake for CPP23
       env:
         CC: gcc-14
-        CXX: g++-14    
+        CXX: g++-14
       working-directory: ${{github.workspace}}/
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
       # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
-      run: cmake -B ${{github.workspace}}/build -S ${{github.workspace}}/cpp -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+      run: cmake -B ${{github.workspace}}/build23 -S ${{github.workspace}}/cpp -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCPP_VERSION=23
 
-    - name: Build
+    - name: Build CPP23
       working-directory: ${{github.workspace}}/
       # Build your program with the given configuration
-      run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+      run: cmake --build ${{github.workspace}}/build23 --config ${{env.BUILD_TYPE}}
 
     - name: Run CTest
-      working-directory: ${{github.workspace}}/build/
+      working-directory: ${{github.workspace}}/build23/
+      run: ctest --rerun-failed --output-on-failure
+
+    - name: Configure CMake for CPP17
+      env:
+        CC: gcc-14
+        CXX: g++-14
+      working-directory: ${{github.workspace}}/
+      # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
+      # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
+      run: cmake -B ${{github.workspace}}/build17 -S ${{github.workspace}}/cpp -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DCPP_VERSION=17
+
+    - name: Build CPP17
+      working-directory: ${{github.workspace}}/
+      run: cmake --build ${{github.workspace}}/build17 --config ${{env.BUILD_TYPE}}
+
+    - name: Run CTest
+      working-directory: ${{github.workspace}}/build17/
       run: ctest --rerun-failed --output-on-failure
 
   convert_to_draft:
