@@ -1,9 +1,9 @@
 {
-  "name": "V2StyxLibL4",
+  "name": "V2StyxLibL4_C",
   "version": "1.0.0",
   "build": {
     "srcFilter": [
-      "+<messages/base/StyxMessage.cpp>"
+      "+<ChannelUartStm8.c>"
     ]
   }
 }
