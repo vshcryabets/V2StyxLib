@@ -56,7 +56,7 @@ void v2styxlib_uart_send(
 
     // send packet size
     WAIT_FOR_TXE();
-    UART1->DR = length;
+    UART1->DR = length + 2; // +2 for CRC16
 
     // then CRC16
     uint16_t crc = v2styxlib_uart_crc16_calculate(buffer, length);
