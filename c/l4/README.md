@@ -1,4 +1,4 @@
-# Channel.h
+# Channel_c.h
 
 UART communication channel configuration and CRC calculation definitions. You can redefine them.
 
@@ -32,3 +32,11 @@ Used in streaming mode to indicate the beginning of a new data frame.
 Second byte of the Start of Frame (SOF) marker sequence.  
 Default: `0xAA`.  
 Used with `V2STYXLIB_SOF_MARKER_1` to form the two-byte SOF marker sequence: `0x55 0xAA`.
+
+## `V2STYXLIB_SEND_CRC16`
+Flag bit indicating CRC16 is appended to each transmitted frame.  
+Default: `0x02`.  
+When set, a 2-byte CRC16 checksum (using `V2STYXLIB_CRC16_POLY` and 
+`V2STYXLIB_CRC16_INITIAL_VALUE`) is added at the beggining of every frame, 
+before the payload. 
+This extends the frame layout by two bytes and enables end-to-end error detection.
