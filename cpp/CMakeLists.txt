@@ -18,17 +18,18 @@ set(CMAKE_C_STANDARD 99)
 set(CMAKE_C_STANDARD_REQUIRED True)
 
 option(USE_STD_MEMORY "Use std lib <memory>" ON)
+option(ENABLE_CATCH2 "Enable Catch2" ON)
 
-# find_package(Catch2 3 REQUIRED)
-
-include(FetchContent)
-FetchContent_Declare(
-    Catch2
-    GIT_REPOSITORY https://github.com/catchorg/Catch2.git
-    GIT_TAG        v3.5.3
-)
-FetchContent_MakeAvailable(Catch2)
-include(Catch)
+if (ENABLE_CATCH2)
+    include(FetchContent)
+    FetchContent_Declare(
+        Catch2
+        GIT_REPOSITORY https://github.com/catchorg/Catch2.git
+        GIT_TAG        v3.5.3
+    )
+    FetchContent_MakeAvailable(Catch2)
+    include(Catch)
+endif()
 
 # For GCC and Clang compilers
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
@@ -39,6 +40,7 @@ elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     add_compile_options(/we4716)
 endif()
 
+add_subdirectory(../c/l4 module/l4_c)
 add_subdirectory(modules/l4)
 add_subdirectory(modules/l5)
 

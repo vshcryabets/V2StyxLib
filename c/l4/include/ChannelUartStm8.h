@@ -3,35 +3,7 @@
 #include <stdint.h>
 #include "stm8s.h"
 
-typedef uint8_t BufferSize_t;
-
-#ifndef V2STYXLIB_CRC16_POLY
-    #define V2STYXLIB_CRC16_POLY 0x1021
-#endif
-#ifndef V2STYXLIB_CRC16_INITIAL_VALUE
-    #define V2STYXLIB_CRC16_INITIAL_VALUE 0xFFFF
-#endif
-
-#define V2STYXLIB_STREAMING_MODE 0x01
-
-#ifndef V2STYXLIB_SOF_MARKER_1
-    #define V2STYXLIB_SOF_MARKER_1 0x55
-    #define V2STYXLIB_SOF_MARKER_2 0xAA
-#endif
-
-typedef struct {
-    uint8_t config;    
-} V2styxlibUartConfig;
-
-/**
- * useStreamingMode - is a boolean flag that indicates whether to use streaming mode for UART communication.
- * In streaming mode client will not wait for the response after sending a message, but will continue to send messages without blocking.
- * We will send SOF marker 0x55 0xAA (check V2STYXLIB_SOF_MARKER_xx) before each frame.
- */
-void v2styxlib_uart_configure_proto(
-    V2styxlibUartConfig *config,
-    bool useStreamingMode
-);
+#include "Channel_c.h"
 
 /**
  * baudRateDivider - is a value that determines the data transmission speed over UART.
