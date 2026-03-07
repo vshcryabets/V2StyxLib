@@ -2,37 +2,6 @@
 
 #define WAIT_FOR_TXE() while (!(UART1->SR & UART1_SR_TXE))
 
-static inline uint16_t v2styxlib_uart_crc16_update(uint16_t crc, uint8_t data) {
-    crc ^= (uint16_t)data << 8;
-    for (uint8_t i = 0; i < 8; i++) {
-        if (crc & 0x8000) {
-            crc = (crc << 1) ^ V2STYXLIB_CRC16_POLY;
-        } else {
-            crc <<= 1;
-        }
-    }
-    return crc;
-}
-
-static uint16_t v2styxlib_uart_crc16_calculate(const uint8_t *data, BufferSize_t length) {
-    uint16_t crc = V2STYXLIB_CRC16_INITIAL_VALUE;
-    for (BufferSize_t i = 0; i < length; i++) {
-        crc = v2styxlib_uart_crc16_update(crc, data[i]);
-    }
-    return crc;
-}
-
-void v2styxlib_uart_configure_proto(
-    V2styxlibUartConfig *config,
-    bool useStreamingMode
-) {
-    if (useStreamingMode) {
-        config->config |= V2STYXLIB_STREAMING_MODE;
-    } else {
-        config->config &= ~V2STYXLIB_STREAMING_MODE;
-    }
-}
-
 void v2styxlib_uart_setup(uint16_t baudRateDivider) 
 {
     UART1->BRR2 = ((baudRateDivider >> 8) & 0xF0) | (baudRateDivider & 0x0F);
@@ -54,16 +23,20 @@ void v2styxlib_uart_send(
         UART1->DR = V2STYXLIB_SOF_MARKER_2;
     }
 
-    // send packet size
     WAIT_FOR_TXE();
-    UART1->DR = length + 2; // +2 for CRC16
-
-    // then CRC16
-    uint16_t crc = v2styxlib_uart_crc16_calculate(buffer, length);
-    WAIT_FOR_TXE();
-    UART1->DR = (crc >> 8) & 0xFF; // send high byte of CRC
-    WAIT_FOR_TXE();
-    UART1->DR = crc & 0xFF; // send low byte of CRC
+    if (config->config & V2STYXLIB_SEND_CRC16) {
+        // send packet size + 2 bytes for CRC16
+        UART1->DR = length + 2;
+        // then CRC16
+        uint16_t crc = v2styxlib_crc16_calculate(buffer, length);
+        WAIT_FOR_TXE();
+        UART1->DR = (crc >> 8) & 0xFF; // send high byte of CRC
+        WAIT_FOR_TXE();
+        UART1->DR = crc & 0xFF; // send low byte of CRC
+    } else {
+        // send packet size
+        UART1->DR = length;
+    }
 
     // then send the actual data
     for (BufferSize_t i = 0; i < length; i++) {

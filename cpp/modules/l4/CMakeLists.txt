@@ -1,15 +1,11 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.22)
 
 add_library(module_l4 STATIC)
-add_executable(module_l4_tests
-    test/test_dummy.cpp)
 
 target_sources(module_l4
     PRIVATE
         src/ChannelRx.cpp
         src/ChannelTx.cpp
-        src/impl/ClientsRepoImpl.cpp
-        src/impl/ChannelUnixFile.cpp
     )
 
 target_include_directories(module_l4 PUBLIC
@@ -17,10 +13,31 @@ target_include_directories(module_l4 PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     )
 
+target_link_libraries(
+    module_l4
+    module_l4_c
+)
 
 if (USE_STD_MEMORY)
     target_compile_definitions(module_l4 PRIVATE USE_STD_MEMORY)
-    target_compile_definitions(module_l4_tests PRIVATE USE_STD_MEMORY)
+endif()
+
+if (SUPPORT_UNIX)
+    target_sources(module_l4
+    PRIVATE
+        src/impl/ClientsRepoImpl.cpp
+        src/impl/ChannelUnixFile.cpp
+    )
+endif()
+
+if (SUPPORT_RP2040)
+    target_sources(module_l4
+    PRIVATE
+        src/styxpico/ChannelUsbUart.cpp
+    )
+    target_link_libraries(module_l4
+        pico_stdlib
+        )
 endif()
 
 if(CMAKE_CXX_STANDARD GREATER_EQUAL 23)
@@ -53,9 +70,23 @@ else()
 
 endif()
 
-target_include_directories(module_l4_tests PRIVATE ./include/)
-target_link_libraries(module_l4_tests PUBLIC Catch2::Catch2WithMain module_l4)
+if (ENABLE_CATCH2)
+    add_executable(module_l4_tests
+        test/test_dummy.cpp)
+    if (USE_STD_MEMORY)
+        target_compile_definitions(module_l4_tests PRIVATE USE_STD_MEMORY)
+    endif()
+    if(CMAKE_CXX_STANDARD GREATER_EQUAL 23)
+        message("Build tests for C++23")
+        target_sources(module_l4_tests PRIVATE
+            test/test_ChannelUnixTcp.cpp
+            test/test_ChannelUnixPipeImpl.cpp
+        )
+    endif()
+    target_include_directories(module_l4_tests PRIVATE ./include/)
+    target_link_libraries(module_l4_tests PUBLIC Catch2::Catch2WithMain module_l4)
 
-catch_discover_tests(module_l4_tests 
-    PROPERTIES 
-    TIMEOUT 10)
+    catch_discover_tests(module_l4_tests 
+        PROPERTIES 
+        TIMEOUT 10)
+endif()

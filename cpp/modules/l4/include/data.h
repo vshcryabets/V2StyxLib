@@ -1,6 +1,9 @@
 #pragma once
 #include <string>
 #include <cstdint>
+
+#include "Channel_c.h"
+
 #ifdef USE_STD_MEMORY
     #include <memory>
 #endif
@@ -33,7 +36,7 @@ namespace styxlib
     using StyxString = std::string;
     using StyxDate = uint32_t;
     using StyxBuffer = uint8_t *;
-    using Size = uint16_t;
+    using Size = BufferSize_t; // Alias for BufferSize_t defined in Channel_c.h
     using Fid = uint32_t;
     using Tag = uint16_t;
     using Type = uint16_t;
