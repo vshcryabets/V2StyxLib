@@ -2,7 +2,7 @@
 
 #define WAIT_FOR_TXE() while (!(UART1->SR & UART1_SR_TXE))
 
-uint16_t v2styxlib_uart_crc16_update(uint16_t crc, uint8_t data) {
+static inline uint16_t v2styxlib_uart_crc16_update(uint16_t crc, uint8_t data) {
     crc ^= (uint16_t)data << 8;
     for (uint8_t i = 0; i < 8; i++) {
         if (crc & 0x8000) {
@@ -14,7 +14,7 @@ uint16_t v2styxlib_uart_crc16_update(uint16_t crc, uint8_t data) {
     return crc;
 }
 
-uint16_t v2styxlib_uart_crc16_calculate(const uint8_t *data, BufferSize_t length) {
+static uint16_t v2styxlib_uart_crc16_calculate(const uint8_t *data, BufferSize_t length) {
     uint16_t crc = V2STYXLIB_CRC16_INITIAL_VALUE;
     for (BufferSize_t i = 0; i < length; i++) {
         crc = v2styxlib_uart_crc16_update(crc, data[i]);
@@ -41,8 +41,8 @@ void v2styxlib_uart_setup(uint16_t baudRateDivider)
 }
 
 void v2styxlib_uart_send(
-    V2styxlibUartConfig* config, 
-    uint8_t *buffer, 
+    const V2styxlibUartConfig* config, 
+    const uint8_t *buffer, 
     BufferSize_t length)
 {
     if (config->config & V2STYXLIB_STREAMING_MODE) {

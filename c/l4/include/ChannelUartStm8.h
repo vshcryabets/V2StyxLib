@@ -1,3 +1,5 @@
+#pragma once
+
 #include <stdint.h>
 #include "stm8s.h"
 
@@ -48,7 +50,7 @@ void v2styxlib_uart_setup(uint16_t baudRateDivider);
  * This function is responsible for sending a specified number of bytes from the provided buffer over UART.
  */
 void v2styxlib_uart_send(
-    V2styxlibUartConfig* config, 
-    uint8_t *buffer, 
+    const V2styxlibUartConfig* config, 
+    const uint8_t *buffer, 
     BufferSize_t length
 );
