@@ -14,12 +14,9 @@
     #define V2STYXLIB_CRC16_INITIAL_VALUE 0xFFFF
 #endif
 
-#ifndef V2STYXLIB_STREAMING_MODE
-    #define V2STYXLIB_STREAMING_MODE 0x01
-#endif
-#ifndef V2STYXLIB_SEND_CRC16
-    #define V2STYXLIB_SEND_CRC16 0x02
-#endif
+#define V2STYXLIB_CONFIG_STREAMING_MODE 0x01
+#define V2STYXLIB_CONFIG_SEND_CRC16 0x02
+#define V2STYXLIB_CONFIG_SOFT_UART_TX 0x04
 
 #ifndef V2STYXLIB_SOF_MARKER_1
     #define V2STYXLIB_SOF_MARKER_1 0x55
@@ -31,7 +28,7 @@ extern "C" {
 #endif
 
 typedef struct {
-    uint8_t config;    
+    uint8_t config;
 } V2styxlibUartConfig;
 
 /**
@@ -43,11 +40,15 @@ typedef struct {
  *
  * sendCrc16 - is a boolean flag that indicates whether to calculate and send
  * CRC16 checksum with each message.
+ *
+ * useSoftUartTx - is a boolean flag that indicates whether to use software 
+ * UART for transmission.
  */
 void v2styxlib_uart_configure_proto(
     V2styxlibUartConfig *config,
     bool useStreamingMode,
-    bool sendCrc16
+    bool sendCrc16,
+    bool useSoftUartTx
 );
 
 /**

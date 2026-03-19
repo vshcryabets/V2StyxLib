@@ -16,13 +16,6 @@ Initial value for CRC16 calculation.
 Default: `0xFFFF`.  
 Used as the starting point for CRC16 calculation.
 
-## `V2STYXLIB_STREAMING_MODE`
-Flag bit indicating streaming mode is enabled.  
-Default: `0x01`.  
-When set, UART operates in streaming mode:
-- SOF (Start of Frame) markers are sent before each data frame.
-- The sender does not wait for responses between transmissions.
-
 ## `V2STYXLIB_SOF_MARKER_1`
 First byte of the Start of Frame (SOF) marker sequence.  
 Default: `0x55`.  
@@ -33,10 +26,10 @@ Second byte of the Start of Frame (SOF) marker sequence.
 Default: `0xAA`.  
 Used with `V2STYXLIB_SOF_MARKER_1` to form the two-byte SOF marker sequence: `0x55 0xAA`.
 
-## `V2STYXLIB_SEND_CRC16`
-Flag bit indicating CRC16 is appended to each transmitted frame.  
-Default: `0x02`.  
-When set, a 2-byte CRC16 checksum (using `V2STYXLIB_CRC16_POLY` and 
-`V2STYXLIB_CRC16_INITIAL_VALUE`) is added at the beggining of every frame, 
-before the payload. 
-This extends the frame layout by two bytes and enables end-to-end error detection.
+## `V2STYXLIB_SOFTUART_TX`
+
+Enables the use of Software UART for TX on STM8. This is particularly useful when 
+you need additional ADC channels and want to free up the **UART1_TX / AIN5 / (HS) PD5** pin for analog input.
+
+**Note:** This implementation covers TX only, as software-based RX is generally 
+unstable on this architecture due to timing constraints.

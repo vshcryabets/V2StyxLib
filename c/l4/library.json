@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "build": {
     "srcFilter": [
+      "+<Channel_c.c>",
       "+<ChannelUartStm8.c>"
     ]
   }
