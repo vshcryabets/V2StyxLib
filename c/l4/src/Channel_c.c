@@ -23,16 +23,22 @@ uint16_t v2styxlib_crc16_calculate(const uint8_t *data, BufferSize_t length) {
 void v2styxlib_uart_configure_proto(
     V2styxlibUartConfig *config,
     bool useStreamingMode,
-    bool sendCrc16
+    bool sendCrc16,
+    bool useSoftUartTx
 ) {
     if (useStreamingMode) {
-        config->config |= V2STYXLIB_STREAMING_MODE;
+        config->config |= V2STYXLIB_CONFIG_STREAMING_MODE;
     } else {
-        config->config &= ~V2STYXLIB_STREAMING_MODE;
+        config->config &= ~V2STYXLIB_CONFIG_STREAMING_MODE;
     }
     if (sendCrc16) {
-        config->config |= V2STYXLIB_SEND_CRC16;
+        config->config |= V2STYXLIB_CONFIG_SEND_CRC16;
     } else {
-        config->config &= ~V2STYXLIB_SEND_CRC16;
+        config->config &= ~V2STYXLIB_CONFIG_SEND_CRC16;
+    }
+    if (useSoftUartTx) {
+        config->config |= V2STYXLIB_CONFIG_SOFT_UART_TX;
+    } else {
+        config->config &= ~V2STYXLIB_CONFIG_SOFT_UART_TX;
     }
 }
