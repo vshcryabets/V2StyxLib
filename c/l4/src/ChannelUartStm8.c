@@ -1,7 +1,7 @@
 #include "ChannelUartStm8.h"
 
 #ifdef V2STYXLIB_SOFTUART
-void v2styxlib_delay_bit() {
+static void v2styxlib_delay_bit() {
     __asm
         pushw x         
         ldw x, #535 ; hardcode for 9600 baud at 16 MHz, adjust if needed
@@ -13,13 +13,16 @@ void v2styxlib_delay_bit() {
 }
 #endif
 
-void v2styxlib_send_byte(
+static void v2styxlib_send_byte(
     const V2styxlibUartStm8Config* config,
     uint8_t byte) {
 #ifdef V2STYXLIB_SOFTUART
     if (config->baseConfig.config & V2STYXLIB_CONFIG_SOFT_UART_TX) {
         // Send byte using software UART
         // Start bit
+        __asm
+            sim ; disable interrupts (software UART timing)
+        __endasm;
         config->softUartPort->ODR &= ~config->softUartTxPinMask;
         v2styxlib_delay_bit();
 
@@ -37,6 +40,9 @@ void v2styxlib_send_byte(
         // Stop bit
         config->softUartPort->ODR |= config->softUartTxPinMask;
         v2styxlib_delay_bit();
+        __asm
+            rim ; enable interrupts (software UART timing)
+        __endasm;
     } else
 #endif
     {    
@@ -48,10 +54,10 @@ void v2styxlib_send_byte(
 }
 
 void v2styxlib_uart_setup(
-    const V2styxlibUartStm8Config* config,`
+    const V2styxlibUartStm8Config* config,
     uint16_t baudRateDivider) 
 {
-    UART1->CR1 |= UART1_CR1_UARTD; // Disable UART after configuration
+    UART1->CR1 |= UART1_CR1_UARTD; // Disable UART before configuration
     UART1->BRR2 = ((baudRateDivider >> 8) & 0xF0) | (baudRateDivider & 0x0F);
     UART1->BRR1 = (baudRateDivider >> 4) & 0xFF;
 #ifdef V2STYXLIB_SOFTUART
@@ -68,7 +74,7 @@ void v2styxlib_uart_setup(
     {
         UART1->CR2 |= (UART1_CR2_TEN | UART1_CR2_REN);
     }
-    UART1->CR1 &= ~UART1_CR1_UARTD; // Enable UART before configuration    
+    UART1->CR1 &= ~UART1_CR1_UARTD; // Enable UART after configuration    
 }
 
 void v2styxlib_uart_send(

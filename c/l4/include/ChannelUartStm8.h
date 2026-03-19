@@ -9,7 +9,7 @@ typedef struct {
     V2styxlibUartConfig baseConfig;
 #ifdef V2STYXLIB_SOFTUART    
     GPIO_TypeDef * softUartPort;
-    int8_t softUartTxPinMask;
+    uint8_t softUartTxPinMask;
 #endif    
 } V2styxlibUartStm8Config;
 
