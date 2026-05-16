@@ -27,9 +27,30 @@
 extern "C" {
 #endif
 
-typedef struct {
+
+typedef struct V2styxlibUartConfig V2styxlibUartConfig;
+
+/**
+ * V2styxlibUartSendFunction - is a function pointer type that 
+ * defines the signature of a function responsible for sending 
+ * data over UART.
+ */
+typedef void V2styxlibUartSendFunction(
+    const V2styxlibUartConfig* config,
+    const uint8_t *buffer,
+    BufferSize_t length);
+
+/**
+ * V2styxlibUartConfig - is a structure that holds the 
+ * configuration for UART communication. And hardware layer 
+ * specific send function.
+ */
+struct V2styxlibUartConfig {
     uint8_t config;
-} V2styxlibUartConfig;
+#ifdef V2STYXLIB_USE_FUNCTIONS_POINTERS
+    V2styxlibUartSendFunction* sendFunction;
+#endif
+};
 
 /**
  * useStreamingMode - is a boolean flag that indicates whether to
@@ -59,7 +80,11 @@ void v2styxlib_uart_configure_proto(
  *
  * Returns the calculated CRC16 checksum.
  */
-uint16_t v2styxlib_crc16_calculate(const uint8_t *data, BufferSize_t length);
+uint16_t v2styxlib_crc16_calculate(
+    const uint8_t *data, 
+    BufferSize_t length
+);
+
 
 #ifdef __cplusplus
 }

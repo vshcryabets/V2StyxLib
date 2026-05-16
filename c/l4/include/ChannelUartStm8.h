@@ -32,7 +32,7 @@ void v2styxlib_uart_setup(
  * length - is the number of bytes to be sent from the buffer.
  * This function is responsible for sending a specified number of bytes from the provided buffer over UART.
  */
-void v2styxlib_uart_send(
+void v2styxlib_uart_stm8_send(
     const V2styxlibUartStm8Config* config, 
     const uint8_t *buffer, 
     BufferSize_t length

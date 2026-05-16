@@ -77,7 +77,7 @@ void v2styxlib_uart_setup(
     UART1->CR1 &= ~UART1_CR1_UARTD; // Enable UART after configuration    
 }
 
-void v2styxlib_uart_send(
+void v2styxlib_uart_stm8_send(
     const V2styxlibUartStm8Config* config, 
     const uint8_t *buffer, 
     BufferSize_t length)

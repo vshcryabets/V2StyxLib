@@ -1,6 +1,6 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.22)
 
-project(V2StyxLib LANGUAGES CXX)
+project(V2StyxLib LANGUAGES C CXX)
 
 enable_testing()
 include(CTest)
@@ -40,7 +40,7 @@ elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     add_compile_options(/we4716)
 endif()
 
-add_compile_definition(BufferSize_t=uint16_t)
+add_compile_definitions(BufferSize_t=uint16_t)
 
 add_subdirectory(../c/l4 module/l4_c)
 add_subdirectory(modules/l4)

@@ -6,6 +6,7 @@ target_sources(module_l4
     PRIVATE
         src/ChannelRx.cpp
         src/ChannelTx.cpp
+        src/uart/ChannelUart.cpp
     )
 
 target_include_directories(module_l4 PUBLIC
@@ -48,26 +49,11 @@ if(CMAKE_CXX_STANDARD GREATER_EQUAL 23)
         src/impl/ChannelUnixPipeImpl.cpp
         src/impl/ChannelUnixSocket.cpp
     )
-
-
-    target_sources(module_l4_tests PRIVATE
-        test/test_ChannelUnixTcp.cpp
-        test/test_ChannelUnixPipeImpl.cpp
-    )
-
-    # This helps CMake provide better error messages if the compiler doesn't fully
-    # support the C++23 standard.
-    target_compile_features(module_l4_tests PRIVATE cxx_std_23)
-
 elseif(CMAKE_CXX_STANDARD GREATER_EQUAL 17)
-
     message("Build for C++17")
     # target_sources(module_l4 PRIVATE src/cxx_17/ChannelTx.cpp)
-
 else()
-
     message(FATAL_ERROR "module_l4 requires C++17 or higher. Please set CMAKE_CXX_STANDARD to 17 or above.")
-
 endif()
 
 if (ENABLE_CATCH2)
@@ -82,6 +68,9 @@ if (ENABLE_CATCH2)
             test/test_ChannelUnixTcp.cpp
             test/test_ChannelUnixPipeImpl.cpp
         )
+        # This helps CMake provide better error messages if the compiler doesn't fully
+        # support the C++23 standard.
+        target_compile_features(module_l4_tests PRIVATE cxx_std_23)
     endif()
     target_include_directories(module_l4_tests PRIVATE ./include/)
     target_link_libraries(module_l4_tests PUBLIC Catch2::Catch2WithMain module_l4)
