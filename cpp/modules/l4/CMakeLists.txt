@@ -58,7 +58,8 @@ endif()
 
 if (ENABLE_CATCH2)
     add_executable(module_l4_tests
-        test/test_dummy.cpp)
+        test/test_dummy.cpp
+        test/test_ChannelUart.cpp)
     if (USE_STD_MEMORY)
         target_compile_definitions(module_l4_tests PRIVATE USE_STD_MEMORY)
     endif()

@@ -31,11 +31,11 @@ extern "C" {
 typedef struct V2styxlibUartConfig V2styxlibUartConfig;
 
 /**
- * V2styxlibUartSendFunction - is a function pointer type that 
+ * V2styxlibUartSendBufferFunction - is a function pointer type that 
  * defines the signature of a function responsible for sending 
  * data over UART.
  */
-typedef void V2styxlibUartSendFunction(
+typedef void V2styxlibUartSendBufferFunction(
     const V2styxlibUartConfig* config,
     const uint8_t *buffer,
     BufferSize_t length);
@@ -48,7 +48,7 @@ typedef void V2styxlibUartSendFunction(
 struct V2styxlibUartConfig {
     uint8_t config;
 #ifdef V2STYXLIB_USE_FUNCTIONS_POINTERS
-    V2styxlibUartSendFunction* sendFunction;
+    V2styxlibUartSendBufferFunction* sendFunction;
 #endif
 };
 
@@ -85,6 +85,17 @@ uint16_t v2styxlib_crc16_calculate(
     BufferSize_t length
 );
 
+#ifdef V2STYXLIB_USE_FUNCTIONS_POINTERS
+/**
+ * buffer - is a pointer to the data buffer that contains the data to be sent over UART.
+ * length - is the number of bytes to be sent from the buffer.
+ * This function is responsible for sending a specified number of bytes from the provided buffer over UART.
+ */
+void v2styxlib_uart_send(
+    const V2styxlibUartConfig* config,
+    const uint8_t *buffer,
+    BufferSize_t length);
+#endif
 
 #ifdef __cplusplus
 }
