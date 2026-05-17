@@ -10,11 +10,11 @@ ChannelUart::ChannelUart(const ChannelUartConfig* config)
     
 ChannelUartConfig::ChannelUartConfig(uint8_t config)
 {
-    this->config = config;
+    this->baseConfig.config = config;
     this->useStreamingMode = (config & V2STYXLIB_CONFIG_STREAMING_MODE) != 0;
     this->sendCrc16 = (config & V2STYXLIB_CONFIG_SEND_CRC16) != 0;
-    this->sofMarkers[0] = (config & V2STYXLIB_CONFIG_STREAMING_MODE) != 0 ? V2STYXLIB_SOF_MARKER_1 : 0;
-    this->sofMarkers[1] = (config & V2STYXLIB_CONFIG_STREAMING_MODE) != 0 ? V2STYXLIB_SOF_MARKER_2 : 0;
+    this->sofMarkers[0] = V2STYXLIB_SOF_MARKER_1;
+    this->sofMarkers[1] = V2STYXLIB_SOF_MARKER_2;
     this->packetSizeHeader = PacketHeaderSize::Size2Bytes; // Default packet size header
 }
 
@@ -29,7 +29,7 @@ SizeResult ChannelUart::sendBuffer(
         return Unexpected(ErrorCode::NullptrArgument);
     }
 
-    if (config->config & V2STYXLIB_CONFIG_STREAMING_MODE) {
+    if (config->baseConfig.config & V2STYXLIB_CONFIG_STREAMING_MODE) {
         auto sofResult = internalSendBytes(config->sofMarkers, static_cast<Size>(2));
         if (!sofResult.has_value()) {
             return sofResult;
@@ -37,7 +37,7 @@ SizeResult ChannelUart::sendBuffer(
     }
 
     uint8_t packetSizeBuffer[4] = { 0, 0, 0, 0 };
-    const Size payloadSize = (config->config & V2STYXLIB_CONFIG_SEND_CRC16)
+    const Size payloadSize = (config->baseConfig.config & V2STYXLIB_CONFIG_SEND_CRC16)
         ? static_cast<Size>(size + 2)
         : size;
     auto headerSize = setPacketSize(
@@ -54,7 +54,7 @@ SizeResult ChannelUart::sendBuffer(
         return headerResult;
     }
 
-    if (config->config & V2STYXLIB_CONFIG_SEND_CRC16) {
+    if (config->baseConfig.config & V2STYXLIB_CONFIG_SEND_CRC16) {
         const uint16_t crc = v2styxlib_crc16_calculate(buffer, size);
         const uint8_t crcBuffer[2] = {
             static_cast<uint8_t>((crc >> 8) & 0xFF),

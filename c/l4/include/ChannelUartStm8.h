@@ -3,10 +3,10 @@
 #include <stdint.h>
 #include "stm8s.h"
 
-#include "Channel_c.h"
+#include "structs.h"
 
 typedef struct {
-    V2styxlibUartConfig baseConfig;
+    V2styxlibUartConfigBase baseConfig;
 #ifdef V2STYXLIB_SOFTUART    
     GPIO_TypeDef * softUartPort;
     uint8_t softUartTxPinMask;
@@ -22,7 +22,7 @@ typedef struct {
  * baudRateDivider = 16000000 / 115200 ≈ 138.89
  * In this case, baudRateDivider will be approximately 139 (rounded to the nearest integer).
  */
-void v2styxlib_uart_setup(
+void v2styxlib_uart_stm8_setup(
     const V2styxlibUartStm8Config* config,
     uint16_t baudRateDivider
     );
@@ -37,3 +37,7 @@ void v2styxlib_uart_stm8_send(
     const uint8_t *buffer, 
     BufferSize_t length
 );
+
+static void v2styxlib_uart_stm8_send_byte(
+    const V2styxlibUartStm8Config* config,
+    uint8_t byte);

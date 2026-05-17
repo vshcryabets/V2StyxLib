@@ -13,7 +13,7 @@ static void v2styxlib_delay_bit() {
 }
 #endif
 
-static void v2styxlib_send_byte(
+static void v2styxlib_uart_stm8_send_byte(
     const V2styxlibUartStm8Config* config,
     uint8_t byte) {
 #ifdef V2STYXLIB_SOFTUART
@@ -53,7 +53,7 @@ static void v2styxlib_send_byte(
     }
 }
 
-void v2styxlib_uart_setup(
+void v2styxlib_uart_stm8_setup(
     const V2styxlibUartStm8Config* config,
     uint16_t baudRateDivider) 
 {
@@ -75,33 +75,4 @@ void v2styxlib_uart_setup(
         UART1->CR2 |= (UART1_CR2_TEN | UART1_CR2_REN);
     }
     UART1->CR1 &= ~UART1_CR1_UARTD; // Enable UART after configuration    
-}
-
-void v2styxlib_uart_stm8_send(
-    const V2styxlibUartStm8Config* config, 
-    const uint8_t *buffer, 
-    BufferSize_t length)
-{
-    if (config->baseConfig.config & V2STYXLIB_CONFIG_STREAMING_MODE) {
-        // If streaming mode is enabled, send SOF markers before the data
-        v2styxlib_send_byte(config, V2STYXLIB_SOF_MARKER_1);
-        v2styxlib_send_byte(config, V2STYXLIB_SOF_MARKER_2);
-    }
-
-    if (config->baseConfig.config & V2STYXLIB_CONFIG_SEND_CRC16) {
-        // send packet size + 2 bytes for CRC16
-        v2styxlib_send_byte(config, length + 2);
-        // then CRC16
-        uint16_t crc = v2styxlib_crc16_calculate(buffer, length);
-        v2styxlib_send_byte(config, (crc >> 8) & 0xFF); // send high byte of CRC
-        v2styxlib_send_byte(config, crc & 0xFF); // send low byte of CRC
-    } else {
-        // send packet size
-        v2styxlib_send_byte(config, length);
-    }
-
-    // then send the actual data
-    for (BufferSize_t i = 0; i < length; i++) {
-        v2styxlib_send_byte(config, buffer[i]);
-    }
 }

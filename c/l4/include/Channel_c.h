@@ -23,12 +23,11 @@
     #define V2STYXLIB_SOF_MARKER_2 0xAA
 #endif
 
+#include "arch.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-
-typedef struct V2styxlibUartConfig V2styxlibUartConfig;
 
 /**
  * V2styxlibUartSendBufferFunction - is a function pointer type that 
@@ -38,19 +37,8 @@ typedef struct V2styxlibUartConfig V2styxlibUartConfig;
 typedef void V2styxlibUartSendBufferFunction(
     const V2styxlibUartConfig* config,
     const uint8_t *buffer,
-    BufferSize_t length);
-
-/**
- * V2styxlibUartConfig - is a structure that holds the 
- * configuration for UART communication. And hardware layer 
- * specific send function.
- */
-struct V2styxlibUartConfig {
-    uint8_t config;
-#ifdef V2STYXLIB_USE_FUNCTIONS_POINTERS
-    V2styxlibUartSendBufferFunction* sendFunction;
-#endif
-};
+    BufferSize_t length
+);
 
 /**
  * useStreamingMode - is a boolean flag that indicates whether to
@@ -85,7 +73,6 @@ uint16_t v2styxlib_crc16_calculate(
     BufferSize_t length
 );
 
-#ifdef V2STYXLIB_USE_FUNCTIONS_POINTERS
 /**
  * buffer - is a pointer to the data buffer that contains the data to be sent over UART.
  * length - is the number of bytes to be sent from the buffer.
@@ -95,7 +82,6 @@ void v2styxlib_uart_send(
     const V2styxlibUartConfig* config,
     const uint8_t *buffer,
     BufferSize_t length);
-#endif
 
 #ifdef __cplusplus
 }

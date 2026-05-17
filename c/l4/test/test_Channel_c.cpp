@@ -1,7 +1,18 @@
 #include <catch2/catch_test_macros.hpp>
+#include <vector>
 
 extern "C" {
 #include "Channel_c.h"
+}
+
+static std::vector<uint8_t> g_uartBytes;
+
+extern "C" void v2styxlib_uart_send_byte(
+    const V2styxlibUartConfig* config,
+    uint8_t byte
+) {
+    (void)config;
+    g_uartBytes.push_back(byte);
 }
 
 TEST_CASE("v2styxlib_crc16_calculate: empty buffer", "[crc16]")
@@ -62,9 +73,9 @@ TEST_CASE("v2styxlib_uart_configure_proto: set streaming mode", "[uart_config]")
     
     v2styxlib_uart_configure_proto(&config, true, false, false);
     
-    REQUIRE((config.config & V2STYXLIB_CONFIG_STREAMING_MODE) != 0);
-    REQUIRE((config.config & V2STYXLIB_CONFIG_SEND_CRC16) == 0);
-    REQUIRE((config.config & V2STYXLIB_CONFIG_SOFT_UART_TX) == 0);
+    REQUIRE((config.baseConfig.config & V2STYXLIB_CONFIG_STREAMING_MODE) != 0);
+    REQUIRE((config.baseConfig.config & V2STYXLIB_CONFIG_SEND_CRC16) == 0);
+    REQUIRE((config.baseConfig.config & V2STYXLIB_CONFIG_SOFT_UART_TX) == 0);
 }
 
 TEST_CASE("v2styxlib_uart_configure_proto: set send CRC16", "[uart_config]")
@@ -73,9 +84,9 @@ TEST_CASE("v2styxlib_uart_configure_proto: set send CRC16", "[uart_config]")
     
     v2styxlib_uart_configure_proto(&config, false, true, false);
     
-    REQUIRE((config.config & V2STYXLIB_CONFIG_STREAMING_MODE) == 0);
-    REQUIRE((config.config & V2STYXLIB_CONFIG_SEND_CRC16) != 0);
-    REQUIRE((config.config & V2STYXLIB_CONFIG_SOFT_UART_TX) == 0);
+    REQUIRE((config.baseConfig.config & V2STYXLIB_CONFIG_STREAMING_MODE) == 0);
+    REQUIRE((config.baseConfig.config & V2STYXLIB_CONFIG_SEND_CRC16) != 0);
+    REQUIRE((config.baseConfig.config & V2STYXLIB_CONFIG_SOFT_UART_TX) == 0);
 }
 
 TEST_CASE("v2styxlib_uart_configure_proto: set soft UART TX", "[uart_config]")
@@ -84,9 +95,9 @@ TEST_CASE("v2styxlib_uart_configure_proto: set soft UART TX", "[uart_config]")
     
     v2styxlib_uart_configure_proto(&config, false, false, true);
     
-    REQUIRE((config.config & V2STYXLIB_CONFIG_STREAMING_MODE) == 0);
-    REQUIRE((config.config & V2STYXLIB_CONFIG_SEND_CRC16) == 0);
-    REQUIRE((config.config & V2STYXLIB_CONFIG_SOFT_UART_TX) != 0);
+    REQUIRE((config.baseConfig.config & V2STYXLIB_CONFIG_STREAMING_MODE) == 0);
+    REQUIRE((config.baseConfig.config & V2STYXLIB_CONFIG_SEND_CRC16) == 0);
+    REQUIRE((config.baseConfig.config & V2STYXLIB_CONFIG_SOFT_UART_TX) != 0);
 }
 
 TEST_CASE("v2styxlib_uart_configure_proto: set all flags", "[uart_config]")
@@ -95,9 +106,9 @@ TEST_CASE("v2styxlib_uart_configure_proto: set all flags", "[uart_config]")
     
     v2styxlib_uart_configure_proto(&config, true, true, true);
     
-    REQUIRE((config.config & V2STYXLIB_CONFIG_STREAMING_MODE) != 0);
-    REQUIRE((config.config & V2STYXLIB_CONFIG_SEND_CRC16) != 0);
-    REQUIRE((config.config & V2STYXLIB_CONFIG_SOFT_UART_TX) != 0);
+    REQUIRE((config.baseConfig.config & V2STYXLIB_CONFIG_STREAMING_MODE) != 0);
+    REQUIRE((config.baseConfig.config & V2STYXLIB_CONFIG_SEND_CRC16) != 0);
+    REQUIRE((config.baseConfig.config & V2STYXLIB_CONFIG_SOFT_UART_TX) != 0);
 }
 
 TEST_CASE("v2styxlib_uart_configure_proto: clear flags", "[uart_config]")
@@ -106,9 +117,9 @@ TEST_CASE("v2styxlib_uart_configure_proto: clear flags", "[uart_config]")
     
     v2styxlib_uart_configure_proto(&config, false, false, false);
     
-    REQUIRE((config.config & V2STYXLIB_CONFIG_STREAMING_MODE) == 0);
-    REQUIRE((config.config & V2STYXLIB_CONFIG_SEND_CRC16) == 0);
-    REQUIRE((config.config & V2STYXLIB_CONFIG_SOFT_UART_TX) == 0);
+    REQUIRE((config.baseConfig.config & V2STYXLIB_CONFIG_STREAMING_MODE) == 0);
+    REQUIRE((config.baseConfig.config & V2STYXLIB_CONFIG_SEND_CRC16) == 0);
+    REQUIRE((config.baseConfig.config & V2STYXLIB_CONFIG_SOFT_UART_TX) == 0);
 }
 
 TEST_CASE("v2styxlib_uart_configure_proto: toggle flags", "[uart_config]")
@@ -117,11 +128,90 @@ TEST_CASE("v2styxlib_uart_configure_proto: toggle flags", "[uart_config]")
     
     // Set all flags
     v2styxlib_uart_configure_proto(&config, true, true, true);
-    REQUIRE(config.config == (V2STYXLIB_CONFIG_STREAMING_MODE | V2STYXLIB_CONFIG_SEND_CRC16 | V2STYXLIB_CONFIG_SOFT_UART_TX));
+    REQUIRE(config.baseConfig.config == (V2STYXLIB_CONFIG_STREAMING_MODE | V2STYXLIB_CONFIG_SEND_CRC16 | V2STYXLIB_CONFIG_SOFT_UART_TX));
     
     // Clear streaming mode, keep others
     v2styxlib_uart_configure_proto(&config, false, true, true);
-    REQUIRE((config.config & V2STYXLIB_CONFIG_STREAMING_MODE) == 0);
-    REQUIRE((config.config & V2STYXLIB_CONFIG_SEND_CRC16) != 0);
-    REQUIRE((config.config & V2STYXLIB_CONFIG_SOFT_UART_TX) != 0);
+    REQUIRE((config.baseConfig.config & V2STYXLIB_CONFIG_STREAMING_MODE) == 0);
+    REQUIRE((config.baseConfig.config & V2STYXLIB_CONFIG_SEND_CRC16) != 0);
+    REQUIRE((config.baseConfig.config & V2STYXLIB_CONFIG_SOFT_UART_TX) != 0);
+}
+
+TEST_CASE("v2styxlib_uart_send: plain frame", "[uart_send]")
+{
+    V2styxlibUartConfig config = {0};
+    v2styxlib_uart_configure_proto(&config, false, false, false);
+    uint8_t payload[] = {0x10, 0x20, 0x30};
+
+    g_uartBytes.clear();
+    v2styxlib_uart_send(&config, payload, static_cast<BufferSize_t>(sizeof(payload)));
+
+    const std::vector<uint8_t> expected = {0x03, 0x10, 0x20, 0x30};
+    REQUIRE(g_uartBytes == expected);
+}
+
+TEST_CASE("v2styxlib_uart_send: streaming frame", "[uart_send]")
+{
+    V2styxlibUartConfig config = {0};
+    v2styxlib_uart_configure_proto(&config, true, false, false);
+    uint8_t payload[] = {0xAB, 0xCD};
+
+    g_uartBytes.clear();
+    v2styxlib_uart_send(&config, payload, static_cast<BufferSize_t>(sizeof(payload)));
+
+    const std::vector<uint8_t> expected = {
+        V2STYXLIB_SOF_MARKER_1,
+        V2STYXLIB_SOF_MARKER_2,
+        0x02,
+        0xAB,
+        0xCD
+    };
+    REQUIRE(g_uartBytes == expected);
+}
+
+TEST_CASE("v2styxlib_uart_send: crc16 frame", "[uart_send]")
+{
+    V2styxlibUartConfig config = {0};
+    v2styxlib_uart_configure_proto(&config, false, true, false);
+    uint8_t payload[] = {0x01, 0x02, 0x03};
+    const uint16_t crc = v2styxlib_crc16_calculate(
+        payload,
+        static_cast<BufferSize_t>(sizeof(payload)));
+
+    g_uartBytes.clear();
+    v2styxlib_uart_send(&config, payload, static_cast<BufferSize_t>(sizeof(payload)));
+
+    const std::vector<uint8_t> expected = {
+        0x05,
+        static_cast<uint8_t>((crc >> 8) & 0xFF),
+        static_cast<uint8_t>(crc & 0xFF),
+        0x01,
+        0x02,
+        0x03
+    };
+    REQUIRE(g_uartBytes == expected);
+}
+
+TEST_CASE("v2styxlib_uart_send: streaming + crc16 frame", "[uart_send]")
+{
+    V2styxlibUartConfig config = {0};
+    v2styxlib_uart_configure_proto(&config, true, true, false);
+    uint8_t payload[] = {0x11, 0x22};
+    const uint16_t crc = v2styxlib_crc16_calculate(
+        payload,
+        static_cast<BufferSize_t>(sizeof(payload)));
+
+    g_uartBytes.clear();
+    v2styxlib_uart_send(&config, payload, static_cast<BufferSize_t>(sizeof(payload)));
+
+    const std::vector<uint8_t> expected = {
+        V2STYXLIB_SOF_MARKER_1,
+        V2STYXLIB_SOF_MARKER_2,
+        0x04,
+        static_cast<uint8_t>((crc >> 8) & 0xFF),
+        static_cast<uint8_t>(crc & 0xFF),
+        0x11,
+        0x22
+    };
+    REQUIRE(g_uartBytes == expected);
 }
