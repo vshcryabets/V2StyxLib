@@ -17,8 +17,7 @@ extern "C" void v2styxlib_uart_send_byte(
 
 TEST_CASE("v2styxlib_crc16_calculate: empty buffer", "[crc16]")
 {
-    uint8_t buffer[] = {};
-    uint16_t crc = v2styxlib_crc16_calculate(buffer, 0);
+    uint16_t crc = v2styxlib_crc16_calculate(nullptr, 0);
     
     // CRC of empty buffer should be the initial value since no data updates it
     REQUIRE(crc == V2STYXLIB_CRC16_INITIAL_VALUE);
