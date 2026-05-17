@@ -9,7 +9,6 @@ namespace styxlib
 class ChannelUartConfig: public V2styxlibUartConfig
 {
 public:
-    const uint8_t sofMarkers[2];
     PacketHeaderSize packetSizeHeader = PacketHeaderSize::Size2Bytes;
     uint32_t baudrate = 9600;
 public:

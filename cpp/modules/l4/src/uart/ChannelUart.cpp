@@ -13,8 +13,10 @@ ChannelUartConfig::ChannelUartConfig(
     PacketHeaderSize packetSizeHeader,
     uint32_t baudrate
 ): 
-    V2styxlibUartConfig{.baseConfig = {config}},
-    sofMarkers{V2STYXLIB_SOF_MARKER_1, V2STYXLIB_SOF_MARKER_2},
+    V2styxlibUartConfig{.baseConfig = {
+        .config = config,
+        .sof = {V2STYXLIB_SOF_MARKER_1, V2STYXLIB_SOF_MARKER_2}
+    }},
     packetSizeHeader(packetSizeHeader),
     baudrate(baudrate)
 {
@@ -32,7 +34,7 @@ SizeResult ChannelUart::sendBuffer(
     }
 
     if (config->baseConfig.config & V2STYXLIB_CONFIG_STREAMING_MODE) {
-        auto sofResult = internalSendBytes(const_cast<uint8_t*>(config->sofMarkers), 2);
+        auto sofResult = internalSendBytes(const_cast<uint8_t*>(config->baseConfig.sof), 2);
         if (!sofResult.has_value()) {
             return sofResult;
         }
