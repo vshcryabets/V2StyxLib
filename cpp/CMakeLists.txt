@@ -19,6 +19,8 @@ set(CMAKE_C_STANDARD_REQUIRED True)
 
 option(USE_STD_MEMORY "Use std lib <memory>" ON)
 option(ENABLE_CATCH2 "Enable Catch2" ON)
+option(SUPPORT_UNIX "Support Unix" ON)
+option(SUPPORT_RP2040 "Support RP2040" OFF)
 
 if (ENABLE_CATCH2)
     include(FetchContent)
@@ -42,7 +44,7 @@ endif()
 
 add_compile_definitions(BufferSize_t=uint16_t)
 
-add_subdirectory(../c/l4 module/l4_c)
+add_subdirectory(../c/l4 modules/l4_c)
 add_subdirectory(modules/l4)
 add_subdirectory(modules/l5)
 
