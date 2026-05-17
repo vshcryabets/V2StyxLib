@@ -2,10 +2,6 @@
   "name": "V2StyxLibL4_C",
   "version": "1.0.0",
   "build": {
-    "srcFilter": [
-      "+<arch.c>",
-      "+<Channel_c.c>",
-      "+<ChannelUartStm8.c>"
-    ]
+    "extraScript": "filter_src.py"
   }
 }
