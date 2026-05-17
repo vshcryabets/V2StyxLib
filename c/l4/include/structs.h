@@ -1,15 +1,15 @@
 #ifndef STRUCTS_H
 #define STRUCTS_H
 
-#include <stdint.h>
+#include "defines.h"
 
 /**
- * V2styxlibUartConfig - is a structure that holds the 
+ * V2styxlibUartConfigBase - is a structure that holds the 
  * configuration for UART communication. And hardware layer 
  * specific send function.
  */
-struct V2styxlibUartConfigBase {
+typedef struct V2styxlibUartConfigBase {
     uint8_t config;
-};
+} V2styxlibUartConfigBase;
 
 #endif // STRUCTS_H

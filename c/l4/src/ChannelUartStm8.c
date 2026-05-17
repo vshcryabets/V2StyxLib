@@ -1,6 +1,6 @@
 #include "ChannelUartStm8.h"
 
-#ifdef V2STYXLIB_SOFTUART
+#ifdef V2STYXLIB_SOFTUART_TX
 static void v2styxlib_delay_bit() {
     __asm
         pushw x         
@@ -13,10 +13,10 @@ static void v2styxlib_delay_bit() {
 }
 #endif
 
-static void v2styxlib_uart_stm8_send_byte(
+void v2styxlib_uart_stm8_send_byte(
     const V2styxlibUartStm8Config* config,
     uint8_t byte) {
-#ifdef V2STYXLIB_SOFTUART
+#ifdef V2STYXLIB_SOFTUART_TX
     if (config->baseConfig.config & V2STYXLIB_CONFIG_SOFT_UART_TX) {
         // Send byte using software UART
         // Start bit
@@ -60,7 +60,7 @@ void v2styxlib_uart_stm8_setup(
     UART1->CR1 |= UART1_CR1_UARTD; // Disable UART before configuration
     UART1->BRR2 = ((baudRateDivider >> 8) & 0xF0) | (baudRateDivider & 0x0F);
     UART1->BRR1 = (baudRateDivider >> 4) & 0xFF;
-#ifdef V2STYXLIB_SOFTUART
+#ifdef V2STYXLIB_SOFTUART_TX
      if (config->baseConfig.config & V2STYXLIB_CONFIG_SOFT_UART_TX) {
         // Configure the soft UART TX pin as output
         config->softUartPort->DDR |= config->softUartTxPinMask;

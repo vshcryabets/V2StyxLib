@@ -1,13 +1,11 @@
 #pragma once
 
-#include <stdint.h>
-#include "stm8s.h"
-
+#include "defines.h"
 #include "structs.h"
 
 typedef struct {
     V2styxlibUartConfigBase baseConfig;
-#ifdef V2STYXLIB_SOFTUART    
+#ifdef V2STYXLIB_SOFTUART_TX
     GPIO_TypeDef * softUartPort;
     uint8_t softUartTxPinMask;
 #endif    
@@ -38,6 +36,6 @@ void v2styxlib_uart_stm8_send(
     BufferSize_t length
 );
 
-static void v2styxlib_uart_stm8_send_byte(
+void v2styxlib_uart_stm8_send_byte(
     const V2styxlibUartStm8Config* config,
     uint8_t byte);

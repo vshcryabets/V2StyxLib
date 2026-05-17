@@ -34,6 +34,6 @@ you need additional ADC channels and want to free up the **UART1_TX / AIN5 / (HS
 **Note:** This implementation covers TX only, as software-based RX is generally 
 unstable on this architecture due to timing constraints.
 
-## `TARGET_STM8`
+## `V2STYXLIB_TARGET_STM8`
 
 Specify that build is for STM8.

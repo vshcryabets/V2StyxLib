@@ -1,6 +1,6 @@
 #include "arch.h"
 
-#ifdef TARGET_STM8
+#ifdef V2STYXLIB_TARGET_STM8
 #elif defined(TARGET_CATCH2)
 #else
 #include <stdio.h>

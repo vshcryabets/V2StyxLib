@@ -3,8 +3,9 @@
 
 #include "structs.h"
 
-#ifdef TARGET_STM8
+#ifdef V2STYXLIB_TARGET_STM8
     #include "ChannelUartStm8.h"
+
     typedef V2styxlibUartStm8Config V2styxlibUartConfig;
     #define v2styxlib_uart_send_byte v2styxlib_uart_stm8_send_byte
 #else
