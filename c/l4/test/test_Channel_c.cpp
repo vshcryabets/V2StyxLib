@@ -183,11 +183,11 @@ TEST_CASE("v2styxlib_uart_send: crc16 frame", "[uart_send]")
 
     const std::vector<uint8_t> expected = {
         0x05,
-        static_cast<uint8_t>((crc >> 8) & 0xFF),
-        static_cast<uint8_t>(crc & 0xFF),
         0x01,
         0x02,
-        0x03
+        0x03,
+        static_cast<uint8_t>((crc >> 8) & 0xFF),
+        static_cast<uint8_t>(crc & 0xFF)
     };
     REQUIRE(g_uartBytes == expected);
 }
@@ -208,10 +208,10 @@ TEST_CASE("v2styxlib_uart_send: streaming + crc16 frame", "[uart_send]")
         V2STYXLIB_SOF_MARKER_1,
         V2STYXLIB_SOF_MARKER_2,
         0x04,
-        static_cast<uint8_t>((crc >> 8) & 0xFF),
-        static_cast<uint8_t>(crc & 0xFF),
         0x11,
-        0x22
+        0x22,
+        static_cast<uint8_t>((crc >> 8) & 0xFF),
+        static_cast<uint8_t>(crc & 0xFF)
     };
     REQUIRE(g_uartBytes == expected);
 }
