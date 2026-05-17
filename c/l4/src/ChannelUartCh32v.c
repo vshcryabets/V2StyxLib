@@ -12,8 +12,9 @@
 
 #include "ChannelUartCh32v.h"
 
-void v2styxlib_uart_ch32v_setup(const V2styxlibUartCh32vConfig* config)
-{
+void v2styxlib_uart_ch32v_setup(
+    const V2styxlibUartCh32vConfig* config
+) {
     GPIO_InitTypeDef  GPIO_InitStructure = {0};
     USART_InitTypeDef USART_InitStructure = {0};
 

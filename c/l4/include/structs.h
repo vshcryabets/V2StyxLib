@@ -10,6 +10,7 @@
  */
 typedef struct V2styxlibUartConfigBase {
     uint8_t config;
+    uint8_t sof[2];
 } V2styxlibUartConfigBase;
 
 #endif // STRUCTS_H

@@ -28,6 +28,8 @@ void v2styxlib_uart_configure_proto(
 ) {
     if (useStreamingMode) {
         config->baseConfig.config |= V2STYXLIB_CONFIG_STREAMING_MODE;
+        config->baseConfig.sof[0] = V2STYXLIB_SOF_MARKER_1;
+        config->baseConfig.sof[1] = V2STYXLIB_SOF_MARKER_2;
     } else {
         config->baseConfig.config &= ~V2STYXLIB_CONFIG_STREAMING_MODE;
     }
@@ -50,11 +52,7 @@ void v2styxlib_uart_send(
 {
     if (config->baseConfig.config & V2STYXLIB_CONFIG_STREAMING_MODE) {
         // If streaming mode is enabled, send SOF markers before the data
-        const uint8_t sofMarkers[2] = {
-            V2STYXLIB_SOF_MARKER_1,
-            V2STYXLIB_SOF_MARKER_2
-        };
-        v2styxlib_uart_send_bytes(config, sofMarkers, 2);
+        v2styxlib_uart_send_bytes(config, config->baseConfig.sof, 2);
     }
 
     {
