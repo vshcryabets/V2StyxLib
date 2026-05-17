@@ -13,43 +13,48 @@ static void v2styxlib_delay_bit() {
 }
 #endif
 
-void v2styxlib_uart_stm8_send_byte(
+void v2styxlib_uart_stm8_send_bytes(
     const V2styxlibUartStm8Config* config,
-    uint8_t byte) {
+    const uint8_t* buffer,
+    BufferSize_t length)
+{
+    for (BufferSize_t i = 0; i < length; i++) {
+        uint8_t byte = buffer[i];
 #ifdef V2STYXLIB_SOFTUART_TX
-    if (config->baseConfig.config & V2STYXLIB_CONFIG_SOFT_UART_TX) {
-        // Send byte using software UART
-        // Start bit
-        __asm
-            sim ; disable interrupts (software UART timing)
-        __endasm;
-        config->softUartPort->ODR &= ~config->softUartTxPinMask;
-        v2styxlib_delay_bit();
-
-        // Data bits (LSB first)
-        for (uint8_t i = 0; i < 8; i++) {
-            if (byte & 0x01) {
-                config->softUartPort->ODR |= config->softUartTxPinMask;
-            } else {
-                config->softUartPort->ODR &= ~config->softUartTxPinMask;
-            }
-            byte >>= 1;
+        if (config->baseConfig.config & V2STYXLIB_CONFIG_SOFT_UART_TX) {
+            // Send byte using software UART
+            // Start bit
+            __asm
+                sim ; disable interrupts (software UART timing)
+            __endasm;
+            config->softUartPort->ODR &= ~config->softUartTxPinMask;
             v2styxlib_delay_bit();
-        }
 
-        // Stop bit
-        config->softUartPort->ODR |= config->softUartTxPinMask;
-        v2styxlib_delay_bit();
-        __asm
-            rim ; enable interrupts (software UART timing)
-        __endasm;
-    } else
+            // Data bits (LSB first)
+            for (uint8_t i = 0; i < 8; i++) {
+                if (byte & 0x01) {
+                    config->softUartPort->ODR |= config->softUartTxPinMask;
+                } else {
+                    config->softUartPort->ODR &= ~config->softUartTxPinMask;
+                }
+                byte >>= 1;
+                v2styxlib_delay_bit();
+            }
+
+            // Stop bit
+            config->softUartPort->ODR |= config->softUartTxPinMask;
+            v2styxlib_delay_bit();
+            __asm
+                rim ; enable interrupts (software UART timing)
+            __endasm;
+        } else
 #endif
-    {    
-        while (!(UART1->SR & UART1_SR_TXE)) {
+        {    
+            while (!(UART1->SR & UART1_SR_TXE)) {
 
-        };
-        UART1->DR = byte;
+            };
+            UART1->DR = byte;
+        }
     }
 }
 
@@ -76,3 +81,4 @@ void v2styxlib_uart_stm8_setup(
     }
     UART1->CR1 &= ~UART1_CR1_UARTD; // Enable UART after configuration    
 }
+

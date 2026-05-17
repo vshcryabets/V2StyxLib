@@ -8,17 +8,6 @@ extern "C" {
 #endif
 
 /**
- * V2styxlibUartSendBufferFunction - is a function pointer type that 
- * defines the signature of a function responsible for sending 
- * data over UART.
- */
-typedef void V2styxlibUartSendBufferFunction(
-    const V2styxlibUartConfig* config,
-    const uint8_t *buffer,
-    BufferSize_t length
-);
-
-/**
  * useStreamingMode - is a boolean flag that indicates whether to
  * use streaming mode for UART communication.
  * In streaming mode client will not wait for the response after

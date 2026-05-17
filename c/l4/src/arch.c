@@ -5,11 +5,15 @@
 #else
 #include <stdio.h>
 
-void v2styxlib_uart_send_byte(
+void v2styxlib_uart_send_bytes(
     const V2styxlibUartConfig* config,
-    uint8_t byte
+    const uint8_t* buffer,
+    BufferSize_t length
 ) {
-    // For host system, we can just print the data to console for testing purposes
-    printf("Sending data over UART: %02X\n", byte);
+    (void)config;
+    // For host system, print bytes for testing/debug purposes.
+    for (BufferSize_t i = 0; i < length; i++) {
+        printf("Sending data over UART: %02X\n", buffer[i]);
+    }
 }
 #endif

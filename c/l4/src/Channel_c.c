@@ -50,27 +50,32 @@ void v2styxlib_uart_send(
 {
     if (config->baseConfig.config & V2STYXLIB_CONFIG_STREAMING_MODE) {
         // If streaming mode is enabled, send SOF markers before the data
-        v2styxlib_uart_send_byte(config, V2STYXLIB_SOF_MARKER_1);
-        v2styxlib_uart_send_byte(config, V2STYXLIB_SOF_MARKER_2);
+        const uint8_t sofMarkers[2] = {
+            V2STYXLIB_SOF_MARKER_1,
+            V2STYXLIB_SOF_MARKER_2
+        };
+        v2styxlib_uart_send_bytes(config, sofMarkers, 2);
     }
 
-    if (config->baseConfig.config & V2STYXLIB_CONFIG_SEND_CRC16) {
-        // send packet size + 2 bytes for CRC16
-        v2styxlib_uart_send_byte(config, length + 2);
-    } else {
-        // send packet size
-        v2styxlib_uart_send_byte(config, length);
+    {
+        uint8_t packetSize = length;
+        if (config->baseConfig.config & V2STYXLIB_CONFIG_SEND_CRC16) {
+            // send packet size + 2 bytes for CRC16
+            packetSize = (uint8_t)(packetSize + 2);
+        }
+        v2styxlib_uart_send_bytes(config, &packetSize, 1);
     }
 
     // then send the actual data
-    for (BufferSize_t i = 0; i < length; i++) {
-        v2styxlib_uart_send_byte(config, buffer[i]);
-    }
+    v2styxlib_uart_send_bytes(config, buffer, length);
 
     if (config->baseConfig.config & V2STYXLIB_CONFIG_SEND_CRC16) {
         // send CRC16 after data
         uint16_t crc = v2styxlib_crc16_calculate(buffer, length);
-        v2styxlib_uart_send_byte(config, (crc >> 8) & 0xFF); // send high byte of CRC
-        v2styxlib_uart_send_byte(config, crc & 0xFF); // send low byte of CRC
+        uint8_t crcBytes[2] = {
+            (uint8_t)((crc >> 8) & 0xFF),
+            (uint8_t)(crc & 0xFF)
+        };
+        v2styxlib_uart_send_bytes(config, crcBytes, 2);
     }
 }

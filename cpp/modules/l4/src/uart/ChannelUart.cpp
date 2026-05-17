@@ -8,14 +8,16 @@ ChannelUart::ChannelUart(const ChannelUartConfig* config)
 {
 }
     
-ChannelUartConfig::ChannelUartConfig(uint8_t config)
+ChannelUartConfig::ChannelUartConfig(
+    uint8_t config,
+    PacketHeaderSize packetSizeHeader,
+    uint32_t baudrate
+): 
+    V2styxlibUartConfig{.baseConfig = {config}},
+    sofMarkers{V2STYXLIB_SOF_MARKER_1, V2STYXLIB_SOF_MARKER_2},
+    packetSizeHeader(packetSizeHeader),
+    baudrate(baudrate)
 {
-    this->baseConfig.config = config;
-    this->useStreamingMode = (config & V2STYXLIB_CONFIG_STREAMING_MODE) != 0;
-    this->sendCrc16 = (config & V2STYXLIB_CONFIG_SEND_CRC16) != 0;
-    this->sofMarkers[0] = V2STYXLIB_SOF_MARKER_1;
-    this->sofMarkers[1] = V2STYXLIB_SOF_MARKER_2;
-    this->packetSizeHeader = PacketHeaderSize::Size2Bytes; // Default packet size header
 }
 
 SizeResult ChannelUart::sendBuffer(
@@ -30,13 +32,12 @@ SizeResult ChannelUart::sendBuffer(
     }
 
     if (config->baseConfig.config & V2STYXLIB_CONFIG_STREAMING_MODE) {
-        auto sofResult = internalSendBytes(config->sofMarkers, static_cast<Size>(2));
+        auto sofResult = internalSendBytes(const_cast<uint8_t*>(config->sofMarkers), 2);
         if (!sofResult.has_value()) {
             return sofResult;
         }
     }
 
-    uint8_t packetSizeBuffer[4] = { 0, 0, 0, 0 };
     const Size payloadSize = (config->baseConfig.config & V2STYXLIB_CONFIG_SEND_CRC16)
         ? static_cast<Size>(size + 2)
         : size;
@@ -54,19 +55,23 @@ SizeResult ChannelUart::sendBuffer(
         return headerResult;
     }
 
+    auto dataResult = internalSendBytes(buffer, size);
+    if (!dataResult.has_value()) {
+        return dataResult;
+    }
+
     if (config->baseConfig.config & V2STYXLIB_CONFIG_SEND_CRC16) {
         const uint16_t crc = v2styxlib_crc16_calculate(buffer, size);
         const uint8_t crcBuffer[2] = {
             static_cast<uint8_t>((crc >> 8) & 0xFF),
             static_cast<uint8_t>(crc & 0xFF)
         };
-        auto crcResult = internalSendBytes(crcBuffer, static_cast<Size>(sizeof(crcBuffer)));
+        auto crcResult = internalSendBytes(const_cast<uint8_t*>(crcBuffer), sizeof(crcBuffer));
         if (!crcResult.has_value()) {
             return crcResult;
         }
     }
-
-    return internalSendBytes(buffer, size);
+    return dataResult;
 }
 
 }

@@ -7,12 +7,13 @@ extern "C" {
 
 static std::vector<uint8_t> g_uartBytes;
 
-extern "C" void v2styxlib_uart_send_byte(
+extern "C" void v2styxlib_uart_send_bytes(
     const V2styxlibUartConfig* config,
-    uint8_t byte
+    const uint8_t* buffer,
+    BufferSize_t length
 ) {
     (void)config;
-    g_uartBytes.push_back(byte);
+    g_uartBytes.insert(g_uartBytes.end(), buffer, buffer + length);
 }
 
 TEST_CASE("v2styxlib_crc16_calculate: empty buffer", "[crc16]")

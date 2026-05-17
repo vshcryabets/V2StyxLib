@@ -14,11 +14,16 @@ public:
         : styxlib::ChannelUart(config)
     {
     }
+    styxlib::ErrorCode configureUart() override
+    {
+        // No actual UART configuration needed for testing
+        return styxlib::ErrorCode::Success;
+    }
 
     std::vector<uint8_t> sentBytes;
 
 protected:
-    styxlib::SizeResult internalSendBytes(const uint8_t* buffer, styxlib::Size size) override
+    styxlib::SizeResult internalSendBytes(const styxlib::StyxBuffer buffer, styxlib::Size size) override
     {
         sentBytes.insert(sentBytes.end(), buffer, buffer + size);
         return size;
@@ -27,7 +32,7 @@ protected:
 
 }
 
-TEST_CASE("ChannelUart::sendBuffer frames payload with SOF, header, CRC and data", "[ChannelUart]")
+TEST_CASE("ChannelUart::sendBuffer frames payload with SOF, header, data and CRC", "[ChannelUart]")
 {
     styxlib::ChannelUartConfig config(
         V2STYXLIB_CONFIG_STREAMING_MODE | V2STYXLIB_CONFIG_SEND_CRC16);
@@ -52,11 +57,11 @@ TEST_CASE("ChannelUart::sendBuffer frames payload with SOF, header, CRC and data
         V2STYXLIB_SOF_MARKER_2,
         0x00,
         0x05,
-        static_cast<uint8_t>((crc >> 8) & 0xFF),
-        static_cast<uint8_t>(crc & 0xFF),
         0x10,
         0x20,
         0x30,
+        static_cast<uint8_t>((crc >> 8) & 0xFF),
+        static_cast<uint8_t>(crc & 0xFF),
     };
 
     REQUIRE(channel.sentBytes == expected);

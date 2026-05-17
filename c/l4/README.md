@@ -36,4 +36,8 @@ unstable on this architecture due to timing constraints.
 
 ## `V2STYXLIB_TARGET_STM8`
 
-Specify that build is for STM8.
+Target build for STM8.
+
+## `V2STYXLIB_TARGET_CH32V`
+
+Target build for CH32V.
