@@ -15,30 +15,36 @@
 void v2styxlib_uart_ch32v_setup(
     const V2styxlibUartCh32vConfig* config
 ) {
-    GPIO_InitTypeDef  GPIO_InitStructure = {0};
-    USART_InitTypeDef USART_InitStructure = {0};
+    uint32_t reg;
+    uint32_t baud = config->baudrate;
 
-    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOD | RCC_APB2Periph_USART1, ENABLE);
+    /* Enable clocks for GPIOD and USART1 */
+    RCC->APB2PCENR |= (RCC_APB2Periph_GPIOD | RCC_APB2Periph_USART1);
 
-    /* PD5 TX */
-    GPIO_InitStructure.GPIO_Pin   = GPIO_Pin_5;
-    GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_AF_PP;
-    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-    GPIO_Init(GPIOD, &GPIO_InitStructure);
+    /* PD5: AF push-pull output, 50 MHz (MODE=11, CNF=10 => 0xB) */
+    reg = GPIOD->CFGLR;
+    reg &= ~(0xFu << (5u * 4u));
+    reg |=  (0xBu << (5u * 4u));
 
-    /* PD6 RX */
-    GPIO_InitStructure.GPIO_Pin  = GPIO_Pin_6;
-    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
-    GPIO_Init(GPIOD, &GPIO_InitStructure);
+    /* PD6: floating input (MODE=00, CNF=01 => 0x4) */
+    reg &= ~(0xFu << (6u * 4u));
+    reg |=  (0x4u << (6u * 4u));
+    GPIOD->CFGLR = reg;
 
-    USART_InitStructure.USART_BaudRate            = config->baudrate;
-    USART_InitStructure.USART_WordLength          = USART_WordLength_8b;
-    USART_InitStructure.USART_StopBits            = USART_StopBits_1;
-    USART_InitStructure.USART_Parity              = USART_Parity_No;
-    USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
-    USART_InitStructure.USART_Mode                = USART_Mode_Tx | USART_Mode_Rx;
-    USART_Init(USART1, &USART_InitStructure);
-    USART_Cmd(USART1, ENABLE);
+    if (baud == 0u) {
+        baud = 9600u;
+    }
+
+    /* Configure baud rate for 16x oversampling */
+    USART1->BRR = (uint16_t)((SystemCoreClock + (baud / 2u)) / baud);
+
+    /* 8 data bits, no parity, 1 stop bit, no HW flow control */
+    USART1->CTLR1 = (USART_CTLR1_TE | USART_CTLR1_RE);
+    USART1->CTLR2 &= ~(USART_CTLR2_STOP);
+    USART1->CTLR3 &= ~(USART_CTLR3_RTSE | USART_CTLR3_CTSE);
+
+    /* Enable USART */
+    USART1->CTLR1 |= USART_CTLR1_UE;
 }
 
 void v2styxlib_uart_ch32v_send_bytes(
@@ -48,10 +54,10 @@ void v2styxlib_uart_ch32v_send_bytes(
 {
     (void)config;
     for (BufferSize_t i = 0; i < length; ++i) {
-        while (USART_GetFlagStatus(USART1, USART_FLAG_TXE) == RESET);
-        USART_SendData(USART1, buffer[i]);
+        while ((USART1->STATR & USART_STATR_TXE) == 0u);
+        USART1->DATAR = buffer[i];
     }
     // wait for transmission complete before returning to ensure all bytes are sent
-    while (USART_GetFlagStatus(USART1, USART_FLAG_TC) == RESET);
+    while ((USART1->STATR & USART_STATR_TC) == 0u);
 }
 
