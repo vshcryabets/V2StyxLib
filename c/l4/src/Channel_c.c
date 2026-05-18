@@ -27,18 +27,53 @@ void v2styxlib_uart_configure_proto(
     bool useSoftUartTx
 ) {
     if (useStreamingMode) {
-        config->config |= V2STYXLIB_CONFIG_STREAMING_MODE;
+        config->baseConfig.config |= V2STYXLIB_CONFIG_STREAMING_MODE;
+        config->baseConfig.sof[0] = V2STYXLIB_SOF_MARKER_1;
+        config->baseConfig.sof[1] = V2STYXLIB_SOF_MARKER_2;
     } else {
-        config->config &= ~V2STYXLIB_CONFIG_STREAMING_MODE;
+        config->baseConfig.config &= ~V2STYXLIB_CONFIG_STREAMING_MODE;
     }
     if (sendCrc16) {
-        config->config |= V2STYXLIB_CONFIG_SEND_CRC16;
+        config->baseConfig.config |= V2STYXLIB_CONFIG_SEND_CRC16;
     } else {
-        config->config &= ~V2STYXLIB_CONFIG_SEND_CRC16;
+        config->baseConfig.config &= ~V2STYXLIB_CONFIG_SEND_CRC16;
     }
     if (useSoftUartTx) {
-        config->config |= V2STYXLIB_CONFIG_SOFT_UART_TX;
+        config->baseConfig.config |= V2STYXLIB_CONFIG_SOFT_UART_TX;
     } else {
-        config->config &= ~V2STYXLIB_CONFIG_SOFT_UART_TX;
+        config->baseConfig.config &= ~V2STYXLIB_CONFIG_SOFT_UART_TX;
+    }
+}
+
+void v2styxlib_uart_send(
+    const V2styxlibUartConfig* config, 
+    const uint8_t *buffer, 
+    BufferSize_t length)
+{
+    if (config->baseConfig.config & V2STYXLIB_CONFIG_STREAMING_MODE) {
+        // If streaming mode is enabled, send SOF markers before the data
+        v2styxlib_uart_send_bytes(config, config->baseConfig.sof, 2);
+    }
+
+    {
+        uint8_t packetSize = length;
+        if (config->baseConfig.config & V2STYXLIB_CONFIG_SEND_CRC16) {
+            // send packet size + 2 bytes for CRC16
+            packetSize = (uint8_t)(packetSize + 2);
+        }
+        v2styxlib_uart_send_bytes(config, &packetSize, 1);
+    }
+
+    // then send the actual data
+    v2styxlib_uart_send_bytes(config, buffer, length);
+
+    if (config->baseConfig.config & V2STYXLIB_CONFIG_SEND_CRC16) {
+        // send CRC16 after data
+        uint16_t crc = v2styxlib_crc16_calculate(buffer, length);
+        uint8_t crcBytes[2] = {
+            (uint8_t)((crc >> 8) & 0xFF),
+            (uint8_t)(crc & 0xFF)
+        };
+        v2styxlib_uart_send_bytes(config, crcBytes, 2);
     }
 }

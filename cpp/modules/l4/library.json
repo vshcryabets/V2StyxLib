@@ -1,0 +1,10 @@
+{
+  "name": "V2StyxLibL4_CPP",
+  "version": "1.0.0",
+  "build": {
+    "extraScript": "filter_src.py"
+  },
+  "dependencies": {
+    "LocalLib": "file://../../../c/l4/"
+  }
+}

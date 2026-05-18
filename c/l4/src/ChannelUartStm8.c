@@ -1,6 +1,6 @@
 #include "ChannelUartStm8.h"
 
-#ifdef V2STYXLIB_SOFTUART
+#ifdef V2STYXLIB_SOFTUART_TX
 static void v2styxlib_delay_bit() {
     __asm
         pushw x         
@@ -13,54 +13,59 @@ static void v2styxlib_delay_bit() {
 }
 #endif
 
-static void v2styxlib_send_byte(
+void v2styxlib_uart_stm8_send_bytes(
     const V2styxlibUartStm8Config* config,
-    uint8_t byte) {
-#ifdef V2STYXLIB_SOFTUART
-    if (config->baseConfig.config & V2STYXLIB_CONFIG_SOFT_UART_TX) {
-        // Send byte using software UART
-        // Start bit
-        __asm
-            sim ; disable interrupts (software UART timing)
-        __endasm;
-        config->softUartPort->ODR &= ~config->softUartTxPinMask;
-        v2styxlib_delay_bit();
-
-        // Data bits (LSB first)
-        for (uint8_t i = 0; i < 8; i++) {
-            if (byte & 0x01) {
-                config->softUartPort->ODR |= config->softUartTxPinMask;
-            } else {
-                config->softUartPort->ODR &= ~config->softUartTxPinMask;
-            }
-            byte >>= 1;
+    const uint8_t* buffer,
+    BufferSize_t length)
+{
+    for (BufferSize_t i = 0; i < length; i++) {
+        uint8_t byte = buffer[i];
+#ifdef V2STYXLIB_SOFTUART_TX
+        if (config->baseConfig.config & V2STYXLIB_CONFIG_SOFT_UART_TX) {
+            // Send byte using software UART
+            // Start bit
+            __asm
+                sim ; disable interrupts (software UART timing)
+            __endasm;
+            config->softUartPort->ODR &= ~config->softUartTxPinMask;
             v2styxlib_delay_bit();
-        }
 
-        // Stop bit
-        config->softUartPort->ODR |= config->softUartTxPinMask;
-        v2styxlib_delay_bit();
-        __asm
-            rim ; enable interrupts (software UART timing)
-        __endasm;
-    } else
+            // Data bits (LSB first)
+            for (uint8_t i = 0; i < 8; i++) {
+                if (byte & 0x01) {
+                    config->softUartPort->ODR |= config->softUartTxPinMask;
+                } else {
+                    config->softUartPort->ODR &= ~config->softUartTxPinMask;
+                }
+                byte >>= 1;
+                v2styxlib_delay_bit();
+            }
+
+            // Stop bit
+            config->softUartPort->ODR |= config->softUartTxPinMask;
+            v2styxlib_delay_bit();
+            __asm
+                rim ; enable interrupts (software UART timing)
+            __endasm;
+        } else
 #endif
-    {    
-        while (!(UART1->SR & UART1_SR_TXE)) {
+        {    
+            while (!(UART1->SR & UART1_SR_TXE)) {
 
-        };
-        UART1->DR = byte;
+            };
+            UART1->DR = byte;
+        }
     }
 }
 
-void v2styxlib_uart_setup(
+void v2styxlib_uart_stm8_setup(
     const V2styxlibUartStm8Config* config,
     uint16_t baudRateDivider) 
 {
     UART1->CR1 |= UART1_CR1_UARTD; // Disable UART before configuration
     UART1->BRR2 = ((baudRateDivider >> 8) & 0xF0) | (baudRateDivider & 0x0F);
     UART1->BRR1 = (baudRateDivider >> 4) & 0xFF;
-#ifdef V2STYXLIB_SOFTUART
+#ifdef V2STYXLIB_SOFTUART_TX
      if (config->baseConfig.config & V2STYXLIB_CONFIG_SOFT_UART_TX) {
         // Configure the soft UART TX pin as output
         config->softUartPort->DDR |= config->softUartTxPinMask;
@@ -77,31 +82,3 @@ void v2styxlib_uart_setup(
     UART1->CR1 &= ~UART1_CR1_UARTD; // Enable UART after configuration    
 }
 
-void v2styxlib_uart_send(
-    const V2styxlibUartStm8Config* config, 
-    const uint8_t *buffer, 
-    BufferSize_t length)
-{
-    if (config->baseConfig.config & V2STYXLIB_CONFIG_STREAMING_MODE) {
-        // If streaming mode is enabled, send SOF markers before the data
-        v2styxlib_send_byte(config, V2STYXLIB_SOF_MARKER_1);
-        v2styxlib_send_byte(config, V2STYXLIB_SOF_MARKER_2);
-    }
-
-    if (config->baseConfig.config & V2STYXLIB_CONFIG_SEND_CRC16) {
-        // send packet size + 2 bytes for CRC16
-        v2styxlib_send_byte(config, length + 2);
-        // then CRC16
-        uint16_t crc = v2styxlib_crc16_calculate(buffer, length);
-        v2styxlib_send_byte(config, (crc >> 8) & 0xFF); // send high byte of CRC
-        v2styxlib_send_byte(config, crc & 0xFF); // send low byte of CRC
-    } else {
-        // send packet size
-        v2styxlib_send_byte(config, length);
-    }
-
-    // then send the actual data
-    for (BufferSize_t i = 0; i < length; i++) {
-        v2styxlib_send_byte(config, buffer[i]);
-    }
-}

@@ -1,13 +1,11 @@
 #pragma once
 
-#include <stdint.h>
-#include "stm8s.h"
-
-#include "Channel_c.h"
+#include "defines.h"
+#include "structs.h"
 
 typedef struct {
-    V2styxlibUartConfig baseConfig;
-#ifdef V2STYXLIB_SOFTUART    
+    V2styxlibUartConfigBase baseConfig;
+#ifdef V2STYXLIB_SOFTUART_TX
     GPIO_TypeDef * softUartPort;
     uint8_t softUartTxPinMask;
 #endif    
@@ -22,18 +20,12 @@ typedef struct {
  * baudRateDivider = 16000000 / 115200 ≈ 138.89
  * In this case, baudRateDivider will be approximately 139 (rounded to the nearest integer).
  */
-void v2styxlib_uart_setup(
+void v2styxlib_uart_stm8_setup(
     const V2styxlibUartStm8Config* config,
     uint16_t baudRateDivider
     );
 
-/**
- * buffer - is a pointer to the data buffer that contains the data to be sent over UART.
- * length - is the number of bytes to be sent from the buffer.
- * This function is responsible for sending a specified number of bytes from the provided buffer over UART.
- */
-void v2styxlib_uart_send(
-    const V2styxlibUartStm8Config* config, 
-    const uint8_t *buffer, 
-    BufferSize_t length
-);
+void v2styxlib_uart_stm8_send_bytes(
+    const V2styxlibUartStm8Config* config,
+    const uint8_t* buffer,
+    BufferSize_t length);
