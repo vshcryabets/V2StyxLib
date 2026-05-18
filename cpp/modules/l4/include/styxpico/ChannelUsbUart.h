@@ -7,12 +7,13 @@ namespace styxlib
 {
     class ChannelUsbUart : public ChannelUart
     {
+    protected:
+        SizeResult internalSendBytes(
+            const StyxBuffer buffer, 
+            Size size) override;
+        void configureUart() override {};
     public:
         ChannelUsbUart(const ChannelUartConfig* config);
         virtual ~ChannelUsbUart();
-        SizeResult sendBuffer(
-            ClientId clientId, 
-            const StyxBuffer buffer, 
-            Size size) override;
     };
 }
