@@ -11,12 +11,10 @@ class ChannelUartConfig: public V2styxlibUartConfig
 public:
     PacketHeaderSize packetSizeHeader = PacketHeaderSize::Size2Bytes;
     uint32_t baudrate = 9600;
-    uint16_t rxBuffer = 32;
 public:
     ChannelUartConfig(uint8_t config,
         PacketHeaderSize packetSizeHeader = PacketHeaderSize::Size2Bytes,
-        uint32_t baudrate = 9600,
-        uint16_t rxBuffer = 32
+        uint32_t baudrate = 9600
     );
 };
 
