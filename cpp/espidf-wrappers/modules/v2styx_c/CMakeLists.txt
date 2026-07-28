@@ -6,5 +6,4 @@ idf_component_register(
         "${ORIGINAL_LIB_DIR}/src/arch.c"
         "${ORIGINAL_LIB_DIR}/src/Channel_c.c"
     INCLUDE_DIRS "${ORIGINAL_LIB_DIR}/include"
-    REQUIRES driver
 )

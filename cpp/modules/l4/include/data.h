@@ -23,7 +23,8 @@ namespace styxlib
         BufferTooSmall,
         InvalidHeaderSize,
         NullptrArgument,
-        SendFailed
+        SendFailed,
+        ConfigureFailed,
     };
 
     enum class PacketHeaderSize : uint8_t

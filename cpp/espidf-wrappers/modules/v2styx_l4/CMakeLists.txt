@@ -5,7 +5,8 @@ idf_component_register(
     SRCS 
         "${ORIGINAL_LIB_DIR}/src/ChannelRx.cpp"
         "${ORIGINAL_LIB_DIR}/src/ChannelTx.cpp"
-        "${ORIGINAL_LIB_DIR}/src/esp32/ChannelUart.cpp"
+        "${ORIGINAL_LIB_DIR}/src/uart/ChannelUart.cpp"
+        "${ORIGINAL_LIB_DIR}/src/esp32/ChannelEsp32Uart.cpp"
     INCLUDE_DIRS "${ORIGINAL_LIB_DIR}/include"
-    REQUIRES driver v2styx_c
+    REQUIRES esp_driver_uart esp_driver_gpio v2styx_c
 )

@@ -11,14 +11,16 @@ ChannelUart::ChannelUart(const ChannelUartConfig* config)
 ChannelUartConfig::ChannelUartConfig(
     uint8_t config,
     PacketHeaderSize packetSizeHeader,
-    uint32_t baudrate
+    uint32_t baudrate,
+    uint16_t rxBuffer
 ): 
     V2styxlibUartConfig{.baseConfig = {
         .config = config,
         .sof = {V2STYXLIB_SOF_MARKER_1, V2STYXLIB_SOF_MARKER_2}
     }},
     packetSizeHeader(packetSizeHeader),
-    baudrate(baudrate)
+    baudrate(baudrate),
+    rxBuffer(rxBuffer)
 {
 }
 
