@@ -17,6 +17,7 @@ class ChannelDriverUart(ChannelRx, ChannelTx):
         self.sof1 = sof1
         self.sof2 = sof2
         self._pending = b''
+        self._need_sof = True
 
     ## Debug method just send raw bytes without any framing, for testing purposes
     def debugSendBytes(self, data: bytes) -> None:
