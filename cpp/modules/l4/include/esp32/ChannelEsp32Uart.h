@@ -1,10 +1,8 @@
 #pragma once
 
 #include "driver/uart.h"
-#include "driver/gpio.h"
 
 #include "uart/ChannelUart.h"
-
 
 namespace styxlib
 {

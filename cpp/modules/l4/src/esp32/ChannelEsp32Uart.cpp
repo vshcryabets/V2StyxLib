@@ -12,17 +12,23 @@ ChannelEsp32Uart::ChannelEsp32Uart(
     int rxPin,
     uint16_t rxBufferSize) : ChannelUart(config),
                                 _uartPortNum(uartPortNum),
-                                _txPin(txPin), _rxPin(rxPin),
+                                _txPin(txPin), 
+                                _rxPin(rxPin),
                                 _rxBufferSize(rxBufferSize)
 {
 }
 
 ChannelEsp32Uart::~ChannelEsp32Uart()
 {
+    uart_driver_delete(_uartPortNum);
 }
 
 ErrorCode ChannelEsp32Uart::configureUart()
 {
+    if (config == nullptr) {
+         ESP_LOGE("ChannelEsp32Uart", "Failed to configure UART: config is null");
+         return ErrorCode::NullptrArgument;
+    }
     uart_config_t uart_config = {
         .baud_rate  = static_cast<int>(config->baudrate),
         .data_bits  = UART_DATA_8_BITS,

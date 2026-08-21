@@ -9,8 +9,10 @@ namespace styxlib
         if (bufferSize < 4) {
             return styxlib::Unexpected(ErrorCode::BufferTooSmall);
         }
+#if defined(__GNUC__)        
 #pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wtype-limits"        
+#pragma GCC diagnostic ignored "-Wtype-limits"
+#endif      
         switch (headerSize)
         {
         case PacketHeaderSize::Size1Byte:
