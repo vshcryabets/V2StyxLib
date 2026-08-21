@@ -7,26 +7,36 @@ namespace styxlib
                           Size bufferSize,
                           Size packetSize) {
         if (bufferSize < 4) {
-            return Unexpected(ErrorCode::BufferTooSmall);
+            return styxlib::Unexpected(ErrorCode::BufferTooSmall);
         }
+#if defined(__GNUC__)        
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wtype-limits"
+#endif      
         switch (headerSize)
         {
         case PacketHeaderSize::Size1Byte:
-            if (packetSize > 0xFF) {
-                return Unexpected(ErrorCode::PacketTooLarge);
+            if constexpr (sizeof(packetSize) > 1) {
+                if (packetSize > 0xFF) {
+                    return styxlib::Unexpected(ErrorCode::PacketTooLarge);
+                }
             }
             buffer[0] = static_cast<uint8_t>(packetSize);
             break;
         case PacketHeaderSize::Size2Bytes:
-            if (packetSize > 0xFFFF) {
-                return Unexpected(ErrorCode::PacketTooLarge);
+            if constexpr (sizeof(packetSize) > 2) {
+                if (packetSize > 0xFFFF) {
+                    return styxlib::Unexpected(ErrorCode::PacketTooLarge);
+                }
             }
             buffer[1] = packetSize & 0xFF;
             buffer[0] = (packetSize >> 8) & 0xFF;
             break;
         case PacketHeaderSize::Size4Bytes:
-            if (packetSize > 0xFFFFFFFF) {
-                return Unexpected(ErrorCode::PacketTooLarge);
+            if constexpr (sizeof(packetSize) > 4) {
+                if (packetSize > 0xFFFFFFFF) {
+                    return styxlib::Unexpected(ErrorCode::PacketTooLarge);
+                }
             }
             buffer[3] = packetSize & 0xFF;
             buffer[2] = (packetSize >> 8) & 0xFF;
@@ -34,8 +44,9 @@ namespace styxlib
             buffer[0] = (packetSize >> 24) & 0xFF;
             break;
         default:
-            return Unexpected(ErrorCode::InvalidHeaderSize);
+            return styxlib::Unexpected(ErrorCode::InvalidHeaderSize);
         }
-        return SizeResult(static_cast<Size>(headerSize));
+#pragma GCC diagnostic pop        
+        return styxlib::SizeResult(static_cast<Size>(headerSize));
     }
 } // namespace styxlib
