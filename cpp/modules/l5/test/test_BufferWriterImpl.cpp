@@ -1,6 +1,8 @@
 #include <catch2/catch_test_macros.hpp>
 #include "serialization/BufferWriterImpl.h"
 
+using namespace styxlib::serialization;
+
 TEST_CASE("testWriteUInt8", "[BufferWriterImpl]")
 {
     BufferWriterImpl writer(32);

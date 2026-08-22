@@ -4,7 +4,7 @@
 #include "structs/StyxQID.h"
 #include "structs/StyxStat.h"
 #include "messages/v9p2000/MessageFactoryImpl.h"
-#include "serialization/IBufferReader.h"
+#include "serialization/IBuffer.h"
 
 namespace styxlib
 {

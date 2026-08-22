@@ -5,6 +5,8 @@
 #include "serialization/BufferWriterImpl.h"
 #include "messages/v9p2000/MessageFactoryImpl.h"
 
+using namespace styxlib::serialization;
+
 TEST_CASE("testGetSize", "[StyxSerializationImpl]")
 {
     StyxSerializerImpl serializer;

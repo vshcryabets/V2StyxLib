@@ -214,9 +214,9 @@ namespace styxlib
         ~ChannelUnixSocketServer() override;
 
         SizeResult sendBuffer(ClientId clientId, const StyxBuffer buffer, Size size) override;
-        virtual std::future<ErrorCode> start();
-        virtual std::future<void> stop();
-        bool isStarted() const;
+        std::future<ErrorCode> start() override;
+        std::future<void> stop() override;
+        bool isStarted() const override;
         ProgressObserver<std::vector<ClientInfo>> &getClientsObserver()
         {
             return clientsObserver;

@@ -6,11 +6,11 @@ using namespace styxlib::messages::v9p2000;
 using namespace styxlib::messages::base;
 
 void StyxSerializerImpl::serialize(const styxlib::messages::base::StyxMessage &message,
-                                   IBufferWriter &output)
+                                   styxlib::serialization::IBufferWriter &output)
 {
 }
 
-void StyxSerializerImpl::serializeStat(const StyxStat &stat, IBufferWriter &output)
+void StyxSerializerImpl::serializeStat(const StyxStat &stat, styxlib::serialization::IBufferWriter &output)
 {
     size_t size = getStatSerializedSize(stat);
     output.writeUInt16(size - 2); // total size except first 2 bytes with size
@@ -37,7 +37,7 @@ styxlib::Size StyxSerializerImpl::getQidSize()
     return 13; // Size of StyxQID: 1 byte type, 4 bytes version, 8 bytes path
 }
 
-void StyxSerializerImpl::serializeQid(const styxlib::structs::QID &qid, IBufferWriter &output)
+void StyxSerializerImpl::serializeQid(const styxlib::structs::QID &qid, styxlib::serialization::IBufferWriter &output)
 {
     output.writeUInt8(qid.type);
     output.writeUInt32(qid.version);

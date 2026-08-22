@@ -1,5 +1,5 @@
 #pragma once
-#include "serialization/IBufferReader.h"
+#include "serialization/IBuffer.h"
 
 class BufferReaderImpl : public styxlib::serialization::IBufferReader
 {
