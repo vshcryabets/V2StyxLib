@@ -11,10 +11,10 @@ namespace styxlib
 {
     structs::QID DeserializerL5StyxImpl::deserializeQid(serialization::IBufferReader &input) const
     {
-        return {
-            input.readUInt8(),
-            input.readUInt32(),
-            input.readUInt64()};
+        const uint8_t type = input.readUInt8();
+        const uint32_t version = input.readUInt32();
+        const uint64_t path = input.readUInt64();
+        return {type, version, path};
     }
 
     StyxStat DeserializerL5StyxImpl::deserializeStat(serialization::IBufferReader &input) const
@@ -38,46 +38,60 @@ namespace styxlib
 
     StyxMessageExpected 
     DeserializerL5StyxImpl::deserializeMessage(
-        serialization::IBufferReader &input,
-        Size packetLimit) const
+        serialization::IBufferReader &input) const
     {
-        const Size packetSize = input.readUInt32();
-        if (packetSize > packetLimit)
-        {
-            return Unexpected(ErrorCode::PacketTooLarge);
-        }
-
         const Type type = input.readUInt8();
         const Tag tag = input.readUInt16();
 
         switch (type)
         {
-        case enums::Tversion:
+        case enums::Tversion: 
+        {
+            const uint32_t iounit = input.readUInt32();
+            const std::string version = input.readUTFString();
             return messageFactory.constructTVersion(
-                input.readUInt32(),
-                input.readUTFString());
-
+                iounit,
+                version);
+        }
         case enums::Rversion:
+        {
+            const uint32_t maxPacketSize = input.readUInt32();
+            const StyxString protocolVersion = input.readUTFString();
             return messageFactory.constructRVersion(
                 tag,
-                input.readUInt32(),
-                input.readUTFString());
+                maxPacketSize,
+                protocolVersion);
+        }
 
         case enums::Tauth:
+        {
+            const Fid fid = input.readUInt32();
+            const StyxString userName = input.readUTFString();
+            const StyxString mountPoint = input.readUTFString();
             return messageFactory.constructTAuth(
-                input.readUInt32(),
-                input.readUTFString(),
-                input.readUTFString());
+                fid,
+                userName,
+                mountPoint);
+        }
 
         case enums::Tflush:
-            return messageFactory.constructTFlushMessage(input.readUInt16());
+        {
+            const Tag oldTag = input.readUInt16();
+            return messageFactory.constructTFlushMessage(oldTag);
+        }
 
         case enums::Tattach:
+        {
+            const Fid fid = input.readUInt32();
+            const Fid authFid = input.readUInt32();
+            const StyxString userName = input.readUTFString();
+            const StyxString mountPoint = input.readUTFString();
             return messageFactory.constructTAttach(
-                input.readUInt32(),
-                input.readUInt32(),
-                input.readUTFString(),
-                input.readUTFString());
+                fid,
+                authFid,
+                userName,
+                mountPoint);
+        }
 
         case enums::Twalk:
         {
@@ -94,16 +108,25 @@ namespace styxlib
         }
 
         case enums::Rauth:
-            return messageFactory.constructRAuthMessage(tag, deserializeQid(input));
+        {
+            const structs::QID qid = deserializeQid(input);
+            return messageFactory.constructRAuthMessage(tag, qid);
+        }
 
         case enums::Rerror:
-            return messageFactory.constructRerror(tag, input.readUTFString());
+        {
+            const StyxString errorMessage = input.readUTFString();
+            return messageFactory.constructRerror(tag, errorMessage);
+        }
 
         case enums::Rflush:
             return messageFactory.constructRFlush(tag);
 
         case enums::Rattach:
-            return messageFactory.constructRAttachMessage(tag, deserializeQid(input));
+        {
+            const structs::QID qid = deserializeQid(input);
+            return messageFactory.constructRAttachMessage(tag, qid);
+        }
 
         case enums::Rwalk:
         {
@@ -118,34 +141,57 @@ namespace styxlib
         }
 
         case enums::Topen:
+        {
+            const Fid fid = input.readUInt32();
+            const uint8_t mode = input.readUInt8();
             return messageFactory.constructTOpenMessage(
-                input.readUInt32(),
-                input.readUInt8());
+                fid,
+                mode);
+        }
 
         case enums::Ropen:
+        {
+            const structs::QID qid = deserializeQid(input);
+            const uint32_t ioUnit = input.readUInt32();
             return messageFactory.constructROpenMessage(
                 tag,
-                deserializeQid(input),
-                input.readUInt32());
+                qid,
+                ioUnit);
+        }
 
         case enums::Tcreate:
+        {
+            const Fid fid = input.readUInt32();
+            const StyxString name = input.readUTFString();
+            const uint32_t permissions = input.readUInt32();
+            const uint8_t mode = input.readUInt8();
             return messageFactory.constructTCreateMessage(
-                input.readUInt32(),
-                input.readUTFString(),
-                input.readUInt32(),
-                input.readUInt8());
+                fid,
+                name,
+                permissions,
+                mode);
+        }
 
         case enums::Rcreate:
+        {
+            const structs::QID qid = deserializeQid(input);
+            const uint32_t ioUnit = input.readUInt32();
             return messageFactory.constructRCreateMessage(
                 tag,
-                deserializeQid(input),
-                input.readUInt32());
+                qid,
+                ioUnit);
+        }
 
         case enums::Tread:
+        {
+            const Fid fid = input.readUInt32();
+            const uint64_t offset = input.readUInt64();
+            const int count = static_cast<int>(input.readUInt32());
             return messageFactory.constructTReadMessage(
-                input.readUInt32(),
-                input.readUInt64(),
-                static_cast<int>(input.readUInt32()));
+                fid,
+                offset,
+                count);
+        }
 
         case enums::Rread:
         {
@@ -174,34 +220,53 @@ namespace styxlib
         }
 
         case enums::Rwrite:
-            return messageFactory.constructRWriteMessage(tag, input.readUInt32());
+        {
+            const uint32_t count = input.readUInt32();
+            return messageFactory.constructRWriteMessage(tag, count);
+        }
 
         case enums::Tclunk:
-            return messageFactory.constructTClunk(input.readUInt32());
+        {
+            const Fid fid = input.readUInt32();
+            return messageFactory.constructTClunk(fid);
+        }
 
         case enums::Rclunk:
-            return messageFactory.constructRClunk(tag, input.readUInt32());
+        {
+            const Fid fid = input.readUInt32();
+            return messageFactory.constructRClunk(tag, fid);
+        }
 
         case enums::Tremove:
-            return messageFactory.constructTRemove(input.readUInt32());
+        {
+            const Fid fid = input.readUInt32();
+            return messageFactory.constructTRemove(fid);
+        }
 
         case enums::Rremove:
             return messageFactory.constructRRemove(tag);
 
         case enums::Tstat:
-            return messageFactory.constructTStat(input.readUInt32());
+        {
+            const Fid fid = input.readUInt32();
+            return messageFactory.constructTStat(fid);
+        }
 
         case enums::Rstat:
         {
-            input.readUInt16();
-            return messageFactory.constructRStatMessage(tag, deserializeStat(input));
+            const uint16_t statSize = input.readUInt16();
+            (void)statSize;
+            const StyxStat stat = deserializeStat(input);
+            return messageFactory.constructRStatMessage(tag, stat);
         }
 
         case enums::Twstat:
         {
             const Fid fid = input.readUInt32();
-            input.readUInt16();
-            return messageFactory.constructTWStatMessage(fid, deserializeStat(input));
+            const uint16_t statSize = input.readUInt16();
+            (void)statSize;
+            const StyxStat stat = deserializeStat(input);
+            return messageFactory.constructTWStatMessage(fid, stat);
         }
 
         case enums::Rwstat:
@@ -232,25 +297,35 @@ namespace styxlib
         try
         {
             BufferReaderImpl reader(buffer, size);
-            auto message = deserializeMessage(reader, ioUnit);
+            auto message = deserializeMessage(reader);
             if (message.has_value())
             {
-                getConsumer()->handleMessage(clientId, *message);
+                messages::base::StyxMessageUPtr &msg = message.value();
+                std::printf("DeserializerL5StyxImpl: Successfully deserialized message of type %d and tag %d for client %d\n", 
+                    static_cast<int>(msg->getType()),
+                    static_cast<int>(msg->getTag()), clientId);
+                getConsumer()->handleMessage(clientId, msg);
             } else {
+                std::cerr << "DeserializerL5StyxImpl: Failed to deserialize message for client " 
+                    << clientId << ". Error code: " << static_cast<int>(message.error()) << std::endl;
                 return message.error();
             }
+            std::printf("DeserializerL5StyxImpl: Finished handling buffer for client %d\n", clientId);
             return ErrorCode::Success;
         }
         catch (const std::out_of_range &)
         {
+            std::printf("DeserializerL5StyxImpl: Buffer too small while handling buffer for client %d\n", clientId);
             return ErrorCode::BufferTooSmall;
         }
         catch (const std::invalid_argument &)
         {
+            std::printf("DeserializerL5StyxImpl: Invalid argument while handling buffer for client %d\n", clientId);
             return ErrorCode::NullptrArgument;
         }
         catch (...)
         {
+            std::printf("DeserializerL5StyxImpl: Unexpected error while handling buffer for client %d\n", clientId);
             return ErrorCode::ConfigureFailed;
         }
     }

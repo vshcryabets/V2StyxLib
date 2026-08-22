@@ -30,11 +30,12 @@ namespace styxlib
         }
 
         uint8_t packetSizeBuffer[4] = {0};
+        const Size headerBytes = to_uint8_t(packetSizeHeader);
         SizeResult headerSize = setPacketSize(
             packetSizeHeader,
             packetSizeBuffer,
             sizeof(packetSizeBuffer),
-            size);
+            size + headerBytes);
         if (!headerSize.has_value())
         {
             return Unexpected(headerSize.error());
@@ -293,7 +294,7 @@ namespace styxlib
         for (auto &pair : socketToClientInfoMapFull)
         {
             ClientFullInfo &readBuffer = pair.second;
-            while (readBuffer.isDirty && readBuffer.currentSize > headerBytes)
+            while (readBuffer.isDirty && readBuffer.currentSize >= headerBytes)
             {
                 auto packetSizeResult = getPacketSize(
                     configuration.packetSizeHeader,
@@ -305,26 +306,29 @@ namespace styxlib
                     break;
                 }
                 const Size packetSize = packetSizeResult.value();
-                const Size packetSizeWithHeader = packetSize + headerBytes;
-                if (readBuffer.currentSize >= packetSizeWithHeader)
+                if (packetSize < headerBytes)
                 {
-                    std::cout << "ChannelUnixSocketServer: Processing packet of size " << packetSize << " for client " << pair.second.id << std::endl;
+                    // Invalid frame: total packet size cannot be less than header size.
+                    break;
+                }
+                if (readBuffer.currentSize >= packetSize)
+                {
+                    const Size payloadSize = packetSize - headerBytes;
                     deserializer->handleBuffer(
                         pair.second.id,
                         readBuffer.buffer.data() + headerBytes,
-                        packetSize);
-                    Size remainingSize = readBuffer.currentSize - packetSizeWithHeader;
+                        payloadSize);
+                    Size remainingSize = readBuffer.currentSize - packetSize;
                     if (remainingSize > 0)
                     {
                         std::memmove(readBuffer.buffer.data(),
-                                     readBuffer.buffer.data() + packetSizeWithHeader,
+                                     readBuffer.buffer.data() + packetSize,
                                      remainingSize);
                     }
                     readBuffer.currentSize = remainingSize;
                 }
                 else
                 {
-                    std::printf("ChannelUnixSocketServer: Not enough data for full payload. Current size: %zu, expected: %zu\n", readBuffer.currentSize, packetSizeWithHeader);
                     // Full payload not yet received – wait for more data.
                     break;
                 }

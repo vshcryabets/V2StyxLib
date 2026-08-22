@@ -13,19 +13,14 @@ namespace styxlib
     {
     private:
         messages::v9p2000::MessageFactoryImpl messageFactory;
-        Size ioUnit;
 
         structs::QID deserializeQid(serialization::IBufferReader &input) const;
         StyxStat deserializeStat(serialization::IBufferReader &input) const;
         StyxMessageExpected deserializeMessage(
-            serialization::IBufferReader &input,
-            Size packetLimit) const;
+            serialization::IBufferReader &input) const;
 
     public:
-        explicit DeserializerL5StyxImpl(Size ioUnit = 8192)
-            : DeserializerL5(), ioUnit(ioUnit)
-        {
-        }
+        explicit DeserializerL5StyxImpl() = default;
 
         ~DeserializerL5StyxImpl() override = default;
 

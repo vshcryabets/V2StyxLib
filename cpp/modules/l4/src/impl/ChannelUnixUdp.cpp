@@ -152,7 +152,7 @@ namespace styxlib
                         std::cerr << "UDP: datagram too short to contain a header – discarded" << std::endl;
                         continue;
                     }
-                    const Size payloadSize = static_cast<Size>(bytesRead) - headerBytes;
+                    const Size datagramSize = static_cast<Size>(bytesRead);
                     const auto packetSizeResult = getPacketSize(
                         configuration.packetSizeHeader, 
                         datagram.data(), 
@@ -163,12 +163,17 @@ namespace styxlib
                             std::endl;
                         continue;
                     }
-                    if (packetSizeResult.value() != payloadSize)
+                    if (packetSizeResult.value() != datagramSize)
                     {
-                        std::cerr << "UDP: payload size mismatch (header says " << 
+                        std::cerr << "UDP: datagram size mismatch (header says " << 
                             packetSizeResult.value() << " bytes, but recvfrom got " << 
-                            payloadSize << " bytes) – discarded" << 
+                            datagramSize << " bytes) – discarded" << 
                             std::endl;
+                        continue;
+                    }
+                    if (packetSizeResult.value() < headerBytes)
+                    {
+                        std::cerr << "UDP: invalid packet size in header – discarded" << std::endl;
                         continue;
                     }
 
@@ -211,7 +216,7 @@ namespace styxlib
                     deserializer->handleBuffer(
                         clientId,
                         datagram.data() + headerBytes,
-                        payloadSize);
+                        packetSizeResult.value() - headerBytes);
                 }
             }
             if (pollItem.revents & (POLLERR | POLLHUP))
@@ -252,7 +257,7 @@ namespace styxlib
         std::vector<uint8_t> datagram(headerBytes + size);
         auto headerResult = setPacketSize(
             configuration.packetSizeHeader,
-            datagram.data(), datagram.size(), size);
+            datagram.data(), datagram.size(), size + headerBytes);
         if (!headerResult)
             return Unexpected(headerResult.error());
 

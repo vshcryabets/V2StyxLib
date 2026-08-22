@@ -52,15 +52,14 @@ TEST_CASE("DeserializerL5StyxImpl ignores messages without consumer", "[Deserial
 {
     styxlib::DeserializerL5StyxImpl deserializer;
 
-    // Packet: size=7, type=Tflush, tag=0x1234, oldTag=0x0001
-    uint8_t packet[] = {
-        0x09, 0x00, 0x00, 0x00,
+    // Payload: type=Tflush, tag=0x1234, oldTag=0x0001
+    uint8_t payload[] = {
         static_cast<uint8_t>(styxlib::enums::Tflush),
         0x34, 0x12,
         0x01, 0x00};
 
     REQUIRE(
-        deserializer.handleBuffer(7, packet, sizeof(packet)) ==
+        deserializer.handleBuffer(7, payload, sizeof(payload)) ==
         styxlib::ErrorCode::Success);
 }
 
@@ -70,16 +69,15 @@ TEST_CASE("DeserializerL5StyxImpl deserializes Rerror and passes message to cons
     TestConsumer consumer;
     deserializer.setConsumer(&consumer);
 
-    // Packet: size=12, type=Rerror, tag=0x1234, error=UTF("ERR")
-    uint8_t packet[] = {
-        0x0C, 0x00, 0x00, 0x00,
+    // Payload: type=Rerror, tag=0x1234, error=UTF("ERR")
+    uint8_t payload[] = {
         static_cast<uint8_t>(styxlib::enums::Rerror),
         0x34, 0x12,
         0x03, 0x00,
         'E', 'R', 'R'};
 
     REQUIRE(
-        deserializer.handleBuffer(42, packet, sizeof(packet)) ==
+        deserializer.handleBuffer(42, payload, sizeof(payload)) ==
         styxlib::ErrorCode::Success);
 
     REQUIRE(consumer.called);
@@ -87,24 +85,4 @@ TEST_CASE("DeserializerL5StyxImpl deserializes Rerror and passes message to cons
     REQUIRE(consumer.lastType == styxlib::enums::Rerror);
     REQUIRE(consumer.lastTag == 0x1234);
     REQUIRE(consumer.lastError == "ERR");
-}
-
-TEST_CASE("DeserializerL5StyxImpl validates packet size against ioUnit", "[DeserializerL5StyxImpl]")
-{
-    styxlib::DeserializerL5StyxImpl deserializer(/*ioUnit*/ 8);
-    TestConsumer consumer;
-    deserializer.setConsumer(&consumer);
-
-    // Declared packet size 12 exceeds ioUnit 8.
-    uint8_t packet[] = {
-        0x0C, 0x00, 0x00, 0x00,
-        static_cast<uint8_t>(styxlib::enums::Rerror),
-        0x34, 0x12,
-        0x03, 0x00,
-        'E', 'R', 'R'};
-
-    REQUIRE(
-        deserializer.handleBuffer(1, packet, sizeof(packet)) ==
-        styxlib::ErrorCode::PacketTooLarge);
-    REQUIRE_FALSE(consumer.called);
 }

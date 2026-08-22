@@ -10,7 +10,10 @@ namespace styxlib::messages::v9p2000
     using StyxMessage = styxlib::messages::base::StyxMessage;
     using StyxMessageUPtr = styxlib::messages::base::StyxMessageUPtr;
 
-    StyxMessageUPtr MessageFactoryImpl::constructTVersion(long iounit, const StyxString &version) const
+    StyxMessageUPtr 
+    MessageFactoryImpl::constructTVersion(
+        long iounit, 
+        const StyxString &version) const
     {
         return std::make_unique<BaseMessage>(
             styxlib::enums::Tversion,

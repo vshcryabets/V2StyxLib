@@ -55,7 +55,7 @@ TEST_CASE("ChannelUart::sendBuffer frames payload with SOF, header, data and CRC
     const std::vector<uint8_t> expected = {
         V2STYXLIB_SOF_MARKER_1,
         V2STYXLIB_SOF_MARKER_2,
-        0x05,
+        0x07,
         0x00,
         0x10,
         0x20,
@@ -84,7 +84,7 @@ TEST_CASE("ChannelUart::sendBuffer frames payload with header and data only", "[
     REQUIRE(result.value() == payload.size());
 
     const std::vector<uint8_t> expected = {
-        0x02,
+        0x03,
         0xAB,
         0xCD,
     };
