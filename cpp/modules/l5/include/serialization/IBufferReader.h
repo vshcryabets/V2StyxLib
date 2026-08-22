@@ -1,6 +1,6 @@
 #pragma once
 #include <cstdint>
-#include "data.h"
+#include "dataL4.h"
 
 namespace styxlib::serialization
 {

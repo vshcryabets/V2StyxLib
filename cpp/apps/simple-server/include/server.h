@@ -3,6 +3,8 @@
 #include <vector>
 #include <atomic>
 
+#include "SimpleServer.h"
+
 class ServerConsole {
 public:
     struct Config {
@@ -12,6 +14,8 @@ public:
         bool enableLogging;
         bool enableCli;
     };
+private:
+        
 public:
     ServerConsole(const Config& config);
     ~ServerConsole();

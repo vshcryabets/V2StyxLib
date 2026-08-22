@@ -88,7 +88,7 @@ namespace styxlib
     // ── ChannelUnixSocketServer ───────────────────────────────────────────────
 
     ChannelUnixSocketServer::ChannelUnixSocketServer(const Configuration &config)
-        : ChannelRx(), configuration(config)
+        : ChannelDriver(), configuration(config)
     {
         if (setDeserializer(config.deserializer) != ErrorCode::Success) {
             throw std::invalid_argument("Deserializer cannot be null");

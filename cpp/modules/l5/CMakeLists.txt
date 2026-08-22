@@ -4,13 +4,16 @@ add_library(module_l5 STATIC
     src/Client.cpp
     src/BufferWriterImpl.cpp
     src/BufferReaderImpl.cpp
+    src/DeserializerL5StyxImpl.cpp
     src/messages/base/StyxMessage.cpp
     src/StyxSerializerImpl.cpp
     src/StyxQID.cpp
     src/StyxStat.cpp
     src/messages/v9p2000/BaseMessage.cpp
     src/messages/v9p2000/MessageFactoryImpl.cpp
-)
+    src/SimpleServer.cpp
+    )
+    
 target_link_libraries(module_l5 PUBLIC module_l4)
 target_include_directories(module_l5 PUBLIC
     $<INSTALL_INTERFACE:include>
