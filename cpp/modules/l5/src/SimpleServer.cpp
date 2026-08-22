@@ -27,7 +27,12 @@ namespace styxlib
                 running.store(true);
                 deserializer->setConsumer(this);
                 channel->setDeserializer(deserializer);
-                channel->start().get();
+                auto startResult = channel->start().get();
+                if (startResult != ErrorCode::Success)
+                {
+                    running.store(false);
+                    return startResult;
+                }
                 return ErrorCode::Success;
             });
     }
