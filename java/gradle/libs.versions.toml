@@ -1,0 +1,27 @@
+[versions]
+java = "17"
+styx-project = "1.1.1"
+shadow = "9.6.1"
+shadow-archive = "0.1.0"
+groovy-jsr223 = "3.0.17"
+codegen-lib = "0ff0f65344"
+codegen-server-sample = "4895044cf9"
+junit-bom = "5.11.4"
+jline = "3.25.0"
+jackson-core = "2.13.4"
+jackson-databind = "2.13.4.2"
+
+[libraries]
+groovy-jsr223 = { module = "org.codehaus.groovy:groovy-jsr223", version.ref = "groovy-jsr223" }
+codegen-lib = { module = "com.github.vshcryabets:codegen", version.ref = "codegen-lib" }
+codegen-server-sample = { module = "com.github.vshcryabets:codegen", version.ref = "codegen-server-sample" }
+junit-bom = { module = "org.junit:junit-bom", version.ref = "junit-bom" }
+junit-jupiter = { module = "org.junit.jupiter:junit-jupiter" }
+junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher" }
+jline = { module = "org.jline:jline", version.ref = "jline" }
+jackson-core = { module = "com.fasterxml.jackson.core:jackson-core", version.ref = "jackson-core" }
+jackson-databind = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jackson-databind" }
+
+[plugins]
+shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }
+
