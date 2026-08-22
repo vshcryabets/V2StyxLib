@@ -2,6 +2,8 @@
 
 #include <iostream>
 
+#include "enums/MessageType.h"
+
 namespace styxlib
 {
     SimpleServer::SimpleServer(
@@ -63,9 +65,20 @@ namespace styxlib
         const styxlib::messages::base::StyxMessageUPtr &message
     ) 
     {
-        std::cout << "Received message from client " << clientId 
+        switch (message->getType())
+        {
+            case styxlib::enums::Tversion:
+                
+                
+                break;
+
+            default:
+                std::cout << "Received message from client " << clientId 
                   << " with type " << static_cast<int>(message->getType()) 
                   << " and tag " << static_cast<int>(message->getTag()) 
                   << std::endl;
+                break;
+        }
+
     }
 }

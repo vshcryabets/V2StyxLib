@@ -16,6 +16,7 @@ namespace styxlib
         {
             ChannelDriverPtr channel;
             DeserializerL5Ptr deserializer;
+            SerializerL5Ptr serializer;
         };
     private:
         DeserializerL5Ptr deserializer;

@@ -5,13 +5,16 @@
 #endif
 
 #include "serialization/DeserializerL5.h"
+#include "serialization/SerializerL5.h"
 
 namespace styxlib
 {
 #ifdef USE_STD_MEMORY
     using DeserializerL5Ptr = std::shared_ptr<DeserializerL5>;
+    using SerializerL5Ptr = std::shared_ptr<SerializerL5>;
 #else
     using DeserializerL5Ptr = DeserializerL5*;
+    using SerializerL5Ptr = SerializerL5*;
 #endif
 
 }
