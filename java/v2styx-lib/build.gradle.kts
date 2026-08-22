@@ -6,9 +6,10 @@ import ce.domain.usecase.load.LoadXmlTreeUseCase
 import ce.domain.usecase.store.StoreAstTreeUseCase
 import ce.domain.usecase.store.StoreOutTreeUseCase
 import ce.domain.usecase.transform.TransformInTreeToOutTreeUseCase
+import org.gradle.api.artifacts.VersionCatalogsExtension
 import javax.script.ScriptEngineManager
 
-val jdkLevel: JavaLanguageVersion by rootProject.extra
+val jdkLevel = rootProject.extra["jdkLevel"] as JavaLanguageVersion
 
 plugins {
     `java-library`
@@ -16,20 +17,23 @@ plugins {
 }
 
 buildscript {
+    val libs = project.extensions.getByType<VersionCatalogsExtension>().named("libs")
+
     repositories {
         maven {
             url = uri("https://jitpack.io")
         }
     }
     dependencies {
-        classpath("org.codehaus.groovy:groovy-jsr223:3.0.17")
-        classpath("com.github.vshcryabets:codegen:0ff0f65344")
+        classpath(libs.findLibrary("groovy-jsr223").get())
+        classpath(libs.findLibrary("codegen-lib").get())
     }
 }
 
 dependencies {
-    testImplementation(platform("org.junit:junit-bom:5.11.4"))
-    testImplementation("org.junit.jupiter:junit-jupiter")
+    testImplementation(platform(libs.junit.bom))
+    testImplementation(libs.junit.jupiter)
+    testRuntimeOnly(libs.junit.platform.launcher)
 }
 
 java {

@@ -1,23 +1,16 @@
-buildscript {
-  repositories {
-    mavenCentral()
-    maven ("https://plugins.gradle.org/m2/")
-  }
-  dependencies {
-    classpath("org.junit.platform:junit-platform-gradle-plugin:1.1.1")
-  }
-}
+import org.gradle.api.artifacts.VersionCatalogsExtension
+
+val libs = extensions.getByType<VersionCatalogsExtension>().named("libs")
+val projectVersion = libs.findVersion("styx-project").get().requiredVersion
+val javaVersion = libs.findVersion("java").get().requiredVersion.toInt()
 
 allprojects {
   group = "com.v2soft"
-  version = "1.1.1"
+  version = projectVersion
 
   repositories {
     mavenCentral()
   }
 }
 
-val jdkLevel by extra { JavaLanguageVersion.of(17) }
-
-plugins {
-}
+extra["jdkLevel"] = JavaLanguageVersion.of(javaVersion)

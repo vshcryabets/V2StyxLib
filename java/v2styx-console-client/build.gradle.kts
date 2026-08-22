@@ -1,11 +1,14 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import org.gradle.api.artifacts.VersionCatalogsExtension
 
-val jdkLevel: JavaLanguageVersion by rootProject.extra
+val libsCatalog = extensions.getByType<VersionCatalogsExtension>().named("libs")
+val jdkLevel = rootProject.extra["jdkLevel"] as JavaLanguageVersion
+val shadowArchiveVersion = libsCatalog.findVersion("shadow-archive").get().requiredVersion
 
 plugins {
     java
     application
-    id("com.github.johnrengelman.shadow") version "8.1.1"
+    alias(libs.plugins.shadow)
 }
 
 java {
@@ -14,15 +17,13 @@ java {
     }
 }
 
-val version = "1.0.0"
-
 repositories {
     mavenCentral()
 }
 
 dependencies {
     implementation(project(":v2styx-lib"))
-    implementation("org.jline:jline:3.25.0")
+    implementation(libs.jline)
 }
 
 application {
@@ -32,7 +33,7 @@ application {
 tasks {
     named<ShadowJar>("shadowJar") {
         archiveBaseName.set("console-client")
-        archiveVersion.set("0.1.0")
+        archiveVersion.set(shadowArchiveVersion)
         mergeServiceFiles()
         manifest {
             attributes(mapOf("Main-Class" to "com.v2soft.styxlib.StyxConsoleClient"))
