@@ -3,7 +3,6 @@ Debug
 CMakeCache.txt
 CMakeFiles
 Makefile
-*.cmake
 *.a
 *.dir
 *.vcxproj.*

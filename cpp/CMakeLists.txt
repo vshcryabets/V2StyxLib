@@ -5,6 +5,8 @@ project(V2StyxLib LANGUAGES C CXX)
 enable_testing()
 include(CTest)
 
+include(cmake/CPM.cmake)
+
 # option(BUILD_MODULE_L5 "Build the L5 module" ON)
 
 set(CPP_VERSION "23" CACHE STRING "C++ standard version to use (17 or 23)")
@@ -48,9 +50,4 @@ add_subdirectory(../c/l4 modules/l4_c)
 add_subdirectory(modules/l4)
 add_subdirectory(modules/l5)
 
-
-#include_directories(include) 
-
-#ADD_SUBDIRECTORY( lib out/lib )
-
-#ADD_SUBDIRECTORY( testserver out/testserver )
+add_subdirectory(apps/simple-server)
