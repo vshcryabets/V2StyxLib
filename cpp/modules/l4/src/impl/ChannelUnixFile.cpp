@@ -73,14 +73,15 @@ namespace styxlib
             break;
         case PacketHeaderSize::Size2Bytes:
             packetSizeReadResult = ::read(fds.readFd, buffer, 2);
-            packetSize = buffer[1] | (buffer[0] << 8);
+            packetSize = static_cast<uint32_t>(buffer[0]) |
+                         (static_cast<uint32_t>(buffer[1]) << 8);
             break;
         case PacketHeaderSize::Size4Bytes:
             packetSizeReadResult = ::read(fds.readFd, buffer, 4);
-            packetSize = buffer[3] |
-                         (buffer[2] << 8) |
-                         (buffer[1] << 16) |
-                         (buffer[0] << 24);
+            packetSize = static_cast<uint32_t>(buffer[0]) |
+                         (static_cast<uint32_t>(buffer[1]) << 8) |
+                         (static_cast<uint32_t>(buffer[2]) << 16) |
+                         (static_cast<uint32_t>(buffer[3]) << 24);
             break;
         }
         if (packetSizeReadResult <= 0)

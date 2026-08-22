@@ -7,7 +7,7 @@
 #include <spdlog/sinks/rotating_file_sink.h>
 
 #include "SimpleServer.h"
-#include "impl/ChannelUnixUdp.h"
+#include "impl/ChannelUnixTcp.h"
 #include "impl/ClientsRepoImpl.h"
 #include "serialization/DeserializerL5StyxImpl.h"
 
@@ -29,16 +29,16 @@ void ServerConsole::start() {
 
     auto deserializer = std::make_shared<styxlib::DeserializerL5StyxImpl>();
     auto clientsRepo = std::make_shared<styxlib::ClientsRepoImpl>();
-    styxlib::ChannelUnixUdpServer::Configuration channelConfig(
+    styxlib::ChannelUnixTcpServer::Configuration channelConfig(
         static_cast<uint16_t>(config.port),
         clientsRepo,
-        styxlib::PacketHeaderSize::Size2Bytes,
+        styxlib::PacketHeaderSize::Size4Bytes,
         8192,
         deserializer,
         16);
 
     styxlib::SimpleServer::Configuration serverConfig;
-    serverConfig.channel = std::make_shared<styxlib::ChannelUnixUdpServer>(channelConfig);
+    serverConfig.channel = std::make_shared<styxlib::ChannelUnixTcpServer>(channelConfig);
     serverConfig.deserializer = deserializer;
     styxlib::SimpleServer server(serverConfig);
     auto startFuture = server.start();
@@ -78,9 +78,11 @@ void ServerConsole::initLogging() {
 
 int main(int argc, char* argv[]) {
     ServerConsole::Config config;
-    config.port = 1234;
+    config.port = 10234;
     config.interfaces = {"127.0.0.1"};
     config.exportPath = "./";
+    config.enableLogging = true;
+    config.enableCli = true;
     ServerConsole server(config);
     server.start();
     return 0;

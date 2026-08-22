@@ -2,6 +2,7 @@
 
 #include <stdexcept>
 #include <vector>
+#include <iostream>
 
 #include "enums/MessageType.h"
 #include "serialization/BufferReaderImpl.h"
@@ -225,6 +226,8 @@ namespace styxlib
         {
             return ErrorCode::Success;
         }
+
+        std::cout << "DeserializerL5StyxImpl: Handling buffer of size " << size << " for client " << clientId << std::endl;
 
         try
         {

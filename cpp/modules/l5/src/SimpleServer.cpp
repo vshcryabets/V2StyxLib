@@ -25,6 +25,7 @@ namespace styxlib
                     return ErrorCode::AlreadyStarted;
                 }
                 deserializer->setConsumer(this);
+                channel->setDeserializer(deserializer);
                 channel->start().get();
                 return ErrorCode::Success;
             });

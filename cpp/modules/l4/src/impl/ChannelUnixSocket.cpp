@@ -308,6 +308,7 @@ namespace styxlib
                 const Size packetSizeWithHeader = packetSize + headerBytes;
                 if (readBuffer.currentSize >= packetSizeWithHeader)
                 {
+                    std::cout << "ChannelUnixSocketServer: Processing packet of size " << packetSize << " for client " << pair.second.id << std::endl;
                     deserializer->handleBuffer(
                         pair.second.id,
                         readBuffer.buffer.data() + headerBytes,
@@ -323,6 +324,7 @@ namespace styxlib
                 }
                 else
                 {
+                    std::printf("ChannelUnixSocketServer: Not enough data for full payload. Current size: %zu, expected: %zu\n", readBuffer.currentSize, packetSizeWithHeader);
                     // Full payload not yet received – wait for more data.
                     break;
                 }

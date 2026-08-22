@@ -32,14 +32,14 @@ namespace styxlib
             return static_cast<Size>(buffer[0]);
         case PacketHeaderSize::Size2Bytes:
             return static_cast<Size>(
-                (static_cast<uint16_t>(buffer[0]) << 8) |
-                 static_cast<uint16_t>(buffer[1]));
+                 static_cast<uint16_t>(buffer[0]) |
+                (static_cast<uint16_t>(buffer[1]) << 8));
         case PacketHeaderSize::Size4Bytes:
             return static_cast<Size>(
-                (static_cast<uint32_t>(buffer[0]) << 24) |
-                (static_cast<uint32_t>(buffer[1]) << 16) |
-                (static_cast<uint32_t>(buffer[2]) <<  8) |
-                 static_cast<uint32_t>(buffer[3]));
+                 static_cast<uint32_t>(buffer[0]) |
+                (static_cast<uint32_t>(buffer[1]) <<  8) |
+                (static_cast<uint32_t>(buffer[2]) << 16) |
+                (static_cast<uint32_t>(buffer[3]) << 24));
         }
         return Unexpected(ErrorCode::InvalidHeaderSize);
     }
