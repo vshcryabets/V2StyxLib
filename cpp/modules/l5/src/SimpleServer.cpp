@@ -47,12 +47,12 @@ namespace styxlib
 
     void SimpleServer::handleMessage(
         ClientId clientId, 
-        const messages::base::StyxMessage &message
+        const styxlib::messages::base::StyxMessageUPtr &message
     ) 
     {
         std::cout << "Received message from client " << clientId 
-                  << " with type " << static_cast<int>(message.getType()) 
-                  << " and tag " << static_cast<int>(message.getTag()) 
+                  << " with type " << static_cast<int>(message->getType()) 
+                  << " and tag " << static_cast<int>(message->getTag()) 
                   << std::endl;
     }
 }

@@ -5,7 +5,6 @@
 
 namespace styxlib::messages::base
 {
-
     class StyxMessage
     {
     private:
@@ -18,5 +17,5 @@ namespace styxlib::messages::base
         Tag getTag() const { return tag; }
     };
 
-    typedef std::unique_ptr<StyxMessage> StyxMessageUPtr;
+    using StyxMessageUPtr = std::unique_ptr<StyxMessage>;
 }

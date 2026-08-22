@@ -30,7 +30,7 @@ namespace styxlib
         bool isStarted() const;
         virtual void handleMessage(
             ClientId clientId, 
-            const messages::base::StyxMessage &message
+            const styxlib::messages::base::StyxMessageUPtr &message
         ) override;
     };
 }

@@ -14,7 +14,7 @@ public:
     TestDeserializerL4() {}
     virtual ~TestDeserializerL4() = default;
     void setChannelTx(styxlib::ChannelTxPtr channelTx) { _channelTx = channelTx; }
-    void handleBuffer(
+    styxlib::ErrorCode handleBuffer(
         styxlib::ClientId clientId,
         const styxlib::StyxBuffer buffer,
         styxlib::Size size) override
@@ -28,8 +28,9 @@ public:
         std::cout << "Received from client " << clientId << ": " << msg << std::endl;
         if (auto p = _channelTx.lock()) {
             const char* response = "Message received";
-            p->sendBuffer(clientId, (const styxlib::StyxBuffer)response, strlen(response));
+            (void)p->sendBuffer(clientId, (const styxlib::StyxBuffer)response, strlen(response));
         }
+        return styxlib::ErrorCode::Success;
     }
     std::future<uint16_t> getReceivedBytes() { 
         receivedBytesPromise = std::make_unique<std::promise<uint16_t>>();

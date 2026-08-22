@@ -35,14 +35,15 @@ namespace styxlib
         return result;
     }
 
-    messages::base::StyxMessageUPtr DeserializerL5StyxImpl::deserializeMessage(
+    StyxMessageExpected 
+    DeserializerL5StyxImpl::deserializeMessage(
         serialization::IBufferReader &input,
         Size packetLimit) const
     {
         const Size packetSize = input.readUInt32();
         if (packetSize > packetLimit)
         {
-            throw std::runtime_error("Packet size is larger than input buffer");
+            return Unexpected(ErrorCode::PacketTooLarge);
         }
 
         const Type type = input.readUInt8();
@@ -206,27 +207,48 @@ namespace styxlib
             return messageFactory.constructRWStat(tag);
 
         default:
-            throw std::runtime_error("Unsupported Styx message type");
+            return Unexpected(ErrorCode::UnsupportedMessageType);
         }
     }
 
-    void DeserializerL5StyxImpl::handleBuffer(
+    ErrorCode DeserializerL5StyxImpl::handleBuffer(
         ClientId clientId,
         const StyxBuffer buffer,
         Size size)
     {
         if (buffer == nullptr)
         {
-            throw std::invalid_argument("Buffer cannot be null");
+            return ErrorCode::NullptrArgument;
         }
 
         if (getConsumer() == nullptr)
         {
-            return;
+            return ErrorCode::Success;
         }
 
-        BufferReaderImpl reader(buffer, size);
-        auto message = deserializeMessage(reader, ioUnit);
-        getConsumer()->handleMessage(clientId, *message);
+        try
+        {
+            BufferReaderImpl reader(buffer, size);
+            auto message = deserializeMessage(reader, ioUnit);
+            if (message.has_value())
+            {
+                getConsumer()->handleMessage(clientId, *message);
+            } else {
+                return message.error();
+            }
+            return ErrorCode::Success;
+        }
+        catch (const std::out_of_range &)
+        {
+            return ErrorCode::BufferTooSmall;
+        }
+        catch (const std::invalid_argument &)
+        {
+            return ErrorCode::NullptrArgument;
+        }
+        catch (...)
+        {
+            return ErrorCode::ConfigureFailed;
+        }
     }
 }

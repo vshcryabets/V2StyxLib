@@ -1,5 +1,6 @@
 #pragma once
 
+#include "dataL5.h"
 #include "serialization/DeserializerL5.h"
 #include "structs/StyxQID.h"
 #include "structs/StyxStat.h"
@@ -16,7 +17,7 @@ namespace styxlib
 
         structs::QID deserializeQid(serialization::IBufferReader &input) const;
         StyxStat deserializeStat(serialization::IBufferReader &input) const;
-        messages::base::StyxMessageUPtr deserializeMessage(
+        StyxMessageExpected deserializeMessage(
             serialization::IBufferReader &input,
             Size packetLimit) const;
 
@@ -28,7 +29,7 @@ namespace styxlib
 
         ~DeserializerL5StyxImpl() override = default;
 
-        void handleBuffer(
+        ErrorCode handleBuffer(
             ClientId clientId,
             const StyxBuffer buffer,
             Size size) override;

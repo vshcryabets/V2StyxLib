@@ -50,4 +50,6 @@ add_subdirectory(../c/l4 modules/l4_c)
 add_subdirectory(modules/l4)
 add_subdirectory(modules/l5)
 
-add_subdirectory(apps/simple-server)
+if(CMAKE_CXX_STANDARD GREATER_EQUAL 23)
+    add_subdirectory(apps/simple-server)
+endif()

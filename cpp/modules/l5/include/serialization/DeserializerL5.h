@@ -12,7 +12,7 @@ namespace styxlib
             virtual ~Consumer() = default;
             virtual void handleMessage(
                 ClientId clientId, 
-                const messages::base::StyxMessage &message
+                const styxlib::messages::base::StyxMessageUPtr &message
             ) = 0;
         };
     protected:

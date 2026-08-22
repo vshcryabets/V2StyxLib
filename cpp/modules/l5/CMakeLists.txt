@@ -23,6 +23,7 @@ target_include_directories(module_l5 PUBLIC
 add_executable(module_l5_tests
     test/test_BufferWriterImpl.cpp
     test/test_BufferReaderImpl.cpp
+    test/test_DeserializerL5StyxImpl.cpp
     test/test_StyxSerializerImpl.cpp
     test/test_MessageFactoryImpl.cpp
     )

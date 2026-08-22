@@ -13,4 +13,14 @@ namespace styxlib
 #else
     using DeserializerL5Ptr = DeserializerL5*;
 #endif
+
 }
+
+#if __cplusplus >= 202302L
+    #include "cxx_23/data.h"
+#elif __cplusplus >= 201703L
+    #include "cxx_17/data.h"
+#else
+    // Handle older standards (C++14, C++11, etc.)
+    #error "This library requires at least C++17."
+#endif
