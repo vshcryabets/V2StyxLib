@@ -43,11 +43,12 @@ SizeResult ChannelUart::sendBuffer(
     const Size payloadSize = (config->baseConfig.config & V2STYXLIB_CONFIG_SEND_CRC16)
         ? static_cast<Size>(size + 2)
         : size;
+    const Size headerBytes = static_cast<Size>(config->packetSizeHeader);
     auto headerSize = setPacketSize(
         config->packetSizeHeader,
         packetSizeBuffer,
         static_cast<Size>(sizeof(packetSizeBuffer)),
-        payloadSize);
+        payloadSize + headerBytes);
     if (!headerSize.has_value()) {
         return Unexpected(headerSize.error());
     }

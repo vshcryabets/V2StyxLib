@@ -37,11 +37,12 @@ namespace styxlib
         }
         // Send the buffer over the file descriptor
         uint8_t packetSizeBuffer[4] = {0};
+        const Size headerBytes = static_cast<Size>(config.packetSizeHeader);
         SizeResult headerSize = setPacketSize(
             config.packetSizeHeader, 
             packetSizeBuffer, 
             sizeof(packetSizeBuffer),
-            size);
+            size + headerBytes);
         if (!headerSize.has_value()) {
             return Unexpected(headerSize.error());
         }
@@ -73,14 +74,15 @@ namespace styxlib
             break;
         case PacketHeaderSize::Size2Bytes:
             packetSizeReadResult = ::read(fds.readFd, buffer, 2);
-            packetSize = buffer[1] | (buffer[0] << 8);
+            packetSize = static_cast<uint32_t>(buffer[0]) |
+                         (static_cast<uint32_t>(buffer[1]) << 8);
             break;
         case PacketHeaderSize::Size4Bytes:
             packetSizeReadResult = ::read(fds.readFd, buffer, 4);
-            packetSize = buffer[3] |
-                         (buffer[2] << 8) |
-                         (buffer[1] << 16) |
-                         (buffer[0] << 24);
+            packetSize = static_cast<uint32_t>(buffer[0]) |
+                         (static_cast<uint32_t>(buffer[1]) << 8) |
+                         (static_cast<uint32_t>(buffer[2]) << 16) |
+                         (static_cast<uint32_t>(buffer[3]) << 24);
             break;
         }
         if (packetSizeReadResult <= 0)
@@ -88,10 +90,17 @@ namespace styxlib
             std::cerr << "Error reading packet size from fd " << fds.readFd << ": " << strerror(errno) << std::endl;
             return;
         }
-        Size totalBytesRead = 0;
-        while (totalBytesRead < packetSize)
+        const Size headerBytes = static_cast<Size>(config.packetSizeHeader);
+        if (packetSize < headerBytes)
         {
-            ssize_t bytesRead = ::read(fds.readFd, readBufferData.buffer.data() + totalBytesRead, packetSize - totalBytesRead);
+            std::cerr << "Invalid packet size from fd " << fds.readFd << ": " << packetSize << std::endl;
+            return;
+        }
+        const Size payloadSize = packetSize - headerBytes;
+        Size totalBytesRead = 0;
+        while (totalBytesRead < payloadSize)
+        {
+            ssize_t bytesRead = ::read(fds.readFd, readBufferData.buffer.data() + totalBytesRead, payloadSize - totalBytesRead);
             if (bytesRead <= 0)
             {
                 std::cerr << "Error reading packet data from fd " << fds.readFd << ": " << strerror(errno) << std::endl;

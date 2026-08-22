@@ -10,6 +10,7 @@
 
 #include "ChannelRx.h"
 #include "ChannelTx.h"
+#include "ChannelDriver.h"
 #include "ClientsRepo.h"
 #include "impl/ChannelUnixFile.h"
 #include "impl/ProgressObservableMutexImpl.h"
@@ -108,7 +109,7 @@ namespace styxlib
      * cleanupClosedSockets(), and sendBuffer() to customise per-protocol
      * behaviour (e.g. UDP does not call accept() and uses recvfrom/sendto).
      */
-    class ChannelUnixSocketServer : public ChannelRx, public ChannelTx
+    class ChannelUnixSocketServer : public ChannelDriver
     {
     public:
         class Configuration
@@ -213,9 +214,9 @@ namespace styxlib
         ~ChannelUnixSocketServer() override;
 
         SizeResult sendBuffer(ClientId clientId, const StyxBuffer buffer, Size size) override;
-        std::future<ErrorCode> start();
-        std::future<void> stop();
-        bool isStarted() const;
+        std::future<ErrorCode> start() override;
+        std::future<void> stop() override;
+        bool isStarted() const override;
         ProgressObserver<std::vector<ClientInfo>> &getClientsObserver()
         {
             return clientsObserver;

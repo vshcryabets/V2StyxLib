@@ -6,7 +6,8 @@ namespace styxlib
                           uint8_t* buffer,
                           Size bufferSize,
                           Size packetSize) {
-        if (bufferSize < 4) {
+        const Size headerBytes = static_cast<Size>(headerSize);
+        if (bufferSize < headerBytes) {
             return styxlib::Unexpected(ErrorCode::BufferTooSmall);
         }
 #if defined(__GNUC__)        
@@ -29,8 +30,8 @@ namespace styxlib
                     return styxlib::Unexpected(ErrorCode::PacketTooLarge);
                 }
             }
-            buffer[1] = packetSize & 0xFF;
-            buffer[0] = (packetSize >> 8) & 0xFF;
+            buffer[0] = packetSize & 0xFF;
+            buffer[1] = (packetSize >> 8) & 0xFF;
             break;
         case PacketHeaderSize::Size4Bytes:
             if constexpr (sizeof(packetSize) > 4) {
@@ -38,10 +39,10 @@ namespace styxlib
                     return styxlib::Unexpected(ErrorCode::PacketTooLarge);
                 }
             }
-            buffer[3] = packetSize & 0xFF;
-            buffer[2] = (packetSize >> 8) & 0xFF;
-            buffer[1] = (packetSize >> 16) & 0xFF;
-            buffer[0] = (packetSize >> 24) & 0xFF;
+            buffer[0] = packetSize & 0xFF;
+            buffer[1] = (packetSize >> 8) & 0xFF;
+            buffer[2] = (packetSize >> 16) & 0xFF;
+            buffer[3] = (packetSize >> 24) & 0xFF;
             break;
         default:
             return styxlib::Unexpected(ErrorCode::InvalidHeaderSize);

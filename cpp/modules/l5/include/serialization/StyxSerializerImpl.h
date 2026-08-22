@@ -9,9 +9,9 @@ public:
     ~StyxSerializerImpl() = default;
     styxlib::Size getMessageSize(const styxlib::messages::base::StyxMessage &message) const override;
     void serialize(const styxlib::messages::base::StyxMessage &message,
-                   IBufferWriter &output) override;
-    void serializeStat(const StyxStat &stat, IBufferWriter &output) override;
+                   styxlib::serialization::IBufferWriter &output) override;
+    void serializeStat(const StyxStat &stat, styxlib::serialization::IBufferWriter &output) override;
     styxlib::Size getStatSerializedSize(const StyxStat &stat) override;
     styxlib::Size getQidSize() override;
-    void serializeQid(const styxlib::structs::QID &qid, IBufferWriter &output) override;
+    void serializeQid(const styxlib::structs::QID &qid, styxlib::serialization::IBufferWriter &output) override;
 };

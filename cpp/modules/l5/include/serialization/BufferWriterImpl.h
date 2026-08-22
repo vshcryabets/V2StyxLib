@@ -1,11 +1,11 @@
 #pragma once
 
-#include "serialization/IBufferWriter.h"
+#include "serialization/IBuffer.h"
 
-using StyxSize = styxlib::Size;
-using StyxBuffer = styxlib::StyxBuffer;
+namespace styxlib::serialization
+{
 
-class BufferWriterImpl : public IBufferWriter
+class BufferWriterImpl : public styxlib::serialization::IBufferWriter
 {
 protected:
     StyxBuffer buffer;
@@ -26,3 +26,5 @@ public:
     StyxSize getPosition() const override { return position; }
     StyxSize getLimit() const override { return limit; }
 };
+
+}

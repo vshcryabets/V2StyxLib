@@ -1,5 +1,5 @@
 #pragma once
-#include "data.h"
+#include "dataL4.h"
 
 namespace styxlib
 {
@@ -18,6 +18,6 @@ namespace styxlib
     public:
         DeserializerL4() = default;
         virtual ~DeserializerL4() = default;
-        virtual void handleBuffer(ClientId clientId, const StyxBuffer buffer, Size size) = 0;
+        virtual ErrorCode handleBuffer(ClientId clientId, const StyxBuffer buffer, Size size) = 0;
     };
 }

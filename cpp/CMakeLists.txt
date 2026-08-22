@@ -5,6 +5,8 @@ project(V2StyxLib LANGUAGES C CXX)
 enable_testing()
 include(CTest)
 
+include(cmake/CPM.cmake)
+
 # option(BUILD_MODULE_L5 "Build the L5 module" ON)
 
 set(CPP_VERSION "23" CACHE STRING "C++ standard version to use (17 or 23)")
@@ -42,15 +44,13 @@ elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
     add_compile_options(/we4716)
 endif()
 
-add_compile_definitions(BufferSize_t=uint16_t)
+## There should be better way to do this, but for now, we will just define BufferSize_t as uint32_t for all platforms.
+add_compile_definitions(BufferSize_t=uint32_t)
 
 add_subdirectory(../c/l4 modules/l4_c)
 add_subdirectory(modules/l4)
 add_subdirectory(modules/l5)
 
-
-#include_directories(include) 
-
-#ADD_SUBDIRECTORY( lib out/lib )
-
-#ADD_SUBDIRECTORY( testserver out/testserver )
+if(CMAKE_CXX_STANDARD GREATER_EQUAL 23)
+    add_subdirectory(apps/simple-server)
+endif()

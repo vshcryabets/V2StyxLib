@@ -152,6 +152,37 @@ TEST_CASE_METHOD(TestSuite, "ChannelUnixTcpServer:receive messages", "[ChannelUn
     server->stop().get();
 }
 
+TEST_CASE_METHOD(TestSuite, "ChannelUnixTcpServer:receive real 9P Tversion packet", "[ChannelUnixTcpServer]")
+{
+    waitStartServer();
+    connectClient();
+
+    const std::vector<uint8_t> tversionPacket = {
+        0x13, 0x00, 0x00, 0x00,
+        0x64,
+        0xFF, 0xFF,
+        0x00, 0x20, 0x00, 0x00,
+        0x06, 0x00,
+        0x39, 0x50, 0x32, 0x30, 0x30, 0x30};
+
+    auto futureReceivedBytes = serverDeserializer->getReceivedBytes();
+
+    auto bytesSent = client->sendBuffer(
+        styxlib::InvalidClientId,
+        const_cast<uint8_t *>(tversionPacket.data()),
+        static_cast<styxlib::Size>(tversionPacket.size()));
+    REQUIRE(bytesSent.has_value());
+    REQUIRE(bytesSent.value() == tversionPacket.size());
+
+    REQUIRE(futureReceivedBytes.wait_for(std::chrono::seconds(2)) == std::future_status::ready);
+    REQUIRE(futureReceivedBytes.get() == tversionPacket.size());
+    REQUIRE(serverDeserializer->getLastReceivedBuffer() == tversionPacket);
+
+    REQUIRE(client->disconnect().wait_for(std::chrono::seconds(1)) == std::future_status::ready);
+    REQUIRE_FALSE(client->isConnected());
+    server->stop().get();
+}
+
 TEST_CASE_METHOD(TestChannelUnixTcpServer, "ChannelUnixTcpServer:handlePollEvents accept connections", "[ChannelUnixTcpServer]")
 {
     pollFds.clear();
@@ -201,26 +232,26 @@ TEST_CASE_METHOD(TestChannelUnixTcpServer, "ChannelUnixTcpServer:processBuffers"
     clientInfo.port = 12345;
     clientInfo.buffer = std::vector<uint8_t>(32, 0);
     clientInfo.currentSize = 18; // more than packetSizeHeader
-    clientInfo.buffer[0] = 0;
-    clientInfo.buffer[1] = 0;
-    clientInfo.buffer[2] = 0;
-    clientInfo.buffer[3] = 4;
+    clientInfo.buffer[0] = 0x08;
+    clientInfo.buffer[1] = 0x00;
+    clientInfo.buffer[2] = 0x00;
+    clientInfo.buffer[3] = 0x00;
     clientInfo.buffer[4] = 'C';
     clientInfo.buffer[5] = 'A';
     clientInfo.buffer[6] = 'D';
     clientInfo.buffer[7] = 'B';
     // next packet
-    clientInfo.buffer[8] = 0x00;
+    clientInfo.buffer[8] = 0x06;
     clientInfo.buffer[9] = 0x00;
     clientInfo.buffer[10] = 0x00;
-    clientInfo.buffer[11] = 0x02;
+    clientInfo.buffer[11] = 0x00;
     clientInfo.buffer[12] = 'M';
     clientInfo.buffer[13] = '2';
     // 3rd packet
-    clientInfo.buffer[14] = 0x00;
+    clientInfo.buffer[14] = 0x06;
     clientInfo.buffer[15] = 0x00;
     clientInfo.buffer[16] = 0x00;
-    clientInfo.buffer[17] = 0x02;
+    clientInfo.buffer[17] = 0x00;
     clientInfo.isDirty = true;
     socketToClientInfoMapFull[clientSocket] = clientInfo;
     // Call processBuffers
@@ -231,3 +262,5 @@ TEST_CASE_METHOD(TestChannelUnixTcpServer, "ChannelUnixTcpServer:processBuffers"
     auto testDeserializer = std::dynamic_pointer_cast<TestDeserializerL4>(deserializer);
     REQUIRE(testDeserializer->getTotalReceivedBytes() == 6); // 1st packet 4 bytes, 2nd packet 2 bytes
 }
+
+

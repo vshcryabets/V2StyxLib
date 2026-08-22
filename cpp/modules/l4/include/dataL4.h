@@ -25,6 +25,7 @@ namespace styxlib
         NullptrArgument,
         SendFailed,
         ConfigureFailed,
+        UnsupportedMessageType,
     };
 
     enum class PacketHeaderSize : uint8_t
@@ -50,17 +51,20 @@ namespace styxlib
     class ChannelRx;
     class ChannelTx;
     class ChannelTxOneToMany;
+    class ChannelDriver;
 
 #ifdef USE_STD_MEMORY
     using SerializerL4Ptr = std::shared_ptr<SerializerL4>;
     using DeserializerL4Ptr = std::shared_ptr<DeserializerL4>;
     using ChannelRxPtr = std::shared_ptr<ChannelRx>;
     using ChannelTxPtr = std::shared_ptr<ChannelTx>;
+    using ChannelDriverPtr = std::shared_ptr<ChannelDriver>;
 #else
     using SerializerL4Ptr = SerializerL4*;
     using DeserializerL4Ptr = DeserializerL4*;
     using ChannelRxPtr = ChannelRx*;
     using ChannelTxPtr = ChannelTx*;
+    using ChannelDriverPtr = ChannelDriver*;
 #endif
 
     inline uint8_t to_uint8_t(const PacketHeaderSize &headerSize)

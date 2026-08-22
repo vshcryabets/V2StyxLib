@@ -30,11 +30,12 @@ namespace styxlib
         }
 
         uint8_t packetSizeBuffer[4] = {0};
+        const Size headerBytes = to_uint8_t(packetSizeHeader);
         SizeResult headerSize = setPacketSize(
             packetSizeHeader,
             packetSizeBuffer,
             sizeof(packetSizeBuffer),
-            size);
+            size + headerBytes);
         if (!headerSize.has_value())
         {
             return Unexpected(headerSize.error());
@@ -88,7 +89,7 @@ namespace styxlib
     // ── ChannelUnixSocketServer ───────────────────────────────────────────────
 
     ChannelUnixSocketServer::ChannelUnixSocketServer(const Configuration &config)
-        : ChannelRx(), configuration(config)
+        : ChannelDriver(), configuration(config)
     {
         if (setDeserializer(config.deserializer) != ErrorCode::Success) {
             throw std::invalid_argument("Deserializer cannot be null");
@@ -293,7 +294,7 @@ namespace styxlib
         for (auto &pair : socketToClientInfoMapFull)
         {
             ClientFullInfo &readBuffer = pair.second;
-            while (readBuffer.isDirty && readBuffer.currentSize > headerBytes)
+            while (readBuffer.isDirty && readBuffer.currentSize >= headerBytes)
             {
                 auto packetSizeResult = getPacketSize(
                     configuration.packetSizeHeader,
@@ -305,18 +306,23 @@ namespace styxlib
                     break;
                 }
                 const Size packetSize = packetSizeResult.value();
-                const Size packetSizeWithHeader = packetSize + headerBytes;
-                if (readBuffer.currentSize >= packetSizeWithHeader)
+                if (packetSize < headerBytes)
                 {
+                    // Invalid frame: total packet size cannot be less than header size.
+                    break;
+                }
+                if (readBuffer.currentSize >= packetSize)
+                {
+                    const Size payloadSize = packetSize - headerBytes;
                     deserializer->handleBuffer(
                         pair.second.id,
                         readBuffer.buffer.data() + headerBytes,
-                        packetSize);
-                    Size remainingSize = readBuffer.currentSize - packetSizeWithHeader;
+                        payloadSize);
+                    Size remainingSize = readBuffer.currentSize - packetSize;
                     if (remainingSize > 0)
                     {
                         std::memmove(readBuffer.buffer.data(),
-                                     readBuffer.buffer.data() + packetSizeWithHeader,
+                                     readBuffer.buffer.data() + packetSize,
                                      remainingSize);
                     }
                     readBuffer.currentSize = remainingSize;

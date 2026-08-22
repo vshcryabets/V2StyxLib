@@ -1,6 +1,9 @@
 #include "serialization/BufferWriterImpl.h"
 #include <stdexcept>
 
+namespace styxlib::serialization
+{
+
 BufferWriterImpl::BufferWriterImpl(size_t bufferSize)
 {
     buffer = new uint8_t[bufferSize];
@@ -93,4 +96,6 @@ void BufferWriterImpl::prepareBuffer(StyxSize bufferSize)
 StyxBuffer BufferWriterImpl::getBuffer() const
 {
     return buffer;
+}
+
 }
