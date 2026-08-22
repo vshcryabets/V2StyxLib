@@ -24,6 +24,7 @@ namespace styxlib
                 {
                     return ErrorCode::AlreadyStarted;
                 }
+                running.store(true);
                 deserializer->setConsumer(this);
                 channel->setDeserializer(deserializer);
                 channel->start().get();
@@ -37,7 +38,13 @@ namespace styxlib
             std::launch::async,
             [this]()
             {
-                stopRequested.store(true);
+                if (!running.load())
+                {
+                    return;
+                }
+                channel->stop().get();
+                deserializer->setConsumer(nullptr);
+                running.store(false);
             });
     }
 

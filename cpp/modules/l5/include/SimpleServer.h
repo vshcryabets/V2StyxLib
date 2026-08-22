@@ -21,7 +21,6 @@ namespace styxlib
         DeserializerL5Ptr deserializer;
         ChannelDriverPtr channel;
         std::atomic<bool> running{false};
-        std::atomic<bool> stopRequested{false};
     public:
         SimpleServer(const SimpleServer::Configuration &config);
         ~SimpleServer();
