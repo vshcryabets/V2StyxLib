@@ -1,16 +1,19 @@
-#include "serialization/StyxSerializerImpl.h"
+#include "serialization/SerializerL5StyxImpl.h"
 #include "enums/MessageType.h"
 #include "messages/v9p2000/BaseMessage.h"
 
 using namespace styxlib::messages::v9p2000;
 using namespace styxlib::messages::base;
 
-void StyxSerializerImpl::serialize(const styxlib::messages::base::StyxMessage &message,
+namespace styxlib::serialization
+{
+
+void SerializerL5StyxImpl::serialize(const styxlib::messages::base::StyxMessage &message,
                                    styxlib::serialization::IBufferWriter &output)
 {
 }
 
-void StyxSerializerImpl::serializeStat(const StyxStat &stat, styxlib::serialization::IBufferWriter &output)
+void SerializerL5StyxImpl::serializeStat(const StyxStat &stat, styxlib::serialization::IBufferWriter &output)
 {
     size_t size = getStatSerializedSize(stat);
     output.writeUInt16(size - 2); // total size except first 2 bytes with size
@@ -27,24 +30,24 @@ void StyxSerializerImpl::serializeStat(const StyxStat &stat, styxlib::serializat
     output.writeUTFString(stat.modificationUser);
 }
 
-styxlib::Size StyxSerializerImpl::getStatSerializedSize(const StyxStat &stat)
+styxlib::Size SerializerL5StyxImpl::getStatSerializedSize(const StyxStat &stat)
 {
     return 28 + getQidSize() + 2 + stat.name.length() + 2 + stat.userName.length() + 2 + stat.groupName.length() + 2 + stat.modificationUser.length();
 }
 
-styxlib::Size StyxSerializerImpl::getQidSize()
+styxlib::Size SerializerL5StyxImpl::getQidSize()
 {
     return 13; // Size of StyxQID: 1 byte type, 4 bytes version, 8 bytes path
 }
 
-void StyxSerializerImpl::serializeQid(const styxlib::structs::QID &qid, styxlib::serialization::IBufferWriter &output)
+void SerializerL5StyxImpl::serializeQid(const styxlib::structs::QID &qid, styxlib::serialization::IBufferWriter &output)
 {
     output.writeUInt8(qid.type);
     output.writeUInt32(qid.version);
     output.writeUInt64(qid.path);
 }
 
-styxlib::Size StyxSerializerImpl::getMessageSize(const styxlib::messages::base::StyxMessage &message) const
+styxlib::Size SerializerL5StyxImpl::getMessageSize(const styxlib::messages::base::StyxMessage &message) const
 {
     styxlib::Size size = IDataSerializer::BASE_BINARY_SIZE;
     // if (message instanceof StyxTMessageFID)
@@ -124,4 +127,24 @@ styxlib::Size StyxSerializerImpl::getMessageSize(const styxlib::messages::base::
         //     break;
     }
     return size;
+}
+
+ErrorCode 
+SerializerL5StyxImpl::sendMessage(
+    const styxlib::ClientId clientId, 
+    const styxlib::StyxMessageUPtr &message
+)
+{
+    if (channelTx == nullptr)
+    {
+        return ErrorCode::NullptrArgument;
+    }
+
+    // BufferWriterImpl outputBuffer(8192);
+    // serialize(*message, outputBuffer);
+    // StyxBuffer buffer = outputBuffer.getBuffer();
+    // channelTx->sendBuffer(clientId, buffer, outputBuffer.getPosition());
+    return ErrorCode::SendFailed;
+}
+
 }

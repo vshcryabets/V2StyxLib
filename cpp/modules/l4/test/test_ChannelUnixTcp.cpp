@@ -14,6 +14,9 @@ public:
     int acceptCalled = 0;
     int readDataFromSocketCalled = 0;
 protected:
+    styxlib::ClientsRepoImpl clientsRepoImpl;
+    TestDeserializerL4 deserializer;
+
     bool acceptClients(int serverSocket) override {
         acceptCalled++;
         if (!dontCallRealMethods)
@@ -31,10 +34,10 @@ public:
     TestChannelUnixTcpServer()
         : ChannelUnixTcpServer(Configuration(
             23500,
-            std::make_shared<styxlib::ClientsRepoImpl>(),
+            &clientsRepoImpl,
             styxlib::PacketHeaderSize::Size4Bytes,
             8192,
-            std::make_shared<TestDeserializerL4>(),
+            &deserializer,
             10))
     {
     }
@@ -45,9 +48,9 @@ class TestSuite
 public:
     const static styxlib::PacketHeaderSize packetSizeHeader = styxlib::PacketHeaderSize::Size1Byte;
     const static uint16_t port = 23500;
-    std::shared_ptr<styxlib::ClientsRepoImpl> clientsRepo = std::make_shared<styxlib::ClientsRepoImpl>();
-    std::shared_ptr<TestDeserializerL4> clientDeserializer = std::make_shared<TestDeserializerL4>();
-    std::shared_ptr<TestDeserializerL4> serverDeserializer = std::make_shared<TestDeserializerL4>();
+    styxlib::ClientsRepoImpl clientsRepo;
+    TestDeserializerL4 clientDeserializer;
+    TestDeserializerL4 serverDeserializer;
     styxlib::ChannelUnixTcpServer::Configuration config;
     std::shared_ptr<styxlib::ChannelUnixTcpServer> server;
     styxlib::ChannelUnixTcpClient::Configuration clientConfig;
@@ -59,19 +62,19 @@ public:
             port,
             packetSizeHeader,
             8192,
-            clientDeserializer
+            &clientDeserializer
         ), config(
             port,
-            clientsRepo,
+            &clientsRepo,
             packetSizeHeader,
             8192,
-            serverDeserializer,
+            &serverDeserializer,
             10
         )
     {
         server = std::make_shared<styxlib::ChannelUnixTcpServer>(config);
         client = std::make_shared<styxlib::ChannelUnixTcpClient>(clientConfig);
-        serverDeserializer->setChannelTx(server);
+        serverDeserializer.setChannelTx(server.get());
     }
 
     void waitStartServer() {
@@ -123,7 +126,7 @@ TEST_CASE_METHOD(TestSuite, "ChannelUnixTcpServer:accepts connections", "[Channe
     }
 
     REQUIRE(client->isConnected());
-    std::cout << "Last issued client ID: " << clientsRepo->getLastIssuedId() << std::endl;
+    std::cout << "Last issued client ID: " << clientsRepo.getLastIssuedId() << std::endl;
     REQUIRE(client->disconnect().wait_for(std::chrono::seconds(1)) == std::future_status::ready);
     waitStopServer();
 }
@@ -135,7 +138,7 @@ TEST_CASE_METHOD(TestSuite, "ChannelUnixTcpServer:receive messages", "[ChannelUn
 
     const char *msg = "Hello, World!";
     uint16_t messageSize = strlen(msg);
-    auto futureReceivedBytes = serverDeserializer->getReceivedBytes();
+    auto futureReceivedBytes = serverDeserializer.getReceivedBytes();
 
     auto bytesSent = client->sendBuffer(
         styxlib::InvalidClientId, 
@@ -165,7 +168,7 @@ TEST_CASE_METHOD(TestSuite, "ChannelUnixTcpServer:receive real 9P Tversion packe
         0x06, 0x00,
         0x39, 0x50, 0x32, 0x30, 0x30, 0x30};
 
-    auto futureReceivedBytes = serverDeserializer->getReceivedBytes();
+    auto futureReceivedBytes = serverDeserializer.getReceivedBytes();
 
     auto bytesSent = client->sendBuffer(
         styxlib::InvalidClientId,
@@ -176,7 +179,7 @@ TEST_CASE_METHOD(TestSuite, "ChannelUnixTcpServer:receive real 9P Tversion packe
 
     REQUIRE(futureReceivedBytes.wait_for(std::chrono::seconds(2)) == std::future_status::ready);
     REQUIRE(futureReceivedBytes.get() == tversionPacket.size());
-    REQUIRE(serverDeserializer->getLastReceivedBuffer() == tversionPacket);
+    REQUIRE(serverDeserializer.getLastReceivedBuffer() == tversionPacket);
 
     REQUIRE(client->disconnect().wait_for(std::chrono::seconds(1)) == std::future_status::ready);
     REQUIRE_FALSE(client->isConnected());
@@ -259,8 +262,7 @@ TEST_CASE_METHOD(TestChannelUnixTcpServer, "ChannelUnixTcpServer:processBuffers"
     // Verify that the buffer is no longer dirty
     REQUIRE(socketToClientInfoMapFull[clientSocket].isDirty == false);
     REQUIRE(socketToClientInfoMapFull[clientSocket].currentSize == 4); // only incomplete 3rd packet remains
-    auto testDeserializer = std::dynamic_pointer_cast<TestDeserializerL4>(deserializer);
-    REQUIRE(testDeserializer->getTotalReceivedBytes() == 6); // 1st packet 4 bytes, 2nd packet 2 bytes
+    REQUIRE(deserializer.getTotalReceivedBytes() == 6); // 1st packet 4 bytes, 2nd packet 2 bytes
 }
 
 

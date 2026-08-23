@@ -7,9 +7,12 @@
 #include "enums/MessageType.h"
 #include "serialization/BufferReaderImpl.h"
 
-namespace styxlib
+namespace styxlib::serialization
 {
-    structs::QID DeserializerL5StyxImpl::deserializeQid(serialization::IBufferReader &input) const
+    structs::QID 
+    DeserializerL5StyxImpl::deserializeQid(
+        serialization::IBufferReader &input
+    ) const
     {
         const uint8_t type = input.readUInt8();
         const uint32_t version = input.readUInt32();
@@ -17,11 +20,12 @@ namespace styxlib
         return {type, version, path};
     }
 
-    StyxStat DeserializerL5StyxImpl::deserializeStat(serialization::IBufferReader &input) const
+    structs::StyxStat 
+    DeserializerL5StyxImpl::deserializeStat(serialization::IBufferReader &input) const
     {
         input.readUInt16(); // Stat total size without this field.
 
-        StyxStat result = StyxStat::EMPTY;
+        structs::StyxStat result = structs::StyxStat::EMPTY;
         result.type = static_cast<int>(input.readUInt16());
         result.dev = static_cast<long>(input.readUInt32());
         result.QID = deserializeQid(input);
@@ -256,7 +260,7 @@ namespace styxlib
         {
             const uint16_t statSize = input.readUInt16();
             (void)statSize;
-            const StyxStat stat = deserializeStat(input);
+            const structs::StyxStat stat = deserializeStat(input);
             return messageFactory.constructRStatMessage(tag, stat);
         }
 
@@ -265,7 +269,7 @@ namespace styxlib
             const Fid fid = input.readUInt32();
             const uint16_t statSize = input.readUInt16();
             (void)statSize;
-            const StyxStat stat = deserializeStat(input);
+            const structs::StyxStat stat = deserializeStat(input);
             return messageFactory.constructTWStatMessage(fid, stat);
         }
 
@@ -300,7 +304,7 @@ namespace styxlib
             auto message = deserializeMessage(reader);
             if (message.has_value())
             {
-                messages::base::StyxMessageUPtr &msg = message.value();
+                StyxMessageUPtr &msg = message.value();
                 std::printf("DeserializerL5StyxImpl: Successfully deserialized message of type %d and tag %d for client %d\n", 
                     static_cast<int>(msg->getType()),
                     static_cast<int>(msg->getTag()), clientId);

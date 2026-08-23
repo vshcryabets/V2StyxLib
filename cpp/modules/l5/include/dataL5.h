@@ -1,22 +1,32 @@
 #pragma once
 
+#include "dataL4.h"
+
 #ifdef USE_STD_MEMORY
     #include <memory>
 #endif
 
-#include "serialization/DeserializerL5.h"
-#include "serialization/SerializerL5.h"
-
 namespace styxlib
 {
-#ifdef USE_STD_MEMORY
-    using DeserializerL5Ptr = std::shared_ptr<DeserializerL5>;
-    using SerializerL5Ptr = std::shared_ptr<SerializerL5>;
-#else
-    using DeserializerL5Ptr = DeserializerL5*;
-    using SerializerL5Ptr = SerializerL5*;
-#endif
+    namespace serialization
+    {
+        class DeserializerL5;
+        class SerializerL5;
+    }
 
+    namespace messages::base {
+        class MessageFactory;
+        class StyxMessage;
+    }
+
+    using DeserializerL5Ptr = serialization::DeserializerL5*;
+    using SerializerL5Ptr = serialization::SerializerL5*;
+    using MessageFactoryPtr = messages::base::MessageFactory*;
+#ifdef USE_STD_MEMORY    
+    using StyxMessageUPtr = std::unique_ptr<messages::base::StyxMessage>;
+#else 
+    using StyxMessageUPtr = messages::base::StyxMessage*;
+#endif
 }
 
 #if __cplusplus >= 202302L

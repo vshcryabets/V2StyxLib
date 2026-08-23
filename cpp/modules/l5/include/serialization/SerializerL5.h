@@ -3,13 +3,18 @@
 #include "ChannelTx.h"
 #include "SerializerL4.h"
 
-namespace styxlib
+namespace styxlib::serialization
 {
     class SerializerL5 : public SerializerL4
     {
     public:
-        SerializerL5(ChannelTxPtr channelTx) : SerializerL4(channelTx) {}
+        SerializerL5() : SerializerL4() {}
         virtual ~SerializerL5() = default;
-        virtual Tag sendMessage(const messages::base::StyxMessage &message) = 0;
+
+        // Serialize and pass binary buffer to channelTx for transmission
+        virtual ErrorCode sendMessage(
+            const ClientId clientId,
+            const StyxMessageUPtr &message
+        ) = 0;
     };
 }

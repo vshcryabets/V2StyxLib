@@ -3,14 +3,18 @@
 #include <iostream>
 
 #include "enums/MessageType.h"
+#include "messages/v9p2000/BaseMessage.h"
 
 namespace styxlib
 {
     SimpleServer::SimpleServer(
         const SimpleServer::Configuration &config
     )
-        : deserializer(config.deserializer),
-          channel(config.channel)
+        : iounit(config.iounit),
+          deserializer(config.deserializer),
+          channel(config.channel),
+          serializer(config.serializer),
+          messageFactory(config.messageFactory)
     {
     }
 
@@ -62,15 +66,24 @@ namespace styxlib
 
     void SimpleServer::handleMessage(
         ClientId clientId, 
-        const styxlib::messages::base::StyxMessageUPtr &message
+        const styxlib::StyxMessageUPtr &message
     ) 
     {
         switch (message->getType())
         {
-            case styxlib::enums::Tversion:
-                
-                
+            case styxlib::enums::Tversion: {
+                auto tversionMessage = dynamic_cast<const styxlib::messages::v9p2000::BaseMessage*>(message.get());
+                // TODO close all files
+                // TODO stop IO operations
+                // TODO reset state
+                uint16_t iounit = (this->iounit < tversionMessage->getIounit()) ? this->iounit : tversionMessage->getIounit();
+                auto answer = messageFactory->constructRVersion(
+                    message->getTag(),
+                    iounit,
+                    "9P2000");                
+                serializer->sendMessage(clientId, answer);
                 break;
+            }
 
             default:
                 std::cout << "Received message from client " << clientId 

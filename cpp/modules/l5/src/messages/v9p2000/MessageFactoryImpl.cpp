@@ -8,7 +8,7 @@
 namespace styxlib::messages::v9p2000
 {
     using StyxMessage = styxlib::messages::base::StyxMessage;
-    using StyxMessageUPtr = styxlib::messages::base::StyxMessageUPtr;
+    using StyxMessageUPtr = styxlib::StyxMessageUPtr;
 
     StyxMessageUPtr 
     MessageFactoryImpl::constructTVersion(
@@ -41,13 +41,19 @@ namespace styxlib::messages::v9p2000
             mountPoint);
     }
 
-    StyxMessageUPtr MessageFactoryImpl::constructRerror(int tag, const StyxString &error) const
+    StyxMessageUPtr MessageFactoryImpl::constructRerror(Tag tag, const StyxString &error) const
     {
         return std::make_unique<StyxRErrorMessage>(
             tag,
             error);
     }
-    StyxMessageUPtr MessageFactoryImpl::constructRVersion(int tag, long maxPacketSize, const StyxString &protocolVersion) const
+
+    StyxMessageUPtr 
+    MessageFactoryImpl::constructRVersion(
+        styxlib::Tag tag, 
+        long maxPacketSize, 
+        const StyxString &protocolVersion
+    ) const
     {
         return std::make_unique<BaseMessage>(
             styxlib::enums::Rversion,
@@ -57,7 +63,7 @@ namespace styxlib::messages::v9p2000
             maxPacketSize,
             protocolVersion);
     }
-    StyxMessageUPtr MessageFactoryImpl::constructRAttachMessage(int tag, const QID &qid) const
+    StyxMessageUPtr MessageFactoryImpl::constructRAttachMessage(Tag tag, const QID &qid) const
     {
         return std::make_unique<BaseMessage>(
             styxlib::enums::Rattach,
@@ -67,7 +73,7 @@ namespace styxlib::messages::v9p2000
             0,
             "");
     }
-    StyxMessageUPtr MessageFactoryImpl::constructRAuthMessage(int tag, const QID &qid) const
+    StyxMessageUPtr MessageFactoryImpl::constructRAuthMessage(Tag tag, const QID &qid) const
     {
         return std::make_unique<BaseMessage>(
             styxlib::enums::Rauth,
@@ -77,7 +83,7 @@ namespace styxlib::messages::v9p2000
             0,
             "");
     }
-    StyxMessageUPtr MessageFactoryImpl::constructROpenMessage(int tag, const QID &qid, long iounit) const
+    StyxMessageUPtr MessageFactoryImpl::constructROpenMessage(Tag tag, const QID &qid, long iounit) const
     {
         return std::make_unique<BaseMessage>(
             styxlib::enums::Ropen,
@@ -87,7 +93,7 @@ namespace styxlib::messages::v9p2000
             iounit,
             "");
     }
-    StyxMessageUPtr MessageFactoryImpl::constructRCreateMessage(int tag, const QID &qid, long iounit) const
+    StyxMessageUPtr MessageFactoryImpl::constructRCreateMessage(Tag tag, const QID &qid, long iounit) const
     {
         return std::make_unique<BaseMessage>(
             styxlib::enums::Rcreate,
@@ -127,7 +133,7 @@ namespace styxlib::messages::v9p2000
             0,
             "");
     }
-    StyxMessageUPtr MessageFactoryImpl::constructRStatMessage(int tag, const StyxStat &stat) const
+    StyxMessageUPtr MessageFactoryImpl::constructRStatMessage(Tag tag, const StyxStat &stat) const
     {
         return std::make_unique<BaseMessage>(
             styxlib::enums::Rstat,
@@ -157,7 +163,7 @@ namespace styxlib::messages::v9p2000
             0,
             "");
     }
-    StyxMessageUPtr MessageFactoryImpl::constructRWriteMessage(int tag, long count) const
+    StyxMessageUPtr MessageFactoryImpl::constructRWriteMessage(Tag tag, long count) const
     {
         return std::make_unique<BaseMessage>(
             styxlib::enums::Rwrite,
@@ -177,7 +183,7 @@ namespace styxlib::messages::v9p2000
             0,
             "");
     }
-    StyxMessageUPtr MessageFactoryImpl::constructRWalkMessage(int tag, const std::vector<QID> &empty) const
+    StyxMessageUPtr MessageFactoryImpl::constructRWalkMessage(Tag tag, const std::vector<QID> &empty) const
     {
         return std::make_unique<BaseMessage>(
             styxlib::enums::Rwalk,
@@ -187,7 +193,7 @@ namespace styxlib::messages::v9p2000
             0,
             "");
     }
-    StyxMessageUPtr MessageFactoryImpl::constructRReadMessage(int tag, StyxBuffer data, int size) const
+    StyxMessageUPtr MessageFactoryImpl::constructRReadMessage(Tag tag, StyxBuffer data, int size) const
     {
         return std::make_unique<BaseMessage>(
             styxlib::enums::Rread,
@@ -217,7 +223,7 @@ namespace styxlib::messages::v9p2000
             0,
             "");
     }
-    StyxMessageUPtr MessageFactoryImpl::constructRClunk(int tag, long fid) const
+    StyxMessageUPtr MessageFactoryImpl::constructRClunk(Tag tag, long fid) const
     {
         return std::make_unique<BaseMessage>(
             styxlib::enums::Rclunk,

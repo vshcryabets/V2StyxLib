@@ -7,7 +7,7 @@
 #include "messages/v9p2000/MessageFactoryImpl.h"
 #include "serialization/IBuffer.h"
 
-namespace styxlib
+namespace styxlib::serialization
 {
     class DeserializerL5StyxImpl : public DeserializerL5
     {
@@ -15,7 +15,7 @@ namespace styxlib
         messages::v9p2000::MessageFactoryImpl messageFactory;
 
         structs::QID deserializeQid(serialization::IBufferReader &input) const;
-        StyxStat deserializeStat(serialization::IBufferReader &input) const;
+        structs::StyxStat deserializeStat(serialization::IBufferReader &input) const;
         StyxMessageExpected deserializeMessage(
             serialization::IBufferReader &input) const;
 
