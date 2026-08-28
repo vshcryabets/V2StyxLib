@@ -5,7 +5,7 @@
 #else
 #include <stdio.h>
 
-void v2styxlib_uart_send_bytes(
+BufferSize_t v2styxlib_uart_send_bytes(
     const V2styxlibUartConfig* config,
     const uint8_t* buffer,
     BufferSize_t length
@@ -15,5 +15,6 @@ void v2styxlib_uart_send_bytes(
     for (BufferSize_t i = 0; i < length; i++) {
         printf("Sending data over UART: %02X\n", buffer[i]);
     }
+    return length;
 }
 #endif

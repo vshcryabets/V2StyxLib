@@ -13,7 +13,7 @@ static void v2styxlib_delay_bit() {
 }
 #endif
 
-void v2styxlib_uart_stm8_send_bytes(
+BufferSize_t v2styxlib_uart_stm8_send_bytes(
     const V2styxlibUartStm8Config* config,
     const uint8_t* buffer,
     BufferSize_t length)
@@ -56,9 +56,10 @@ void v2styxlib_uart_stm8_send_bytes(
             UART1->DR = byte;
         }
     }
+    return length;
 }
 
-void v2styxlib_uart_stm8_setup(
+int8_t v2styxlib_uart_stm8_setup(
     const V2styxlibUartStm8Config* config,
     uint16_t baudRateDivider) 
 {
@@ -80,5 +81,6 @@ void v2styxlib_uart_stm8_setup(
         UART1->CR2 |= (UART1_CR2_TEN | UART1_CR2_REN);
     }
     UART1->CR1 &= ~UART1_CR1_UARTD; // Enable UART after configuration    
+    return 0;
 }
 

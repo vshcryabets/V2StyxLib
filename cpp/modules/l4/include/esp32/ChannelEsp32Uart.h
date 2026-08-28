@@ -1,7 +1,5 @@
 #pragma once
 
-#include "driver/uart.h"
-
 #include "uart/ChannelUart.h"
 
 namespace styxlib
@@ -9,11 +7,6 @@ namespace styxlib
 
 class ChannelEsp32Uart: public ChannelUart
 {
-private:
-    uart_port_t _uartPortNum;
-    int _txPin;
-    int _rxPin;
-    uint16_t _rxBufferSize = 256;
 protected:
     SizeResult internalSendBytes(
         const StyxBuffer buffer, 
