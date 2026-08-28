@@ -12,7 +12,7 @@ using styxlib::messages::v9p2000::StyxRErrorMessage;
 
 namespace
 {
-    class TestConsumer : public styxlib::DeserializerL5::Consumer
+    class TestConsumer : public styxlib::serialization::DeserializerL5::Consumer
     {
     public:
         bool called{false};
@@ -23,7 +23,7 @@ namespace
 
         void handleMessage(
             styxlib::ClientId clientId,
-            const styxlib::messages::base::StyxMessageUPtr &message) override
+            const styxlib::StyxMessageUPtr &message) override
         {
             called = true;
             lastClientId = clientId;
@@ -41,7 +41,7 @@ namespace
 
 TEST_CASE("DeserializerL5StyxImpl rejects null buffer", "[DeserializerL5StyxImpl]")
 {
-    styxlib::DeserializerL5StyxImpl deserializer;
+    styxlib::serialization::DeserializerL5StyxImpl deserializer;
 
     REQUIRE(
         deserializer.handleBuffer(1, nullptr, 1) ==
@@ -50,7 +50,7 @@ TEST_CASE("DeserializerL5StyxImpl rejects null buffer", "[DeserializerL5StyxImpl
 
 TEST_CASE("DeserializerL5StyxImpl ignores messages without consumer", "[DeserializerL5StyxImpl]")
 {
-    styxlib::DeserializerL5StyxImpl deserializer;
+    styxlib::serialization::DeserializerL5StyxImpl deserializer;
 
     // Payload: type=Tflush, tag=0x1234, oldTag=0x0001
     uint8_t payload[] = {
@@ -65,7 +65,7 @@ TEST_CASE("DeserializerL5StyxImpl ignores messages without consumer", "[Deserial
 
 TEST_CASE("DeserializerL5StyxImpl deserializes Rerror and passes message to consumer", "[DeserializerL5StyxImpl]")
 {
-    styxlib::DeserializerL5StyxImpl deserializer;
+    styxlib::serialization::DeserializerL5StyxImpl deserializer;
     TestConsumer consumer;
     deserializer.setConsumer(&consumer);
 

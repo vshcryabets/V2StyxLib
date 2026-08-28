@@ -27,19 +27,18 @@ void ServerConsole::start() {
     running.store(true);
     spdlog::info("Server starting on port {}", config.port);
 
-    auto deserializer = std::make_shared<styxlib::DeserializerL5StyxImpl>();
-    auto clientsRepo = std::make_shared<styxlib::ClientsRepoImpl>();
     styxlib::ChannelUnixTcpServer::Configuration channelConfig(
         static_cast<uint16_t>(config.port),
-        clientsRepo,
+        &clientsRepo,
         styxlib::PacketHeaderSize::Size4Bytes,
         8192,
-        deserializer,
+        &deserializer,
         16);
 
+    styxlib::ChannelUnixTcpServer channel(channelConfig);
     styxlib::SimpleServer::Configuration serverConfig;
-    serverConfig.channel = std::make_shared<styxlib::ChannelUnixTcpServer>(channelConfig);
-    serverConfig.deserializer = deserializer;
+    serverConfig.channel = &channel;
+    serverConfig.deserializer = &deserializer;
     styxlib::SimpleServer server(serverConfig);
     auto startFuture = server.start();
     auto startResult = startFuture.get();

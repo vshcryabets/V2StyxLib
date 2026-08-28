@@ -2,11 +2,14 @@
 #include "structs/StyxQID.h"
 #include "dataL5.h"
 
+namespace styxlib::structs
+{
+
 struct StyxStat
 {
     int type; // for kernel use
     long dev; // for kernel use
-    styxlib::structs::QID QID;
+    QID QID;
     long mode;                            // permissions and flags
     styxlib::StyxDate accessTime;         // last access time
     styxlib::StyxDate modificationTime;   // last modification time
@@ -18,3 +21,5 @@ struct StyxStat
 
     const static StyxStat EMPTY;
 };
+
+}

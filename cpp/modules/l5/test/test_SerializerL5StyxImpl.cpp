@@ -1,5 +1,5 @@
 #include <catch2/catch_test_macros.hpp>
-#include "serialization/StyxSerializerImpl.h"
+#include "serialization/SerializerL5StyxImpl.h"
 #include "structs/StyxStat.h"
 #include "enums/QidType.h"
 #include "serialization/BufferWriterImpl.h"
@@ -7,31 +7,56 @@
 
 using namespace styxlib::serialization;
 
-TEST_CASE("testGetSize", "[StyxSerializationImpl]")
+class TestChannelTx : public styxlib::ChannelTx
 {
-    StyxSerializerImpl serializer;
+public:
+    styxlib::SizeResult
+    sendBuffer(
+        styxlib::ClientId clientId,
+        const styxlib::StyxBuffer buffer,
+        styxlib::Size size
+    ) override
+    {
+        return size;
+    }
+};
+
+class SerializerL5StyxImplSuite
+{
+public:
+    TestChannelTx channelTx;
+    SerializerL5StyxImpl serializer;
     styxlib::messages::v9p2000::MessageFactoryImpl messageFactory;
+
+    SerializerL5StyxImplSuite()
+        : channelTx(),
+          serializer(),
+          messageFactory()
+    {
+        serializer.setChannelTx(&channelTx);
+    }
+};
+
+TEST_CASE_METHOD(SerializerL5StyxImplSuite, "testGetSize", "[SerializationL5StyxImpl]")
+{
     auto message = messageFactory.constructRerror(0, "AB");
 
     REQUIRE(IDataSerializer::BASE_BINARY_SIZE + 2 + 2 ==
             serializer.getMessageSize(*message));
 }
 
-TEST_CASE("testGetStyxStatSize", "[StyxSerializationImpl]")
+TEST_CASE_METHOD(SerializerL5StyxImplSuite, "testGetStyxStatSize", "[SerializationL5StyxImpl]")
 {
-    StyxSerializerImpl impl;
-    REQUIRE(28 + 13 + 2 + 2 + 2 + 2 == impl.getStatSerializedSize(StyxStat::EMPTY));
+    REQUIRE(28 + 13 + 2 + 2 + 2 + 2 == serializer.getStatSerializedSize(StyxStat::EMPTY));
 }
 
-TEST_CASE("testGetQidSize", "[StyxSerializationImpl]")
+TEST_CASE_METHOD(SerializerL5StyxImplSuite, "testGetQidSize", "[SerializationL5StyxImpl]")
 {
-    StyxSerializerImpl impl;
-    REQUIRE(13 == impl.getQidSize());
+    REQUIRE(13 == serializer.getQidSize());
 }
 
-TEST_CASE("testQidSerialization", "[StyxSerializationImpl]")
+TEST_CASE_METHOD(SerializerL5StyxImplSuite, "testQidSerialization", "[SerializationL5StyxImpl]")
 {
-    StyxSerializerImpl serializer;
     styxlib::structs::QID qid(
         styxlib::enums::QTDIR,
         0x6A7470F1,
@@ -49,10 +74,8 @@ TEST_CASE("testQidSerialization", "[StyxSerializationImpl]")
     REQUIRE(std::equal(std::begin(expected), std::end(expected), buffer));
 }
 
-TEST_CASE("testSerializeStat", "[StyxSerializationImpl]")
+TEST_CASE_METHOD(SerializerL5StyxImplSuite, "testSerializeStat", "[SerializationL5StyxImpl]")
 {
-    StyxSerializerImpl serializer;
-
     StyxStat stat{
         .type = 1,
         .dev = 2,
@@ -94,4 +117,13 @@ TEST_CASE("testSerializeStat", "[StyxSerializationImpl]")
         'e', 'd', 'i', 't', 'o', 'r'                    // muid
     };
     REQUIRE(std::equal(std::begin(expected), std::end(expected), buffer));
+}
+
+TEST_CASE_METHOD(SerializerL5StyxImplSuite, "testSerializing RVersion", "[SerializationL5StyxImpl]")
+{
+    auto message = messageFactory.constructRVersion(123, 16384, "9P2000ABC");
+    serializer.setChannelTx(nullptr); // Set channelTx to nullptr for testing
+
+    REQUIRE(IDataSerializer::BASE_BINARY_SIZE + 2 + 2 ==
+            serializer.getMessageSize(*message));
 }

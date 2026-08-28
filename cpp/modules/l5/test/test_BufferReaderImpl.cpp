@@ -1,6 +1,8 @@
 #include <catch2/catch_test_macros.hpp>
 #include "serialization/BufferReaderImpl.h"
 
+using namespace styxlib::serialization;
+
 TEST_CASE("readUTFString", "[BufferReaderImpl]") {
     uint8_t testData[] = {0x05, 0x00, 'A', 'B', 'C', 'D', 'E', 'F', 'G'};
     BufferReaderImpl impl(testData, sizeof(testData));

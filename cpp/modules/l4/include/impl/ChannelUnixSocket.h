@@ -116,7 +116,7 @@ namespace styxlib
         {
         public:
             const uint16_t port;
-            const std::shared_ptr<ClientsRepo> clientsRepo{nullptr};
+            const ClientsRepoPtr clientsRepo{nullptr};
             const PacketHeaderSize packetSizeHeader{PacketHeaderSize::Size2Bytes};
             const uint16_t iounit{8192};
             const DeserializerL4Ptr deserializer{nullptr};
@@ -124,7 +124,7 @@ namespace styxlib
 
             Configuration(
                 uint16_t port,
-                std::shared_ptr<ClientsRepo> clientsRepo,
+                ClientsRepoPtr clientsRepo,
                 PacketHeaderSize packetSizeHeader,
                 uint16_t iounit,
                 DeserializerL4Ptr deserializer,
