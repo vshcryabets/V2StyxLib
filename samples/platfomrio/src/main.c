@@ -1,5 +1,6 @@
 #include "stm8s.h"
 #include "stdbool.h"
+#include "string.h"
 
 #include "Channel_c.h"
 #include "ChannelUartStm8.h"
