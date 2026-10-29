@@ -77,3 +77,73 @@ void v2styxlib_uart_send(
         v2styxlib_uart_send_bytes(config, crcBytes, 2);
     }
 }
+
+/**
+ * @brief Encodes a buffer using Consistent Overhead Byte Stuffing (COBS) with a protected byte.
+ *
+ * buffer[0] is reserved for the first COBS code byte.
+ * Input data is at buffer[1..inputLen].
+ * The encoded output is written back to buffer[0..outputLen-1].
+ *
+ * @param buffer The buffer to encode. buffer[0] is reserved. Input data at buffer[1..inputLen].
+ * @param inputLen The length of the input data (number of bytes at buffer[1..inputLen]).
+ * @param protectedByte The byte value that should be protected (not appear in the encoded data).
+ * @return int16_t The total length of the encoded data (including buffer[0]), or a negative error code on failure.
+ */
+int16_t v2styxlib_cobs_encode(uint8_t *buffer, BufferSize_t inputLen, uint8_t protectedByte) {
+    if (!buffer) {
+        return COBS_ENCODE_NULL_BUFFER;
+    }
+    
+    if (inputLen < 2) {
+        return COBS_ENCODE_INPUT_TOO_SMALL;
+    }
+    
+    if (inputLen > 254) {
+        return COBS_ENCODE_INPUT_TOO_LARGE;
+    }
+
+    uint8_t encodedBuffer[256];
+    uint16_t readIdx = 1;  // Start reading from buffer[1] (skip reserved buffer[0])
+    uint16_t writeIdx = 1; // Start writing after code byte placeholder at buffer[0]
+    uint8_t codeIdx = 0;   // Code byte position (buffer[0])
+    uint8_t code = 1;
+
+    while (readIdx < inputLen) {
+        if (buffer[readIdx] == protectedByte) {
+            // Write the code byte
+            encodedBuffer[codeIdx] = code;
+            code = 1;
+            codeIdx = writeIdx;
+            writeIdx++;
+            readIdx++;
+        } else {
+            // Write the data byte
+            encodedBuffer[writeIdx] = buffer[readIdx];
+            code++;
+            writeIdx++;
+            readIdx++;
+
+            if (code == 255) {
+                // Code byte is full, write it and start a new one
+                encodedBuffer[codeIdx] = code;
+                code = 1;
+                codeIdx = writeIdx;
+                writeIdx++;
+            }
+        }
+    }
+
+    // Write the final code byte
+    encodedBuffer[codeIdx] = code;
+    
+    if (writeIdx > 255) {
+        return COBS_ENCODE_OUTPUT_TOO_LARGE;
+    }
+
+    for (uint16_t i = 0; i < writeIdx; i++) {
+        buffer[i] = encodedBuffer[i];
+    }
+
+    return (int16_t)writeIdx;
+}
