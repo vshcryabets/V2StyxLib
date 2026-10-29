@@ -83,14 +83,14 @@ void v2styxlib_uart_send(
  *
  * buffer[0] is reserved for the first COBS code byte.
  * Input data is at buffer[1..inputLen].
- * The encoded output is written back to buffer[0..outputLen-1].
+ * The encoded output is written back to buffer[0..inputLen-1] or buffer[0..inputLen] depending on encoding.
  *
  * @param buffer The buffer to encode. buffer[0] is reserved. Input data at buffer[1..inputLen].
  * @param inputLen The length of the input data (number of bytes at buffer[1..inputLen]).
  * @param protectedByte The byte value that should be protected (not appear in the encoded data).
- * @return int16_t The total length of the encoded data (including buffer[0]), or a negative error code on failure.
+ * @return int8_t 0 on success, or a negative error code on failure.
  */
-int16_t v2styxlib_cobs_encode(uint8_t *buffer, BufferSize_t inputLen, uint8_t protectedByte) {
+int8_t v2styxlib_cobs_encode(uint8_t *buffer, BufferSize_t inputLen, uint8_t protectedByte) {
     if (!buffer) {
         return COBS_ENCODE_NULL_BUFFER;
     }
@@ -145,5 +145,5 @@ int16_t v2styxlib_cobs_encode(uint8_t *buffer, BufferSize_t inputLen, uint8_t pr
         buffer[i] = encodedBuffer[i];
     }
 
-    return (int16_t)writeIdx;
+    return 0;
 }

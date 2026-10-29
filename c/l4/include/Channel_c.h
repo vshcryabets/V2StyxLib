@@ -64,7 +64,7 @@ void v2styxlib_uart_send(
  * inputLen - total size of the buffer including the reserved byte (at least 2). Input data is at buffer[1..inputLen-1].
  * protectedByte - the byte value that should not appear in the encoded output (typically 0x00)
  *
- * Returns the length of the encoded buffer (including the reserved code byte at buffer[0]), or a negative error code on failure.
+ * Returns 0 on success, or a negative error code on failure.
  * Returns COBS_ENCODE_NULL_BUFFER if buffer is null.
  * Returns COBS_ENCODE_INPUT_TOO_SMALL if inputLen < 2 (need at least 1 byte reserved + 1 byte data).
  * Returns COBS_ENCODE_INPUT_TOO_LARGE if inputLen > 254.
@@ -73,7 +73,7 @@ void v2styxlib_uart_send(
  * Note: The encoded buffer may be larger than the input buffer by up to 1/253rd of its size.
  * Ensure the output buffer has sufficient space (max 255 bytes).
  */
-int16_t v2styxlib_cobs_encode(uint8_t *buffer, BufferSize_t inputLen, uint8_t protectedByte);
+int8_t v2styxlib_cobs_encode(uint8_t *buffer, BufferSize_t inputLen, uint8_t protectedByte);
 
 #ifdef __cplusplus
 }
