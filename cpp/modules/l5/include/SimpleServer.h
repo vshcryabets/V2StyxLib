@@ -18,10 +18,10 @@ namespace styxlib
         struct Configuration
         {
             uint16_t iounit{8192};
-            ChannelDriverPtr channel;
-            DeserializerL5Ptr deserializer;
-            SerializerL5Ptr serializer;
-            MessageFactoryPtr messageFactory;
+            ChannelDriverPtr channel{nullptr};
+            DeserializerL5Ptr deserializer{nullptr};
+            SerializerL5Ptr serializer{nullptr};
+            MessageFactoryPtr messageFactory{nullptr};
         };
     private:
         uint16_t iounit;
