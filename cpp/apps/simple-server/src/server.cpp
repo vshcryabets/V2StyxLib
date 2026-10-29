@@ -10,6 +10,8 @@
 #include "impl/ChannelUnixTcp.h"
 #include "impl/ClientsRepoImpl.h"
 #include "serialization/DeserializerL5StyxImpl.h"
+#include "serialization/SerializerL5StyxImpl.h"
+#include "messages/v9p2000/MessageFactoryImpl.h"
 
 ServerConsole::ServerConsole(const Config& config) : config(config) {
     initLogging();
@@ -37,8 +39,12 @@ void ServerConsole::start() {
 
     styxlib::ChannelUnixTcpServer channel(channelConfig);
     styxlib::SimpleServer::Configuration serverConfig;
+    styxlib::serialization::SerializerL5StyxImpl serializer;
+    styxlib::messages::v9p2000::MessageFactoryImpl messageFactory;
     serverConfig.channel = &channel;
     serverConfig.deserializer = &deserializer;
+    serverConfig.serializer = &serializer;
+    serverConfig.messageFactory = &messageFactory;
     styxlib::SimpleServer server(serverConfig);
     auto startFuture = server.start();
     auto startResult = startFuture.get();

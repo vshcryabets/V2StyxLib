@@ -19,7 +19,7 @@ void SerializerL5StyxImpl::serializeStat(const StyxStat &stat, styxlib::serializ
     output.writeUInt16(size - 2); // total size except first 2 bytes with size
     output.writeUInt16(stat.type);
     output.writeUInt32(stat.dev);
-    serializeQid(stat.QID, output);
+    serializeQid(stat.qid, output);
     output.writeUInt32(stat.mode);
     output.writeUInt32(stat.accessTime);
     output.writeUInt32(stat.modificationTime);

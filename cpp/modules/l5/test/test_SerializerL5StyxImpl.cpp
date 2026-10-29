@@ -79,7 +79,7 @@ TEST_CASE_METHOD(SerializerL5StyxImplSuite, "testSerializeStat", "[Serialization
     StyxStat stat{
         .type = 1,
         .dev = 2,
-        .QID = styxlib::structs::QID(styxlib::enums::QTFILE, 0x80, 0x90),
+        .qid = styxlib::structs::QID(styxlib::enums::QTFILE, 0x80, 0x90),
         .mode = 0x01,
         .accessTime = 1717171717, // fixed date for reproducibility
         .modificationTime = 1717171717,

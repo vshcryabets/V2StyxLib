@@ -28,7 +28,7 @@ namespace styxlib::serialization
         structs::StyxStat result = structs::StyxStat::EMPTY;
         result.type = static_cast<int>(input.readUInt16());
         result.dev = static_cast<long>(input.readUInt32());
-        result.QID = deserializeQid(input);
+        result.qid = deserializeQid(input);
         result.mode = static_cast<long>(input.readUInt32());
         result.accessTime = input.readUInt32();
         result.modificationTime = input.readUInt32();
