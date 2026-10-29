@@ -4,7 +4,7 @@
 
 namespace styxlib
 {
-    using StyxMessageExpected = std::expected<messages::base::StyxMessageUPtr, ErrorCode>;
+    using StyxMessageExpected = std::expected<StyxMessageUPtr, ErrorCode>;
 }
 
 

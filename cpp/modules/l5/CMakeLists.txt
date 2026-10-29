@@ -4,9 +4,9 @@ add_library(module_l5 STATIC
     src/Client.cpp
     src/BufferWriterImpl.cpp
     src/BufferReaderImpl.cpp
-    src/DeserializerL5StyxImpl.cpp
     src/messages/base/StyxMessage.cpp
-    src/StyxSerializerImpl.cpp
+    src/serialization/DeserializerL5StyxImpl.cpp
+    src/serialization/SerializerL5StyxImpl.cpp
     src/StyxQID.cpp
     src/StyxStat.cpp
     src/messages/v9p2000/BaseMessage.cpp
@@ -24,7 +24,7 @@ add_executable(module_l5_tests
     test/test_BufferWriterImpl.cpp
     test/test_BufferReaderImpl.cpp
     test/test_DeserializerL5StyxImpl.cpp
-    test/test_StyxSerializerImpl.cpp
+    test/test_SerializerL5StyxImpl.cpp
     test/test_MessageFactoryImpl.cpp
     )
 

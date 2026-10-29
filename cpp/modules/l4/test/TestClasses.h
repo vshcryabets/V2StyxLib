@@ -8,7 +8,7 @@
 class TestDeserializerL4 : public styxlib::DeserializerL4
 {
 private:
-    std::weak_ptr<styxlib::ChannelTx> _channelTx;
+    styxlib::ChannelTxPtr _channelTx{nullptr};
     std::unique_ptr<std::promise<uint16_t>> receivedBytesPromise;
     uint32_t totalReceivedBytes{0};
     std::vector<uint8_t> lastReceivedBuffer;
@@ -29,9 +29,9 @@ public:
         }
         std::string msg((const char*)buffer, size);
         std::cout << "Received from client " << clientId << ": " << msg << std::endl;
-        if (auto p = _channelTx.lock()) {
+        if (_channelTx) {
             const char* response = "Message received";
-            (void)p->sendBuffer(clientId, (const styxlib::StyxBuffer)response, strlen(response));
+            _channelTx->sendBuffer(clientId, (const styxlib::StyxBuffer)response, strlen(response));
         }
         return styxlib::ErrorCode::Success;
     }

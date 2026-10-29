@@ -1,6 +1,6 @@
 #include <catch2/catch_test_macros.hpp>
 #include "messages/v9p2000/MessageFactoryImpl.h"
-#include "serialization/StyxSerializerImpl.h"
+#include "serialization/SerializerL5StyxImpl.h"
 #include "serialization/BufferWriterImpl.h"
 #include "messages/v9p2000/BaseMessage.h"
 #include "messages/v9p2000/StyxTAuthMessage.h"
@@ -21,7 +21,7 @@ public:
 TEST_CASE("testCreateTVersion", "[MessageFactoryImpl]")
 {
     Suite suite;
-    StyxMessageUPtr message = suite.messageFactory.constructTVersion(16384, "9P2000");
+    styxlib::StyxMessageUPtr message = suite.messageFactory.constructTVersion(16384, "9P2000");
     REQUIRE(message.get() != nullptr);
     REQUIRE(((BaseMessage *)message.get())->getIounit() == 16384);
     REQUIRE(((BaseMessage *)message.get())->getProtocolVersion() == "9P2000");
@@ -30,7 +30,7 @@ TEST_CASE("testCreateTVersion", "[MessageFactoryImpl]")
 TEST_CASE("testCreateTAuth", "[MessageFactoryImpl]")
 {
     Suite suite;
-    StyxMessageUPtr message = suite.messageFactory.constructTAuth(0x20, "user", "test");
+    styxlib::StyxMessageUPtr message = suite.messageFactory.constructTAuth(0x20, "user", "test");
     REQUIRE(message.get() != nullptr);
     REQUIRE(((BaseMessage *)message.get())->getFID() == 0x20);
     REQUIRE(((StyxTAuthMessage *)message.get())->userName == "user");
@@ -40,7 +40,7 @@ TEST_CASE("testCreateTAuth", "[MessageFactoryImpl]")
 TEST_CASE("testCreateTAttach", "[MessageFactoryImpl]")
 {
     Suite suite;
-    StyxMessageUPtr message = suite.messageFactory.constructTAttach(1, 2, "user", "test");
+    styxlib::StyxMessageUPtr message = suite.messageFactory.constructTAttach(1, 2, "user", "test");
     REQUIRE(message.get() != nullptr);
     REQUIRE(((BaseMessage *)message.get())->getFID() == 1);
     REQUIRE(((StyxTAttachMessage *)message.get())->authFID == 2);
@@ -51,7 +51,7 @@ TEST_CASE("testCreateTAttach", "[MessageFactoryImpl]")
 TEST_CASE("testCreateRerror", "[MessageFactoryImpl]")
 {
     Suite suite;
-    StyxMessageUPtr message = suite.messageFactory.constructRerror(1, "Test error");
+    styxlib::StyxMessageUPtr message = suite.messageFactory.constructRerror(1, "Test error");
     REQUIRE(message.get() != nullptr);
     REQUIRE(((BaseMessage *)message.get())->getTag() == 1);
     REQUIRE(((StyxRErrorMessage *)message.get())->getMessage() == "Test error");
@@ -60,7 +60,7 @@ TEST_CASE("testCreateRerror", "[MessageFactoryImpl]")
 TEST_CASE("testCreateRVersion", "[MessageFactoryImpl]")
 {
     Suite suite;
-    StyxMessageUPtr message = suite.messageFactory.constructRVersion(1, 16384, "9P2000");
+    styxlib::StyxMessageUPtr message = suite.messageFactory.constructRVersion(1, 16384, "9P2000");
     REQUIRE(message.get() != nullptr);
     REQUIRE(((BaseMessage *)message.get())->getTag() == 1);
     REQUIRE(((BaseMessage *)message.get())->getIounit() == 16384);
@@ -70,7 +70,7 @@ TEST_CASE("testCreateRVersion", "[MessageFactoryImpl]")
 TEST_CASE("testCreateRAttachMessage", "[MessageFactoryImpl]")
 {
     Suite suite;
-    StyxMessageUPtr message = suite.messageFactory.constructRAttachMessage(1, QID::EMPTY);
+    styxlib::StyxMessageUPtr message = suite.messageFactory.constructRAttachMessage(1, QID::EMPTY);
     REQUIRE(message.get() != nullptr);
     REQUIRE(((BaseMessage *)message.get())->getTag() == 1);
     REQUIRE(((BaseMessage *)message.get())->getQID() == QID::EMPTY);

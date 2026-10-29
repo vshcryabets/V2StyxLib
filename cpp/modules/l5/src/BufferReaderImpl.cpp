@@ -1,6 +1,9 @@
 #include "serialization/BufferReaderImpl.h"
 #include <stdexcept>
 
+namespace styxlib::serialization
+{
+
 BufferReaderImpl::BufferReaderImpl(const styxlib::StyxBuffer &buf, styxlib::Size size)
     : buffer(buf), position(0), limit(size)
 {
@@ -98,4 +101,6 @@ styxlib::Size BufferReaderImpl::read(uint8_t *data, styxlib::Size count)
         data[i] = buffer[position++];
     }
     return count;
+}
+
 }

@@ -1,10 +1,10 @@
 #pragma once
 
 #include "dataL4.h"
-#include <memory>
 
 namespace styxlib::messages::base
 {
+    // TODO rename to Message
     class StyxMessage
     {
     private:
@@ -17,5 +17,4 @@ namespace styxlib::messages::base
         Tag getTag() const { return tag; }
     };
 
-    using StyxMessageUPtr = std::unique_ptr<StyxMessage>;
 }

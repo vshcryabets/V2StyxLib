@@ -5,21 +5,30 @@
 #include <thread>
 
 #include "dataL5.h"
+#include "serialization/DeserializerL5.h"
+#include "serialization/SerializerL5.h"
 #include "ChannelDriver.h"
+#include "messages/v9p2000/MessageFactoryImpl.h"
 
 namespace styxlib
 {
-    class SimpleServer: public DeserializerL5::Consumer
+    class SimpleServer: public styxlib::serialization::DeserializerL5::Consumer
     {
     public:
         struct Configuration
         {
-            ChannelDriverPtr channel;
-            DeserializerL5Ptr deserializer;
+            uint16_t iounit{8192};
+            ChannelDriverPtr channel{nullptr};
+            DeserializerL5Ptr deserializer{nullptr};
+            SerializerL5Ptr serializer{nullptr};
+            MessageFactoryPtr messageFactory{nullptr};
         };
     private:
+        uint16_t iounit;
         DeserializerL5Ptr deserializer;
+        SerializerL5Ptr serializer;
         ChannelDriverPtr channel;
+        MessageFactoryPtr messageFactory;
         std::atomic<bool> running{false};
     public:
         SimpleServer(const SimpleServer::Configuration &config);
@@ -29,7 +38,7 @@ namespace styxlib
         bool isStarted() const;
         virtual void handleMessage(
             ClientId clientId, 
-            const styxlib::messages::base::StyxMessageUPtr &message
+            const styxlib::StyxMessageUPtr &message
         ) override;
     };
 }

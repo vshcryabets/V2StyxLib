@@ -2,7 +2,7 @@
 #include "messages/base/StyxMessage.h"
 #include "SerializerL4.h"
 
-namespace styxlib
+namespace styxlib::serialization
 {
     class DeserializerL5: public DeserializerL4
     {
@@ -12,7 +12,7 @@ namespace styxlib
             virtual ~Consumer() = default;
             virtual void handleMessage(
                 ClientId clientId, 
-                const styxlib::messages::base::StyxMessageUPtr &message
+                const styxlib::StyxMessageUPtr &message
             ) = 0;
         };
     protected:

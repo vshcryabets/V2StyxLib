@@ -4,6 +4,8 @@
 #include <atomic>
 
 #include "SimpleServer.h"
+#include "serialization/DeserializerL5StyxImpl.h"
+#include "impl/ClientsRepoImpl.h"
 
 class ServerConsole {
 public:
@@ -15,6 +17,8 @@ public:
         bool enableCli;
     };
 private:
+    styxlib::serialization::DeserializerL5StyxImpl deserializer;
+    styxlib::ClientsRepoImpl clientsRepo;
         
 public:
     ServerConsole(const Config& config);
@@ -25,6 +29,6 @@ public:
 
 private:
     Config config;
-    std::atomic<bool> running;
+    std::atomic<bool> running{false};
     void initLogging();
 };

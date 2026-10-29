@@ -12,9 +12,9 @@ class TestSuiteUnixPipe
 {
 public:
     constexpr static styxlib::PacketHeaderSize packetSizeHeader = styxlib::PacketHeaderSize::Size1Byte;
-    std::shared_ptr<styxlib::ClientsRepoImpl> clientsRepo = std::make_shared<styxlib::ClientsRepoImpl>();
-    std::shared_ptr<TestDeserializerL4> clientDeserializer = std::make_shared<TestDeserializerL4>();
-    std::shared_ptr<TestDeserializerL4> serverDeserializer = std::make_shared<TestDeserializerL4>();
+    styxlib::ClientsRepoImpl clientsRepo;
+    TestDeserializerL4 clientDeserializer;
+    TestDeserializerL4 serverDeserializer;
     std::shared_ptr<styxlib::ChannelUnixPipeImpl> server;
     std::shared_ptr<styxlib::ChannelUnixPipeImpl> client;
 
@@ -25,19 +25,19 @@ public:
             styxlib::ChannelUnixFile::Configuration(
                 packetSizeHeader,
                 8192,
-                serverDeserializer
+                &serverDeserializer
             )
         );
         client = std::make_shared<styxlib::ChannelUnixPipeImpl>(
             styxlib::ChannelUnixFile::Configuration(
                 packetSizeHeader,
                 8192,
-                clientDeserializer
+                &clientDeserializer
             )
         );
 
-        clientDeserializer->setChannelTx(client);
-        serverDeserializer->setChannelTx(server);
+        clientDeserializer.setChannelTx(client.get());
+        serverDeserializer.setChannelTx(server.get());
     }
 
     void waitStartServer() {
@@ -81,7 +81,7 @@ TEST_CASE_METHOD(TestSuiteUnixPipe, "ChannelUnixPipeServerReceiveMessages", "[Ch
 
     const char *msg = "Hello, World!";
     uint16_t messageSize = strlen(msg);
-    auto futureReceivedBytes = serverDeserializer->getReceivedBytes();
+    auto futureReceivedBytes = serverDeserializer.getReceivedBytes();
 
     auto bytesSent = client->sendBuffer(styxlib::InvalidClientId, (const styxlib::StyxBuffer)msg, strlen(msg));
     REQUIRE(bytesSent.has_value());

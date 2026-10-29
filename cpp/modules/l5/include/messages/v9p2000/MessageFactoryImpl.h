@@ -6,24 +6,25 @@ namespace styxlib::messages::v9p2000
 {
 
     using MessageFactory = styxlib::messages::base::MessageFactory;
-    using StyxMessageUniquePtr = styxlib::messages::base::StyxMessageUPtr;
+    using StyxMessageUniquePtr = styxlib::StyxMessageUPtr;
     using QID = styxlib::structs::QID;
+    using StyxStat = styxlib::structs::StyxStat;
 
     class MessageFactoryImpl : public MessageFactory
     {
     public:
         MessageFactoryImpl() = default;
-        StyxMessageUniquePtr constructRerror(int tag, const StyxString &error) const override;
-        StyxMessageUniquePtr constructRVersion(int tag, long maxPacketSize, const StyxString &protocolVersion) const override;
-        StyxMessageUniquePtr constructRAttachMessage(int tag, const QID &qid) const override;
-        StyxMessageUniquePtr constructRAuthMessage(int tag, const QID &qid) const override;
-        StyxMessageUniquePtr constructROpenMessage(int tag, const QID &qid, long iounit) const override;
-        StyxMessageUniquePtr constructRCreateMessage(int tag, const QID &qid, long iounit) const override;
-        StyxMessageUniquePtr constructRStatMessage(int tag, const StyxStat &stat) const override;
-        StyxMessageUniquePtr constructRWriteMessage(int tag, long count) const override;
-        StyxMessageUniquePtr constructRWalkMessage(int tag, const std::vector<QID> &empty) const override;
-        StyxMessageUniquePtr constructRReadMessage(int tag, StyxBuffer data, int size) const override;
-        StyxMessageUniquePtr constructRClunk(int tag, long fid) const override;
+        StyxMessageUniquePtr constructRerror(Tag tag, const StyxString &error) const override;
+        StyxMessageUniquePtr constructRVersion(Tag tag, long maxPacketSize, const StyxString &protocolVersion) const override;
+        StyxMessageUniquePtr constructRAttachMessage(Tag tag, const QID &qid) const override;
+        StyxMessageUniquePtr constructRAuthMessage(Tag tag, const QID &qid) const override;
+        StyxMessageUniquePtr constructROpenMessage(Tag tag, const QID &qid, long iounit) const override;
+        StyxMessageUniquePtr constructRCreateMessage(Tag tag, const QID &qid, long iounit) const override;
+        StyxMessageUniquePtr constructRStatMessage(Tag tag, const StyxStat &stat) const override;
+        StyxMessageUniquePtr constructRWriteMessage(Tag tag, long count) const override;
+        StyxMessageUniquePtr constructRWalkMessage(Tag tag, const std::vector<QID> &empty) const override;
+        StyxMessageUniquePtr constructRReadMessage(Tag tag, StyxBuffer data, int size) const override;
+        StyxMessageUniquePtr constructRClunk(Tag tag, long fid) const override;
         StyxMessageUniquePtr constructRRemove(int tag) const override;
         StyxMessageUniquePtr constructRWStat(int tag) const override;
         StyxMessageUniquePtr constructRFlush(int tag) const override;

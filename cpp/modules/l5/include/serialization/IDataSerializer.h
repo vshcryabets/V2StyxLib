@@ -4,6 +4,7 @@
 #include "serialization/IBuffer.h"
 
 using StyxMessage = styxlib::messages::base::StyxMessage;
+using StyxStat = styxlib::structs::StyxStat;
 
 class IDataSerializer
 {

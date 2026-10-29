@@ -9,8 +9,9 @@ namespace styxlib
         ChannelTxPtr channelTx;
 
     public:
-        SerializerL4(ChannelTxPtr channelTx) : channelTx(channelTx) {}
+        SerializerL4() : channelTx(nullptr) {}
         virtual ~SerializerL4() = default;
+        void setChannelTx(ChannelTxPtr channelTx) { this->channelTx = channelTx; }
     };
 
     class DeserializerL4
