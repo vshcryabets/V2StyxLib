@@ -82,9 +82,12 @@ int8_t v2styxlib_cobs_encode(uint8_t *buffer, BufferSize_t inputLen, uint8_t pro
  * protected bytes to their original positions.
  *
  * NOTE: The encoded data occupies buffer[0..encodedLen-1]. After decoding, decoded data
- * will be at buffer[0..decodedLen-1]. The caller must know or track the encoded length.
+ * is written to buffer[1..encodedLen-1]. buffer[0] retains the first COBS code byte.
+ * The caller can read the decoded data from buffer[1] and knows the decoded length is
+ * encodedLen - 1 (the COBS code byte at buffer[0] is not needed by the consumer).
  *
- * buffer - pointer to the encoded buffer (modified in-place to contain decoded data).
+ * buffer - pointer to the encoded buffer (modified in-place). Encoded data at buffer[0..encodedLen-1].
+ *          After decoding, decoded data is at buffer[1..encodedLen-1].
  * encodedLen - total size of the encoded buffer (the output length from encoding).
  * protectedByte - the byte value that was protected during encoding (typically 0x00).
  *

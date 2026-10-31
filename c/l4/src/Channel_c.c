@@ -224,8 +224,10 @@ int8_t v2styxlib_cobs_decode(uint8_t *buffer, BufferSize_t encodedLen, uint8_t p
         }
     }
 
+    // Write decoded data to buffer[1..], keep buffer[0] as COBS code
+    // Consumer knows decoded size = encodedLen - 1
     for (uint16_t i = 0; i < writeIdx; i++) {
-        buffer[i] = decodedBuffer[i];
+        buffer[i + 1] = decodedBuffer[i];
     }
 
     return 0;
