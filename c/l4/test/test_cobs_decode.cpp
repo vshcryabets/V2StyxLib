@@ -167,7 +167,7 @@ TEST_CASE("v2styxlib_cobs_decode_0: roundtrip - simple no protected bytes", "[co
     REQUIRE(encodeResult == 0);
     
     // Should be: [3 (code), 0x11, 0x22, 0x33]
-    REQUIRE(buffer[0] == 3);
+    REQUIRE(buffer[0] == 4);
     REQUIRE(buffer[1] == 0x11);
     REQUIRE(buffer[2] == 0x22);
     REQUIRE(buffer[3] == 0x33);

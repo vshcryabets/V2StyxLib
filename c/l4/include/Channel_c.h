@@ -102,6 +102,44 @@ int8_t v2styxlib_cobs_encode_0(uint8_t *buffer, BufferSize_t inputLen);
  */
 int8_t v2styxlib_cobs_decode_0(uint8_t *buffer, BufferSize_t encodedLen);
 
+/**
+ * Encode a buffer using Consistent Overhead Byte Stuffing (COBS) with a custom protected byte.
+ *
+ * This is a wrapper around v2styxlib_cobs_encode_0 that allows protecting any byte value.
+ * It works by XORing the data with the protected byte before and after encoding,
+ * transforming the problem into protecting 0x00.
+ *
+ * NOTE: buffer[0] is reserved for the first COBS code byte. Input data is at buffer[1..inputLen-1].
+ * The caller should ensure the buffer has sufficient space (at least inputLen bytes).
+ *
+ * buffer - pointer to the buffer to encode (modified in-place). buffer[0] is reserved for first code byte.
+ * inputLen - total size of the buffer including the reserved byte (at least 2). Input data is at buffer[1..inputLen-1].
+ * protectedByte - the byte value that should be protected (not appear in the encoded output).
+ *
+ * Returns 0 on success, or a negative error code on failure.
+ * See v2styxlib_cobs_encode_0 for error code documentation.
+ */
+int8_t v2styxlib_cobs_encode(uint8_t *buffer, BufferSize_t inputLen, uint8_t protectedByte);
+
+/**
+ * Decode a buffer that was encoded using Consistent Overhead Byte Stuffing (COBS) with a custom protected byte.
+ *
+ * This is a wrapper around v2styxlib_cobs_decode_0 that allows decoding data protected with any byte value.
+ * It works by XORing the data with the protected byte before and after decoding,
+ * transforming the problem into protecting 0x00.
+ *
+ * NOTE: The encoded data occupies buffer[0..encodedLen-1]. After decoding, decoded data
+ * is written to buffer[1..encodedLen-1]. buffer[0] retains the first COBS code byte.
+ *
+ * buffer - pointer to the encoded buffer (modified in-place). Encoded data at buffer[0..encodedLen-1].
+ * encodedLen - total size of the encoded buffer (the output length from encoding).
+ * protectedByte - the byte value that was protected during encoding.
+ *
+ * Returns 0 on success, or a negative error code on failure.
+ * See v2styxlib_cobs_decode_0 for error code documentation.
+ */
+int8_t v2styxlib_cobs_decode(uint8_t *buffer, BufferSize_t encodedLen, uint8_t protectedByte);
+
 #ifdef __cplusplus
 }
 #endif

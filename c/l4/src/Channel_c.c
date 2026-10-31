@@ -102,41 +102,22 @@ int8_t v2styxlib_cobs_encode_0(uint8_t *buffer, BufferSize_t inputLen) {
         return COBS_ENCODE_INPUT_TOO_LARGE;
     }
 
-    // Validate no 0x00 bytes in input data
-    for (uint16_t i = 1; i < inputLen; i++) {
-        if (buffer[i] == 0x00) {
-            return COBS_ENCODE_PROTECTED_BYTE_IN_DATA;
-        }
-    }
-
-    uint16_t readIdx = 1;  // Start reading from buffer[1] (skip reserved buffer[0])
-    uint16_t writeIdx = 1; // Start writing after code byte placeholder at buffer[0]
-    uint8_t codeIdx = 0;   // Code byte position (buffer[0])
-    uint8_t code = 0;
+    uint16_t readIdx = 1; // Read input data from buffer[1..inputLen-1]
+    uint8_t codeIdx = 0;  // Current code byte position
+    uint8_t code = 1;     // Distance to next protected byte (or end)
 
     while (readIdx < inputLen) {
-        // Write the data byte in-place
-        buffer[writeIdx] = buffer[readIdx];
-        code++;
-        writeIdx++;
-        readIdx++;
-
-        if (code == 254) {
-            // Code byte is full, write it and start a new one
+        if (buffer[readIdx] == 0x00) {
             buffer[codeIdx] = code;
-            code = 0;
-            codeIdx = writeIdx;
-            writeIdx++;
+            codeIdx = (uint8_t)readIdx;
+            code = 1;
+        } else {
+            code++;
         }
+        readIdx++;
     }
 
-    // Write the final code byte
     buffer[codeIdx] = code;
-    
-    if (writeIdx > 255) {
-        return COBS_ENCODE_OUTPUT_TOO_LARGE;
-    }
-
     return 0;
 }
 
@@ -172,4 +153,67 @@ int8_t v2styxlib_cobs_decode_0(uint8_t *buffer, BufferSize_t encodedLen) {
         writeIdx += code;
     }
     return 0;
+}
+/**
+ * @brief Encodes a buffer using COBS with a custom protected byte.
+ *
+ * Wrapper around v2styxlib_cobs_encode_0 that supports any protected byte value.
+ * Transforms the problem by XORing data with the protected byte.
+ *
+ * @param buffer The buffer to encode (modified in-place). buffer[0] is reserved.
+ * @param inputLen The length of input data (including reserved byte[0]).
+ * @param protectedByte The byte value to protect (typically 0x00 for UART framing).
+ * @return int8_t 0 on success, or a negative error code on failure.
+ */
+int8_t v2styxlib_cobs_encode(uint8_t *buffer, BufferSize_t inputLen, uint8_t protectedByte) {
+    if (!buffer) {
+        return COBS_ENCODE_NULL_BUFFER;
+    }
+    
+    if (inputLen < 2 || inputLen > 254) {
+        return inputLen < 2 ? COBS_ENCODE_INPUT_TOO_SMALL : COBS_ENCODE_INPUT_TOO_LARGE;
+    }
+
+    // Encode using the 0x00 encoder (input may contain 0x00 as regular data)
+    int8_t result = v2styxlib_cobs_encode_0(buffer, inputLen);
+    
+    if (result != 0) {
+        return result;
+    }
+
+    // XOR output buffer (code and data bytes) with protected byte
+    // This transforms protectedByte to the 0x00
+    for (uint16_t i = 0; i < inputLen; i++) {
+        buffer[i] ^= protectedByte;
+    }
+
+    return 0;
+}
+
+/**
+ * @brief Decodes a buffer that was encoded using COBS with a custom protected byte.
+ *
+ * Wrapper around v2styxlib_cobs_decode_0 that supports any protected byte value.
+ *
+ * @param buffer The encoded buffer (modified in-place). Encoded data at buffer[0..encodedLen-1].
+ * @param encodedLen The length of the encoded data.
+ * @param protectedByte The byte value that was protected during encoding.
+ * @return int8_t 0 on success, or a negative error code on failure.
+ */
+int8_t v2styxlib_cobs_decode(uint8_t *buffer, BufferSize_t encodedLen, uint8_t protectedByte) {
+    if (!buffer) {
+        return COBS_ENCODE_NULL_BUFFER;
+    }
+    
+    if (encodedLen < 2 || encodedLen > 255) {
+        return encodedLen < 2 ? COBS_ENCODE_INPUT_TOO_SMALL : COBS_ENCODE_INPUT_TOO_LARGE;
+    }
+
+    // XOR return buffer with protectedBytes
+    for (uint16_t i = 0; i < encodedLen; i++) {
+        buffer[i] ^= protectedByte;
+    }
+
+    // Decode using the 0x00 decoder
+    return v2styxlib_cobs_decode_0(buffer, encodedLen);
 }
