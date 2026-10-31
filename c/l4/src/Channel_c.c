@@ -79,18 +79,17 @@ void v2styxlib_uart_send(
 }
 
 /**
- * @brief Encodes a buffer using Consistent Overhead Byte Stuffing (COBS) with a protected byte.
+ * @brief Encodes a buffer using Consistent Overhead Byte Stuffing (COBS) protecting 0x00.
  *
  * buffer[0] is reserved for the first COBS code byte.
- * Input data is at buffer[1..inputLen].
+ * Input data is at buffer[1..inputLen-1].
  * The encoded output is written back to buffer[0..inputLen-1] or buffer[0..inputLen] depending on encoding.
  *
- * @param buffer The buffer to encode. buffer[0] is reserved. Input data at buffer[1..inputLen].
- * @param inputLen The length of the input data (number of bytes at buffer[1..inputLen]).
- * @param protectedByte The byte value that should be protected (not appear in the encoded data).
+ * @param buffer The buffer to encode. buffer[0] is reserved. Input data at buffer[1..inputLen-1].
+ * @param inputLen The length of the input data (number of bytes at buffer[1..inputLen-1]).
  * @return int8_t 0 on success, or a negative error code on failure.
  */
-int8_t v2styxlib_cobs_encode(uint8_t *buffer, BufferSize_t inputLen, uint8_t protectedByte) {
+int8_t v2styxlib_cobs_encode(uint8_t *buffer, BufferSize_t inputLen) {
     if (!buffer) {
         return COBS_ENCODE_NULL_BUFFER;
     }
@@ -103,33 +102,31 @@ int8_t v2styxlib_cobs_encode(uint8_t *buffer, BufferSize_t inputLen, uint8_t pro
         return COBS_ENCODE_INPUT_TOO_LARGE;
     }
 
+    // Validate no 0x00 bytes in input data
+    for (uint16_t i = 1; i < inputLen; i++) {
+        if (buffer[i] == 0x00) {
+            return COBS_ENCODE_PROTECTED_BYTE_IN_DATA;
+        }
+    }
+
     uint16_t readIdx = 1;  // Start reading from buffer[1] (skip reserved buffer[0])
     uint16_t writeIdx = 1; // Start writing after code byte placeholder at buffer[0]
     uint8_t codeIdx = 0;   // Code byte position (buffer[0])
-    uint8_t code = 1;
+    uint8_t code = 0;
 
     while (readIdx < inputLen) {
-        if (buffer[readIdx] == protectedByte) {
-            // Write the code byte in-place
+        // Write the data byte in-place
+        buffer[writeIdx] = buffer[readIdx];
+        code++;
+        writeIdx++;
+        readIdx++;
+
+        if (code == 254) {
+            // Code byte is full, write it and start a new one
             buffer[codeIdx] = code;
-            code = 1;
+            code = 0;
             codeIdx = writeIdx;
             writeIdx++;
-            readIdx++;
-        } else {
-            // Write the data byte in-place
-            buffer[writeIdx] = buffer[readIdx];
-            code++;
-            writeIdx++;
-            readIdx++;
-
-            if (code == 255) {
-                // Code byte is full, write it and start a new one
-                buffer[codeIdx] = code;
-                code = 1;
-                codeIdx = writeIdx;
-                writeIdx++;
-            }
         }
     }
 
@@ -146,14 +143,13 @@ int8_t v2styxlib_cobs_encode(uint8_t *buffer, BufferSize_t inputLen, uint8_t pro
 /**
  * @brief Decodes a buffer that was encoded using Consistent Overhead Byte Stuffing (COBS).
  *
- * Reads code bytes and restores the protected bytes to their original positions.
+ * Reads code bytes and restores the protected bytes (0x00) to their original positions.
  *
  * @param buffer The encoded buffer (modified in-place). Contains encoded data at buffer[0..encodedLen-1].
  * @param encodedLen The length of the encoded data.
- * @param protectedByte The byte value that was protected during encoding.
  * @return int8_t 0 on success, or a negative error code on failure.
  */
-int8_t v2styxlib_cobs_decode(uint8_t *buffer, BufferSize_t encodedLen, uint8_t protectedByte) {
+int8_t v2styxlib_cobs_decode_0(uint8_t *buffer, BufferSize_t encodedLen) {
     if (!buffer) {
         return COBS_ENCODE_NULL_BUFFER;
     }
@@ -166,64 +162,14 @@ int8_t v2styxlib_cobs_decode(uint8_t *buffer, BufferSize_t encodedLen, uint8_t p
         return COBS_ENCODE_INPUT_TOO_LARGE;
     }
 
-    // Use temporary buffer to avoid read/write overlap issues during decoding
-    uint8_t tempBuffer[256];
-    uint16_t readIdx = 0;    // Read code bytes and data from encoded buffer
-    uint16_t writeIdx = 0;   // Write decoded data to temp buffer
-    uint8_t code = 0;
-    uint16_t codeIndex = 0;  // Track position in current code segment
-
-    while (readIdx < encodedLen) {
-        if (codeIndex == 0) {
-            // Read the code byte
-            code = buffer[readIdx];
-            readIdx++;
-            codeIndex = 1;
-            
-            if (code == 0 || code > 255) {
-                return COBS_ENCODE_OUTPUT_TOO_LARGE;
-            }
-        } else {
-            // We're in the middle of a code segment
-            if (codeIndex < code) {
-                // Read a data byte
-                uint8_t byte = buffer[readIdx];
-                
-                // Validate: no protected byte should appear in data
-                if (byte == protectedByte) {
-                    return COBS_ENCODE_OUTPUT_TOO_LARGE;
-                }
-                
-                tempBuffer[writeIdx] = byte;
-                writeIdx++;
-                readIdx++;
-                codeIndex++;
-            } else {
-                // Reached the end of this code segment, insert the protected byte
-                tempBuffer[writeIdx] = protectedByte;
-                writeIdx++;
-                codeIndex = 0;
-            }
+    uint16_t writeIdx = buffer[0];
+    while (writeIdx < encodedLen) {
+        uint8_t code = buffer[writeIdx];
+        if (code == 0x00) {
+            return COBS_ENCODE_PROTECTED_BYTE_IN_DATA;
         }
+        buffer[writeIdx] = 0x00;
+        writeIdx += code;
     }
-
-    // Check if we ended in the middle of a code segment
-    if (codeIndex > 1) {
-        // We had started reading a segment but didn't finish
-        // This means the last segment ended with the protected byte
-        // which is valid
-    } else if (codeIndex == 1 && readIdx == encodedLen) {
-        // We read a code byte but no data follows - this might be valid
-        // if code == 1, which means a protected byte at the end
-        if (code != 1) {
-            return COBS_ENCODE_OUTPUT_TOO_LARGE;
-        }
-    }
-
-    // Write decoded data to buffer[1..], keep buffer[0] as COBS code
-    for (uint16_t i = 0; i < writeIdx; i++) {
-        buffer[i + 1] = tempBuffer[i];
-    }
-
     return 0;
 }

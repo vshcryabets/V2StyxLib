@@ -54,32 +54,33 @@ void v2styxlib_uart_send(
  * Encode a buffer using Consistent Overhead Byte Stuffing (COBS).
  * 
  * The function encodes the input buffer in-place by inserting code bytes that indicate
- * the distance to the next occurrence of the protected byte.
- * This allows the protected byte to be used as a frame delimiter without ambiguity.
+ * the number of data bytes to skip before the next protected byte (0x00).
+ * This allows 0x00 to be used as a frame delimiter without ambiguity.
  *
  * NOTE: buffer[0] is reserved for the first COBS code byte. Input data is at buffer[1..inputLen-1].
  * The caller should ensure the buffer has sufficient space (at least inputLen bytes).
+ * The protected byte is always 0x00.
  *
  * buffer - pointer to the buffer to encode (modified in-place). buffer[0] is reserved for first code byte.
  * inputLen - total size of the buffer including the reserved byte (at least 2). Input data is at buffer[1..inputLen-1].
- * protectedByte - the byte value that should not appear in the encoded output (typically 0x00)
  *
  * Returns 0 on success, or a negative error code on failure.
  * Returns COBS_ENCODE_NULL_BUFFER if buffer is null.
  * Returns COBS_ENCODE_INPUT_TOO_SMALL if inputLen < 2 (need at least 1 byte reserved + 1 byte data).
  * Returns COBS_ENCODE_INPUT_TOO_LARGE if inputLen > 254.
  * Returns COBS_ENCODE_OUTPUT_TOO_LARGE if encoded output exceeds 255 bytes.
+ * Returns COBS_ENCODE_PROTECTED_BYTE_IN_DATA if input data contains 0x00.
  *
  * Note: The encoded buffer may be larger than the input buffer by up to 1/253rd of its size.
  * Ensure the output buffer has sufficient space (max 255 bytes).
  */
-int8_t v2styxlib_cobs_encode(uint8_t *buffer, BufferSize_t inputLen, uint8_t protectedByte);
+int8_t v2styxlib_cobs_encode(uint8_t *buffer, BufferSize_t inputLen);
 
 /**
  * Decode a buffer that was encoded using Consistent Overhead Byte Stuffing (COBS).
  * 
- * The function reverses the COBS encoding by reading code bytes and restoring the
- * protected bytes to their original positions.
+ * The function reverses the COBS encoding by reading code bytes (which indicate the number
+ * of data bytes to skip) and restoring the protected bytes (0x00) to their original positions.
  *
  * NOTE: The encoded data occupies buffer[0..encodedLen-1]. After decoding, decoded data
  * is written to buffer[1..encodedLen-1]. buffer[0] retains the first COBS code byte.
@@ -89,18 +90,17 @@ int8_t v2styxlib_cobs_encode(uint8_t *buffer, BufferSize_t inputLen, uint8_t pro
  * buffer - pointer to the encoded buffer (modified in-place). Encoded data at buffer[0..encodedLen-1].
  *          After decoding, decoded data is at buffer[1..encodedLen-1].
  * encodedLen - total size of the encoded buffer (the output length from encoding).
- * protectedByte - the byte value that was protected during encoding (typically 0x00).
  *
  * Returns 0 on success, or a negative error code on failure.
  * Returns COBS_ENCODE_NULL_BUFFER if buffer is null.
  * Returns COBS_ENCODE_INPUT_TOO_SMALL if encodedLen < 2 (need at least code byte + data).
  * Returns COBS_ENCODE_INPUT_TOO_LARGE if encodedLen > 255.
- * Returns COBS_ENCODE_OUTPUT_TOO_LARGE if decoded output would be invalid (malformed encoding).
+ * Returns COBS_ENCODE_PROTECTED_BYTE_IN_DATA if a code byte is 0x00 (malformed encoding).
  *
- * Note: The decoder validates that code bytes are valid and that no protected byte
- * appears in the encoded data (except as indicated by code bytes).
+ * Note: The protected byte is always 0x00. The decoder validates that no code byte
+ * is 0x00 (which would indicate data corruption).
  */
-int8_t v2styxlib_cobs_decode(uint8_t *buffer, BufferSize_t encodedLen, uint8_t protectedByte);
+int8_t v2styxlib_cobs_decode_0(uint8_t *buffer, BufferSize_t encodedLen);
 
 #ifdef __cplusplus
 }

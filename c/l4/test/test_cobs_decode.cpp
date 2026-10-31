@@ -6,231 +6,178 @@ extern "C" {
 #include "Channel_c.h"
 }
 
-TEST_CASE("v2styxlib_cobs_decode: null buffer", "[cobs_decode]")
+TEST_CASE("v2styxlib_cobs_decode_0: null buffer", "[cobs_decode_0]")
 {
-    int8_t result = v2styxlib_cobs_decode(nullptr, 5, 0x00);
-    
+    int8_t result = v2styxlib_cobs_decode_0(nullptr, 5);
     REQUIRE(result == COBS_ENCODE_NULL_BUFFER);
 }
 
-TEST_CASE("v2styxlib_cobs_decode: input too small (less than 2)", "[cobs_decode]")
+TEST_CASE("v2styxlib_cobs_decode_0: input too small", "[cobs_decode_0]")
 {
     uint8_t buffer[256] = {0};
-    int8_t result = v2styxlib_cobs_decode(buffer, 1, 0x00);
-    
+    int8_t result = v2styxlib_cobs_decode_0(buffer, 1);
     REQUIRE(result == COBS_ENCODE_INPUT_TOO_SMALL);
 }
 
-TEST_CASE("v2styxlib_cobs_decode: input too large (256 bytes)", "[cobs_decode]")
+TEST_CASE("v2styxlib_cobs_decode_0: input too large", "[cobs_decode_0]")
 {
     uint8_t buffer[256];
     std::memset(buffer, 0xAA, 256);
     
-    int8_t result = v2styxlib_cobs_decode(buffer, 256, 0x00);
-    
+    int8_t result = v2styxlib_cobs_decode_0(buffer, 256);
     REQUIRE(result == COBS_ENCODE_INPUT_TOO_LARGE);
 }
 
-TEST_CASE("v2styxlib_cobs_decode: two bytes no protected byte", "[cobs_decode]")
+TEST_CASE("v2styxlib_cobs_decode_0: simple single protected byte", "[cobs_decode_0]")
 {
-    // Encoded: [2 (code), 0xAA] -> should decode to buffer[1]=0xAA
-    uint8_t buffer[256] = {2, 0xAA};
-    int8_t result = v2styxlib_cobs_decode(buffer, 2, 0x00);
+    // Encoded: [1 (code=1, protected at 0+1=1), 0xAA]
+    // After decode: buffer[1] becomes 0x00
+    uint8_t buffer[256] = {1, 0xAA};
+    int8_t result = v2styxlib_cobs_decode_0(buffer, 2);
     
     REQUIRE(result == 0);
-    REQUIRE(buffer[1] == 0xAA);
+    REQUIRE(buffer[1] == 0x00);
 }
 
-TEST_CASE("v2styxlib_cobs_decode: three bytes no protected byte", "[cobs_decode]")
+TEST_CASE("v2styxlib_cobs_decode_0: code 2 protects at position 2", "[cobs_decode_0]")
 {
-    // Encoded: [3 (code), 0x11, 0x22] -> should decode to buffer[1]=0x11, buffer[2]=0x22
-    uint8_t buffer[256] = {3, 0x11, 0x22};
-    int8_t result = v2styxlib_cobs_decode(buffer, 3, 0x00);
-    
-    REQUIRE(result == 0);
-    REQUIRE(buffer[1] == 0x11);
-    REQUIRE(buffer[2] == 0x22);
-}
-
-TEST_CASE("v2styxlib_cobs_decode: protected byte in middle", "[cobs_decode]")
-{
-    // Encoded: [2 (code), 0x11, 2 (code), 0x22]
-    // Decoded: buffer[1]=0x11, buffer[2]=0x00, buffer[3]=0x22
-    uint8_t buffer[256] = {2, 0x11, 2, 0x22};
-    int8_t result = v2styxlib_cobs_decode(buffer, 4, 0x00);
+    // Encoded: [2 (code=2, protected at 0+2=2), 0x11, 0x22]
+    // After decode: buffer[2] becomes 0x00
+    uint8_t buffer[256] = {2, 0x11, 0x22};
+    int8_t result = v2styxlib_cobs_decode_0(buffer, 3);
     
     REQUIRE(result == 0);
     REQUIRE(buffer[1] == 0x11);
     REQUIRE(buffer[2] == 0x00);
-    REQUIRE(buffer[3] == 0x22);
 }
 
-TEST_CASE("v2styxlib_cobs_decode: multiple protected bytes", "[cobs_decode]")
+TEST_CASE("v2styxlib_cobs_decode_0: two protected bytes", "[cobs_decode_0]")
 {
-    // Encoded: [2 (code), 0x11, 2 (code), 0x22, 2 (code), 0x33]
-    // Decoded: buffer[1]=0x11, buffer[2]=0x00, buffer[3]=0x22, buffer[4]=0x00, buffer[5]=0x33
-    uint8_t buffer[256] = {2, 0x11, 2, 0x22, 2, 0x33};
-    int8_t result = v2styxlib_cobs_decode(buffer, 6, 0x00);
+    // Encoded: [1 (protect at 1), 1 (protect at 1+1=2), 0x33]
+    // After decode: buffer[1]=0x00, buffer[2]=0x00
+    uint8_t buffer[256] = {1, 1, 0x33};
+    int8_t result = v2styxlib_cobs_decode_0(buffer, 3);
+    
+    REQUIRE(result == 0);
+    REQUIRE(buffer[1] == 0x00);
+    REQUIRE(buffer[2] == 0x00);
+}
+
+TEST_CASE("v2styxlib_cobs_decode_0: data then protected", "[cobs_decode_0]")
+{
+    // Encoded: [3 (protect at 3), 0x11, 0x22, 0x33]
+    // After decode: buffer[3] becomes 0x00
+    uint8_t buffer[256] = {3, 0x11, 0x22, 0x33};
+    int8_t result = v2styxlib_cobs_decode_0(buffer, 4);
+    
+    REQUIRE(result == 0);
+    REQUIRE(buffer[1] == 0x11);
+    REQUIRE(buffer[2] == 0x22);
+    REQUIRE(buffer[3] == 0x00);
+}
+
+TEST_CASE("v2styxlib_cobs_decode_0: protect, data, protect", "[cobs_decode_0]")
+{
+    // Encoded: [1 (protect at 1), 2 (protect at 1+2=3), 0xAA, 0xBB]
+    // After decode: buffer[1]=0x00, buffer[2]=0xAA, buffer[3]=0x00
+    uint8_t buffer[256] = {1, 2, 0xAA, 0xBB};
+    int8_t result = v2styxlib_cobs_decode_0(buffer, 4);
+    
+    REQUIRE(result == 0);
+    REQUIRE(buffer[1] == 0x00);
+    REQUIRE(buffer[2] == 0xAA);
+    REQUIRE(buffer[3] == 0x00);
+}
+
+TEST_CASE("v2styxlib_cobs_decode_0: skip many bytes", "[cobs_decode_0]")
+{
+    // Encoded: [10 (protect at 10), followed by 9 data bytes]
+    uint8_t buffer[256];
+    buffer[0] = 10;
+    for (int i = 1; i < 10; i++) {
+        buffer[i] = (uint8_t)(0x10 + i);
+    }
+    
+    int8_t result = v2styxlib_cobs_decode_0(buffer, 10);
+    
+    REQUIRE(result == 0);
+    for (int i = 1; i < 10; i++) {
+        REQUIRE(buffer[i] == (uint8_t)(0x10 + i));
+    }
+    REQUIRE(buffer[10] == 0x00);
+}
+
+TEST_CASE("v2styxlib_cobs_decode_0: code byte 0x00 is error", "[cobs_decode_0]")
+{
+    // First code cannot be 0 - that would mean protected byte at position 0
+    uint8_t buffer[256] = {0, 0x11};
+    int8_t result = v2styxlib_cobs_decode_0(buffer, 2);
+    
+    REQUIRE(result == COBS_ENCODE_PROTECTED_BYTE_IN_DATA);
+}
+
+TEST_CASE("v2styxlib_cobs_decode_0: second code byte 0x00 is error", "[cobs_decode_0]")
+{
+    // Encoded: [3 (protect at 3), 0x11, 0x22, 0 (INVALID - this is code byte with value 0)]
+    uint8_t buffer[256] = {3, 0x11, 0x22, 0};
+    int8_t result = v2styxlib_cobs_decode_0(buffer, 4);
+    
+    REQUIRE(result == COBS_ENCODE_PROTECTED_BYTE_IN_DATA);
+}
+
+TEST_CASE("v2styxlib_cobs_decode_0: complex multi-segment", "[cobs_decode_0]")
+{
+    // Encoded: [2 (protect at 2), 0x11, 2 (protect at 2+2=4), 0x22, 1 (protect at 4+1=5)]
+    // After decode: positions 2,4,5 are 0x00
+    uint8_t buffer[256] = {2, 0x11, 2, 0x22, 1};
+    int8_t result = v2styxlib_cobs_decode_0(buffer, 5);
     
     REQUIRE(result == 0);
     REQUIRE(buffer[1] == 0x11);
     REQUIRE(buffer[2] == 0x00);
     REQUIRE(buffer[3] == 0x22);
     REQUIRE(buffer[4] == 0x00);
-    REQUIRE(buffer[5] == 0x33);
+    REQUIRE(buffer[5] == 0x00);
 }
 
-TEST_CASE("v2styxlib_cobs_decode: protected byte at start", "[cobs_decode]")
+TEST_CASE("v2styxlib_cobs_decode_0: max skip (254)", "[cobs_decode_0]")
 {
-    // Encoded: [1 (code), 3 (code), 0x11, 0x22]
-    // Decoded: buffer[1]=0x00, buffer[2]=0x11, buffer[3]=0x22
-    uint8_t buffer[256] = {1, 3, 0x11, 0x22};
-    int8_t result = v2styxlib_cobs_decode(buffer, 4, 0x00);
-    
-    REQUIRE(result == 0);
-    REQUIRE(buffer[1] == 0x00);
-    REQUIRE(buffer[2] == 0x11);
-    REQUIRE(buffer[3] == 0x22);
-}
-
-TEST_CASE("v2styxlib_cobs_decode: protected byte at end", "[cobs_decode]")
-{
-    // Encoded: [3 (code), 0x11, 0x22, 1 (code)]
-    // Decoded: buffer[1]=0x11, buffer[2]=0x22, buffer[3]=0x00
-    uint8_t buffer[256] = {3, 0x11, 0x22, 1};
-    int8_t result = v2styxlib_cobs_decode(buffer, 4, 0x00);
-    
-    REQUIRE(result == 0);
-    REQUIRE(buffer[1] == 0x11);
-    REQUIRE(buffer[2] == 0x22);
-    REQUIRE(buffer[3] == 0x00);
-}
-
-TEST_CASE("v2styxlib_cobs_decode: consecutive protected bytes", "[cobs_decode]")
-{
-    // Encoded: [1 (code), 1 (code), 2 (code), 0x11]
-    // Decoded: buffer[1]=0x00, buffer[2]=0x00, buffer[3]=0x11
-    uint8_t buffer[256] = {1, 1, 2, 0x11};
-    int8_t result = v2styxlib_cobs_decode(buffer, 4, 0x00);
-    
-    REQUIRE(result == 0);
-    REQUIRE(buffer[1] == 0x00);
-    REQUIRE(buffer[2] == 0x00);
-    REQUIRE(buffer[3] == 0x11);
-}
-
-TEST_CASE("v2styxlib_cobs_decode: different protected byte (0xFF)", "[cobs_decode]")
-{
-    // Encoded: [2 (code), 0x11, 2 (code), 0x22]
-    // Decoded: buffer[1]=0x11, buffer[2]=0xFF, buffer[3]=0x22
-    uint8_t buffer[256] = {2, 0x11, 2, 0x22};
-    int8_t result = v2styxlib_cobs_decode(buffer, 4, 0xFF);
-    
-    REQUIRE(result == 0);
-    REQUIRE(buffer[1] == 0x11);
-    REQUIRE(buffer[2] == 0xFF);
-    REQUIRE(buffer[3] == 0x22);
-}
-
-TEST_CASE("v2styxlib_cobs_decode: mixed data with protected bytes", "[cobs_decode]")
-{
-    // Encoded: [3 (code), 0x01, 0x02, 3 (code), 0x03, 0x04, 2 (code), 0x05]
-    // Decoded: buffer[1]=0x01, buffer[2]=0x02, buffer[3]=0x00, buffer[4]=0x03, buffer[5]=0x04, buffer[6]=0x00, buffer[7]=0x05
-    uint8_t buffer[256] = {3, 0x01, 0x02, 3, 0x03, 0x04, 2, 0x05};
-    int8_t result = v2styxlib_cobs_decode(buffer, 8, 0x00);
-    
-    REQUIRE(result == 0);
-    REQUIRE(buffer[1] == 0x01);
-    REQUIRE(buffer[2] == 0x02);
-    REQUIRE(buffer[3] == 0x00);
-    REQUIRE(buffer[4] == 0x03);
-    REQUIRE(buffer[5] == 0x04);
-    REQUIRE(buffer[6] == 0x00);
-    REQUIRE(buffer[7] == 0x05);
-}
-
-TEST_CASE("v2styxlib_cobs_decode: all same data bytes", "[cobs_decode]")
-{
-    // Encoded: [11 (code), 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42, 0x42]
-    // Decoded: buffer[1..10] = [0x42 x 10]
-    uint8_t buffer[256];
-    buffer[0] = 11;
-    std::memset(buffer + 1, 0x42, 10);
-    
-    int8_t result = v2styxlib_cobs_decode(buffer, 11, 0x00);
-    
-    REQUIRE(result == 0);
-    for (int i = 0; i < 10; i++) {
-        REQUIRE(buffer[i + 1] == 0x42);
-    }
-}
-
-TEST_CASE("v2styxlib_cobs_decode: roundtrip encode-decode no protected bytes", "[cobs_decode]")
-{
-    // Original: [0x11, 0x22, 0x33]
-    uint8_t buffer[256] = {0, 0x11, 0x22, 0x33};
-    uint8_t original[3] = {0x11, 0x22, 0x33};
-    
-    // Encode
-    int8_t encodeResult = v2styxlib_cobs_encode(buffer, 4, 0x00);
-    REQUIRE(encodeResult == 0);
-    uint8_t encodedLen = 4;  // Code byte + 3 data bytes
-    
-    // Decode
-    int8_t decodeResult = v2styxlib_cobs_decode(buffer, encodedLen, 0x00);
-    REQUIRE(decodeResult == 0);
-    
-    // Should get back original data at buffer[1]
-    REQUIRE(buffer[1] == original[0]);
-    REQUIRE(buffer[2] == original[1]);
-    REQUIRE(buffer[3] == original[2]);
-}
-
-TEST_CASE("v2styxlib_cobs_decode: roundtrip encode-decode with protected bytes", "[cobs_decode]")
-{
-    // Original: [0x11, 0x00, 0x22, 0x00, 0x33]
-    uint8_t buffer[256] = {0, 0x11, 0x00, 0x22, 0x00, 0x33};
-    uint8_t original[5] = {0x11, 0x00, 0x22, 0x00, 0x33};
-    
-    // Encode
-    int8_t encodeResult = v2styxlib_cobs_encode(buffer, 6, 0x00);
-    REQUIRE(encodeResult == 0);
-    uint8_t encodedLen = 6;  // Code + data + code + data + code + data
-    
-    // Decode
-    int8_t decodeResult = v2styxlib_cobs_decode(buffer, encodedLen, 0x00);
-    REQUIRE(decodeResult == 0);
-    
-    // Should get back original data at buffer[1..5]
-    REQUIRE(buffer[1] == original[0]);
-    REQUIRE(buffer[2] == original[1]);
-    REQUIRE(buffer[3] == original[2]);
-    REQUIRE(buffer[4] == original[3]);
-    REQUIRE(buffer[5] == original[4]);
-}
-
-TEST_CASE("v2styxlib_cobs_decode: max encoded length (255 bytes)", "[cobs_decode]")
-{
-    // Create a buffer with max encoded data: [254 (code), 253 x 0xBB]
     uint8_t buffer[256];
     buffer[0] = 254;
-    std::memset(buffer + 1, 0xBB, 253);
+    for (int i = 1; i < 254; i++) {
+        buffer[i] = 0xCC;
+    }
     
-    int8_t result = v2styxlib_cobs_decode(buffer, 254, 0x00);
+    int8_t result = v2styxlib_cobs_decode_0(buffer, 254);
     
     REQUIRE(result == 0);
-    for (int i = 0; i < 253; i++) {
-        REQUIRE(buffer[i + 1] == 0xBB);
+    for (int i = 1; i < 254; i++) {
+        REQUIRE(buffer[i] == 0xCC);
     }
+    REQUIRE(buffer[254] == 0x00);
 }
 
-TEST_CASE("v2styxlib_cobs_decode: error when protected byte in data", "[cobs_decode]")
+TEST_CASE("v2styxlib_cobs_decode_0: roundtrip - simple no protected bytes", "[cobs_decode_0]")
 {
-    // Encoded data should never contain the protected byte
-    // This is malformed: [3 (code), 0x11, 0x00, 0x22]
-    // The 0x00 shouldn't appear in data
-    uint8_t buffer[256] = {3, 0x11, 0x00, 0x22};
-    int8_t result = v2styxlib_cobs_decode(buffer, 4, 0x00);
+    // Original input: [0x11, 0x22, 0x33] (no 0x00 bytes)
+    uint8_t buffer[256] = {0, 0x11, 0x22, 0x33};
     
-    REQUIRE(result == COBS_ENCODE_OUTPUT_TOO_LARGE);
+    // Encode
+    int8_t encodeResult = v2styxlib_cobs_encode(buffer, 4);
+    REQUIRE(encodeResult == 0);
+    
+    // Should be: [3 (code), 0x11, 0x22, 0x33]
+    REQUIRE(buffer[0] == 3);
+    REQUIRE(buffer[1] == 0x11);
+    REQUIRE(buffer[2] == 0x22);
+    REQUIRE(buffer[3] == 0x33);
+    
+    // Decode
+    int8_t decodeResult = v2styxlib_cobs_decode_0(buffer, 4);
+    REQUIRE(decodeResult == 0);
+    
+    // After decode: [3, 0x11, 0x22, 0x00] - position 4 was written with 0x00
+    REQUIRE(buffer[4] == 0x00);
 }
+
+
