@@ -22,6 +22,7 @@ if (ENABLE_CATCH2)
     add_executable(module_l4_c_tests
         test/test_Channel_c.cpp
         test/test_cobs_encode.cpp
+        test/test_cobs_decode.cpp
         ${MODULE_L4C_SRC}
         )
     target_compile_definitions(module_l4_c_tests PRIVATE TARGET_CATCH2)
