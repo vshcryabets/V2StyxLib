@@ -13,13 +13,18 @@
 
     typedef V2styxlibUartCh32vConfig V2styxlibUartConfig;
     #define v2styxlib_uart_send_bytes v2styxlib_uart_ch32v_send_bytes
+#elif defined(V2STYXLIB_TARGET_ESP32)
+    #include "ChannelUartEsp32.h"
+
+    typedef V2styxlibUartEsp32vConfig V2styxlibUartConfig;
+    #define v2styxlib_uart_send_bytes v2styxlib_uart_esp32v_send_bytes
 #else
     // target to host system, use generic config
     typedef struct {
         struct V2styxlibUartConfigBase baseConfig; 
     } V2styxlibUartConfig;
 
-    void v2styxlib_uart_send_bytes(
+    BufferSize_t v2styxlib_uart_send_bytes(
         const V2styxlibUartConfig* config,
         const uint8_t* buffer,
         BufferSize_t length

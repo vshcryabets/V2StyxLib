@@ -20,12 +20,12 @@ typedef struct {
  * baudRateDivider = 16000000 / 115200 ≈ 138.89
  * In this case, baudRateDivider will be approximately 139 (rounded to the nearest integer).
  */
-void v2styxlib_uart_stm8_setup(
+int8_t v2styxlib_uart_stm8_setup(
     const V2styxlibUartStm8Config* config,
     uint16_t baudRateDivider
     );
 
-void v2styxlib_uart_stm8_send_bytes(
+BufferSize_t v2styxlib_uart_stm8_send_bytes(
     const V2styxlibUartStm8Config* config,
     const uint8_t* buffer,
     BufferSize_t length);

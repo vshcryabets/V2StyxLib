@@ -12,7 +12,7 @@
 
 #include "ChannelUartCh32v.h"
 
-void v2styxlib_uart_ch32v_setup(
+int8_t v2styxlib_uart_ch32v_setup(
     const V2styxlibUartCh32vConfig* config
 ) {
     uint32_t reg;
@@ -45,9 +45,10 @@ void v2styxlib_uart_ch32v_setup(
 
     /* Enable USART */
     USART1->CTLR1 |= USART_CTLR1_UE;
+    return 0;
 }
 
-void v2styxlib_uart_ch32v_send_bytes(
+BufferSize_t v2styxlib_uart_ch32v_send_bytes(
     const V2styxlibUartCh32vConfig* config,
     const uint8_t* buffer,
     BufferSize_t length)
@@ -59,5 +60,6 @@ void v2styxlib_uart_ch32v_send_bytes(
     }
     // wait for transmission complete before returning to ensure all bytes are sent
     while ((USART1->STATR & USART_STATR_TC) == 0u);
+    return length;
 }
 

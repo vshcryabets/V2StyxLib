@@ -8,13 +8,14 @@
             "name": "(lldb) Launch",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/modules/l5/module_l5_tests",
-            "args": [],
+            "program": "${workspaceFolder}/build23/modules/l4_c/module_l4_c_tests",
+            "args": ["v2styxlib_cobs_roundtrip: data without protected byte 0xFF"],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",
             "environment": [],
             "externalConsole": false,
-            "MIMode": "lldb"
+            "MIMode": "gdb",
+            "miDebuggerPath": "/usr/bin/gdb"
         }
     ]
 }
