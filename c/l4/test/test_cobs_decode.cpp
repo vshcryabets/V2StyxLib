@@ -163,7 +163,7 @@ TEST_CASE("v2styxlib_cobs_decode_0: roundtrip - simple no protected bytes", "[co
     uint8_t buffer[256] = {0, 0x11, 0x22, 0x33};
     
     // Encode
-    int8_t encodeResult = v2styxlib_cobs_encode(buffer, 4);
+    int8_t encodeResult = v2styxlib_cobs_encode_0(buffer, 4);
     REQUIRE(encodeResult == 0);
     
     // Should be: [3 (code), 0x11, 0x22, 0x33]

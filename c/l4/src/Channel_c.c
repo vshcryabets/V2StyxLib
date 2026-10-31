@@ -89,7 +89,7 @@ void v2styxlib_uart_send(
  * @param inputLen The length of the input data (number of bytes at buffer[1..inputLen-1]).
  * @return int8_t 0 on success, or a negative error code on failure.
  */
-int8_t v2styxlib_cobs_encode(uint8_t *buffer, BufferSize_t inputLen) {
+int8_t v2styxlib_cobs_encode_0(uint8_t *buffer, BufferSize_t inputLen) {
     if (!buffer) {
         return COBS_ENCODE_NULL_BUFFER;
     }

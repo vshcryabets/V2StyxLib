@@ -51,7 +51,7 @@ void v2styxlib_uart_send(
     BufferSize_t length);
 
 /**
- * Encode a buffer using Consistent Overhead Byte Stuffing (COBS).
+ * Encode a buffer using Consistent Overhead Byte Stuffing (COBS) protecting 0x00.
  * 
  * The function encodes the input buffer in-place by inserting code bytes that indicate
  * the number of data bytes to skip before the next protected byte (0x00).
@@ -74,7 +74,7 @@ void v2styxlib_uart_send(
  * Note: The encoded buffer may be larger than the input buffer by up to 1/253rd of its size.
  * Ensure the output buffer has sufficient space (max 255 bytes).
  */
-int8_t v2styxlib_cobs_encode(uint8_t *buffer, BufferSize_t inputLen);
+int8_t v2styxlib_cobs_encode_0(uint8_t *buffer, BufferSize_t inputLen);
 
 /**
  * Decode a buffer that was encoded using Consistent Overhead Byte Stuffing (COBS).
