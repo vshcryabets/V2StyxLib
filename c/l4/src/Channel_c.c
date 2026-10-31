@@ -103,7 +103,6 @@ int8_t v2styxlib_cobs_encode(uint8_t *buffer, BufferSize_t inputLen, uint8_t pro
         return COBS_ENCODE_INPUT_TOO_LARGE;
     }
 
-    uint8_t encodedBuffer[256];
     uint16_t readIdx = 1;  // Start reading from buffer[1] (skip reserved buffer[0])
     uint16_t writeIdx = 1; // Start writing after code byte placeholder at buffer[0]
     uint8_t codeIdx = 0;   // Code byte position (buffer[0])
@@ -111,22 +110,22 @@ int8_t v2styxlib_cobs_encode(uint8_t *buffer, BufferSize_t inputLen, uint8_t pro
 
     while (readIdx < inputLen) {
         if (buffer[readIdx] == protectedByte) {
-            // Write the code byte
-            encodedBuffer[codeIdx] = code;
+            // Write the code byte in-place
+            buffer[codeIdx] = code;
             code = 1;
             codeIdx = writeIdx;
             writeIdx++;
             readIdx++;
         } else {
-            // Write the data byte
-            encodedBuffer[writeIdx] = buffer[readIdx];
+            // Write the data byte in-place
+            buffer[writeIdx] = buffer[readIdx];
             code++;
             writeIdx++;
             readIdx++;
 
             if (code == 255) {
                 // Code byte is full, write it and start a new one
-                encodedBuffer[codeIdx] = code;
+                buffer[codeIdx] = code;
                 code = 1;
                 codeIdx = writeIdx;
                 writeIdx++;
@@ -135,14 +134,10 @@ int8_t v2styxlib_cobs_encode(uint8_t *buffer, BufferSize_t inputLen, uint8_t pro
     }
 
     // Write the final code byte
-    encodedBuffer[codeIdx] = code;
+    buffer[codeIdx] = code;
     
     if (writeIdx > 255) {
         return COBS_ENCODE_OUTPUT_TOO_LARGE;
-    }
-
-    for (uint16_t i = 0; i < writeIdx; i++) {
-        buffer[i] = encodedBuffer[i];
     }
 
     return 0;
@@ -171,9 +166,10 @@ int8_t v2styxlib_cobs_decode(uint8_t *buffer, BufferSize_t encodedLen, uint8_t p
         return COBS_ENCODE_INPUT_TOO_LARGE;
     }
 
-    uint8_t decodedBuffer[256];
+    // Use temporary buffer to avoid read/write overlap issues during decoding
+    uint8_t tempBuffer[256];
     uint16_t readIdx = 0;    // Read code bytes and data from encoded buffer
-    uint16_t writeIdx = 0;   // Write decoded data
+    uint16_t writeIdx = 0;   // Write decoded data to temp buffer
     uint8_t code = 0;
     uint16_t codeIndex = 0;  // Track position in current code segment
 
@@ -198,13 +194,13 @@ int8_t v2styxlib_cobs_decode(uint8_t *buffer, BufferSize_t encodedLen, uint8_t p
                     return COBS_ENCODE_OUTPUT_TOO_LARGE;
                 }
                 
-                decodedBuffer[writeIdx] = byte;
+                tempBuffer[writeIdx] = byte;
                 writeIdx++;
                 readIdx++;
                 codeIndex++;
             } else {
                 // Reached the end of this code segment, insert the protected byte
-                decodedBuffer[writeIdx] = protectedByte;
+                tempBuffer[writeIdx] = protectedByte;
                 writeIdx++;
                 codeIndex = 0;
             }
@@ -225,9 +221,8 @@ int8_t v2styxlib_cobs_decode(uint8_t *buffer, BufferSize_t encodedLen, uint8_t p
     }
 
     // Write decoded data to buffer[1..], keep buffer[0] as COBS code
-    // Consumer knows decoded size = encodedLen - 1
     for (uint16_t i = 0; i < writeIdx; i++) {
-        buffer[i + 1] = decodedBuffer[i];
+        buffer[i + 1] = tempBuffer[i];
     }
 
     return 0;
